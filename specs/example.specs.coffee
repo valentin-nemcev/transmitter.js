@@ -1,6 +1,6 @@
 'use strict'
 
-assert = require 'assert'
+{assert} = require 'chai'
 
 binder = require 'binder'
 binderExample = require 'binder/example'
