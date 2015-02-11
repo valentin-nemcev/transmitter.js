@@ -1,0 +1,15 @@
+{
+  "name": "binder",
+  "version": "0.1.0",
+  "description": "Declarative data-binding framework",
+  "main": "index.js",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha --opts specs/mocha.opts specs"
+  },
+  "author": "Valentin Nemcev <mail@valentin-nemcev.com>",
+  "license": "MIT",
+  "devDependencies": {
+    "coffee-script": "^1.9.0",
+    "mocha": "^2.1.0"
+  }
+}
