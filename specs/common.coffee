@@ -1,5 +1,7 @@
 'use strict'
 
+require 'es6-shim'
+
 
 chai = require 'chai'
 global.expect = chai.expect

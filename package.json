@@ -14,5 +14,8 @@
     "mocha": "^2.1.0",
     "sinon": "^1.12.2",
     "sinon-chai": "^2.6.0"
+  },
+  "dependencies": {
+    "es6-shim": "^0.24.0"
   }
 }
