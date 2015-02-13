@@ -1,2 +1,4 @@
+--reporter spec
 --recursive
+--require specs/common
 --compilers coffee:coffee-script/register

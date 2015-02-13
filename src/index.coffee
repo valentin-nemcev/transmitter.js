@@ -1,2 +1,4 @@
-example = require('./example');
-module.exports = {example: example}
+'use strict'
+
+
+module.exports = require './binder'
