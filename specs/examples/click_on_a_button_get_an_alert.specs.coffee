@@ -6,16 +6,18 @@ StatelessSourceNode = require 'binder/stateless_source_node'
 StatelessTargetNode = require 'binder/stateless_target_node'
 Binding = require 'binder/binding'
 
+
 class Button extends StatelessSourceNode
 
-  click: -> @send()
+  click: ->
+    @send()
 
 
 class AlertEmitter extends StatelessTargetNode
 
   alert: sinon.spy()
 
-  receive: (message) -> @alert(message)
+  receiveValue: (message) -> @alert(message)
 
 
 describe 'Example: a button bound to the alert emitter', ->
@@ -27,8 +29,8 @@ describe 'Example: a button bound to the alert emitter', ->
 
     Binder.bind new Binding({
       source: @button
-      target: @messageBox
-      transform: -> 'Button was clicked!'
+      target: @alertEmitter
+      transform: (message) -> message.toValueMessage 'Button was clicked!'
     })
 
   it 'should emit alert when button is clicked', ->

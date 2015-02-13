@@ -1,11 +1,5 @@
 'use strict'
 
-describe 'Binding graph', ->
-  it 'should be implemented'
-
-describe 'Unidirectional event propagation with transformations', ->
-  it 'should be implemented'
-
 describe 'Queries and state', ->
   it 'should be implemented'
 

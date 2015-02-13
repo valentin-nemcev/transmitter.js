@@ -3,4 +3,4 @@
 
 module.exports = class Binder
 
-  @bind: (binding) -> binding
+  @bind: (binding) -> binding.bind()
