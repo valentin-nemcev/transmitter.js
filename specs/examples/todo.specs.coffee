@@ -10,7 +10,7 @@ describe 'Example: Two-way text input binding', ->
 describe 'Example: Button with enabled or disabled states', ->
   it 'should be implemented'
 
-describe 'Example: Serialized value with on-demand propagation', ->
+describe 'Example: Serialized value with on-demand transmission', ->
   it 'should be implemented'
 
 describe 'Example: Two-way select box binding', ->

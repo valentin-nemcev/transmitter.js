@@ -6,11 +6,11 @@ StatelessTargetNode = require 'binder/stateless_target_node'
 
 describe 'StatelessTargetNode', ->
 
-  it 'should delegate to message when message is propagated to it', ->
+  it 'should delegate to message when message is sent to it', ->
     @node = new StatelessTargetNode
     @node.receive = sinon.spy()
-    message = {propagateTo: sinon.spy()}
+    message = {sendTo: sinon.spy()}
 
-    @node.propagate(message)
+    @node.send(message)
 
-    expect(message.propagateTo).to.have.been.calledWith(@node)
+    expect(message.sendTo).to.have.been.calledWith(@node)

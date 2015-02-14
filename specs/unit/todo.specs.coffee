@@ -3,10 +3,10 @@
 describe 'Queries and state', ->
   it 'should be implemented'
 
-describe 'Propagation loops', ->
+describe 'Binding loops', ->
   it 'should be implemented'
 
-describe 'Lazy propagation', ->
+describe 'Lazy updates', ->
   it 'should be implemented'
 
 describe 'Different directions', ->
@@ -15,7 +15,7 @@ describe 'Different directions', ->
 describe 'Merges and forks', ->
   it 'should be implemented'
 
-describe 'Different propagation passes', ->
+describe 'Different transmission passes', ->
   it 'should be implemented'
 
 describe 'Nested bindings', ->

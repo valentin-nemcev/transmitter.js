@@ -12,6 +12,6 @@ module.exports = class StatelessTargetNode
     return this
 
 
-  propagate: (message) ->
-    message.propagateTo(this)
+  send: (message) ->
+    message.sendTo(this)
     return this

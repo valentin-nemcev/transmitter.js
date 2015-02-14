@@ -12,7 +12,7 @@ describe 'Binding', ->
 
     @target =
       attachIncomingBinding: sinon.spy()
-      propagate: sinon.spy()
+      send: sinon.spy()
 
 
   describe 'when bound', ->
@@ -30,13 +30,13 @@ describe 'Binding', ->
       expect(@target.attachIncomingBinding).to.have.been.calledWith(@binding)
 
 
-    it 'should propagate message to its target', ->
+    it 'should send message to its target', ->
       message = {}
-      @binding.propagate(message)
-      expect(@target.propagate).to.have.been.calledWith(message)
+      @binding.send(message)
+      expect(@target.send).to.have.been.calledWith(message)
 
 
-  describe 'when propagated with transform function', ->
+  describe 'when bound with transform function', ->
 
     beforeEach ->
       @message = {}
@@ -45,15 +45,15 @@ describe 'Binding', ->
       @binding = new Binding({@source, @target, @transform})
       @binding.bind()
 
-      @binding.propagate(@message)
+      @binding.send(@message)
 
 
-    it 'should pass message propagated from source to transform function', ->
+    it 'should pass message from source to transform function', ->
       expect(@transform).to.have.been.calledWith(@message)
 
 
     it 'should pass result of transform function to target', ->
-      expect(@target.propagate).to.have.been.calledWith(@transformedMessage)
+      expect(@target.send).to.have.been.calledWith(@transformedMessage)
 
 
     it 'should call transform function without context', ->

@@ -17,4 +17,4 @@ module.exports = class StatelessSourceNode
 
 
   send: ->
-    @outgoingBindings.propagate(Message.createBare())
+    @outgoingBindings.send(Message.createBare())

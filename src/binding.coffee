@@ -16,6 +16,6 @@ module.exports = class Binding
     return this
 
 
-  propagate: (message) ->
-    @target.propagate(@transform.call(null, message))
+  send: (message) ->
+    @target.send(@transform.call(null, message))
     return this

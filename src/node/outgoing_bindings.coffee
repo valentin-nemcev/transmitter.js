@@ -12,7 +12,7 @@ module.exports = class OutgoingBindings
     return this
 
 
-  propagate: (message) ->
-    @bindings.forEach (binding) -> binding.propagate(message)
+  send: (message) ->
+    @bindings.forEach (binding) -> binding.send(message)
     return this
 

@@ -15,6 +15,6 @@ class ValueMessage extends Message
 
   constructor: (@value) ->
 
-  propagateTo: (target) ->
+  sendTo: (target) ->
     target.receiveValue(@value)
     return this
