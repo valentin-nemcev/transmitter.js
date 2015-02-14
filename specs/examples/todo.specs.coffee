@@ -1,9 +1,6 @@
 'use strict'
 
 
-describe 'Example: Click on a button, get an alert with the value of a text input', ->
-  it 'should be implemented'
-
 describe 'Example: Two-way text input binding', ->
   it 'should be implemented'
 

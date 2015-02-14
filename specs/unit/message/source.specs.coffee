@@ -1,24 +1,24 @@
 'use strict'
 
 
-OutgoingBindings = require 'binder/node/outgoing_bindings'
+MessageSource = require 'binder/message/source'
 
 
-describe 'OutgoingBindings', ->
+describe 'MessageSource', ->
 
   describe 'with attached bindings', ->
 
     beforeEach ->
       @binding1 = {send: sinon.spy()}
       @binding2 = {send: sinon.spy()}
-      @outgoingBindings = new OutgoingBindings
-      @outgoingBindings.attach(@binding1)
-      @outgoingBindings.attach(@binding2)
+      @messageSource = new MessageSource
+      @messageSource.attachOutgoingBinding(@binding1)
+      @messageSource.attachOutgoingBinding(@binding2)
 
 
     it 'should send message to attached bindings', ->
       message = {}
-      @outgoingBindings.send(message)
+      @messageSource.send(message)
       expect(@binding1.send).to.have.been.calledWith(message)
       expect(@binding2.send).to.have.been.calledWith(message)
 

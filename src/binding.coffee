@@ -12,7 +12,6 @@ module.exports = class Binding
 
   bind: ->
     @source.attachOutgoingBinding(this)
-    @target.attachIncomingBinding(this)
     return this
 
 

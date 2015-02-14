@@ -5,6 +5,8 @@ module.exports = class Message
 
   @createBare = -> new BareMessage
 
+  @createValue = (value) -> new ValueMessage(value)
+
   toValueMessage: -> new ValueMessage(arguments...)
 
 

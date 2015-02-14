@@ -11,7 +11,6 @@ describe 'Binding', ->
       attachOutgoingBinding: sinon.spy()
 
     @target =
-      attachIncomingBinding: sinon.spy()
       send: sinon.spy()
 
 
@@ -24,10 +23,6 @@ describe 'Binding', ->
 
     it 'should attach itself to its source', ->
       expect(@source.attachOutgoingBinding).to.have.been.calledWith(@binding)
-
-
-    it 'should attach itself to its target', ->
-      expect(@target.attachIncomingBinding).to.have.been.calledWith(@binding)
 
 
     it 'should send message to its target', ->
