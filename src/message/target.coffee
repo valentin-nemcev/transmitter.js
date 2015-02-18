@@ -7,5 +7,5 @@ module.exports = class MessageTarget
 
 
   send: (message) ->
-    message.sendTo(@node)
+    message.deliver(@node)
     return this

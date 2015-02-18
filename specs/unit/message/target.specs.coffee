@@ -9,9 +9,9 @@ describe 'MessageTarget', ->
   it 'should delegate to message when message is sent to it', ->
     @node = {}
     @target = new MessageTarget(@node)
-    message = {sendTo: sinon.spy()}
+    message = {deliver: sinon.spy()}
 
     @target.send(message)
 
-    expect(message.sendTo).to.have.been.calledWith(@node)
+    expect(message.deliver).to.have.been.calledWith(@node)
 

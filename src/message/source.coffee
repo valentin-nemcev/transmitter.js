@@ -4,14 +4,14 @@
 module.exports = class MessageSource
 
   constructor: ->
-    @outgoingBindings = new Set()
+    @targets = new Set()
 
 
-  attachOutgoingBinding: (binding) ->
-    @outgoingBindings.add(binding)
+  bindTarget: (target) ->
+    @targets.add(target)
     return this
 
 
   send: (message) ->
-    @outgoingBindings.forEach (binding) -> binding.send(message)
+    @targets.forEach (target) -> target.send(message)
     return this

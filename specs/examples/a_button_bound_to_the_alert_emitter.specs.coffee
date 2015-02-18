@@ -21,6 +21,8 @@ class AlertEmitter
   constructor: ->
     @messageTarget = new MessageTarget(this)
 
+  setTarget: (@target) -> this
+
   alert: sinon.spy()
 
   receiveValue: (messageStr) -> @alert(messageStr)
@@ -32,10 +34,10 @@ describe 'Example: a button bound to the alert emitter', ->
     @button = new Button()
     @alertEmitter = new AlertEmitter()
 
-    new Binding({
+    binding = new Binding({
+      transform: (message) -> message.toValueMessage 'Button was clicked!'
       source: @button.messageSource
       target: @alertEmitter.messageTarget
-      transform: (message) -> message.toValueMessage 'Button was clicked!'
     }).bind()
 
 
