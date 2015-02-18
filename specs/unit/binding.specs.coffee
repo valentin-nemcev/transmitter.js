@@ -17,8 +17,8 @@ describe 'Binding', ->
   describe 'when bound', ->
 
     beforeEach ->
-      @binding = new Binding({@source, @target})
-      @binding.bind()
+      @binding = new Binding({transform: (arg) -> arg})
+      @binding.bindSourceTarget(@source, @target)
 
 
     it 'should add itself as target to its source', ->
@@ -37,8 +37,8 @@ describe 'Binding', ->
       @message = {}
       @transformedMessage = {}
       @transform = sinon.spy () => @transformedMessage
-      @binding = new Binding({@source, @target, @transform})
-      @binding.bind()
+      @binding = new Binding({@transform})
+      @binding.bindSourceTarget(@source, @target)
 
       @binding.send(@message)
 

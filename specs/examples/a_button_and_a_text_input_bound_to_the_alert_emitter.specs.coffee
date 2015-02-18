@@ -4,9 +4,10 @@
 Message = require 'binder/message'
 MessageSource = require 'binder/message/source'
 MessageTarget = require 'binder/message/target'
-Binding = require 'binder/binding'
-CompositeBindingSource = require 'binder/binding/composite_source'
-CompositeBindingSourcePart = require 'binder/binding/composite_source_part'
+BindingBuilder = require 'binder/binding/builder'
+# Binding = require 'binder/binding'
+# CompositeBindingSource = require 'binder/binding/composite_source'
+# CompositeBindingSourcePart = require 'binder/binding/composite_source_part'
 
 
 class Button
@@ -46,15 +47,14 @@ describe 'Example: a button and a text input bound to the alert emitter', ->
     @alertEmitter = new AlertEmitter()
     @alertEmitter.alert = sinon.spy()
 
-    new Binding({
-      source: new CompositeBindingSource([
-        new CompositeBindingSourcePart(@button.messageSource, initiatesMerge: yes)
-        new CompositeBindingSourcePart(@textInput.messageSource)
-      ])
-      target: @alertEmitter.messageTarget
-      transform: (messages) =>
-        messages.get(@textInput.messageSource)
-    }).bind()
+    BindingBuilder.build()
+      .fromCompositeSource (source) =>
+        source
+        .withPart @button.messageSource
+        .withPassivePart @textInput.messageSource
+        .withMerge (messages) => messages.get(@textInput.messageSource)
+      .toTarget @alertEmitter.messageTarget
+      .bind()
 
 
   it 'should emit alert with text input value when button is clicked', ->

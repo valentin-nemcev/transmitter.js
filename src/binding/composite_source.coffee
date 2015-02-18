@@ -3,7 +3,7 @@
 
 module.exports = class CompositeBindingSource
 
-  constructor: (@sources) ->
+  constructor: (@sources, {@merge}) ->
     @target = null
 
 
@@ -18,5 +18,5 @@ module.exports = class CompositeBindingSource
     @sources.forEach (source) ->
       composedMessage.set(source.getSourceKey(), source.enquire())
 
-    @target.send(composedMessage)
+    @target.send(@merge(composedMessage))
     return this

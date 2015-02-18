@@ -11,7 +11,9 @@ describe 'CompositeBindingSource', ->
       bindCompositeTarget: ->
     @part2 =
       bindCompositeTarget: ->
-    @compositeSource = new CompositeBindingSource([@part1, @part2])
+    @mergeResult = {mergeResult: yes}
+    @merge = sinon.stub().returns(@mergeResult)
+    @compositeSource = new CompositeBindingSource([@part1, @part2], {@merge})
     @target = send: sinon.spy()
     @compositeSource.bindTarget(@target)
 
@@ -30,11 +32,15 @@ describe 'CompositeBindingSource', ->
 
       @compositeSource.sendMerged()
 
-      @mergedMessages = @target.send.firstCall.args[0]
+      @mergedMessages = @merge.firstCall.args[0]
 
 
-    it 'should merge messages from all its sources into map', ->
+    it 'should pass combined messages from sources for merge as a map', ->
       expect(Array.from(@mergedMessages.keys()))
         .to.have.members([@part1SourceKey, @part2SourceKey])
       expect(@mergedMessages.get(@part1SourceKey)).to.equal(@messageFromPart1)
       expect(@mergedMessages.get(@part2SourceKey)).to.equal(@messageFromPart2)
+
+
+    it 'should send merged message to its target', ->
+      expect(@target.send).to.have.been.calledWithSame(@mergeResult)

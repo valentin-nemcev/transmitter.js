@@ -4,7 +4,7 @@
 Message = require 'binder/message'
 MessageSource = require 'binder/message/source'
 MessageTarget = require 'binder/message/target'
-Binding = require 'binder/binding'
+BindingBuilder = require 'binder/binding/builder'
 
 
 class Button
@@ -34,11 +34,11 @@ describe 'Example: a button bound to the alert emitter', ->
     @button = new Button()
     @alertEmitter = new AlertEmitter()
 
-    binding = new Binding({
-      transform: (message) -> message.toValueMessage 'Button was clicked!'
-      source: @button.messageSource
-      target: @alertEmitter.messageTarget
-    }).bind()
+    BindingBuilder.build()
+      .fromSource @button.messageSource
+      .toTarget @alertEmitter.messageTarget
+      .withTransform (message) -> message.toValueMessage 'Button was clicked!'
+      .bind()
 
 
   it 'should emit alert when button is clicked', ->

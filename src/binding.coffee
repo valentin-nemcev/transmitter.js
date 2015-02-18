@@ -3,14 +3,10 @@
 
 module.exports = class Binding
 
-  idFunc = (arg) -> arg
+  constructor: ({@transform}) ->
 
 
-  constructor: ({@source, @target, @transform}) ->
-    @transform ?= idFunc
-
-
-  bind: ->
+  bindSourceTarget: (@source, @target) ->
     @source.bindTarget(this)
     return this
 
