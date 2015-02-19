@@ -1,9 +1,6 @@
 'use strict'
 
 
-describe 'Example: Two-way text input binding', ->
-  it 'should be implemented'
-
 describe 'Example: Button with enabled or disabled states', ->
   it 'should be implemented'
 

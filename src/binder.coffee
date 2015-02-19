@@ -1,6 +1,15 @@
 'use strict'
 
 
-module.exports = class Binder
+CompositeSourceBuilder = require './binding/composite_source_builder'
+OneWayBindingBuilder = require './binding/one_way_builder'
+Binding = require './binding'
 
-  @bind: (binding) -> binding.bind()
+
+module.exports =
+
+  buildOneWayBinding: -> new OneWayBindingBuilder(bindingConstructor: Binding)
+
+  buildCompositeSource: -> new CompositeSourceBuilder()
+
+  bind: (binding) -> binding.bind()

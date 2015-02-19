@@ -9,7 +9,7 @@ module.exports = class CompositeBindingSourcePart
 
 
   bindCompositeTarget: (compositeTarget) ->
-    @source.bindTarget(this)
+    @source.getMessageSource().bindTarget(this)
     @compositeTarget = compositeTarget
     return this
 

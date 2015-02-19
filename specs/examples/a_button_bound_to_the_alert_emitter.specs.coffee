@@ -4,22 +4,20 @@
 Message = require 'binder/message'
 MessageSource = require 'binder/message/source'
 MessageTarget = require 'binder/message/target'
-BindingBuilder = require 'binder/binding/builder'
+Binder = require 'binder'
 
 
 class Button
 
-  constructor: ->
-    @messageSource = new MessageSource()
+  getMessageSource: -> @messageSource ?= new MessageSource()
 
   click: ->
-    @messageSource.send(Message.createBare())
+    @getMessageSource().send(Message.createBare())
 
 
 class AlertEmitter
 
-  constructor: ->
-    @messageTarget = new MessageTarget(this)
+  getMessageTarget: -> @messageTarget ?= new MessageTarget(this)
 
   setTarget: (@target) -> this
 
@@ -34,9 +32,9 @@ describe 'Example: a button bound to the alert emitter', ->
     @button = new Button()
     @alertEmitter = new AlertEmitter()
 
-    BindingBuilder.build()
-      .fromSource @button.messageSource
-      .toTarget @alertEmitter.messageTarget
+    Binder.buildOneWayBinding()
+      .fromSource @button
+      .toTarget @alertEmitter
       .withTransform (message) -> message.toValueMessage 'Button was clicked!'
       .bind()
 

@@ -31,3 +31,6 @@ module.exports = class CompositeSourceBuilder
 
   create: ->
     new CompositeSource(@parts, {@merge})
+
+
+  getMessageSource: -> @create()
