@@ -33,7 +33,7 @@ describe 'OneWayBindingBuilder', ->
         .bind()
 
       expect(@createdBinding.bindSourceTarget)
-        .to.have.been.calledWith(@messageSource, @messageTarget)
+        .to.have.been.calledWithSame(@messageSource, @messageTarget)
 
 
   describe 'with transform function', ->

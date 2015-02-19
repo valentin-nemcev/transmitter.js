@@ -13,5 +13,5 @@ describe 'MessageTarget', ->
 
     @target.send(message)
 
-    expect(message.deliver).to.have.been.calledWith(@node)
+    expect(message.deliver).to.have.been.calledWithSame(@node)
 

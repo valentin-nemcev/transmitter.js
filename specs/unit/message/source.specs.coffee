@@ -19,7 +19,5 @@ describe 'MessageSource', ->
     it 'should send message to bound targets', ->
       message = {}
       @messageSource.send(message)
-      expect(@binding1.send).to.have.been.calledWith(message)
-      expect(@binding2.send).to.have.been.calledWith(message)
-
-
+      expect(@binding1.send).to.have.been.calledWithSame(message)
+      expect(@binding2.send).to.have.been.calledWithSame(message)
