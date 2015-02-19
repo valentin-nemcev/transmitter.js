@@ -1,14 +1,14 @@
 'use strict'
 
 
-MessageTarget = require 'binder/message/target'
+MessageReceiver = require 'binder/message/receiver'
 
 
-describe 'MessageTarget', ->
+describe 'MessageReceiver', ->
 
   it 'should delegate to message when message is sent to it', ->
     @node = {}
-    @target = new MessageTarget(@node)
+    @target = new MessageReceiver(@node)
     message = {deliver: sinon.spy()}
 
     @target.send(message)

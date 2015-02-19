@@ -1,17 +1,17 @@
 'use strict'
 
 
-MessageSource = require 'binder/message/source'
+MessageSender = require 'binder/message/sender'
 
 
-describe 'MessageSource', ->
+describe 'MessageSender', ->
 
   describe 'with bound targets', ->
 
     beforeEach ->
       @binding1 = {send: sinon.spy()}
       @binding2 = {send: sinon.spy()}
-      @messageSource = new MessageSource
+      @messageSource = new MessageSender
       @messageSource.bindTarget(@binding1)
       @messageSource.bindTarget(@binding2)
 

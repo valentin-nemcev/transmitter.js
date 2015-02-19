@@ -1,23 +1,17 @@
 'use strict'
 
 
-Message = require 'binder/message'
-MessageSource = require 'binder/message/source'
-MessageTarget = require 'binder/message/target'
 Binder = require 'binder'
 
 
 class Button
+  Binder.extendWithMessageSender(this)
 
-  getMessageSource: -> @messageSource ?= new MessageSource()
-
-  click: ->
-    @getMessageSource().send(Message.createBare())
+  click: -> @sendBare()
 
 
 class AlertEmitter
-
-  getMessageTarget: -> @messageTarget ?= new MessageTarget(this)
+  Binder.extendWithMessageReceiver(this)
 
   alert: ->
 
@@ -25,11 +19,9 @@ class AlertEmitter
 
 
 class TextInput
+  Binder.extendWithMessageSender(this)
 
-  getMessageSource: -> @messageSource ?= new MessageSource()
-
-  change: (value) ->
-    @getMessageSource().send(Message.createValue(value))
+  change: (value) -> @sendValue(value)
 
 
 describe 'Example: a button and a text input bound to the alert emitter', ->

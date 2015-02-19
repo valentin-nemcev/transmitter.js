@@ -16,11 +16,11 @@ describe 'OneWayBindingBuilder', ->
 
     @messageSource = new class MessageSourceStub
     @source = new class SourceStub
-    @source.getMessageSource = => @messageSource
+    @source.getMessageSender = => @messageSource
 
     @messageTarget = new class MessageTargetStub
     @target = new class TargetStub
-    @target.getMessageTarget = => @messageTarget
+    @target.getMessageReceiver = => @messageTarget
 
 
   describe 'when building binding with simple source', ->

@@ -1,9 +1,6 @@
 'use strict'
 
 
-Message = require 'binder/message'
-MessageSource = require 'binder/message/source'
-MessageTarget = require 'binder/message/target'
 Binder = require 'binder'
 
 
@@ -11,15 +8,15 @@ describe 'Example: Two-way text input binding', ->
 
   beforeEach ->
     @textInput = new class TextInput
-      getMessageSource: -> @messageSource ?= new MessageSource()
-      getMessageTarget: -> @messageTarget ?= new MessageTarget(this)
-      change: (value) -> @getMessageSource().send(Message.createValue(value))
+      Binder.extendWithMessageSender(this)
+      Binder.extendWithMessageReceiver(this)
+      change: (value) -> @sendValue(value)
       receiveValue: sinon.spy()
 
     @originVariable = new class Variable
-      getMessageSource: -> @messageSource ?= new MessageSource()
-      getMessageTarget: -> @messageTarget ?= new MessageTarget(this)
-      update: (value) -> @getMessageSource().send(Message.createValue(value))
+      Binder.extendWithMessageSender(this)
+      Binder.extendWithMessageReceiver(this)
+      update: (value) -> @sendValue(value)
       receiveValue: sinon.spy()
 
     Binder.buildTwoWayBinding()
