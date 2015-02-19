@@ -18,7 +18,7 @@ class AlertEmitter
   receiveValue: (messageStr) -> @alert(messageStr)
 
 
-describe 'Example: a button bound to the alert emitter', ->
+describe 'Example: one-way binding', ->
 
   beforeEach ->
     @button = new Button()

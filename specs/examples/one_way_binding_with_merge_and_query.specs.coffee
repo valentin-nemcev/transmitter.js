@@ -24,7 +24,7 @@ class TextInput
   change: (value) -> @sendValue(value)
 
 
-describe 'Example: a button and a text input bound to the alert emitter', ->
+describe 'Example: one-way binding with merge and query', ->
 
   beforeEach ->
     @button = new Button()
