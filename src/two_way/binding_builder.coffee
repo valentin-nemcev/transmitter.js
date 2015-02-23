@@ -14,21 +14,14 @@ module.exports = class TwoWayBindingBuilder
     return this
 
 
-  bindForward: ->
+  bindOneWay: (source, target)->
     @binder.buildOneWayBinding()
-      .fromSource @origin
-      .toTarget @derived
-      .bind()
-
-
-  bindBackward: ->
-    @binder.buildOneWayBinding()
-      .fromSource @derived
-      .toTarget @origin
+      .fromSource source
+      .toTarget target
       .bind()
 
 
   bind: ->
-    @bindForward()
-    @bindBackward()
+    @bindOneWay(@origin, @derived)
+    @bindOneWay(@derived, @origin)
     return null

@@ -1,15 +1,7 @@
 'use strict'
 
 
-Binding = require '../binding'
-
-
 module.exports = class BindingBuilder
-
-  @build = ->
-    new this(
-      bindingConstructor: Binding,
-    )
 
 
   returnArg = (arg) -> arg
