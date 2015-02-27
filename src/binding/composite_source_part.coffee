@@ -9,7 +9,7 @@ module.exports = class CompositeBindingSourcePart
 
 
   bindCompositeTarget: (compositeTarget) ->
-    @source.getMessageSender().bindTarget(this)
+    @source.bindTarget(this)
     @compositeTarget = compositeTarget
     return this
 
@@ -19,10 +19,9 @@ module.exports = class CompositeBindingSourcePart
 
 
   send: (message) ->
-    @lastMessage = message
-    @compositeTarget.sendMerged() if @initiatesMerge
+    @compositeTarget.receive(message)
     return this
 
 
-  enquire: ->
-    return @lastMessage
+  getSentMessage: (messageChain) ->
+    messageChain.getMessageSentFrom(@source)

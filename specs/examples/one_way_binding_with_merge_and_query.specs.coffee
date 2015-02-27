@@ -7,7 +7,7 @@ Binder = require 'binder'
 class Button
   Binder.extendWithMessageSender(this)
 
-  click: -> @sendBare()
+  click: -> Binder.sendBare(from: this)
 
 
 class AlertEmitter
@@ -21,7 +21,7 @@ class AlertEmitter
 class TextInput
   Binder.extendWithMessageSender(this)
 
-  change: (value) -> @sendValue(value)
+  change: (value) -> Binder.sendValue(value, from: this)
 
 
 describe 'Example: one-way binding with merge and query', ->

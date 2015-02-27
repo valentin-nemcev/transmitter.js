@@ -3,11 +3,21 @@
 
 module.exports = class Message
 
-  @createBare = -> new BareMessage
+  @createBare = () -> new BareMessage()
 
   @createValue = (value) -> new ValueMessage(value)
 
-  toValueMessage: -> new ValueMessage(arguments...)
+  toValueMessage: (value) -> new ValueMessage(value)
+
+  getChain: -> @chain
+
+  setChain: (@chain) -> this
+
+
+  sendFrom: (sender) ->
+    @getChain().messageSent(this, sender)
+    sender.send(this)
+    return this
 
 
 class BareMessage extends Message

@@ -13,10 +13,17 @@ module.exports = class CompositeBindingSource
     return this
 
 
-  sendMerged: ->
-    composedMessage = new Map()
-    @sources.forEach (source) ->
-      composedMessage.set(source.getSourceKey(), source.enquire())
+  _getComposedSentMessages: (chain)->
+    composedMessages = new Map()
+    for source in @sources
+      key = source.getSourceKey()
+      message = source.getSentMessage(chain)
+      return null if not message?
+      composedMessages.set(key, message)
+    return composedMessages
 
-    @target.send(@merge(composedMessage))
+
+  receive: (message) ->
+    if (messages = @_getComposedSentMessages(message.getChain()))
+      @target.send(@merge(messages))
     return this

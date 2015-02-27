@@ -7,7 +7,7 @@ Binder = require 'binder'
 class Button
   Binder.extendWithMessageSender(this)
 
-  click: -> @sendBare()
+  click: -> Binder.sendBare(from: this)
 
 
 class AlertEmitter

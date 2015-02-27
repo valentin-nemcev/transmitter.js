@@ -10,13 +10,13 @@ describe 'Example: Two-way text input binding', ->
     @textInput = new class TextInput
       Binder.extendWithMessageSender(this)
       Binder.extendWithMessageReceiver(this)
-      change: (value) -> @sendValue(value)
+      change: (value) -> Binder.sendValue(value, from: this)
       receiveValue: sinon.spy()
 
     @originVariable = new class Variable
       Binder.extendWithMessageSender(this)
       Binder.extendWithMessageReceiver(this)
-      update: (value) -> @sendValue(value)
+      update: (value) -> Binder.sendValue(value, from: this)
       receiveValue: sinon.spy()
 
     Binder.buildTwoWayBinding()
