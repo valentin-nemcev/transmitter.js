@@ -19,7 +19,7 @@ module.exports = class CompositeBindingSourcePart
 
 
   send: (message) ->
-    @compositeTarget.receive(message)
+    @compositeTarget.sendMerged(message.getChain())
     return this
 
 

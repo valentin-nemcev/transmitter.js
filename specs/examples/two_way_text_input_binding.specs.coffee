@@ -4,20 +4,34 @@
 Binder = require 'binder'
 
 
+class TextInput
+  Binder.extendWithMessageSender(this)
+
+  Binder.extendWithMessageReceiver(this)
+
+  change: (value) -> Binder.sendValue(value, from: this)
+
+  receiveValue: ->
+
+
+class Variable
+  Binder.extendWithMessageSender(this)
+
+  Binder.extendWithMessageReceiver(this)
+
+  update: (value) -> Binder.sendValue(value, from: this)
+
+  receiveValue: ->
+
+
 describe 'Example: Two-way text input binding', ->
 
   beforeEach ->
-    @textInput = new class TextInput
-      Binder.extendWithMessageSender(this)
-      Binder.extendWithMessageReceiver(this)
-      change: (value) -> Binder.sendValue(value, from: this)
-      receiveValue: sinon.spy()
+    @textInput = new TextInput()
+    sinon.spy(@textInput, 'receiveValue')
 
-    @originVariable = new class Variable
-      Binder.extendWithMessageSender(this)
-      Binder.extendWithMessageReceiver(this)
-      update: (value) -> Binder.sendValue(value, from: this)
-      receiveValue: sinon.spy()
+    @originVariable = new Variable()
+    sinon.spy(@originVariable, 'receiveValue')
 
     Binder.buildTwoWayBinding()
       .withOrigin @originVariable

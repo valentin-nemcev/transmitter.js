@@ -30,7 +30,7 @@ describe 'Example: one-way binding with merge and query', ->
     @button = new Button()
     @textInput = new TextInput()
     @alertEmitter = new AlertEmitter()
-    @alertEmitter.alert = sinon.spy()
+    sinon.spy(@alertEmitter, 'alert')
 
     Binder.buildOneWayBinding()
       .fromSource(

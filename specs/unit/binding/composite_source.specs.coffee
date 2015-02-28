@@ -6,39 +6,42 @@ CompositeBindingSource = require 'binder/binding/composite_source'
 
 describe 'CompositeBindingSource', ->
 
+  class CompositePartStub
+    bindCompositeTarget: ->
+    getSourceKey: ->
+    getSentMessage: ->
+
+
   beforeEach ->
-    @part1 =
-      bindCompositeTarget: ->
-    @part2 =
-      bindCompositeTarget: ->
-    @mergeResult = {mergeResult: yes}
-    @merge = sinon.stub().returns(@mergeResult)
+    @part1 = new CompositePartStub
+    @part2 = new CompositePartStub
+    @mergedMessage = new class MergedMessageStub
+    @merge = sinon.stub().returns(@mergedMessage)
     @compositeSource = new CompositeBindingSource([@part1, @part2], {@merge})
     @target = send: sinon.spy()
     @compositeSource.bindTarget(@target)
 
     @messageChain = new class MessageChainStub
-    @messageFromPart1 = {getChain: => @messageChain}
-    @messageFromPart2 = {getChain: => @messageChain}
+    class MessageStub
+    @messageFromPart1 = new MessageStub
+    @messageFromPart2 = new MessageStub
     @part1SourceKey = {}
     @part2SourceKey = {}
-    @part1.getSourceKey = => @part1SourceKey
-    @part2.getSourceKey = => @part2SourceKey
-
+    sinon.stub(@part1, 'getSourceKey').returns(@part1SourceKey)
+    sinon.stub(@part2, 'getSourceKey').returns(@part2SourceKey)
 
 
   describe 'when some parts have sent their messages', ->
 
     beforeEach ->
-      @part1.getSentMessage = sinon.stub()
-      @part1.getSentMessage
+      sinon.stub(@part1, 'getSentMessage')
         .withArgs(sinon.match.same(@messageChain))
         .returns @messageFromPart1
 
-      @part2.getSentMessage = sinon.stub()
-      @part2.getSentMessage.returns null
+      sinon.stub(@part2, 'getSentMessage')
+        .returns(null)
 
-      @compositeSource.receive(@messageFromPart1)
+      @compositeSource.sendMerged(@messageChain)
 
 
     it 'should not send anything to merge', ->
@@ -48,17 +51,15 @@ describe 'CompositeBindingSource', ->
   describe 'when all parts have sent their messages', ->
 
     beforeEach ->
-      @part1.getSentMessage = sinon.stub()
-      @part1.getSentMessage
+      sinon.stub(@part1, 'getSentMessage')
         .withArgs(sinon.match.same(@messageChain))
         .returns @messageFromPart1
 
-      @part2.getSentMessage = sinon.stub()
-      @part2.getSentMessage
+      sinon.stub(@part2, 'getSentMessage')
         .withArgs(sinon.match.same(@messageChain))
         .returns @messageFromPart2
 
-      @compositeSource.receive(@messageFromPart1)
+      @compositeSource.sendMerged(@messageChain)
 
       @mergedMessages = @merge.firstCall.args[0]
 
@@ -71,4 +72,4 @@ describe 'CompositeBindingSource', ->
 
 
     it 'should send merged messages to its target', ->
-      expect(@target.send).to.have.been.calledWithSame(@mergeResult)
+      expect(@target.send).to.have.been.calledWithSame(@mergedMessage)

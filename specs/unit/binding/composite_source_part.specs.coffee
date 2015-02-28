@@ -7,11 +7,19 @@ CompositeBindingSourcePart = require 'binder/binding/composite_source_part'
 
 describe 'CompositeBindingSourcePart', ->
 
+  class MessageStub
+    getChain: ->
+
+  class MessageChainStub
+    getMessageSentFrom: ->
+
+
   beforeEach ->
     @source = {}
     @source.bindTarget = sinon.spy()
     @part = new CompositeBindingSourcePart(@source)
     @compositeTarget = new class CompositeTargetStub
+      sendMerged: ->
     @part.bindCompositeTarget(@compositeTarget)
 
 
@@ -23,20 +31,22 @@ describe 'CompositeBindingSourcePart', ->
     expect(@part.getSourceKey()).to.equal(@source)
 
 
-  it 'should get message in chain sent from source', ->
-    @messageChain = {}
-    @message = {}
-    @messageChain.getMessageSentFrom = sinon.stub()
-    @messageChain.getMessageSentFrom
+  it 'should provide message in chain sent from source', ->
+    message = new MessageStub
+    messageChain = new MessageChainStub
+    sinon.stub(messageChain, 'getMessageSentFrom')
       .withArgs(sinon.match.same(@source))
-      .returns(@message)
+      .returns(message)
 
-    expect(@part.getSentMessage(@messageChain)).to.equal(@message)
+    expect(@part.getSentMessage(messageChain)).to.equal(message)
 
 
   it 'should notify its composite target when message is sent to it', ->
-    message = {}
-    @compositeTarget.receive = sinon.spy()
+    message = new MessageStub
+    messageChain = new MessageChainStub
+    sinon.stub(message, 'getChain').returns(messageChain)
+    sinon.spy(@compositeTarget, 'sendMerged')
     @part.send(message)
 
-    expect(@compositeTarget.receive).to.have.been.calledWithSame(message)
+    expect(@compositeTarget.sendMerged)
+      .to.have.been.calledWithSame(messageChain)

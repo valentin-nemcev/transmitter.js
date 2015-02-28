@@ -23,7 +23,7 @@ module.exports = class CompositeBindingSource
     return composedMessages
 
 
-  receive: (message) ->
-    if (messages = @_getComposedSentMessages(message.getChain()))
+  sendMerged: (messageChain) ->
+    if (messages = @_getComposedSentMessages(messageChain))
       @target.send(@merge(messages))
     return this
