@@ -10,15 +10,22 @@ describe 'CompositeBindingSource', ->
     bindCompositeTarget: ->
     getSourceKey: ->
     getSentMessage: ->
+    enquire: ->
+
+  class TargetStub
+    send: ->
 
 
   beforeEach ->
     @part1 = new CompositePartStub
     @part2 = new CompositePartStub
+
     @mergedMessage = new class MergedMessageStub
     @merge = sinon.stub().returns(@mergedMessage)
+
     @compositeSource = new CompositeBindingSource([@part1, @part2], {@merge})
-    @target = send: sinon.spy()
+
+    @target = new TargetStub()
     @compositeSource.bindTarget(@target)
 
     @messageChain = new class MessageChainStub
@@ -59,12 +66,11 @@ describe 'CompositeBindingSource', ->
         .withArgs(sinon.match.same(@messageChain))
         .returns @messageFromPart2
 
+
+    it 'should send messages from sources for merge as a map', ->
       @compositeSource.sendMerged(@messageChain)
 
       @mergedMessages = @merge.firstCall.args[0]
-
-
-    it 'should send messages from sources for merge as a map', ->
       expect(Array.from(@mergedMessages.keys()))
         .to.have.members([@part1SourceKey, @part2SourceKey])
       expect(@mergedMessages.get(@part1SourceKey)).to.equal(@messageFromPart1)
@@ -72,4 +78,20 @@ describe 'CompositeBindingSource', ->
 
 
     it 'should send merged messages to its target', ->
+      sinon.spy(@target, 'send')
+
+      @compositeSource.sendMerged(@messageChain)
+
       expect(@target.send).to.have.been.calledWithSame(@mergedMessage)
+
+
+  describe 'when enquired', ->
+
+    it 'should enquire source its source parts', ->
+      sinon.spy(@part1, 'enquire')
+      sinon.spy(@part2, 'enquire')
+
+      @compositeSource.enquire(@messageChain)
+
+      expect(@part1.enquire).to.have.been.calledWithSame(@messageChain)
+      expect(@part2.enquire).to.have.been.calledWithSame(@messageChain)

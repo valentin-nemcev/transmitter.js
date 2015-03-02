@@ -4,14 +4,19 @@
 MessageChain = require 'binder/message/chain'
 
 
+class MessageStub
+  setChain: ->
+
+class QueryQueueStub
+  addSenderWithChain: ->
+
+
 describe 'MessageChain', ->
 
-  class MessageStub
-    setChain: ->
-
-
   beforeEach ->
-    @chain = new MessageChain()
+    @queryQueue = new QueryQueueStub()
+    @chain = new MessageChain({@queryQueue})
+
 
   it 'should provide message sent from given sender', ->
     @message1 = new MessageStub
@@ -19,8 +24,21 @@ describe 'MessageChain', ->
     @sender1 = {}
     @sender2 = {}
 
-    @chain.messageSent(@message1, from: @sender1)
-    @chain.messageSent(@message2, from: @sender2)
+    @chain.addMessageFrom(@message1, @sender1)
+    @chain.addMessageFrom(@message2, @sender2)
 
-    expect(@chain.getMessageSentFrom(@sender1)).to.equal(@message1)
-    expect(@chain.getMessageSentFrom(@sender2)).to.equal(@message2)
+    expect(@chain.getMessageFrom(@sender1)).to.equal(@message1)
+    expect(@chain.getMessageFrom(@sender2)).to.equal(@message2)
+
+
+  it 'should add senders to query queue', ->
+    sender = new class SenderStub
+    sinon.spy(@queryQueue, 'addSenderWithChain')
+
+    @chain.addToQueryQueue(sender)
+
+    expect(@queryQueue.addSenderWithChain)
+      .to.have.been.calledWith(
+        sinon.match.same(sender),
+        sinon.match.same(@chain)
+      )

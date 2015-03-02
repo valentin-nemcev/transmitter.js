@@ -14,9 +14,8 @@ module.exports = class Message
   setChain: (@chain) -> this
 
 
-  sendFrom: (sender) ->
-    @getChain().messageSent(this, sender)
-    sender.send(this)
+  markAsSentFrom: (sender) ->
+    @getChain().addMessageFrom(this, sender)
     return this
 
 

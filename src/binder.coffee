@@ -6,6 +6,8 @@ OneWayBindingBuilder = require './binding/one_way_builder'
 TwoWayBindingBuilder = require './two_way/binding_builder'
 Binding = require './binding'
 
+QueryQueue = require './query_queue'
+
 Message = require './message'
 MessageChain = require './message/chain'
 MessageSender = require './message/sender'
@@ -14,18 +16,22 @@ MessageReceiver = require './message/receiver'
 
 module.exports = new class Binder
 
+
+  startTransmissionWithMessageFrom: (message, node) ->
+    queryQueue = new QueryQueue()
+    chain = new MessageChain({queryQueue})
+    message.setChain(chain)
+    node.getMessageSender().send(message)
+    return this
+
+
+
   sendValue: (value, from: node) ->
-    @send(Message.createValue(value), from: node)
+    @startTransmissionWithMessageFrom(Message.createValue(value), node)
 
 
   sendBare: (from: node) ->
-    @send(Message.createBare(), from: node)
-
-
-  send: (message, from: node) ->
-    chain = new MessageChain()
-    message.setChain(chain).sendFrom(node.getMessageSender())
-    return this
+    @startTransmissionWithMessageFrom(Message.createBare(), node)
 
 
   extendWithMessageSender: (cls) ->

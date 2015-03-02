@@ -27,3 +27,9 @@ module.exports = class CompositeBindingSource
     if (messages = @_getComposedSentMessages(messageChain))
       @target.send(@merge(messages))
     return this
+
+
+  enquire: (messageChain) ->
+    for source in @sources
+      source.enquire(messageChain)
+    return this

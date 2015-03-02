@@ -19,5 +19,11 @@ module.exports = class MessageSender
 
 
   send: (message) ->
+    message.markAsSentFrom(this)
     @targets.forEach (target) -> target.send(message)
+    return this
+
+
+  enquire: (messageChain) ->
+    messageChain.addToQueryQueue(this)
     return this
