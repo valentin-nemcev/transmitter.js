@@ -27,7 +27,7 @@ describe 'Example: one-way binding', ->
     Binder.buildOneWayBinding()
       .fromSource @button
       .toTarget @alertEmitter
-      .withTransform (message) -> message.toValueMessage 'Button was clicked!'
+      .withTransform (event) -> event.toValue 'Button was clicked!'
       .bind()
 
 

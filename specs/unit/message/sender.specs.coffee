@@ -13,7 +13,6 @@ class MessageChainStub
 
 
 class MessageStub
-  markAsSentFrom: ->
 
 
 describe 'MessageSender', ->
@@ -35,22 +34,10 @@ describe 'MessageSender', ->
       sinon.spy(@target2, 'send')
       message = new MessageStub
 
-      @messageSource.send(message)
+      @messageSource.sendMessage(message)
 
       expect(@target1.send).to.have.been.calledWithSame(message)
       expect(@target2.send).to.have.been.calledWithSame(message)
-
-
-  describe 'when sending message', ->
-
-    it 'should notify message', ->
-      message = new MessageStub
-      sinon.spy(message, 'markAsSentFrom')
-
-      @messageSource.send(message)
-
-      expect(message.markAsSentFrom)
-        .to.have.been.calledWithSame(@messageSource)
 
 
   describe 'when enquired', ->

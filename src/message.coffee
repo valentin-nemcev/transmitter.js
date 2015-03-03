@@ -3,29 +3,25 @@
 
 module.exports = class Message
 
-  @createBare = () -> new BareMessage()
-
-  @createValue = (value) -> new ValueMessage(value)
-
-  toValueMessage: (value) -> new ValueMessage(value)
-
-  getChain: -> @chain
-
-  setChain: (@chain) -> this
+  constructor: (@chain) ->
 
 
-  markAsSentFrom: (sender) ->
-    @getChain().addMessageFrom(this, sender)
+  setPayload: (@payload) ->
     return this
 
 
-class BareMessage extends Message
+  copyWithTransformedPayload: (transform) ->
+    copy = new Message(@chain)
+    copy.setPayload(transform(@payload))
+    return copy
 
 
-class ValueMessage extends Message
+  sendFrom: (sender) ->
+    @chain.addMessageFrom(this, sender)
+    sender.sendMessage(this)
+    return this
 
-  constructor: (@value) ->
 
-  deliver: (target) ->
-    target.receiveValue(@value)
+  sendToNode: (targetNode) ->
+    @payload.deliver(targetNode)
     return this

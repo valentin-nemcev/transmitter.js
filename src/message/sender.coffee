@@ -18,8 +18,7 @@ module.exports = class MessageSender
     return this
 
 
-  send: (message) ->
-    message.markAsSentFrom(this)
+  sendMessage: (message) ->
     @targets.forEach (target) -> target.send(message)
     return this
 

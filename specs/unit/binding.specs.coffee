@@ -4,52 +4,54 @@
 Binding = require 'binder/binding'
 
 
+class SourceStub
+  bindTarget: ->
+
+class TargetStub
+  send: ->
+
+class MessageStub
+  copyWithTransformedPayload: ->
+
+
 describe 'Binding', ->
 
   beforeEach ->
-    @source =
-      bindTarget: sinon.spy()
-
-    @target =
-      send: sinon.spy()
+    @source = new SourceStub
+    @target = new TargetStub
 
 
   describe 'when bound', ->
 
     beforeEach ->
       @binding = new Binding({transform: (arg) -> arg})
-      @binding.bindSourceTarget(@source, @target)
 
 
     it 'should add itself as target to its source', ->
+      sinon.spy(@source, 'bindTarget')
+
+      @binding.bindSourceTarget(@source, @target)
+
       expect(@source.bindTarget).to.have.been.calledWithSame(@binding)
 
 
-    it 'should send message to its target', ->
-      message = {}
-      @binding.send(message)
-      expect(@target.send).to.have.been.calledWithSame(message)
-
-
-  describe 'when bound with transform function', ->
+  describe 'when sending message with transform function', ->
 
     beforeEach ->
-      @message = {}
-      @transformedMessage = {}
-      @transform = sinon.spy () => @transformedMessage
+      @transform = ->
       @binding = new Binding({@transform})
       @binding.bindSourceTarget(@source, @target)
-
-      @binding.send(@message)
-
-
-    it 'should pass message from source to transform function', ->
-      expect(@transform).to.have.been.calledWithSame(@message)
+      sinon.spy(@target, 'send')
 
 
-    it 'should pass result of transform function to target', ->
-      expect(@target.send).to.have.been.calledWithSame(@transformedMessage)
+    it 'should send message copy with transformed payload', ->
+      message = new MessageStub
+      messageWithTransformedPayload = new MessageStub
+      sinon.stub(message, 'copyWithTransformedPayload')
+        .withArgs(sinon.match.same(@transform))
+        .returns(messageWithTransformedPayload)
 
+      @binding.send(message)
 
-    it 'should call transform function without context', ->
-      expect(@transform).to.have.been.calledOn(null)
+      expect(@target.send)
+        .to.have.been.calledWithSame(messageWithTransformedPayload)

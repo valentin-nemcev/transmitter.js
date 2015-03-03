@@ -12,5 +12,5 @@ module.exports = class MessageReceiver
 
 
   send: (message) ->
-    message.deliver(@node)
+    message.sendToNode(@node)
     return this

@@ -9,6 +9,8 @@ Binding = require './binding'
 QueryQueue = require './query_queue'
 
 Message = require './message'
+{EventPayload, ValuePayload} = require './message/payloads'
+
 MessageChain = require './message/chain'
 MessageSender = require './message/sender'
 MessageReceiver = require './message/receiver'
@@ -17,21 +19,23 @@ MessageReceiver = require './message/receiver'
 module.exports = new class Binder
 
 
-  startTransmissionWithMessageFrom: (message, node) ->
+  startTransmissionWithPayloadFrom: (payload, node) ->
     queryQueue = new QueryQueue()
     chain = new MessageChain({queryQueue})
-    message.setChain(chain)
-    node.getMessageSender().send(message)
+    message = new Message(chain)
+    message.setPayload(payload)
+    message.sendFrom(node.getMessageSender())
     return this
 
 
 
   sendValue: (value, from: node) ->
-    @startTransmissionWithMessageFrom(Message.createValue(value), node)
+    @startTransmissionWithPayloadFrom(new ValuePayload(value), node)
 
 
+  # TODO rename to sendEvent
   sendBare: (from: node) ->
-    @startTransmissionWithMessageFrom(Message.createBare(), node)
+    @startTransmissionWithPayloadFrom(new EventPayload(), node)
 
 
   extendWithMessageSender: (cls) ->
