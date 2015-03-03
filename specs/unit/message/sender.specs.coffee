@@ -7,10 +7,10 @@ MessageSender = require 'binder/message/sender'
 class TargetStub
   send: ->
 
+class NodeStub
 
-class MessageChainStub
-  addToQueryQueue: ->
-
+class QueryStub
+  enquireNode: ->
 
 class MessageStub
 
@@ -18,7 +18,8 @@ class MessageStub
 describe 'MessageSender', ->
 
   beforeEach ->
-    @messageSource = new MessageSender()
+    @node = new NodeStub()
+    @messageSource = new MessageSender(@node)
 
   describe 'with bound targets', ->
 
@@ -42,11 +43,11 @@ describe 'MessageSender', ->
 
   describe 'when enquired', ->
 
-    it 'should add itself to query queue', ->
-      messageChain = new MessageChainStub
-      sinon.spy(messageChain, 'addToQueryQueue')
+    it 'should pass its node to message', ->
+      @query = new QueryStub()
+      sinon.spy(@query, 'enquireNode')
 
-      @messageSource.enquire(messageChain)
+      @messageSource.enquire(@query)
 
-      expect(messageChain.addToQueryQueue)
-        .to.have.been.calledWithSame(@messageSource)
+      expect(@query.enquireNode)
+        .to.have.been.calledWithSame(@node)

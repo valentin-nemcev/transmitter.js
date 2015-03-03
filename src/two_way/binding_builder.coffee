@@ -24,4 +24,5 @@ module.exports = class TwoWayBindingBuilder
   bind: ->
     @bindOneWay(@origin, @derived)
     @bindOneWay(@derived, @origin)
+    @binder.enquire(@derived)
     return null

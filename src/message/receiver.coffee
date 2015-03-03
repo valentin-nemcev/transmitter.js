@@ -11,6 +11,15 @@ module.exports = class MessageReceiver
   constructor: (@node) ->
 
 
+  bindSource: (@source) ->
+    return this
+
+
   send: (message) ->
     message.sendToNode(@node)
+    return this
+
+
+  enquire: (query) ->
+    @source.enquire(query)
     return this

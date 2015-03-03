@@ -8,6 +8,8 @@ Binding = require './binding'
 
 QueryQueue = require './query_queue'
 
+Query = require './query'
+
 Message = require './message'
 {EventPayload, ValuePayload} = require './message/payloads'
 
@@ -19,14 +21,24 @@ MessageReceiver = require './message/receiver'
 module.exports = new class Binder
 
 
-  startTransmissionWithPayloadFrom: (payload, node) ->
+  startTransmission: (doWithChain) ->
     queryQueue = new QueryQueue()
     chain = new MessageChain({queryQueue})
-    message = new Message(chain)
-    message.setPayload(payload)
-    message.sendFrom(node.getMessageSender())
+    doWithChain(chain)
     return this
 
+
+  startTransmissionWithPayloadFrom: (payload, node) ->
+    @startTransmission (chain) =>
+      message = new Message(chain)
+      message.setPayload(payload)
+      message.sendFrom(node.getMessageSender())
+
+
+  enquire: (node) ->
+    @startTransmission (chain) =>
+      query = new Query(chain)
+      query.enquireTarget(node)
 
 
   sendValue: (value, from: node) ->

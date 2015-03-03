@@ -6,12 +6,16 @@ Binding = require 'binder/binding'
 
 class SourceStub
   bindTarget: ->
+  enquire: ->
 
 class TargetStub
+  bindSource: ->
   send: ->
 
 class MessageStub
   copyWithTransformedPayload: ->
+
+class QueryStub
 
 
 describe 'Binding', ->
@@ -27,12 +31,20 @@ describe 'Binding', ->
       @binding = new Binding({transform: (arg) -> arg})
 
 
-    it 'should add itself as target to its source', ->
+    it 'should bind itself as target to its source', ->
       sinon.spy(@source, 'bindTarget')
 
       @binding.bindSourceTarget(@source, @target)
 
       expect(@source.bindTarget).to.have.been.calledWithSame(@binding)
+
+
+    it 'should bind itself as source to its target', ->
+      sinon.spy(@target, 'bindSource')
+
+      @binding.bindSourceTarget(@source, @target)
+
+      expect(@target.bindSource).to.have.been.calledWithSame(@binding)
 
 
   describe 'when sending message with transform function', ->
@@ -55,3 +67,18 @@ describe 'Binding', ->
 
       expect(@target.send)
         .to.have.been.calledWithSame(messageWithTransformedPayload)
+
+
+  describe 'when enquired', ->
+
+    beforeEach ->
+      @binding = new Binding({})
+      @binding.bindSourceTarget(@source, @target)
+
+
+    it 'should send query to its source', ->
+      @query = new QueryStub
+      sinon.spy(@source, 'enquire')
+      @binding.enquire(@query)
+
+      expect(@source.enquire).to.have.been.calledWithSame(@query)

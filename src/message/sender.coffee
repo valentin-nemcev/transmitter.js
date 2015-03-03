@@ -6,10 +6,10 @@ module.exports = class MessageSender
   @extend = (nodeClass) ->
     Object.assign nodeClass.prototype,
       getMessageSender: ->
-        @messageSender ?= new MessageSender()
+        @messageSender ?= new MessageSender(this)
 
 
-  constructor: ->
+  constructor: (@node) ->
     @targets = new Set()
 
 
@@ -23,6 +23,6 @@ module.exports = class MessageSender
     return this
 
 
-  enquire: (messageChain) ->
-    messageChain.addToQueryQueue(this)
+  enquire: (query) ->
+    query.enquireNode(@node)
     return this
