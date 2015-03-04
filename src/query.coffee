@@ -3,6 +3,14 @@
 
 module.exports = class Query
 
-  enquireTarget: (node) ->
+  constructor: ({@messageChain}) ->
+
+
+  enquireTargetNode: (node) ->
     node.getMessageReceiver().enquire(this)
+    return this
+
+
+  enquireSourceNode: (node) ->
+    @messageChain.addQueryTo(node)
     return this

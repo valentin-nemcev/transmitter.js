@@ -3,7 +3,7 @@
 
 module.exports = class MessageChain
 
-  constructor: ({@queryQueue})->
+  constructor: ()->
     @sendersToMessages = new Map()
 
 
@@ -16,6 +16,5 @@ module.exports = class MessageChain
     @sendersToMessages.get(sender)
 
 
-  addToQueryQueue: (sender) ->
-    @queryQueue.addSenderWithChain(sender, this)
+  addQueryTo: (node) ->
     return this

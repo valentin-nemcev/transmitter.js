@@ -5,40 +5,33 @@ MessageChain = require 'binder/message/chain'
 
 
 class MessageStub
-  setChain: ->
 
-class QueryQueueStub
-  addSenderWithChain: ->
+class NodeStub
 
 
 describe 'MessageChain', ->
 
   beforeEach ->
-    @queryQueue = new QueryQueueStub()
-    @chain = new MessageChain({@queryQueue})
+    @chain = new MessageChain()
 
 
   it 'should provide message sent from given sender', ->
     @message1 = new MessageStub
     @message2 = new MessageStub
-    @sender1 = {}
-    @sender2 = {}
+    @node1 = new NodeStub
+    @node2 = new NodeStub
 
-    @chain.addMessageFrom(@message1, @sender1)
-    @chain.addMessageFrom(@message2, @sender2)
+    @chain.addMessageFrom(@message1, @node1)
+    @chain.addMessageFrom(@message2, @node2)
 
-    expect(@chain.getMessageFrom(@sender1)).to.equal(@message1)
-    expect(@chain.getMessageFrom(@sender2)).to.equal(@message2)
+    expect(@chain.getMessageFrom(@node1)).to.equal(@message1)
+    expect(@chain.getMessageFrom(@node2)).to.equal(@message2)
 
 
-  it 'should add senders to query queue', ->
-    sender = new class SenderStub
-    sinon.spy(@queryQueue, 'addSenderWithChain')
+  it 'should add nodes to query queue', ->
+    @node1 = new NodeStub
+    @node2 = new NodeStub
 
-    @chain.addToQueryQueue(sender)
+    @chain.addQueryTo(@node1)
+    @chain.addQueryTo(@node2)
 
-    expect(@queryQueue.addSenderWithChain)
-      .to.have.been.calledWith(
-        sinon.match.same(sender),
-        sinon.match.same(@chain)
-      )

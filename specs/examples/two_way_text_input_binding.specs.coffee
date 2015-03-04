@@ -9,9 +9,14 @@ class TextInput
 
   Binder.extendWithMessageReceiver(this)
 
-  change: (value) -> Binder.sendValue(value, from: this)
+  change: (value) ->
+    @setValue(value)
+    Binder.sendNodeState(this)
+    return this
 
-  receiveValue: ->
+  setValue: (@value) -> this
+
+  getValue: -> @value
 
 
 class Variable
@@ -19,19 +24,18 @@ class Variable
 
   Binder.extendWithMessageReceiver(this)
 
-  update: (value) -> Binder.sendValue(value, from: this)
+  getValue: -> @value
 
-  receiveValue: ->
+  setValue: (@value) -> this
 
 
 describe 'Example: Two-way text input binding', ->
 
   beforeEach ->
     @textInput = new TextInput()
-    sinon.spy(@textInput, 'receiveValue')
 
     @originVariable = new Variable()
-    sinon.spy(@originVariable, 'receiveValue')
+    @originVariable.setValue('initial value')
 
     Binder.buildTwoWayBinding()
       .withOrigin @originVariable
@@ -40,15 +44,14 @@ describe 'Example: Two-way text input binding', ->
 
 
   it 'should send origin variable value to the text input after binding', ->
-    expect(@textInput.receiveValue).to.have.been.calledWith('initial value')
+    expect(@textInput.getValue()).to.equal('initial value')
 
 
   it 'should send origin variable update to the text input', ->
-    @originVariable.update('updated value')
-    expect(@textInput.receiveValue).to.have.been.calledWith('updated value')
+    Binder.updateNodeState(@originVariable, 'updated value')
+    expect(@textInput.getValue()).to.equal('updated value')
 
 
   it 'should send text input update to the origin variable', ->
     @textInput.change('updated value')
-    expect(@originVariable.receiveValue)
-      .to.have.been.calledWith('updated value')
+    expect(@originVariable.getValue()).to.equal('updated value')

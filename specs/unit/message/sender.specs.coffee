@@ -10,7 +10,7 @@ class TargetStub
 class NodeStub
 
 class QueryStub
-  enquireNode: ->
+  enquireSourceNode: ->
 
 class MessageStub
 
@@ -45,9 +45,9 @@ describe 'MessageSender', ->
 
     it 'should pass its node to message', ->
       @query = new QueryStub()
-      sinon.spy(@query, 'enquireNode')
+      sinon.spy(@query, 'enquireSourceNode')
 
       @messageSource.enquire(@query)
 
-      expect(@query.enquireNode)
+      expect(@query.enquireSourceNode)
         .to.have.been.calledWithSame(@node)

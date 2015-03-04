@@ -24,5 +24,5 @@ module.exports = class MessageSender
 
 
   enquire: (query) ->
-    query.enquireNode(@node)
+    query.enquireSourceNode(@node)
     return this

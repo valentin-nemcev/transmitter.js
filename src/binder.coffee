@@ -6,12 +6,10 @@ OneWayBindingBuilder = require './binding/one_way_builder'
 TwoWayBindingBuilder = require './two_way/binding_builder'
 Binding = require './binding'
 
-QueryQueue = require './query_queue'
-
 Query = require './query'
 
 Message = require './message'
-{EventPayload, ValuePayload} = require './message/payloads'
+{EventPayload, ValuePayload, StatePayload} = require './message/payloads'
 
 MessageChain = require './message/chain'
 MessageSender = require './message/sender'
@@ -21,24 +19,38 @@ MessageReceiver = require './message/receiver'
 module.exports = new class Binder
 
 
+  createQueryResponseMessage: (messageChain, node) ->
+    message = new Message(messageChain)
+    message.setPayload(new StatePayload(node))
+    return message
+
+
   startTransmission: (doWithChain) ->
-    queryQueue = new QueryQueue()
-    chain = new MessageChain({queryQueue})
-    doWithChain(chain)
+    messageChain = new MessageChain()
+    doWithChain(messageChain)
     return this
 
 
   startTransmissionWithPayloadFrom: (payload, node) ->
-    @startTransmission (chain) =>
-      message = new Message(chain)
+    @startTransmission (messageChain) =>
+      message = new Message(messageChain)
       message.setPayload(payload)
       message.sendFrom(node.getMessageSender())
 
 
   enquire: (node) ->
-    @startTransmission (chain) =>
-      query = new Query(chain)
-      query.enquireTarget(node)
+    @startTransmission (messageChain) =>
+      query = new Query({messageChain})
+      query.enquireTargetNode(node)
+
+
+  updateNodeState: (node, value) ->
+    payload = StatePayload.updateNodeAndCreate(node, value)
+    @startTransmissionWithPayloadFrom(payload, node)
+
+
+  sendNodeState: (node) ->
+    @startTransmissionWithPayloadFrom(new StatePayload(node), node)
 
 
   sendValue: (value, from: node) ->
