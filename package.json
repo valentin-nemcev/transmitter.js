@@ -4,7 +4,7 @@
   "description": "Declarative data-binding framework",
   "main": "index.js",
   "scripts": {
-    "test": "./node_modules/mocha/bin/mocha --opts specs/mocha.opts specs"
+    "test": "./node_modules/.bin/cake specs"
   },
   "author": "Valentin Nemcev <mail@valentin-nemcev.com>",
   "license": "MIT",
@@ -14,6 +14,7 @@
     "madge": "^0.4.1",
     "mocha": "^2.1.0",
     "mocha-sinon": "^1.1.4",
+    "shelljs": "^0.3.0",
     "sinon": "^1.12.2",
     "sinon-chai": "^2.6.0"
   },

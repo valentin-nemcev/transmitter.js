@@ -2,6 +2,8 @@
 
 require 'es6-shim'
 
+Error.stackTraceLimit = 3
+
 chai = require 'chai'
 global.expect = chai.expect
 

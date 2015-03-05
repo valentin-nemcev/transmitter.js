@@ -31,7 +31,7 @@ describe 'Example: Two-way serialization of nested models', ->
 describe 'Example: View types dependent on model property', ->
   it 'should be implemented'
 
-describe 'Reusing same view with different models', ->
+describe 'Example: Reusing same view with different models', ->
   it 'should be implemented'
 
 describe 'Example: Accepting or canceling changes with intermediate models', ->
