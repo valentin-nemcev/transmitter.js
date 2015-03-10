@@ -1,10 +1,16 @@
 'use strict'
 
+Query = require '../query'
+
 
 module.exports = class MessageChain
 
   constructor: ()->
     @sendersToMessages = new Map()
+
+
+  createQuery: ->
+    return new Query({messageChain: this})
 
 
   addMessageFrom: (message, sender) ->

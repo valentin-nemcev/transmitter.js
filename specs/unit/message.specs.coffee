@@ -7,6 +7,7 @@ Message = require 'binder/message'
 class MessageChainStub
   addMessageFrom: ->
   getMessageFrom: ->
+  createQuery: ->
 
 class MessageSenderStub
   sendMessage: ->
@@ -16,6 +17,8 @@ class MessagePayloadStub
 
 class MessageTargetStub
   send: ->
+  enquire: ->
+
 
 describe 'Message', ->
 
@@ -107,3 +110,18 @@ describe 'Message', ->
         @message.sendMergedTo(sourceKeys, @messageChain)
 
         expect(@target.send).to.not.have.been.called
+
+
+  describe 'sends query for merge', ->
+    beforeEach ->
+      @target = new MessageTargetStub
+      sinon.spy(@target, 'enquire')
+
+
+    it 'should create a query and send it to source', ->
+      @mergeQuery = new class QueryStub
+      sinon.stub(@messageChain, 'createQuery').returns(@mergeQuery)
+
+      @message.enquireForMerge(@target)
+
+      expect(@target.enquire).to.have.been.calledWithSame(@mergeQuery)

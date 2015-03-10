@@ -27,5 +27,10 @@ module.exports = class Message
     return this
 
 
-  sendMergedTo: (compositeSource) ->
+  sendMergedTo: (target) ->
+    return this
+
+
+  enquireForMerge: (source) ->
+    source.enquire(@chain.createQuery())
     return this

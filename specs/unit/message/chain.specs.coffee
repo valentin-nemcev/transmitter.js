@@ -3,6 +3,7 @@
 
 MessageChain = require 'binder/message/chain'
 
+Query = require 'binder/query'
 
 class MessageStub
 
@@ -13,6 +14,12 @@ describe 'MessageChain', ->
 
   beforeEach ->
     @chain = new MessageChain()
+
+
+  it 'creates queries', ->
+    query = @chain.createQuery()
+
+    expect(query).to.be.instanceOf(Query)
 
 
   it 'should provide message sent from given sender', ->
