@@ -28,6 +28,12 @@ module.exports = new class Binder
   startTransmission: (doWithChain) ->
     messageChain = new MessageChain()
     doWithChain(messageChain)
+    for node in messageChain.getEnqueriedNodes()
+      message = new Message(messageChain)
+      payload = new StatePayload(node)
+      message.setPayload(payload)
+      message.sendFrom(node.getMessageSender())
+
     return this
 
 

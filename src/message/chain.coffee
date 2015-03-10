@@ -7,6 +7,7 @@ module.exports = class MessageChain
 
   constructor: ()->
     @sendersToMessages = new Map()
+    @enqueriedNodes = []
 
 
   createQuery: ->
@@ -23,4 +24,9 @@ module.exports = class MessageChain
 
 
   addQueryTo: (node) ->
+    @enqueriedNodes.push node
     return this
+
+
+  getEnqueriedNodes: ->
+    @enqueriedNodes

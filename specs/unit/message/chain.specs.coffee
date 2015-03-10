@@ -42,3 +42,4 @@ describe 'MessageChain', ->
     @chain.addQueryTo(@node1)
     @chain.addQueryTo(@node2)
 
+    expect(@chain.getEnqueriedNodes()).to.have.members([@node1, @node2])

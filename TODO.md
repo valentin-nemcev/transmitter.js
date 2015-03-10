@@ -7,6 +7,7 @@
   * Find a name for high level api
 * Rename `MessageChain` to `Transmission`
 * Rename `send` and `enquire` to `receive/sendMessage` and `receive/sendQuery`
+
 * Use Given-When-Then format for functional specs and examples
 * Introduce functional specs
   * Write functional spec for message merging
