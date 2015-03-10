@@ -19,9 +19,8 @@ module.exports = class CompositeBindingSourcePart
 
 
   send: (message) ->
-    chain = message.getChain()
     message.enquireForMerge(@compositeTarget) if @initiatesMerge
-    @compositeTarget.sendMerged(chain)
+    @compositeTarget.receive(message)
     return this
 
 

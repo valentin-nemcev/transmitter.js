@@ -25,3 +25,7 @@ module.exports = class Message
   sendToNode: (targetNode) ->
     @payload.deliver(targetNode)
     return this
+
+
+  sendMergedTo: (compositeSource) ->
+    return this

@@ -3,18 +3,21 @@
 
 CompositeBindingSource = require 'binder/binding/composite_source'
 
+class CompositePartStub
+  bindCompositeTarget: ->
+  getSourceKey: ->
+  getSentMessage: ->
+  enquire: ->
+
+class TargetStub
+  send: ->
+
+class MessageStub
+  sendMergedTo: ->
+  sendTo: ->
+
 
 describe 'CompositeBindingSource', ->
-
-  class CompositePartStub
-    bindCompositeTarget: ->
-    getSourceKey: ->
-    getSentMessage: ->
-    enquire: ->
-
-  class TargetStub
-    send: ->
-
 
   beforeEach ->
     @part1 = new CompositePartStub
@@ -29,13 +32,32 @@ describe 'CompositeBindingSource', ->
     @compositeSource.bindTarget(@target)
 
     @messageChain = new class MessageChainStub
-    class MessageStub
     @messageFromPart1 = new MessageStub
     @messageFromPart2 = new MessageStub
-    @part1SourceKey = {}
-    @part2SourceKey = {}
+    @part1SourceKey = new class Part1SourceKeyStub
+    @part2SourceKey = new class Part2SourceKeyStub
     sinon.stub(@part1, 'getSourceKey').returns(@part1SourceKey)
     sinon.stub(@part2, 'getSourceKey').returns(@part2SourceKey)
+
+
+  describe 'merges messages from its source parts', ->
+
+    beforeEach ->
+      @message = new MessageStub
+      sinon.spy(@message, 'sendMergedTo')
+
+      @compositeSource.receive(@message)
+
+
+    it 'should pass its source part keys to message for merge', ->
+      sourceKeysForMerge = @message.sendMergedTo.firstCall.args[0]
+      expect(sourceKeysForMerge)
+        .to.have.members([@part1SourceKey, @part2SourceKey])
+
+
+    it 'should send merged message to its target', ->
+      mergedMessageTarget = @message.sendMergedTo.firstCall.args[1]
+      expect(mergedMessageTarget).to.equal(@target)
 
 
   describe 'when some parts have sent their messages', ->

@@ -29,6 +29,12 @@ module.exports = class CompositeBindingSource
     return this
 
 
+  receive: (message) ->
+    sourceKeys = @sources.map (source) -> source.getSourceKey()
+    message.sendMergedTo(sourceKeys, @target)
+    return this
+
+
   enquire: (messageChain) ->
     for source in @sources
       source.enquire(messageChain)

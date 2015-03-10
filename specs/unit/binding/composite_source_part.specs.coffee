@@ -1,7 +1,6 @@
 'use strict'
 
 
-
 CompositeBindingSourcePart = require 'binder/binding/composite_source_part'
 
 
@@ -10,14 +9,15 @@ class SourceStub
   enquire: ->
 
 class MessageStub
-  getChain: ->
   enquireForMerge: ->
+
+class QueryStub
 
 class MessageChainStub
   getMessageFrom: ->
 
 class CompositeTargetStub
-  sendMerged: ->
+  receive: ->
   enquire: ->
 
 
@@ -51,31 +51,29 @@ describe 'CompositeBindingSourcePart', ->
 
 
   it 'should pass enquiry to its source', ->
-    messageChain = new MessageChainStub
+    query = new QueryStub
     sinon.spy(@source, 'enquire')
 
-    @part.enquire(messageChain)
+    @part.enquire(query)
 
-    expect(@source.enquire).to.have.been.calledWithSame(messageChain)
+    expect(@source.enquire).to.have.been.calledWithSame(query)
 
 
   describe 'after receiving a message', ->
 
     beforeEach ->
       @message = new MessageStub
-      @messageChain = new MessageChainStub
-      sinon.stub(@message, 'getChain').returns(@messageChain)
 
 
-    it 'should notify its composite target when message is sent to it', ->
-      compositeTarget = new CompositeTargetStub()
-      @part.bindCompositeTarget(compositeTarget)
-      sinon.spy(compositeTarget, 'sendMerged')
+    it 'should merge and send it to composite target', ->
+      @compositeTarget = new CompositeTargetStub()
+      @part.bindCompositeTarget(@compositeTarget)
+      sinon.spy(@compositeTarget, 'receive')
 
       @part.send(@message)
 
-      expect(compositeTarget.sendMerged)
-        .to.have.been.calledWithSame(@messageChain)
+      expect(@compositeTarget.receive)
+        .to.have.been.calledWithSame(@message)
 
 
     it 'should enquire target for merge when it initiates merge', ->
@@ -90,7 +88,7 @@ describe 'CompositeBindingSourcePart', ->
         .to.have.been.calledWithSame(@compositeTarget)
 
 
-    it 'should not enquire target for merge when it doesnt initiate merge', ->
+    it "should not enquire target for merge when it doesn't initiate merge", ->
       @part = new CompositeBindingSourcePart(@source, initiatesMerge: no)
       @compositeTarget = new CompositeTargetStub()
       @part.bindCompositeTarget(@compositeTarget)

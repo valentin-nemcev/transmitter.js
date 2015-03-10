@@ -6,6 +6,7 @@ Message = require 'binder/message'
 
 class MessageChainStub
   addMessageFrom: ->
+  getMessageFrom: ->
 
 class MessageSenderStub
   sendMessage: ->
@@ -14,7 +15,6 @@ class MessagePayloadStub
   deliver: ->
 
 class MessageTargetStub
-  # TODO: rename to send
   send: ->
 
 describe 'Message', ->
@@ -88,3 +88,22 @@ describe 'Message', ->
       @message.sendToNode(targetNode)
 
       expect(@payload.deliver).to.have.been.calledWithSame(targetNode)
+
+
+  describe 'merges messages from multiple nodes', ->
+    beforeEach ->
+      @target = new MessageTargetStub
+      sinon.spy(@target, 'send')
+
+
+    describe 'when not all nodes have sent their messages', ->
+
+      beforeEach ->
+
+
+      it 'should not send anything to target', ->
+        sourceKeys = undefined
+
+        @message.sendMergedTo(sourceKeys, @messageChain)
+
+        expect(@target.send).to.not.have.been.called
