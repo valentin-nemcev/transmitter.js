@@ -35,7 +35,7 @@ module.exports = class CompositeBindingSource
     return this
 
 
-  enquire: (messageChain) ->
+  enquire: (query) ->
     for source in @sources
-      source.enquire(messageChain)
+      source.enquire(query)
     return this

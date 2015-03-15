@@ -1,5 +1,6 @@
 'use strict'
 
+{MergedPayload} = require './message/payloads'
 
 module.exports = class Message
 
@@ -10,6 +11,16 @@ module.exports = class Message
     return this
 
 
+  getPayload: ->
+    return @payload
+
+
+  copyWithPayload: (payload) ->
+    copy = new Message(@chain)
+    copy.setPayload(payload)
+    return copy
+
+
   copyWithTransformedPayload: (transform) ->
     copy = new Message(@chain)
     copy.setPayload(transform(@payload))
@@ -18,7 +29,7 @@ module.exports = class Message
 
   sendFrom: (sender) ->
     @chain.addMessageFrom(this, sender)
-    sender.sendMessage(this)
+    sender.getMessageSender().sendMessage(this)
     return this
 
 
@@ -27,7 +38,15 @@ module.exports = class Message
     return this
 
 
-  sendMergedTo: (target) ->
+  sendMergedTo: (sourceKeys, target) ->
+    mergedPayload = new MergedPayload(sourceKeys)
+    for key in sourceKeys
+      message = @chain.getMessageFrom(key)
+      continue unless message?
+      mergedPayload.set(key, message.getPayload())
+
+    if mergedPayload.isPresent()
+      target.receive(@copyWithPayload(mergedPayload))
     return this
 
 

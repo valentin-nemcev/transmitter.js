@@ -21,7 +21,16 @@ class AlertEmitter
 class TextInput
   Binder.extendWithMessageSender(this)
 
-  change: (value) -> Binder.sendValue(value, from: this)
+  Binder.extendWithMessageReceiver(this)
+
+  change: (value) ->
+    @setValue(value)
+    Binder.sendNodeState(this)
+    return this
+
+  setValue: (@value) -> this
+
+  getValue: -> @value
 
 
 describe 'Example: one-way binding with merge and query', ->
@@ -37,8 +46,8 @@ describe 'Example: one-way binding with merge and query', ->
         Binder.buildCompositeSource()
           .withPart @button
           .withPassivePart @textInput
-          .withMerge (messages) => messages.get(@textInput)
       )
+      .withTransform (messages) => messages.get(@textInput)
       .toTarget @alertEmitter
       .bind()
 

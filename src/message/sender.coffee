@@ -19,7 +19,7 @@ module.exports = class MessageSender
 
 
   sendMessage: (message) ->
-    @targets.forEach (target) -> target.send(message)
+    @targets.forEach (target) -> target.receive(message)
     return this
 
 

@@ -8,6 +8,7 @@ class MessageChainStub
   addMessageFrom: ->
   getMessageFrom: ->
   createQuery: ->
+  mergeMessagesFrom: ->
 
 class MessageSenderStub
   sendMessage: ->
@@ -15,8 +16,11 @@ class MessageSenderStub
 class MessagePayloadStub
   deliver: ->
 
+class MessageStub
+  sendTo: ->
+
 class MessageTargetStub
-  send: ->
+  receive: ->
   enquire: ->
 
 
@@ -93,23 +97,26 @@ describe 'Message', ->
       expect(@payload.deliver).to.have.been.calledWithSame(targetNode)
 
 
-  describe 'merges messages from multiple nodes', ->
+  describe.skip 'merges messages from multiple nodes', ->
+
     beforeEach ->
+      @sourceKeys = new class SourceKeysStub
+
       @target = new MessageTargetStub
-      sinon.spy(@target, 'send')
 
-
-    describe 'when not all nodes have sent their messages', ->
+    describe 'creates a copy of itself with merged payload', ->
 
       beforeEach ->
+        sinon.stub(@message, 'copyWithPayload')
+          .withArgs(@mergedPayload)
+          .returns(@mergedMessage)
 
+      it 'sends it to provided target', ->
+        sinon.spy(@mergedMessage, 'sendTo')
 
-      it 'should not send anything to target', ->
-        sourceKeys = undefined
+        @message.sendMergedTo(@sourceKeys, @target)
 
-        @message.sendMergedTo(sourceKeys, @messageChain)
-
-        expect(@target.send).to.not.have.been.called
+        expect(@mergedMessage.sendTo).to.have.been.calledWithSame(@target)
 
 
   describe 'sends query for merge', ->

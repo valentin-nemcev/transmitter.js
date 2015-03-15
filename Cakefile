@@ -8,3 +8,6 @@ task 'specs', ->
 
 task 'specs:unit', ->
   exec mochaCmd + ' -ig Example:'
+
+task 'specs:examples', ->
+  exec mochaCmd + ' -g Example:'

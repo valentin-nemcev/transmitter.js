@@ -29,6 +29,27 @@ class exports.StatePayload
 
 
   deliver: (targetNode) ->
-    targetNode.setValue(@node.getValue())
+    if not targetNode.setValue? and targetNode.receiveValue?
+      targetNode.receiveValue(@node.getValue())
+    else
+      targetNode.setValue(@node.getValue())
     return this
 
+
+class exports.MergedPayload
+
+  constructor: (@keys) ->
+    @payloads = new Map()
+
+
+  set: (key, payload) ->
+    @payloads.set(key, payload)
+    return this
+
+
+  get: (key) ->
+    @payloads.get(key)
+
+
+  isPresent: ->
+    @keys.every (key) => @payloads.get(key)?

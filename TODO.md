@@ -8,8 +8,9 @@
 * Rename `MessageChain` to `Transmission`
 * Rename `send` and `enquire` to `receive/sendMessage` and `receive/sendQuery`
 
-* Use Given-When-Then format for functional specs and examples
+* Manual order for specs
+
 * Introduce functional specs
   * Write functional spec for message merging
   * Write functional spec for state querying
-  * Write functional spec for
+* Use Given-When-Then format for functional specs and examples

@@ -12,8 +12,8 @@ module.exports = class Binding
     return this
 
 
-  send: (message) ->
-    @target.send(message.copyWithTransformedPayload(@transform))
+  receive: (message) ->
+    @target.receive(message.copyWithTransformedPayload(@transform))
     return this
 
 

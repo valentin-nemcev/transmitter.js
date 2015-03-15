@@ -24,17 +24,12 @@ module.exports = class CompositeSourceBuilder
 
 
   _addSourcePart: (partSource, params) ->
-    source = partSource.getMessageSender()
-    @parts.push(new CompositeSourcePart(source,params))
-    return this
-
-
-  withMerge: (@merge) ->
+    @parts.push(new CompositeSourcePart(partSource, params))
     return this
 
 
   create: ->
-    new CompositeSource(@parts, {@merge})
+    new CompositeSource(@parts, {})
 
 
   getMessageSender: -> @create()
