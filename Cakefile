@@ -1,13 +1,15 @@
 require 'shelljs/global'
 
 
-mochaCmd = './node_modules/mocha/bin/mocha -c --opts specs/mocha.opts specs'
+execMocha = (files...) ->
+  exec './node_modules/mocha/bin/mocha -c --opts specs/mocha.opts ' \
+    + files.join(' ')
 
-task 'specs', ->
-  exec mochaCmd
+# task 'specs', ->
+#   exec mochaCmd
 
-task 'specs:unit', ->
-  exec mochaCmd + ' -ig Example:'
+# task 'specs:unit', ->
+#   exec mochaCmd + ' -ig Example:'
 
 task 'specs:examples', ->
-  exec mochaCmd + ' -g Example:'
+  execMocha 'specs/examples.specs.coffee'
