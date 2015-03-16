@@ -1,7 +1,7 @@
 'use strict'
 
 
-Binding = require 'binder/binding'
+Binding = require 'binder/binding/binding'
 
 
 class SourceStub

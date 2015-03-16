@@ -1,6 +1,6 @@
 'use strict'
 
-{MergedPayload} = require './message/payloads'
+{MergedPayload} = require './payloads'
 
 module.exports = class Message
 

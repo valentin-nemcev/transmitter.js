@@ -1,6 +1,6 @@
 'use strict'
 
-Query = require '../query'
+Query = require './query'
 
 
 module.exports = class MessageChain

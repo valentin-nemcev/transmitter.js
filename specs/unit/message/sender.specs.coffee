@@ -1,7 +1,7 @@
 'use strict'
 
 
-MessageSender = require 'binder/message/sender'
+MessageSender = require 'binder/binding/sender'
 
 
 class TargetStub

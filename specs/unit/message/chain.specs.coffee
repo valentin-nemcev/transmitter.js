@@ -1,9 +1,9 @@
 'use strict'
 
 
-MessageChain = require 'binder/message/chain'
+MessageChain = require 'binder/transmission/chain'
 
-Query = require 'binder/query'
+Query = require 'binder/transmission/query'
 
 class MessageStub
 

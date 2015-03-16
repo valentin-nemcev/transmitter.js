@@ -3,8 +3,7 @@
 * Remove use strict (needs custom compiler for mocha, browserify and npm)
 
 * Unit tests should describe classes and their responsibilities
-* Separate classes into topology and transmission and high-level api dirs
-  * Find a name for high level api
+* Replace recursive binding with centralized in binding builder
 * Rename `MessageChain` to `Transmission`
 * Rename `send` and `enquire` to `receive/sendMessage` and `receive/sendQuery`
 

@@ -1,7 +1,7 @@
 'use strict'
 
 
-Query = require 'binder/query'
+Query = require 'binder/transmission/query'
 
 
 class MessageChainStub

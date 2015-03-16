@@ -3,17 +3,17 @@
 
 CompositeSourceBuilder = require './binding/composite_source_builder'
 OneWayBindingBuilder = require './binding/one_way_builder'
-TwoWayBindingBuilder = require './two_way/binding_builder'
-Binding = require './binding'
+TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
+Binding = require './binding/binding'
 
-Query = require './query'
+Query = require './transmission/query'
 
-Message = require './message'
-{EventPayload, ValuePayload, StatePayload} = require './message/payloads'
+Message = require './transmission/message'
+{EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
-MessageChain = require './message/chain'
-MessageSender = require './message/sender'
-MessageReceiver = require './message/receiver'
+MessageChain = require './transmission/chain'
+MessageSender = require './binding/sender'
+MessageReceiver = require './binding/receiver'
 
 
 module.exports = new class Binder

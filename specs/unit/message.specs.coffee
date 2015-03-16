@@ -1,7 +1,7 @@
 'use strict'
 
 
-Message = require 'binder/message'
+Message = require 'binder/transmission/message'
 
 
 class MessageChainStub
