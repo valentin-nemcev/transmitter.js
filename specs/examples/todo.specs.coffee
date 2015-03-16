@@ -1,38 +1,38 @@
 'use strict'
 
 
-describe 'Example: Button with enabled or disabled states', ->
+describe 'Button with enabled or disabled states', ->
   it 'should be implemented'
 
-describe 'Example: Serialized value with on-demand transmission', ->
+describe 'Serialized value with on-demand transmission', ->
   it 'should be implemented'
 
-describe 'Example: Two-way select box binding', ->
+describe 'Two-way select box binding', ->
   it 'should be implemented'
 
-describe 'Example: Changing model list order preserving view state', ->
+describe 'Changing model list order preserving view state', ->
   it 'should be implemented'
 
-describe 'Example: Adding model to list without full view refresh', ->
+describe 'Adding model to list without full view refresh', ->
   it 'should be implemented'
 
-describe 'Example: Managing list ordering with list entries', ->
+describe 'Managing list ordering with list entries', ->
   it 'should be implemented'
 
-describe 'Example: Display some property of each model in a list with repetitions', ->
+describe 'Display some property of each model in a list with repetitions', ->
   it 'should be implemented'
 
-describe 'Example: Two-way serialization of model list with self-references', ->
+describe 'Two-way serialization of model list with self-references', ->
   it 'should be implemented'
 
-describe 'Example: Two-way serialization of nested models', ->
+describe 'Two-way serialization of nested models', ->
   it 'should be implemented'
 
-describe 'Example: View types dependent on model property', ->
+describe 'View types dependent on model property', ->
   it 'should be implemented'
 
-describe 'Example: Reusing same view with different models', ->
+describe 'Reusing same view with different models', ->
   it 'should be implemented'
 
-describe 'Example: Accepting or canceling changes with intermediate models', ->
+describe 'Accepting or canceling changes with intermediate models', ->
   it 'should be implemented'

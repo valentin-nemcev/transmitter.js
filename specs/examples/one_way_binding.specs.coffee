@@ -18,7 +18,7 @@ class AlertEmitter
   receiveValue: (messageStr) -> @alert(messageStr)
 
 
-describe 'Example: one-way binding', ->
+describe 'One-way binding', ->
 
   beforeEach ->
     @button = new Button()
