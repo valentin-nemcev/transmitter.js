@@ -4,6 +4,9 @@
 Message = require 'binder/transmission/message'
 
 
+class NodeStub
+  getMessageSender: ->
+
 class MessageChainStub
   addMessageFrom: ->
   getMessageFrom: ->
@@ -29,6 +32,8 @@ describe 'Message', ->
   beforeEach ->
     @messageChain = new MessageChainStub
     @messageSender = new MessageSenderStub
+    @node = new NodeStub
+    sinon.stub(@node, 'getMessageSender').returns(@messageSender)
     @message = new Message(@messageChain)
     @payload = new MessagePayloadStub
     @message.setPayload(@payload)
@@ -39,18 +44,18 @@ describe 'Message', ->
     it 'should add itself to message chain', ->
       sinon.spy(@messageChain, 'addMessageFrom')
 
-      @message.sendFrom(@messageSender)
+      @message.sendFromNode(@node)
 
       expect(@messageChain.addMessageFrom).to.have.been.calledWith(
         sinon.match.same(@message),
-        sinon.match.same(@messageSender),
+        sinon.match.same(@node),
       )
 
 
     it 'should pass itself for sending to message sender', ->
       sinon.spy(@messageSender, 'sendMessage')
 
-      @message.sendFrom(@messageSender)
+      @message.sendFromNode(@node)
 
       expect(@messageSender.sendMessage).to.have.been.calledWithSame(@message)
 
@@ -59,7 +64,7 @@ describe 'Message', ->
       sinon.spy(@messageChain, 'addMessageFrom')
       sinon.spy(@messageSender, 'sendMessage')
 
-      @message.sendFrom(@messageSender)
+      @message.sendFromNode(@node)
 
       expect(@messageChain.addMessageFrom)
         .to.have.been.calledBefore(@messageSender.sendMessage)

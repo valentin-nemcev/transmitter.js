@@ -32,7 +32,7 @@ module.exports = new class Binder
       message = new Message(messageChain)
       payload = new StatePayload(node)
       message.setPayload(payload)
-      message.sendFrom(node)
+      message.sendFromNode(node)
 
     return this
 
@@ -41,7 +41,7 @@ module.exports = new class Binder
     @startTransmission (messageChain) =>
       message = new Message(messageChain)
       message.setPayload(payload)
-      message.sendFrom(node)
+      message.sendFromNode(node)
 
 
   enquire: (node) ->

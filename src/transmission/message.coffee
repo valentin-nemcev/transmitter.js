@@ -27,7 +27,7 @@ module.exports = class Message
     return copy
 
 
-  sendFrom: (sender) ->
+  sendFromNode: (sender) ->
     @chain.addMessageFrom(this, sender)
     sender.getMessageSender().sendMessage(this)
     return this
