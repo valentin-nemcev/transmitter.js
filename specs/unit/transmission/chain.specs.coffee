@@ -22,7 +22,7 @@ describe 'MessageChain', ->
     expect(query).to.be.instanceOf(Query)
 
 
-  it 'should provide message sent from given sender', ->
+  it 'should provide message sent from given node', ->
     @message1 = new MessageStub
     @message2 = new MessageStub
     @node1 = new NodeStub

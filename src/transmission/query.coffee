@@ -7,7 +7,7 @@ module.exports = class Query
 
 
   enquireTargetNode: (node) ->
-    node.getMessageReceiver().enquire(this)
+    node.getNodeTarget().enquire(this)
     return this
 
 

@@ -5,13 +5,13 @@ Binder = require 'binder'
 
 
 class Button
-  Binder.extendWithMessageSender(this)
+  Binder.extendWithNodeSource(this)
 
   click: -> Binder.sendBare(from: this)
 
 
 class AlertEmitter
-  Binder.extendWithMessageReceiver(this)
+  Binder.extendWithNodeTarget(this)
 
   alert: sinon.spy()
 

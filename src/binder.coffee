@@ -68,12 +68,12 @@ module.exports = new class Binder
     @startTransmissionWithPayloadFrom(new EventPayload(), node)
 
 
-  extendWithMessageSender: (cls) ->
+  extendWithNodeSource: (cls) ->
     NodeSource.extend(cls)
     return this
 
 
-  extendWithMessageReceiver: (cls) ->
+  extendWithNodeTarget: (cls) ->
     NodeTarget.extend(cls)
     return this
 

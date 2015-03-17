@@ -24,7 +24,7 @@ module.exports = class CompositeSourceBuilder
 
 
   _addSourcePart: (node, params) ->
-    @parts.push(new CompositeSourcePart(node, node.getMessageSender(), params))
+    @parts.push(new CompositeSourcePart(node, node.getNodeSource(), params))
     return this
 
 
@@ -32,4 +32,4 @@ module.exports = class CompositeSourceBuilder
     new CompositeSource(@parts, {})
 
 
-  getMessageSender: -> @create()
+  getNodeSource: -> @create()

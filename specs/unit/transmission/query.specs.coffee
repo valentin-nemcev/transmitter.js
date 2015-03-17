@@ -7,7 +7,7 @@ Query = require 'binder/transmission/query'
 class MessageChainStub
   addQueryTo: ->
 
-class MessageReceiverStub
+class NodeTargetStub
   enquire: ->
 
 
@@ -21,15 +21,15 @@ describe 'Query', ->
   describe 'when enquired target node', ->
 
     beforeEach ->
-      @targetMessageReceiver = new MessageReceiverStub
-      @targetNode = {getMessageReceiver: => @targetMessageReceiver}
+      @targetNodeTarget = new NodeTargetStub
+      @targetNode = {getNodeTarget: => @targetNodeTarget}
 
 
     it 'should enquire node message target', ->
-      sinon.spy(@targetMessageReceiver, 'enquire')
+      sinon.spy(@targetNodeTarget, 'enquire')
       @query.enquireTargetNode(@targetNode)
 
-      expect(@targetMessageReceiver.enquire)
+      expect(@targetNodeTarget.enquire)
         .to.have.been.calledWithSame(@query)
 
 

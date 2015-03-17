@@ -5,9 +5,9 @@ Binder = require 'binder'
 
 
 class TextInput
-  Binder.extendWithMessageSender(this)
+  Binder.extendWithNodeSource(this)
 
-  Binder.extendWithMessageReceiver(this)
+  Binder.extendWithNodeTarget(this)
 
   change: (value) ->
     @setValue(value)
@@ -20,9 +20,9 @@ class TextInput
 
 
 class Variable
-  Binder.extendWithMessageSender(this)
+  Binder.extendWithNodeSource(this)
 
-  Binder.extendWithMessageReceiver(this)
+  Binder.extendWithNodeTarget(this)
 
   getValue: -> @value
 

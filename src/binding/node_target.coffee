@@ -4,8 +4,8 @@
 module.exports = class NodeTarget
 
   @extend = (nodeClass) ->
-    nodeClass::getMessageReceiver = ->
-      @messageReceiver ?= new NodeTarget(this)
+    nodeClass::getNodeTarget = ->
+      @nodeTarget ?= new NodeTarget(this)
 
 
   constructor: (@node) ->

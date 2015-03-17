@@ -5,8 +5,8 @@ module.exports = class NodeSource
 
   @extend = (nodeClass) ->
     Object.assign nodeClass.prototype,
-      getMessageSender: ->
-        @messageSender ?= new NodeSource(this)
+      getNodeSource: ->
+        @nodeSource ?= new NodeSource(this)
 
 
   constructor: (@node) ->
