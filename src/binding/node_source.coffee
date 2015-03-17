@@ -1,12 +1,12 @@
 'use strict'
 
 
-module.exports = class MessageSender
+module.exports = class NodeSource
 
   @extend = (nodeClass) ->
     Object.assign nodeClass.prototype,
       getMessageSender: ->
-        @messageSender ?= new MessageSender(this)
+        @messageSender ?= new NodeSource(this)
 
 
   constructor: (@node) ->

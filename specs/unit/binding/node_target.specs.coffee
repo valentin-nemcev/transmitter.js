@@ -1,11 +1,8 @@
 'use strict'
 
 
-MessageReceiver = require 'binder/binding/receiver'
+NodeTarget = require 'binder/binding/node_target'
 
-
-class MessageStub
-  sendToNode: ->
 
 class NodeStub
 
@@ -14,24 +11,27 @@ class SourceStub
 
 class QueryStub
 
+class MessageStub
+  sendToNode: ->
 
-describe 'MessageReceiver', ->
+
+describe 'NodeTarget', ->
 
   beforeEach ->
     @node = new NodeStub
-    @target = new MessageReceiver(@node)
+    @target = new NodeTarget(@node)
 
 
-  it 'should delegate to message when message is sent to it', ->
+  it 'delivers messages to its node', ->
     message = new MessageStub
     sinon.spy(message, 'sendToNode')
 
-    @target.send(message)
+    @target.receive(message)
 
     expect(message.sendToNode).to.have.been.calledWithSame(@node)
 
 
-  it 'should delegate to its source when enquired', ->
+  it 'sends queries to its source', ->
     @source = new SourceStub
     sinon.spy(@source, 'enquire')
     @target.bindSource(@source)

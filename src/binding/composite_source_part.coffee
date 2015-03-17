@@ -3,19 +3,19 @@
 
 module.exports = class CompositeBindingSourcePart
 
-  constructor: (@source, params = {}) ->
+  constructor: (@sourceNode, @source, params = {}) ->
     {@initiatesMerge} = params
     @compositeTarget = null
 
 
   bindCompositeTarget: (compositeTarget) ->
-    @source.getMessageSender().bindTarget(this)
+    @source.bindTarget(this)
     @compositeTarget = compositeTarget
     return this
 
 
   getSourceKey: ->
-    @source
+    @sourceNode
 
 
   receive: (message) ->
@@ -24,10 +24,6 @@ module.exports = class CompositeBindingSourcePart
     return this
 
 
-  # getSentMessage: (messageChain) ->
-  #   messageChain.getMessageFrom(@source)
-
-
   enquire: (query) ->
-    @source.getMessageSender().enquire(query)
+    @source.enquire(query)
     return this

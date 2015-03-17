@@ -1,11 +1,11 @@
 'use strict'
 
 
-module.exports = class MessageReceiver
+module.exports = class NodeTarget
 
   @extend = (nodeClass) ->
     nodeClass::getMessageReceiver = ->
-      @messageReceiver ?= new MessageReceiver(this)
+      @messageReceiver ?= new NodeTarget(this)
 
 
   constructor: (@node) ->

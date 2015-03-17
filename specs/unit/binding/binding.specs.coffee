@@ -10,7 +10,7 @@ class SourceStub
 
 class TargetStub
   bindSource: ->
-  send: ->
+  receive: ->
 
 class MessageStub
   copyWithTransformedPayload: ->
@@ -53,7 +53,7 @@ describe 'Binding', ->
       @transform = ->
       @binding = new Binding({@transform})
       @binding.bindSourceTarget(@source, @target)
-      sinon.spy(@target, 'send')
+      sinon.spy(@target, 'receive')
 
 
     it 'should send message copy with transformed payload', ->
@@ -63,9 +63,9 @@ describe 'Binding', ->
         .withArgs(sinon.match.same(@transform))
         .returns(messageWithTransformedPayload)
 
-      @binding.send(message)
+      @binding.receive(message)
 
-      expect(@target.send)
+      expect(@target.receive)
         .to.have.been.calledWithSame(messageWithTransformedPayload)
 
 

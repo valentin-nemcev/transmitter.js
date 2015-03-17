@@ -25,7 +25,8 @@ describe 'CompositeBindingSourcePart', ->
 
   beforeEach ->
     @source = new SourceStub
-    @part = new CompositeBindingSourcePart(@source)
+    @sourceNode = new class SourceNodeStub
+    @part = new CompositeBindingSourcePart(@sourceNode, @source)
 
 
   it 'should bind itself to message sender', ->
@@ -37,17 +38,7 @@ describe 'CompositeBindingSourcePart', ->
 
 
   it 'should provide its source as a key', ->
-    expect(@part.getSourceKey()).to.equal(@source)
-
-
-  it 'should provide message in chain sent from source', ->
-    message = new MessageStub
-    messageChain = new MessageChainStub
-    sinon.stub(messageChain, 'getMessageFrom')
-      .withArgs(sinon.match.same(@source))
-      .returns(message)
-
-    expect(@part.getSentMessage(messageChain)).to.equal(message)
+    expect(@part.getSourceKey()).to.equal(@sourceNode)
 
 
   it 'should pass enquiry to its source', ->
@@ -70,31 +61,31 @@ describe 'CompositeBindingSourcePart', ->
       @part.bindCompositeTarget(@compositeTarget)
       sinon.spy(@compositeTarget, 'receive')
 
-      @part.send(@message)
+      @part.receive(@message)
 
       expect(@compositeTarget.receive)
         .to.have.been.calledWithSame(@message)
 
 
     it 'should enquire target for merge when it initiates merge', ->
-      @part = new CompositeBindingSourcePart(@source, initiatesMerge: yes)
+      @part = new CompositeBindingSourcePart(@sourceNode, @source, initiatesMerge: yes)
       @compositeTarget = new CompositeTargetStub()
       @part.bindCompositeTarget(@compositeTarget)
       sinon.spy(@message, 'enquireForMerge')
 
-      @part.send(@message)
+      @part.receive(@message)
 
       expect(@message.enquireForMerge)
         .to.have.been.calledWithSame(@compositeTarget)
 
 
     it "should not enquire target for merge when it doesn't initiate merge", ->
-      @part = new CompositeBindingSourcePart(@source, initiatesMerge: no)
+      @part = new CompositeBindingSourcePart(@sourceNode, @source, initiatesMerge: no)
       @compositeTarget = new CompositeTargetStub()
       @part.bindCompositeTarget(@compositeTarget)
       sinon.spy(@message, 'enquireForMerge')
 
-      @part.send(@message)
+      @part.receive(@message)
 
       expect(@message.enquireForMerge).to.not.have.been.called
 

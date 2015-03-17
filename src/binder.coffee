@@ -12,8 +12,8 @@ Message = require './transmission/message'
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
 MessageChain = require './transmission/chain'
-MessageSender = require './binding/sender'
-MessageReceiver = require './binding/receiver'
+NodeSource = require './binding/node_source'
+NodeTarget = require './binding/node_target'
 
 
 module.exports = new class Binder
@@ -69,12 +69,12 @@ module.exports = new class Binder
 
 
   extendWithMessageSender: (cls) ->
-    MessageSender.extend(cls)
+    NodeSource.extend(cls)
     return this
 
 
   extendWithMessageReceiver: (cls) ->
-    MessageReceiver.extend(cls)
+    NodeTarget.extend(cls)
     return this
 
 

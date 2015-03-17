@@ -15,16 +15,16 @@ module.exports = class CompositeSourceBuilder
     @parts = []
 
 
-  withPart: (partSource) ->
-    @_addSourcePart(partSource, initiatesMerge: yes)
+  withPart: (node) ->
+    @_addSourcePart(node, initiatesMerge: yes)
 
 
-  withPassivePart: (partSource) ->
-    @_addSourcePart(partSource, initiatesMerge: no)
+  withPassivePart: (node) ->
+    @_addSourcePart(node, initiatesMerge: no)
 
 
-  _addSourcePart: (partSource, params) ->
-    @parts.push(new CompositeSourcePart(partSource, params))
+  _addSourcePart: (node, params) ->
+    @parts.push(new CompositeSourcePart(node, node.getMessageSender(), params))
     return this
 
 
