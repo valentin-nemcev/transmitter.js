@@ -4,7 +4,6 @@
 CompositeSourceBuilder = require './binding/composite_source_builder'
 OneWayBindingBuilder = require './binding/one_way_builder'
 TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
-Binding = require './binding/binding'
 
 Query = require './transmission/query'
 
@@ -80,7 +79,7 @@ module.exports = new class Binder
 
   buildTwoWayBinding: -> new TwoWayBindingBuilder(this)
 
-  buildOneWayBinding: -> new OneWayBindingBuilder(bindingConstructor: Binding)
+  buildOneWayBinding: -> new OneWayBindingBuilder()
 
   buildCompositeSource: -> new CompositeSourceBuilder()
 

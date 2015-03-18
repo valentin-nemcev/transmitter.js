@@ -1,13 +1,16 @@
 'use strict'
 
 
+Binding = require './binding'
+
+
 module.exports = class BindingBuilder
 
 
   returnArg = (arg) -> arg
 
 
-  constructor: ({@bindingConstructor}) ->
+  constructor: ->
     @transform ?= returnArg
 
 
@@ -24,7 +27,7 @@ module.exports = class BindingBuilder
 
 
   bind: ->
-    binding = new @bindingConstructor({@transform})
+    binding = new Binding({@transform})
     binding.bindSourceTarget(
       @source.getNodeSource(),
       @target.getNodeTarget()
