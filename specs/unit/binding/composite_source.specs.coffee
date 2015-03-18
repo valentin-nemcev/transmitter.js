@@ -31,7 +31,7 @@ describe 'CompositeBindingSource', ->
     @target = new TargetStub()
     @compositeSource.bindTarget(@target)
 
-    @messageChain = new class MessageChainStub
+    @transmission = new class TransmissionStub
     @messageFromPart1 = new MessageStub
     @messageFromPart2 = new MessageStub
     @part1SourceKey = new class Part1SourceKeyStub
@@ -64,13 +64,13 @@ describe 'CompositeBindingSource', ->
 
     beforeEach ->
       sinon.stub(@part1, 'getSentMessage')
-        .withArgs(sinon.match.same(@messageChain))
+        .withArgs(sinon.match.same(@transmission))
         .returns @messageFromPart1
 
       sinon.stub(@part2, 'getSentMessage')
         .returns(null)
 
-      @compositeSource.sendMerged(@messageChain)
+      @compositeSource.sendMerged(@transmission)
 
 
     it 'should not send anything to merge', ->
@@ -81,16 +81,16 @@ describe 'CompositeBindingSource', ->
 
     beforeEach ->
       sinon.stub(@part1, 'getSentMessage')
-        .withArgs(sinon.match.same(@messageChain))
+        .withArgs(sinon.match.same(@transmission))
         .returns @messageFromPart1
 
       sinon.stub(@part2, 'getSentMessage')
-        .withArgs(sinon.match.same(@messageChain))
+        .withArgs(sinon.match.same(@transmission))
         .returns @messageFromPart2
 
 
     it 'should send messages from sources for merge as a map', ->
-      @compositeSource.sendMerged(@messageChain)
+      @compositeSource.sendMerged(@transmission)
 
       @mergedMessages = @merge.firstCall.args[0]
       expect(Array.from(@mergedMessages.keys()))
@@ -102,7 +102,7 @@ describe 'CompositeBindingSource', ->
     it 'should send merged messages to its target', ->
       sinon.spy(@target, 'send')
 
-      @compositeSource.sendMerged(@messageChain)
+      @compositeSource.sendMerged(@transmission)
 
       expect(@target.send).to.have.been.calledWithSame(@mergedMessage)
 
@@ -113,7 +113,7 @@ describe 'CompositeBindingSource', ->
       sinon.spy(@part1, 'enquire')
       sinon.spy(@part2, 'enquire')
 
-      @compositeSource.enquire(@messageChain)
+      @compositeSource.enquire(@transmission)
 
-      expect(@part1.enquire).to.have.been.calledWithSame(@messageChain)
-      expect(@part2.enquire).to.have.been.calledWithSame(@messageChain)
+      expect(@part1.enquire).to.have.been.calledWithSame(@transmission)
+      expect(@part2.enquire).to.have.been.calledWithSame(@transmission)

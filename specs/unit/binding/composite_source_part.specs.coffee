@@ -13,9 +13,6 @@ class MessageStub
 
 class QueryStub
 
-class MessageChainStub
-  getMessageFrom: ->
-
 class CompositeTargetStub
   receive: ->
   enquire: ->

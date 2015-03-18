@@ -7,7 +7,7 @@ Message = require 'binder/transmission/message'
 class NodeStub
   getNodeSource: ->
 
-class MessageChainStub
+class TransmissionStub
   addMessageFrom: ->
   getMessageFrom: ->
   createQuery: ->
@@ -30,23 +30,23 @@ class MessageTargetStub
 describe 'Message', ->
 
   beforeEach ->
-    @messageChain = new MessageChainStub
+    @transmission = new TransmissionStub
     @nodeSource = new NodeSourceStub
     @node = new NodeStub
     sinon.stub(@node, 'getNodeSource').returns(@nodeSource)
-    @message = new Message(@messageChain)
+    @message = new Message(@transmission)
     @payload = new MessagePayloadStub
     @message.setPayload(@payload)
 
 
   describe 'when sent from sender', ->
 
-    it 'should add itself to message chain', ->
-      sinon.spy(@messageChain, 'addMessageFrom')
+    it 'should add itself to transmission', ->
+      sinon.spy(@transmission, 'addMessageFrom')
 
       @message.sendFromNode(@node)
 
-      expect(@messageChain.addMessageFrom).to.have.been.calledWith(
+      expect(@transmission.addMessageFrom).to.have.been.calledWith(
         sinon.match.same(@message),
         sinon.match.same(@node),
       )
@@ -60,13 +60,13 @@ describe 'Message', ->
       expect(@nodeSource.sendMessage).to.have.been.calledWithSame(@message)
 
 
-    it 'should add itself to message chain before passing itself to sender', ->
-      sinon.spy(@messageChain, 'addMessageFrom')
+    it 'should add itself to transmission before passing itself to sender', ->
+      sinon.spy(@transmission, 'addMessageFrom')
       sinon.spy(@nodeSource, 'sendMessage')
 
       @message.sendFromNode(@node)
 
-      expect(@messageChain.addMessageFrom)
+      expect(@transmission.addMessageFrom)
         .to.have.been.calledBefore(@nodeSource.sendMessage)
 
 
@@ -86,10 +86,10 @@ describe 'Message', ->
       expect(messageCopy.payload).to.equal(@transformedPayload)
 
 
-    it 'should have same chain as the original', ->
+    it 'should have same transmission as the original', ->
       messageCopy = @message.copyWithTransformedPayload(@transform)
 
-      expect(messageCopy.chain).to.equal(@message.chain)
+      expect(messageCopy.transmission).to.equal(@message.transmission)
 
 
   describe 'when sent to node', ->
@@ -132,7 +132,7 @@ describe 'Message', ->
 
     it 'should create a query and send it to source', ->
       @mergeQuery = new class QueryStub
-      sinon.stub(@messageChain, 'createQuery').returns(@mergeQuery)
+      sinon.stub(@transmission, 'createQuery').returns(@mergeQuery)
 
       @message.enquireForMerge(@target)
 

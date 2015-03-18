@@ -3,7 +3,7 @@
 Query = require './query'
 
 
-module.exports = class MessageChain
+module.exports = class Transmission
 
   constructor: ()->
     @sendersToMessages = new Map()
@@ -11,7 +11,7 @@ module.exports = class MessageChain
 
 
   createQuery: ->
-    return new Query({messageChain: this})
+    return new Query({transmission: this})
 
 
   addMessageFrom: (message, sender) ->

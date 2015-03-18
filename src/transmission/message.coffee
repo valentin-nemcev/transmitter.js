@@ -4,7 +4,7 @@
 
 module.exports = class Message
 
-  constructor: (@chain) ->
+  constructor: (@transmission) ->
 
 
   setPayload: (@payload) ->
@@ -16,19 +16,19 @@ module.exports = class Message
 
 
   copyWithPayload: (payload) ->
-    copy = new Message(@chain)
+    copy = new Message(@transmission)
     copy.setPayload(payload)
     return copy
 
 
   copyWithTransformedPayload: (transform) ->
-    copy = new Message(@chain)
+    copy = new Message(@transmission)
     copy.setPayload(transform(@payload))
     return copy
 
 
   sendFromNode: (node) ->
-    @chain.addMessageFrom(this, node)
+    @transmission.addMessageFrom(this, node)
     node.getNodeSource().sendMessage(this)
     return this
 
@@ -41,7 +41,7 @@ module.exports = class Message
   sendMergedTo: (sourceKeys, target) ->
     mergedPayload = new MergedPayload(sourceKeys)
     for key in sourceKeys
-      message = @chain.getMessageFrom(key)
+      message = @transmission.getMessageFrom(key)
       continue unless message?
       mergedPayload.set(key, message.getPayload())
 
@@ -51,5 +51,5 @@ module.exports = class Message
 
 
   enquireForMerge: (source) ->
-    source.enquire(@chain.createQuery())
+    source.enquire(@transmission.createQuery())
     return this

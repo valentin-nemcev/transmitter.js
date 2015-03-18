@@ -4,7 +4,7 @@
 Query = require 'binder/transmission/query'
 
 
-class MessageChainStub
+class TransmissionStub
   addQueryTo: ->
 
 class NodeTargetStub
@@ -14,8 +14,8 @@ class NodeTargetStub
 describe 'Query', ->
 
   beforeEach ->
-    @messageChain = new MessageChainStub()
-    @query = new Query({@messageChain})
+    @transmission = new TransmissionStub()
+    @query = new Query({@transmission})
 
 
   describe 'when enquired target node', ->
@@ -35,10 +35,10 @@ describe 'Query', ->
 
   describe 'when enquired source node', ->
 
-    it 'should add query to message chain', ->
+    it 'should add query to transmission', ->
       @node = new class NodeStub
-      sinon.spy(@messageChain, 'addQueryTo')
+      sinon.spy(@transmission, 'addQueryTo')
 
       @query.enquireSourceNode(@node)
 
-      expect(@messageChain.addQueryTo).to.have.been.calledWithSame(@node)
+      expect(@transmission.addQueryTo).to.have.been.calledWithSame(@node)

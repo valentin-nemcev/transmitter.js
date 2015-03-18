@@ -11,7 +11,7 @@ Query = require './transmission/query'
 Message = require './transmission/message'
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
-MessageChain = require './transmission/chain'
+Transmission = require './transmission/transmission'
 NodeSource = require './binding/node_source'
 NodeTarget = require './binding/node_target'
 
@@ -19,17 +19,17 @@ NodeTarget = require './binding/node_target'
 module.exports = new class Binder
 
 
-  createQueryResponseMessage: (messageChain, node) ->
-    message = new Message(messageChain)
+  createQueryResponseMessage: (transmission, node) ->
+    message = new Message(transmission)
     message.setPayload(new StatePayload(node))
     return message
 
 
-  startTransmission: (doWithChain) ->
-    messageChain = new MessageChain()
-    doWithChain(messageChain)
-    for node in messageChain.getEnqueriedNodes()
-      message = new Message(messageChain)
+  startTransmission: (doWithTransmission) ->
+    transmission = new Transmission()
+    doWithTransmission(transmission)
+    for node in transmission.getEnqueriedNodes()
+      message = new Message(transmission)
       payload = new StatePayload(node)
       message.setPayload(payload)
       message.sendFromNode(node)
@@ -38,15 +38,15 @@ module.exports = new class Binder
 
 
   startTransmissionWithPayloadFrom: (payload, node) ->
-    @startTransmission (messageChain) =>
-      message = new Message(messageChain)
+    @startTransmission (transmission) =>
+      message = new Message(transmission)
       message.setPayload(payload)
       message.sendFromNode(node)
 
 
   enquire: (node) ->
-    @startTransmission (messageChain) =>
-      query = new Query({messageChain})
+    @startTransmission (transmission) =>
+      query = new Query({transmission})
       query.enquireTargetNode(node)
 
 

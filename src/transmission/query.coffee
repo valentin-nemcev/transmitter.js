@@ -3,7 +3,7 @@
 
 module.exports = class Query
 
-  constructor: ({@messageChain}) ->
+  constructor: ({@transmission}) ->
 
 
   enquireTargetNode: (node) ->
@@ -12,5 +12,5 @@ module.exports = class Query
 
 
   enquireSourceNode: (node) ->
-    @messageChain.addQueryTo(node)
+    @transmission.addQueryTo(node)
     return this
