@@ -4,11 +4,7 @@
 
 module.exports = class Message
 
-  constructor: (@transmission) ->
-
-
-  setPayload: (@payload) ->
-    return this
+  constructor: (@transmission, @payload) ->
 
 
   getPayload: ->
@@ -16,14 +12,12 @@ module.exports = class Message
 
 
   copyWithPayload: (payload) ->
-    copy = new Message(@transmission)
-    copy.setPayload(payload)
+    copy = new Message(@transmission, payload)
     return copy
 
 
   copyWithTransformedPayload: (transform) ->
-    copy = new Message(@transmission)
-    copy.setPayload(transform(@payload))
+    copy = new Message(@transmission, transform(@payload))
     return copy
 
 

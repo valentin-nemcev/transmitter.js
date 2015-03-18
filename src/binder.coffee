@@ -7,7 +7,6 @@ TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
 
 Query = require './transmission/query'
 
-Message = require './transmission/message'
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
 Transmission = require './transmission/transmission'
@@ -28,9 +27,8 @@ module.exports = new class Binder
     transmission = new Transmission()
     doWithTransmission(transmission)
     for node in transmission.getEnqueriedNodes()
-      message = new Message(transmission)
       payload = new StatePayload(node)
-      message.setPayload(payload)
+      message = transmission.createMessage(payload)
       message.sendFromNode(node)
 
     return this
@@ -38,8 +36,7 @@ module.exports = new class Binder
 
   startTransmissionWithPayloadFrom: (payload, node) ->
     @startTransmission (transmission) =>
-      message = new Message(transmission)
-      message.setPayload(payload)
+      message = transmission.createMessage(payload)
       message.sendFromNode(node)
 
 

@@ -5,7 +5,6 @@ NodeTarget = require 'binder/binding/node_target'
 BindingBuilder = require 'binder/binding/one_way_builder'
 
 Transmission = require 'binder/transmission/transmission'
-Message = require 'binder/transmission/message'
 
 
 class NodeSourceStub
@@ -29,14 +28,13 @@ describe 'Message and query transmission', ->
       .toTarget @target
       .bind()
 
+    @transmission = new Transmission()
+
 
   it 'transmits message from source to target', ->
-    @transmission = new Transmission()
-    @message = new Message(@transmission)
-
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message.setPayload(@payload)
+    @message = @transmission.createMessage(@payload)
 
     @message.sendFromNode(@source)
 

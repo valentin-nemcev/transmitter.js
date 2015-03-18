@@ -1,13 +1,18 @@
 'use strict'
 
 Query = require './query'
+Message = require './message'
 
 
 module.exports = class Transmission
 
-  constructor: ()->
+  constructor: ->
     @sendersToMessages = new Map()
     @enqueriedNodes = []
+
+
+  createMessage: (payload) ->
+    new Message(this, payload)
 
 
   createQuery: ->
