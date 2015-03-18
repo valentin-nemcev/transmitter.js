@@ -2,17 +2,22 @@ require 'shelljs/global'
 
 bin = './node_modules/mocha/bin'
 
-execMocha = (files...) ->
-  exec "#{bin}/mocha --colors --opts specs/mocha.opts #{files.join(' ')}"
+mochaCmd = (files...) ->
+  "#{bin}/mocha --colors --opts specs/mocha.opts #{files.join(' ')}"
 
 unitSpecs = 'specs/unit.specs.coffee'
 exampleSpecs = 'specs/examples.specs.coffee'
 
 task 'specs', ->
-  execMocha unitSpecs, exampleSpecs
+  exec(mochaCmd unitSpecs, exampleSpecs)
+
+task 'specs:coverage', ->
+  cmd =
+    mochaCmd('specs/coverage.coffee', unitSpecs, exampleSpecs, '-R html-cov')
+  exec(cmd, silent: yes).output.to('specs/coverage.html')
 
 task 'specs:unit', ->
-  execMocha unitSpecs
+  exec(mochaCmd(unitSpecs))
 
 task 'specs:examples', ->
-  execMocha exampleSpecs
+  exec(mochaCmd(exampleSpecs))
