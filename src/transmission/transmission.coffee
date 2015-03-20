@@ -37,6 +37,6 @@ module.exports = class Transmission
     for [node, query] in Array.from(@queriesToNodes.entries())
       payload = query.createResponsePayload(node)
       message = @createMessage(payload)
-      message.sendFromNode(node)
+      message.sendFromSourceNode(node)
     return this
 

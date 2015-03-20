@@ -25,13 +25,13 @@ module.exports = new class Binder
   startTransmissionWithPayloadFrom: (payload, node) ->
     @startTransmission (transmission) =>
       message = transmission.createMessage(payload)
-      message.sendFromNode(node)
+      message.sendFromSourceNode(node)
 
 
-  enquire: (node) ->
+  queryNodeState: (node) ->
     @startTransmission (transmission) =>
       query = transmission.createQuery(StatePayload.create)
-      query.sendFromNode(node)
+      query.sendFromTargetNode(node)
 
 
   updateNodeState: (node, value) ->

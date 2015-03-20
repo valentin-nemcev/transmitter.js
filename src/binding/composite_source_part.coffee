@@ -18,12 +18,12 @@ module.exports = class CompositeBindingSourcePart
     @sourceNode
 
 
-  receive: (message) ->
-    message.enquireForMerge(@compositeTarget) if @initiatesMerge
-    @compositeTarget.receive(message)
+  receiveMessage: (message) ->
+    message.sendQueryForMerge(@compositeTarget) if @initiatesMerge
+    @compositeTarget.receiveMessage(message)
     return this
 
 
-  enquire: (query) ->
-    @source.enquire(query)
+  receiveQuery: (query) ->
+    @source.receiveQuery(query)
     return this

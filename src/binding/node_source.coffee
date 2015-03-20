@@ -18,11 +18,11 @@ module.exports = class NodeSource
     return this
 
 
-  sendMessage: (message) ->
-    @targets.forEach (target) -> target.receive(message)
+  receiveMessage: (message) ->
+    @targets.forEach (target) -> target.receiveMessage(message)
     return this
 
 
-  enquire: (query) ->
-    query.enquireSourceNode(@node)
+  receiveQuery: (query) ->
+    query.sendToSourceNode(@node)
     return this

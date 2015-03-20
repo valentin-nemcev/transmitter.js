@@ -36,7 +36,7 @@ describe 'Message and query transmission', ->
     sinon.spy(@payload, 'deliver')
     @message = @transmission.createMessage(@payload)
 
-    @message.sendFromNode(@source)
+    @message.sendFromSourceNode(@source)
 
     expect(@payload.deliver).to.have.been.calledWithSame(@target)
 
@@ -45,7 +45,7 @@ describe 'Message and query transmission', ->
     @query = @transmission.createQuery()
     sinon.spy(@transmission, 'addQueryTo')
 
-    @query.sendFromNode(@target)
+    @query.sendFromTargetNode(@target)
 
     expect(@transmission.addQueryTo).to.have.been.calledWith(
       sinon.match.same(@query), sinon.match.same(@source)

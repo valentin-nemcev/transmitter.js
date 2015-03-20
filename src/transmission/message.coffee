@@ -21,13 +21,13 @@ module.exports = class Message
     return copy
 
 
-  sendFromNode: (node) ->
+  sendFromSourceNode: (node) ->
     @transmission.addMessageFrom(this, node)
-    node.getNodeSource().sendMessage(this)
+    node.getNodeSource().receiveMessage(this)
     return this
 
 
-  sendToNode: (targetNode) ->
+  sendToTargetNode: (targetNode) ->
     @payload.deliver(targetNode)
     return this
 
@@ -40,10 +40,10 @@ module.exports = class Message
       mergedPayload.set(key, message.getPayload())
 
     if mergedPayload.isPresent()
-      target.receive(@copyWithPayload(mergedPayload))
+      target.receiveMessage(@copyWithPayload(mergedPayload))
     return this
 
 
-  enquireForMerge: (source) ->
-    source.enquire(@transmission.createQuery(StatePayload.create))
+  sendQueryForMerge: (source) ->
+    source.receiveQuery(@transmission.createQuery(StatePayload.create))
     return this

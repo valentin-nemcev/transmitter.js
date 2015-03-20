@@ -15,11 +15,11 @@ module.exports = class NodeTarget
     return this
 
 
-  receive: (message) ->
-    message.sendToNode(@node)
+  receiveMessage: (message) ->
+    message.sendToTargetNode(@node)
     return this
 
 
-  enquire: (query) ->
-    @source.enquire(query)
+  receiveQuery: (query) ->
+    @source.receiveQuery(query)
     return this

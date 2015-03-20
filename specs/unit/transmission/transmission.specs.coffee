@@ -18,7 +18,7 @@ describe 'Transmission', ->
 
   it 'responds to queries', ->
     @nodeSource = @node.getNodeSource()
-    sinon.spy(@nodeSource, 'sendMessage')
+    sinon.spy(@nodeSource, 'receiveMessage')
     @createResponsePayload = sinon.stub()
     @createResponsePayload
       .withArgs(sinon.match.same(@node))
@@ -29,5 +29,5 @@ describe 'Transmission', ->
     @transmission.addQueryTo(@query, @node)
     @transmission.respondToQueries()
 
-    @responseMessage = @nodeSource.sendMessage.args[0][0]
+    @responseMessage = @nodeSource.receiveMessage.args[0][0]
     expect(@responseMessage.getPayload()).to.equal(@responsePayload)

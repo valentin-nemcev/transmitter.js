@@ -12,11 +12,11 @@ module.exports = class Binding
     return this
 
 
-  receive: (message) ->
-    @target.receive(message.copyWithTransformedPayload(@transform))
+  receiveMessage: (message) ->
+    @target.receiveMessage(message.copyWithTransformedPayload(@transform))
     return this
 
 
-  enquire: (query) ->
-    @source.enquire(query)
+  receiveQuery: (query) ->
+    @source.receiveQuery(query)
     return this
