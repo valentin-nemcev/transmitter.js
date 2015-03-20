@@ -2,44 +2,32 @@
 
 
 Transmission = require 'binder/transmission/transmission'
+NodeSource = require 'binder/binding/node_source'
 
-Query = require 'binder/transmission/query'
-
-class MessageStub
 
 class NodeStub
+  NodeSource.extend(this)
 
 
 describe 'Transmission', ->
 
   beforeEach ->
     @transmission = new Transmission()
+    @node = new NodeStub
 
 
-  it 'creates queries', ->
-    query = @transmission.createQuery()
+  it 'responds to queries', ->
+    @nodeSource = @node.getNodeSource()
+    sinon.spy(@nodeSource, 'sendMessage')
+    @createResponsePayload = sinon.stub()
+    @createResponsePayload
+      .withArgs(sinon.match.same(@node))
+      .returns(@responsePayload = new class PayloadStub)
 
-    expect(query).to.be.instanceOf(Query)
+    @query = @transmission.createQuery(@createResponsePayload)
 
+    @transmission.addQueryTo(@query, @node)
+    @transmission.respondToQueries()
 
-  it 'should provide message sent from given node', ->
-    @message1 = new MessageStub
-    @message2 = new MessageStub
-    @node1 = new NodeStub
-    @node2 = new NodeStub
-
-    @transmission.addMessageFrom(@message1, @node1)
-    @transmission.addMessageFrom(@message2, @node2)
-
-    expect(@transmission.getMessageFrom(@node1)).to.equal(@message1)
-    expect(@transmission.getMessageFrom(@node2)).to.equal(@message2)
-
-
-  it 'should add nodes to query queue', ->
-    @node1 = new NodeStub
-    @node2 = new NodeStub
-
-    @transmission.addQueryTo(@node1)
-    @transmission.addQueryTo(@node2)
-
-    expect(@transmission.getEnqueriedNodes()).to.have.members([@node1, @node2])
+    @responseMessage = @nodeSource.sendMessage.args[0][0]
+    expect(@responseMessage.getPayload()).to.equal(@responsePayload)

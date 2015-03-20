@@ -5,8 +5,6 @@ CompositeSourceBuilder = require './binding/composite_source_builder'
 OneWayBindingBuilder = require './binding/one_way_builder'
 TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
 
-Query = require './transmission/query'
-
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
 Transmission = require './transmission/transmission'
@@ -17,20 +15,10 @@ NodeTarget = require './binding/node_target'
 module.exports = new class Binder
 
 
-  createQueryResponseMessage: (transmission, node) ->
-    message = new Message(transmission)
-    message.setPayload(new StatePayload(node))
-    return message
-
-
   startTransmission: (doWithTransmission) ->
     transmission = new Transmission()
     doWithTransmission(transmission)
-    for node in transmission.getEnqueriedNodes()
-      payload = new StatePayload(node)
-      message = transmission.createMessage(payload)
-      message.sendFromNode(node)
-
+    transmission.respondToQueries()
     return this
 
 
@@ -42,8 +30,8 @@ module.exports = new class Binder
 
   enquire: (node) ->
     @startTransmission (transmission) =>
-      query = new Query({transmission})
-      query.enquireTargetNode(node)
+      query = transmission.createQuery(StatePayload.create)
+      query.sendFromNode(node)
 
 
   updateNodeState: (node, value) ->

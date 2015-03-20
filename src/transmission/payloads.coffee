@@ -20,7 +20,11 @@ class exports.ValuePayload
 
 class exports.StatePayload
 
-  @updateNodeAndCreate = (node, value) ->
+  @create = (node) =>
+    return new this(node)
+
+
+  @updateNodeAndCreate = (node, value) =>
     node.setValue(value)
     return new this(node)
 

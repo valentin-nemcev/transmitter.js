@@ -12,8 +12,3 @@
 
 * Introduce functional specs
   * Write functional spec for message merging
-  * Write functional spec for state querying
-  * Write functional spec for message transmission
-
-* Use Given-When-Then format for functional specs and examples
-  * Use mocha-steps (maybe)

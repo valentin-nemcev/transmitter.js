@@ -8,15 +8,15 @@ module.exports = class Transmission
 
   constructor: ->
     @sendersToMessages = new Map()
-    @enqueriedNodes = []
+    @queriesToNodes = new Map()
 
 
   createMessage: (payload) ->
     new Message(this, payload)
 
 
-  createQuery: ->
-    return new Query({transmission: this})
+  createQuery: (createResponsePayload) ->
+    new Query(this, createResponsePayload)
 
 
   addMessageFrom: (message, sender) ->
@@ -28,10 +28,15 @@ module.exports = class Transmission
     @sendersToMessages.get(sender)
 
 
-  addQueryTo: (node) ->
-    @enqueriedNodes.push node
+  addQueryTo: (query, node) ->
+    @queriesToNodes.set(node, query)
     return this
 
 
-  getEnqueriedNodes: ->
-    @enqueriedNodes
+  respondToQueries: ->
+    for [node, query] in Array.from(@queriesToNodes.entries())
+      payload = query.createResponsePayload(node)
+      message = @createMessage(payload)
+      message.sendFromNode(node)
+    return this
+

@@ -3,14 +3,14 @@
 
 module.exports = class Query
 
-  constructor: ({@transmission}) ->
+  constructor: (@transmission, @createResponsePayload) ->
 
 
-  enquireTargetNode: (node) ->
+  sendFromNode: (node) ->
     node.getNodeTarget().enquire(this)
     return this
 
 
   enquireSourceNode: (node) ->
-    @transmission.addQueryTo(node)
+    @transmission.addQueryTo(this, node)
     return this

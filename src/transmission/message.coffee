@@ -1,6 +1,6 @@
 'use strict'
 
-{MergedPayload} = require './payloads'
+{StatePayload, MergedPayload} = require './payloads'
 
 module.exports = class Message
 
@@ -45,5 +45,5 @@ module.exports = class Message
 
 
   enquireForMerge: (source) ->
-    source.enquire(@transmission.createQuery())
+    source.enquire(@transmission.createQuery(StatePayload.create))
     return this
