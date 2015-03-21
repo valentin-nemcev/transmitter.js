@@ -11,16 +11,6 @@ module.exports = class Message
     return @payload
 
 
-  copyWithPayload: (payload) ->
-    copy = new Message(@transmission, payload)
-    return copy
-
-
-  copyWithTransformedPayload: (transform) ->
-    copy = new Message(@transmission, transform(@payload))
-    return copy
-
-
   sendFromSourceNode: (node) ->
     @transmission.addMessageFrom(this, node)
     node.getNodeSource().receiveMessage(this)
@@ -29,6 +19,16 @@ module.exports = class Message
 
   sendToTargetNode: (targetNode) ->
     @payload.deliver(targetNode)
+    return this
+
+
+  copyWithPayload: (payload) ->
+    copy = new Message(@transmission, payload)
+    return copy
+
+
+  sendTransformedTo: (transform, target) ->
+    target.receiveMessage(@copyWithPayload(transform(@payload)))
     return this
 
 

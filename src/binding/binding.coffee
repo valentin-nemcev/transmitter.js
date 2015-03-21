@@ -13,7 +13,7 @@ module.exports = class Binding
 
 
   receiveMessage: (message) ->
-    @target.receiveMessage(message.copyWithTransformedPayload(@transform))
+    message.sendTransformedTo(@transform, @target)
     return this
 
 
