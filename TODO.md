@@ -6,6 +6,3 @@
 
 * Unit tests should describe units and their responsibilities
 * Replace recursive binding with centralized in binding builder (maybe)
-
-* Introduce functional specs
-  * Write functional spec for message merging

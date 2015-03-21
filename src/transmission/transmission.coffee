@@ -7,8 +7,8 @@ Message = require './message'
 module.exports = class Transmission
 
   constructor: ->
-    @sendersToMessages = new Map()
-    @queriesToNodes = new Map()
+    @nodesToMessages = new Map()
+    @nodesToQueries = new Map()
 
 
   createMessage: (payload) ->
@@ -19,22 +19,23 @@ module.exports = class Transmission
     new Query(this, createResponsePayload)
 
 
-  addMessageFrom: (message, sender) ->
-    @sendersToMessages.set(sender, message)
+  addMessageFrom: (message, node) ->
+    @nodesToMessages.set(node, message)
     return this
 
 
-  getMessageFrom: (sender) ->
-    @sendersToMessages.get(sender)
+  getMessageFrom: (node) ->
+    @nodesToMessages.get(node)
 
 
   addQueryTo: (query, node) ->
-    @queriesToNodes.set(node, query)
+    @nodesToQueries.set(node, query)
     return this
 
 
   respondToQueries: ->
-    for [node, query] in Array.from(@queriesToNodes.entries())
+    for [node, query] in Array.from(@nodesToQueries.entries())
+      continue if @getMessageFrom(node)?
       payload = query.createResponsePayload(node)
       message = @createMessage(payload)
       message.sendFromSourceNode(node)

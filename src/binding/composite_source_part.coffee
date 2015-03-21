@@ -4,7 +4,7 @@
 module.exports = class CompositeBindingSourcePart
 
   constructor: (@sourceNode, @source, params = {}) ->
-    {@initiatesMerge} = params
+    {@queryForMergeWith} = params
     @compositeTarget = null
 
 
@@ -19,7 +19,8 @@ module.exports = class CompositeBindingSourcePart
 
 
   receiveMessage: (message) ->
-    message.sendQueryForMerge(@compositeTarget) if @initiatesMerge
+    if @queryForMergeWith?
+      message.sendQueryForMerge(@compositeTarget, @queryForMergeWith)
     @compositeTarget.receiveMessage(message)
     return this
 

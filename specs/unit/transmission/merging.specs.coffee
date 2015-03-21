@@ -2,6 +2,8 @@
 
 NodeSource = require 'binder/binding/node_source'
 CompositeSourceBuilder = require 'binder/binding/composite_source_builder'
+CompositeSource = require 'binder/binding/composite_source'
+CompositeSourcePart = require 'binder/binding/composite_source_part'
 Transmission = require 'binder/transmission/transmission'
 
 
@@ -77,8 +79,14 @@ describe 'Message merging', ->
       @passiveSource = new NodeStub()
       @activeSource = new NodeStub()
 
+      @mergeQueryResponsePayload = new PayloadStub()
+      @createResponsePayload = sinon.stub()
+      @createResponsePayload
+        .withArgs(sinon.match.same(@passiveSource))
+        .returns(@mergeQueryResponsePayload)
+
       @compositeSource = CompositeSourceBuilder.build()
-        .withPart(@activeSource)
+        .withPart(@activeSource, queryForMergeWith: @createResponsePayload)
         .withPassivePart(@passiveSource)
         .create()
 
@@ -93,11 +101,11 @@ describe 'Message merging', ->
       expect(@target.receiveMessage).to.not.have.been.called
 
 
-    describe 'when only active sources have sent messages', ->
+    describe 'when one active source have sent message', ->
 
       beforeEach ->
         @payload1 = new PayloadStub()
-        @payload2 = new PayloadStub()
+
         @message1 = @transmission.createMessage(@payload1)
         @message1.sendFromSourceNode(@activeSource)
         @transmission.respondToQueries()
@@ -109,11 +117,17 @@ describe 'Message merging', ->
           .to.have.been.calledWith(sinon.match.instanceOf(Message))
 
 
-      specify.skip 'merged message payload contains source payloads', ->
-        @mergedMessage = @target.receiveMessage.firstCall.args[0]
-        @mergedPayload = @mergedMessage.getPayload()
+      describe 'merged message payload', ->
 
-        expect(@mergedPayload.get(@activeSource)).to.equal(@payload1)
-        expect(@mergedPayload.get(@passiveSource)).to.equal(@payload2)
+        beforeEach ->
+          @mergedMessage = @target.receiveMessage.firstCall.args[0]
+          @mergedPayload = @mergedMessage.getPayload()
 
 
+        specify 'contains active source payload', ->
+          expect(@mergedPayload.get(@activeSource)).to.equal(@payload1)
+
+
+        specify 'contains query response payload for other sources', ->
+          expect(@mergedPayload.get(@passiveSource))
+            .to.equal(@mergeQueryResponsePayload)

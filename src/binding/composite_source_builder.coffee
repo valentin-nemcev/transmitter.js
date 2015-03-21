@@ -4,6 +4,7 @@
 CompositeSource = require './composite_source'
 CompositeSourcePart = require './composite_source_part'
 
+{StatePayload} = require '../transmission/payloads'
 
 module.exports = class CompositeSourceBuilder
 
@@ -15,16 +16,18 @@ module.exports = class CompositeSourceBuilder
     @parts = []
 
 
-  withPart: (node) ->
-    @_addSourcePart(node, initiatesMerge: yes)
+  withPart: (node, opts = {}) ->
+    {queryForMergeWith} = opts
+    queryForMergeWith ?= StatePayload.create
+    @_addSourcePart(node, {queryForMergeWith})
 
 
   withPassivePart: (node) ->
-    @_addSourcePart(node, initiatesMerge: no)
+    @_addSourcePart(node, {})
 
 
-  _addSourcePart: (node, params) ->
-    @parts.push(new CompositeSourcePart(node, node.getNodeSource(), params))
+  _addSourcePart: (node, opts) ->
+    @parts.push(new CompositeSourcePart(node, node.getNodeSource(), opts))
     return this
 
 

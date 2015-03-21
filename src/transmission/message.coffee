@@ -1,10 +1,12 @@
 'use strict'
 
-{StatePayload, MergedPayload} = require './payloads'
+assert = require 'assert'
+{MergedPayload} = require './payloads'
 
 module.exports = class Message
 
   constructor: (@transmission, @payload) ->
+    assert(@payload, 'Message must have payload')
 
 
   getPayload: ->
@@ -44,6 +46,6 @@ module.exports = class Message
     return this
 
 
-  sendQueryForMerge: (source) ->
-    source.receiveQuery(@transmission.createQuery(StatePayload.create))
+  sendQueryForMerge: (source, createQueryResponse) ->
+    source.receiveQuery(@transmission.createQuery(createQueryResponse))
     return this
