@@ -6,23 +6,29 @@ module.exports = class TwoWayBindingBuilder
   constructor: (@binder) ->
 
 
-  withOrigin: (@origin) ->
-    return this
+  withOrigin:  (@origin)  -> this
+  withDerived: (@derived) -> this
+
+  withTransformOrigin:  (@transformOrigin)  -> this
+  withTransformDerived: (@transformDerived) -> this
+
+  mapPayloadValue = (map) ->
+    (payload) -> payload.mapValue(map)
+
+  withMapOrigin:  (map) -> @withTransformOrigin  mapPayloadValue(map)
+  withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)
 
 
-  withDerived: (@derived) ->
-    return this
-
-
-  bindOneWay: (source, target)->
+  bindOneWay: (source, target, transform)->
     @binder.buildOneWayBinding()
       .fromSource source
       .toTarget target
+      .withTransform transform
       .bind()
 
 
   bind: ->
-    @bindOneWay(@origin, @derived)
-    @bindOneWay(@derived, @origin)
+    @bindOneWay(@origin, @derived, @transformOrigin)
+    @bindOneWay(@derived, @origin, @transformDerived)
     @binder.queryNodeState(@derived)
     return null

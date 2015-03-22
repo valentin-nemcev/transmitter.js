@@ -27,7 +27,7 @@ module.exports = class BindingBuilder
 
 
   bind: ->
-    binding = new Binding({@transform})
+    binding = new Binding(@transform)
     binding.bindSourceTarget(
       @source.getNodeSource(),
       @target.getNodeTarget()

@@ -29,7 +29,7 @@ class Variable
   setValue: (@value) -> this
 
 
-describe 'Two-way text input binding', ->
+describe 'Two-way state binding', ->
 
   beforeEach ->
     @textInput = new TextInput()

@@ -3,7 +3,7 @@
 
 module.exports = class Binding
 
-  constructor: ({@transform}) ->
+  constructor: (@transform) ->
 
 
   bindSourceTarget: (@source, @target) ->

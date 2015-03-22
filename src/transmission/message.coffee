@@ -30,7 +30,11 @@ module.exports = class Message
 
 
   sendTransformedTo: (transform, target) ->
-    target.receiveMessage(@copyWithPayload(transform(@payload)))
+    msg = if transform?
+      @copyWithPayload(transform(@payload))
+    else
+      this
+    target.receiveMessage(msg)
     return this
 
 

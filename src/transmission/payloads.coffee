@@ -12,8 +12,15 @@ class exports.ValuePayload
   constructor: (@value) ->
 
 
-  deliver: (target) ->
-    target.receiveValue(@value)
+  mapValue: (map) ->
+    new exports.ValuePayload(map(@value))
+
+
+  deliver: (targetNode) ->
+    if targetNode.setValue? and not targetNode.receiveValue?
+      targetNode.setValue(@value)
+    else
+      targetNode.receiveValue(@value)
     return this
 
 
@@ -30,6 +37,10 @@ class exports.StatePayload
 
 
   constructor: (@node) ->
+
+
+  mapValue: (map) ->
+    new exports.ValuePayload(map(@node.getValue()))
 
 
   deliver: (targetNode) ->
