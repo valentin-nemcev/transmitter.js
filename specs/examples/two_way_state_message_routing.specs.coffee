@@ -65,3 +65,20 @@ describe 'Two-way state message routing', ->
 
     expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
     expect(@tagInput.getValue()).to.equal('tagA, tagB')
+
+
+  specify 'when dervied node is updated, \
+    change is transmitted to origin and other derived nodes', ->
+    Binder.updateNodeState(@tagInput, 'tagA, tagB')
+
+    expect(Array.from(@tagSet.getValue())).to.deep.equal(['tagA', 'tagB'])
+    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
+
+
+  specify 'when intermediate node is updated, \
+    change is transmitted to origin and derived nodes', ->
+    Binder.updateNodeState(@tagSet, ['tagA', 'tagB'])
+
+    expect(Array.from(@tagSet.getValue())).to.deep.equal(['tagA', 'tagB'])
+    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
+    expect(@tagInput.getValue()).to.equal('tagA, tagB')
