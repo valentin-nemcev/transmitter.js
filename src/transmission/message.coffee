@@ -14,13 +14,19 @@ module.exports = class Message
 
 
   sendFromSourceNode: (node) ->
-    @transmission.addMessageFrom(this, node)
+    return this if @transmission.hasMessageForNode(node)
+    @transmission.addMessageForNode(this, node)
     node.getNodeSource().receiveMessage(this)
     return this
 
 
-  sendToTargetNode: (targetNode) ->
-    @payload.deliver(targetNode)
+  sendToTargetNode: (node) ->
+    return this if @transmission.hasMessageForNode(node)
+    @transmission.addMessageForNode(this, node)
+    @payload.deliver(node)
+    if node.getNodeSource?
+      copy = @copyWithPayload(@payload)
+      node.getNodeSource().receiveMessage(copy)
     return this
 
 
@@ -30,11 +36,11 @@ module.exports = class Message
 
 
   sendTransformedTo: (transform, target) ->
-    msg = if transform?
+    copy = if transform?
       @copyWithPayload(transform(@payload))
     else
       this
-    target.receiveMessage(msg)
+    target.receiveMessage(copy)
     return this
 
 

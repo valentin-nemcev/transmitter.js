@@ -19,7 +19,11 @@ module.exports = class Transmission
     new Query(this, createResponsePayload)
 
 
-  addMessageFrom: (message, node) ->
+  hasMessageForNode: (node) ->
+    @nodesToMessages.has(node)
+
+
+  addMessageForNode: (message, node) ->
     @nodesToMessages.set(node, message)
     return this
 
@@ -40,4 +44,3 @@ module.exports = class Transmission
       message = @createMessage(payload)
       message.sendFromSourceNode(node)
     return this
-

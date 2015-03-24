@@ -10,6 +10,9 @@ class NodeStub
 
 class PayloadStub
 
+class TargetStub
+  receiveMessage: ->
+
 
 describe 'Transmission', ->
 
@@ -22,8 +25,9 @@ describe 'Transmission', ->
       .withArgs(sinon.match.same(@node))
       .returns(@responsePayload = new PayloadStub())
 
-    @nodeSource = @node.getNodeSource()
-    sinon.spy(@nodeSource, 'receiveMessage')
+    @target = new TargetStub()
+    @node.getNodeSource().bindTarget(@target)
+    sinon.spy(@target, 'receiveMessage')
 
 
   it 'responds to queries', ->
@@ -32,7 +36,7 @@ describe 'Transmission', ->
     @transmission.addQueryTo(@query, @node)
     @transmission.respondToQueries()
 
-    @responseMessage = @nodeSource.receiveMessage.args[0][0]
+    @responseMessage = @target.receiveMessage.args[0][0]
     expect(@responseMessage.getPayload()).to.equal(@responsePayload)
 
 
@@ -44,5 +48,5 @@ describe 'Transmission', ->
     @transmission.addQueryTo(@query, @node)
     @transmission.respondToQueries()
 
-    expect(@nodeSource.receiveMessage).to.have.been.calledOnce
-    expect(@nodeSource.receiveMessage).to.have.been.calledWithSame(@message)
+    expect(@target.receiveMessage).to.have.been.calledOnce
+    expect(@target.receiveMessage).to.have.been.calledWithSame(@message)

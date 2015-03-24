@@ -59,7 +59,7 @@ describe 'Two-way state message routing', ->
       .bind()
 
 
-  specify.only 'when origin node is updated, \
+  specify 'when origin node is updated, \
     change is transmitted to derived nodes', ->
     Binder.updateNodeState(@tagSet, new Set(['tagB', 'tagA']))
 
