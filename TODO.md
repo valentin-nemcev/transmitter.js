@@ -9,3 +9,5 @@
 
 * Unit tests should describe units and their responsibilities
 * Replace recursive binding with centralized in binding builder (maybe)
+
+* Don't use context in isolated tests, use context in scenarios.
