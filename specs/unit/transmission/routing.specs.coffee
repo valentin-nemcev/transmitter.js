@@ -21,6 +21,9 @@ class StubPayload
 class TargetStub
   receiveMessage: ->
 
+class SourceStub
+  receiveQuery: ->
+
 
 describe 'Message routing', ->
 
@@ -38,6 +41,18 @@ describe 'Message routing', ->
     @message.sendToTargetNode(@node)
 
     expect(@target.receiveMessage).to.have.been.calledOnce
+
+
+  specify 'query should be routed from node source to node target', ->
+    @node = new NodeStub()
+    @source = new SourceStub()
+    @node.getNodeTarget().bindSource(@source)
+    sinon.spy(@source, 'receiveQuery')
+    @query = @transmission.createQuery(->)
+
+    @query.sendToSourceNode(@node)
+
+    expect(@source.receiveQuery).to.have.been.calledOnce
 
 
   describe 'multiple message through same node', ->

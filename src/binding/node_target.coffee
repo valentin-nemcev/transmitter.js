@@ -9,9 +9,11 @@ module.exports = class NodeTarget
 
 
   constructor: (@node) ->
+    @sources = new Set()
 
 
-  bindSource: (@source) ->
+  bindSource: (source) ->
+    @sources.add(source)
     return this
 
 
@@ -21,5 +23,8 @@ module.exports = class NodeTarget
 
 
   receiveQuery: (query) ->
-    @source.receiveQuery(query)
+    if @sources.size
+      @sources.forEach (source) -> source.receiveQuery(query)
+    else
+      query.sendToResponderNode(@node)
     return this

@@ -12,5 +12,13 @@ module.exports = class Query
 
 
   sendToSourceNode: (node) ->
+    if node.getNodeTarget?
+      @sendFromTargetNode(node)
+    else
+      @sendToResponderNode(node)
+    return this
+
+
+  sendToResponderNode: (node) ->
     @transmission.addQueryTo(this, node)
     return this
