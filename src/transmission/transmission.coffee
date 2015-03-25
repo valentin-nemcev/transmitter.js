@@ -6,7 +6,8 @@ Message = require './message'
 
 module.exports = class Transmission
 
-  constructor: ->
+  constructor: (opts = {}) ->
+    @reverseOrder = opts.reverseOrder ? no
     @nodesToMessages = new Map()
     @nodesToQueries = new Map()
 
@@ -38,7 +39,9 @@ module.exports = class Transmission
 
 
   respondToQueries: ->
-    for [node, query] in Array.from(@nodesToQueries.entries())
+    queries = Array.from(@nodesToQueries.entries())
+    queries.reverse() if @reverseOrder
+    for [node, query] in queries
       continue if @getMessageFrom(node)?
       payload = query.createResponsePayload(node)
       message = @createMessage(payload)

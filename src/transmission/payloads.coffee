@@ -1,6 +1,9 @@
 'use strict'
 
 
+assert = require 'assert'
+
+
 class exports.EventPayload
 
   toValue: (value) -> new exports.ValuePayload(value)
@@ -10,6 +13,10 @@ class exports.EventPayload
 class exports.ValuePayload
 
   constructor: (@value) ->
+
+
+  getValue: ->
+    @value
 
 
   mapValue: (map) ->
@@ -39,15 +46,19 @@ class exports.StatePayload
   constructor: (@node) ->
 
 
+  getValue: ->
+    @node.getValue()
+
+
   mapValue: (map) ->
-    new exports.ValuePayload(map(@node.getValue()))
+    new exports.ValuePayload(map(@getValue()))
 
 
   deliver: (targetNode) ->
     if not targetNode.setValue? and targetNode.receiveValue?
-      targetNode.receiveValue(@node.getValue())
+      targetNode.receiveValue(@getValue())
     else
-      targetNode.setValue(@node.getValue())
+      targetNode.setValue(@getValue())
     return this
 
 
@@ -55,6 +66,17 @@ class exports.MergedPayload
 
   constructor: (@keys) ->
     @payloads = new Map()
+
+
+  deliver: ->
+    assert(false, "Can't deliver MergedPayload")
+
+
+  reduceValue: (initial, reduce) ->
+    result = initial
+    for [node, payload] in Array.from(@payloads.entries())
+      result = reduce(result, node, payload.getValue())
+    new exports.ValuePayload(result)
 
 
   set: (key, payload) ->

@@ -14,9 +14,18 @@ NodeTarget = require './binding/node_target'
 
 module.exports = new class Binder
 
+  constructor: (opts = {}) ->
+    {@reverseOrder} = opts
+
+
+  withDifferentTransmissionOrders: (doWithOrder) ->
+    doWithOrder(new @constructor(reverseOrder: no), 'straight')
+    doWithOrder(new @constructor(reverseOrder: yes), 'reverse')
+    return this
+
 
   startTransmission: (doWithTransmission) ->
-    transmission = new Transmission()
+    transmission = new Transmission({@reverseOrder})
     doWithTransmission(transmission)
     transmission.respondToQueries()
     return this
@@ -37,6 +46,13 @@ module.exports = new class Binder
   updateNodeState: (node, value) ->
     payload = StatePayload.updateNodeAndCreate(node, value)
     @startTransmissionWithPayloadFrom(payload, node)
+
+
+  updateNodesState: (nodeValues...) ->
+    @startTransmission (transmission) =>
+      for [node, value] in nodeValues
+        payload = StatePayload.updateNodeAndCreate(node, value)
+        transmission.createMessage(payload).sendFromSourceNode(node)
 
 
   sendNodeState: (node) ->
