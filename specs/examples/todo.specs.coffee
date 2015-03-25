@@ -36,3 +36,6 @@ describe 'Reusing same view with different models', ->
 
 describe 'Accepting or canceling changes with intermediate models', ->
   it 'should be implemented'
+
+describe 'Collection with uniquely named elements', ->
+  it 'should be implemented'
