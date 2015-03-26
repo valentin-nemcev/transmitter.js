@@ -19,7 +19,7 @@ class SourceStub
   receiveQuery: ->
 
 
-describe 'Message routing', ->
+describe 'Message and query routing', ->
 
   beforeEach ->
     @transmission = new Transmission()

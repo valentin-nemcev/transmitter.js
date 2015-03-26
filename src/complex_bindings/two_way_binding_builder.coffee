@@ -30,5 +30,4 @@ module.exports = class TwoWayBindingBuilder
   bind: ->
     @bindOneWay(@origin, @derived, @transformOrigin)
     @bindOneWay(@derived, @origin, @transformDerived)
-    @binder.queryNodeState(@derived)
     return null

@@ -59,6 +59,16 @@ describe 'Two-way state message routing', ->
       .bind()
 
 
+  specify 'when derived node is queried, it gets update from origin node', ->
+    @tagSet.setValue(new Set(['tagB', 'tagA']))
+
+    Binder.queryNodeState(@tagJSON)
+    Binder.queryNodeState(@tagInput)
+
+    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
+    expect(@tagInput.getValue()).to.equal('tagA, tagB')
+
+
   specify 'when origin node is updated, \
     change is transmitted to derived nodes', ->
     Binder.updateNodeState(@tagSet, new Set(['tagB', 'tagA']))
