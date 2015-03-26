@@ -7,18 +7,22 @@ module.exports = class Query
 
 
   sendFromTargetNode: (node) ->
+    return this if @transmission.hasQueryOrMessageForNode(node)
+    @transmission.addQueryToNode(this, node)
     node.getNodeTarget().receiveQuery(this)
     return this
 
 
   sendToSourceNode: (node) ->
+    return this if @transmission.hasQueryOrMessageForNode(node)
+    @transmission.addQueryToNode(this, node)
     if node.getNodeTarget?
-      @sendFromTargetNode(node)
+      node.getNodeTarget().receiveQuery(this)
     else
       @sendToResponderNode(node)
     return this
 
 
   sendToResponderNode: (node) ->
-    @transmission.addQueryTo(this, node)
+    @transmission.enqueueQueryForResponseFromNode(this, node)
     return this

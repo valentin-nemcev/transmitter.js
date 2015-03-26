@@ -8,7 +8,7 @@ NodeSource = require 'binder/binding/node_source'
 class NodeStub
   NodeSource.extend(this)
 
-class PayloadStub
+class StubPayload
 
 class TargetStub
   receiveMessage: ->
@@ -23,7 +23,7 @@ describe 'Transmission', ->
     @createResponsePayload = sinon.stub()
     @createResponsePayload
       .withArgs(sinon.match.same(@node))
-      .returns(@responsePayload = new PayloadStub())
+      .returns(@responsePayload = new StubPayload())
 
     @target = new TargetStub()
     @node.getNodeSource().bindTarget(@target)
@@ -33,7 +33,7 @@ describe 'Transmission', ->
   it 'responds to queries', ->
     @query = @transmission.createQuery(@createResponsePayload)
 
-    @transmission.addQueryTo(@query, @node)
+    @transmission.enqueueQueryForResponseFromNode(@query, @node)
     @transmission.respondToQueries()
 
     @responseMessage = @target.receiveMessage.args[0][0]
@@ -41,11 +41,11 @@ describe 'Transmission', ->
 
 
   it 'does not respond to query when message was already sent before', ->
-    @message = @transmission.createMessage(new PayloadStub())
+    @message = @transmission.createMessage(new StubPayload())
     @message.sendFromSourceNode(@node)
     @query = @transmission.createQuery(@createResponsePayload)
 
-    @transmission.addQueryTo(@query, @node)
+    @transmission.enqueueQueryForResponseFromNode(@query, @node)
     @transmission.respondToQueries()
 
     expect(@target.receiveMessage).to.have.been.calledOnce

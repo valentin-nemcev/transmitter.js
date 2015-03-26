@@ -43,10 +43,8 @@ describe 'Message and query transmission', ->
 
   it 'transmits query from source to target', ->
     @query = @transmission.createQuery()
-    sinon.spy(@transmission, 'addQueryTo')
+    sinon.spy(@query, 'sendToResponderNode')
 
     @query.sendFromTargetNode(@target)
 
-    expect(@transmission.addQueryTo).to.have.been.calledWith(
-      sinon.match.same(@query), sinon.match.same(@source)
-    )
+    expect(@query.sendToResponderNode).to.have.been.calledWithSame(@source)

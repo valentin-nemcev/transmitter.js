@@ -10,6 +10,7 @@ module.exports = class Transmission
     @reverseOrder = opts.reverseOrder ? no
     @nodesToMessages = new Map()
     @nodesToQueries = new Map()
+    @queryQueue = []
 
 
   createMessage: (payload) ->
@@ -33,16 +34,28 @@ module.exports = class Transmission
     @nodesToMessages.get(node)
 
 
-  addQueryTo: (query, node) ->
+  enqueueQueryForResponseFromNode: (query, node) ->
+    @queryQueue.push [node, query]
+    return this
+
+
+  addQueryToNode: (query, node) ->
     @nodesToQueries.set(node, query)
     return this
 
 
+  hasQueryToNode: (node) ->
+    @nodesToQueries.has(node)
+
+
+  hasQueryOrMessageForNode: (node) ->
+    @hasMessageForNode(node) or @hasQueryToNode(node)
+
+
   respondToQueries: ->
-    queries = Array.from(@nodesToQueries.entries())
+    queries = @queryQueue.slice()
     queries.reverse() if @reverseOrder
     for [node, query] in queries
-      continue if @getMessageFrom(node)?
       payload = query.createResponsePayload(node)
       message = @createMessage(payload)
       message.sendFromSourceNode(node)

@@ -13,7 +13,7 @@ class NodeStub
 class TargetStub
   receiveMessage: ->
 
-class PayloadStub
+class StubPayload
 
 
 describe 'Message merging', ->
@@ -40,7 +40,7 @@ describe 'Message merging', ->
 
 
     specify 'when not all sources have sent messages, nothing is sent', ->
-      @message1 = @transmission.createMessage(new PayloadStub)
+      @message1 = @transmission.createMessage(new StubPayload)
       @message1.sendFromSourceNode(@source1)
       @transmission.respondToQueries()
 
@@ -50,8 +50,8 @@ describe 'Message merging', ->
     describe 'when all source have sent messages', ->
 
       beforeEach ->
-        @payload1 = new PayloadStub()
-        @payload2 = new PayloadStub()
+        @payload1 = new StubPayload()
+        @payload2 = new StubPayload()
         @message1 = @transmission.createMessage(@payload1)
         @message2 = @transmission.createMessage(@payload2)
         @message1.sendFromSourceNode(@source1)
@@ -79,11 +79,13 @@ describe 'Message merging', ->
       @passiveSource = new NodeStub()
       @activeSource = new NodeStub()
 
-      @mergeQueryResponsePayload = new PayloadStub()
+      @mergeQueryResponsePayload = new StubPayload()
       @createResponsePayload = sinon.stub()
       @createResponsePayload
         .withArgs(sinon.match.same(@passiveSource))
         .returns(@mergeQueryResponsePayload)
+      @createResponsePayload
+        .returns(new StubPayload())
 
       @compositeSource = CompositeSourceBuilder.build()
         .withPart(@activeSource, queryForMergeWith: @createResponsePayload)
@@ -94,7 +96,7 @@ describe 'Message merging', ->
 
 
     specify 'when only passive sources have sent messages, nothing is sent', ->
-      @message1 = @transmission.createMessage(new PayloadStub)
+      @message1 = @transmission.createMessage(new StubPayload)
       @message1.sendFromSourceNode(@passiveSource)
       @transmission.respondToQueries()
 
@@ -104,7 +106,7 @@ describe 'Message merging', ->
     describe 'when one active source have sent message', ->
 
       beforeEach ->
-        @payload1 = new PayloadStub()
+        @payload1 = new StubPayload()
 
         @message1 = @transmission.createMessage(@payload1)
         @message1.sendFromSourceNode(@activeSource)
