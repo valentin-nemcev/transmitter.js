@@ -3,26 +3,36 @@
 
 module.exports = class Query
 
-  constructor: (@transmission, @createResponsePayload) ->
+  constructor: (@transmission, @createResponsePayload, @direction) ->
+
+
+  _copy: -> new Query(@transmission, @createResponsePayload)
+
+
+  _trySendingFromNodeTarget: (node) ->
+    @wasSent = no
+    node.getNodeTarget?()?.receiveQuery(this)
+    return @wasSent
 
 
   sendFromTargetNode: (node) ->
     return this if @transmission.hasQueryOrMessageForNode(node)
     @transmission.addQueryToNode(this, node)
-    node.getNodeTarget().receiveQuery(this)
+    unless @_trySendingFromNodeTarget(node)
+      @transmission.enqueueQueryForResponseToNode(this, node)
     return this
 
 
   sendToSourceNode: (node) ->
     return this if @transmission.hasQueryOrMessageForNode(node)
     @transmission.addQueryToNode(this, node)
-    if node.getNodeTarget?
-      node.getNodeTarget().receiveQuery(this)
-    else
-      @sendToResponderNode(node)
+    unless @_copy()._trySendingFromNodeTarget(node)
+      @transmission.enqueueQueryForResponseFromNode(this, node)
     return this
 
 
-  sendToResponderNode: (node) ->
-    @transmission.enqueueQueryForResponseFromNode(this, node)
+  sendToSourceAlongDirection: (source, direction) ->
+    if @direction == direction
+      @wasSent = yes
+      source.receiveQuery(this)
     return this

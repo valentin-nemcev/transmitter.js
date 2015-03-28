@@ -11,7 +11,7 @@ module.exports = class BindingNodeLine
 
 
   receiveQuery: (query) ->
-    @source.receiveQuery(query)
+    query.sendToSourceAlongDirection(@source, @direction)
     return this
 
 

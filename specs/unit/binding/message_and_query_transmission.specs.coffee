@@ -42,9 +42,15 @@ describe 'Message and query transmission', ->
 
 
   it 'transmits query from source to target', ->
-    @query = @transmission.createQuery()
-    sinon.spy(@query, 'sendToResponderNode')
+    @payload = new StubPayload()
+    sinon.spy(@payload, 'deliver')
+    @createStubPayload = sinon.stub()
+    @createStubPayload
+      .withArgs(sinon.match.same(@source))
+      .returns(@payload)
+    @query = @transmission.createQuery(@createStubPayload)
 
     @query.sendFromTargetNode(@target)
+    @transmission.respondToQueries()
 
-    expect(@query.sendToResponderNode).to.have.been.calledWithSame(@source)
+    expect(@payload.deliver).to.have.been.calledWithSame(@target)

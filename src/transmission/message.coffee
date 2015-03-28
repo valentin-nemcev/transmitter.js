@@ -9,6 +9,11 @@ module.exports = class Message
     assert(@payload, 'Message must have payload')
 
 
+  _copyWithPayload: (payload) ->
+    copy = new Message(@transmission, payload)
+    return copy
+
+
   getPayload: ->
     return @payload
 
@@ -25,19 +30,14 @@ module.exports = class Message
     @transmission.addMessageForNode(this, node)
     @payload.deliver(node)
     if node.getNodeSource?
-      copy = @copyWithPayload(@payload)
+      copy = @_copyWithPayload(@payload)
       node.getNodeSource().receiveMessage(copy)
     return this
 
 
-  copyWithPayload: (payload) ->
-    copy = new Message(@transmission, payload)
-    return copy
-
-
   sendTransformedTo: (transform, target) ->
     copy = if transform?
-      @copyWithPayload(transform(@payload))
+      @_copyWithPayload(transform(@payload))
     else
       this
     target.receiveMessage(copy)
@@ -52,7 +52,7 @@ module.exports = class Message
       mergedPayload.set(key, message.getPayload())
 
     if mergedPayload.isPresent()
-      target.receiveMessage(@copyWithPayload(mergedPayload))
+      target.receiveMessage(@_copyWithPayload(mergedPayload))
     return this
 
 

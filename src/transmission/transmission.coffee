@@ -17,8 +17,8 @@ module.exports = class Transmission
     new Message(this, payload)
 
 
-  createQuery: (createResponsePayload) ->
-    new Query(this, createResponsePayload)
+  createQuery: (createResponsePayload, direction) ->
+    new Query(this, createResponsePayload, direction)
 
 
   hasMessageForNode: (node) ->
@@ -35,7 +35,12 @@ module.exports = class Transmission
 
 
   enqueueQueryForResponseFromNode: (query, node) ->
-    @queryQueue.push [node, query]
+    @queryQueue.push {source: node, query}
+    return this
+
+
+  enqueueQueryForResponseToNode: (query, node) ->
+    @queryQueue.push {target: node, query}
     return this
 
 
@@ -55,8 +60,11 @@ module.exports = class Transmission
   respondToQueries: ->
     queries = @queryQueue.slice()
     queries.reverse() if @reverseOrder
-    for [node, query] in queries
-      payload = query.createResponsePayload(node)
+    for {source, target, query} in queries
+      payload = query.createResponsePayload(source or target)
       message = @createMessage(payload)
-      message.sendFromSourceNode(node)
+      if source
+        message.sendFromSourceNode(source)
+      if target
+        message.sendToTargetNode(target)
     return this

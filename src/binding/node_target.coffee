@@ -23,8 +23,5 @@ module.exports = class NodeTarget
 
 
   receiveQuery: (query) ->
-    if @sources.size
-      @sources.forEach (source) -> source.receiveQuery(query)
-    else
-      query.sendToResponderNode(@node)
+    @sources.forEach (source) -> source.receiveQuery(query)
     return this
