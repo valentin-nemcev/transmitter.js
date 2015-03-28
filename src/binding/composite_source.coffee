@@ -8,18 +8,16 @@ module.exports = class CompositeBindingSource
 
 
   bindTarget: (target) ->
-    @sources.forEach (source) => source.bindCompositeTarget(this)
+    @sources.forEach (source, node) => source.bindTarget(this)
     @target = target
     return this
 
 
   receiveMessage: (message) ->
-    sourceKeys = @sources.map (source) -> source.getSourceKey()
-    message.sendMergedTo(sourceKeys, @target)
+    message.sendMergedTo(Array.from(@sources.keys()), @target)
     return this
 
 
   receiveQuery: (query) ->
-    for source in @sources
-      source.receiveQuery(query)
+    @sources.forEach (source, node) -> source.receiveQuery(query)
     return this

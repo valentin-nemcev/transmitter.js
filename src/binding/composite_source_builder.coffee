@@ -2,7 +2,7 @@
 
 
 CompositeSource = require './composite_source'
-CompositeSourcePart = require './composite_source_part'
+NodeBindingLine = require './node_binding_line'
 
 {StatePayload} = require '../transmission/payloads'
 
@@ -13,7 +13,7 @@ module.exports = class CompositeSourceBuilder
 
 
   constructor: ->
-    @parts = []
+    @parts = new Map()
 
 
   withPart: (node, opts = {}) ->
@@ -27,12 +27,9 @@ module.exports = class CompositeSourceBuilder
 
 
   _addSourcePart: (node, opts) ->
-    @parts.push(new CompositeSourcePart(node, node.getNodeSource(), opts))
+    @parts.set(node, new NodeBindingLine(node.getNodeSource(), null, opts))
     return this
 
 
   create: ->
     new CompositeSource(@parts, {})
-
-
-  getNodeSource: -> @create()

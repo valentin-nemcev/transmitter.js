@@ -2,6 +2,8 @@
 
 NodeSource = require 'binder/binding/node_source'
 NodeTarget = require 'binder/binding/node_target'
+NodeBindingLine = require 'binder/binding/node_binding_line'
+BindingNodeLine = require 'binder/binding/binding_node_line'
 Transmission = require 'binder/transmission/transmission'
 
 
@@ -18,17 +20,21 @@ class TargetStub
 class SourceStub
   receiveQuery: ->
 
+class DirectionStub
+
 
 describe 'Message and query routing', ->
 
   beforeEach ->
     @transmission = new Transmission()
+    @otherDirection = new DirectionStub()
+    @queryDirection = new DirectionStub()
 
 
   specify 'message should be routed from node target to node source', ->
     @node = new NodeStub()
     @target = new TargetStub()
-    @node.getNodeSource().bindTarget(@target)
+    new NodeBindingLine(@node.getNodeSource()).bindTarget(@target)
     sinon.spy(@target, 'receiveMessage')
     @message = @transmission.createMessage(new StubPayload())
 
@@ -40,7 +46,7 @@ describe 'Message and query routing', ->
   specify 'query should be routed from node source to node target', ->
     @node = new NodeStub()
     @source = new SourceStub()
-    @node.getNodeTarget().bindSource(@source)
+    new BindingNodeLine(@node.getNodeTarget()).bindSource(@source)
     sinon.spy(@source, 'receiveQuery')
     @query = @transmission.createQuery(->)
 
@@ -49,12 +55,17 @@ describe 'Message and query routing', ->
     expect(@source.receiveQuery).to.have.been.calledOnce
 
 
-  specify 'query should be queued for response when node has no targes', ->
+  specify 'query should be queued for response \
+      when node targe has no sources with same direction', ->
     @node = new NodeStub()
+    @source = new SourceStub()
     @target = new TargetStub()
-    @node.getNodeSource().bindTarget(@target)
+    new NodeBindingLine(@node.getNodeSource(), @otherDirection)
+      .bindTarget(@target)
+    new BindingNodeLine(@node.getNodeTarget())
+      .bindSource(@source)
     sinon.spy(@target, 'receiveMessage')
-    @query = @transmission.createQuery( -> new StubPayload())
+    @query = @transmission.createQuery((-> new StubPayload()), @queryDirection)
 
     @query.sendToSourceNode(@node)
     @transmission.respondToQueries()

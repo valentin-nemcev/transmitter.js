@@ -2,6 +2,8 @@
 
 
 Binding = require './binding'
+NodeBindingLine = require './node_binding_line'
+BindingNodeLine = require './binding_node_line'
 
 
 module.exports = class BindingBuilder
@@ -26,9 +28,17 @@ module.exports = class BindingBuilder
     return this
 
 
+  _buildSource: ->
+    if @source.create?
+      return @source.create()
+    else
+      return new NodeBindingLine(@source.getNodeSource())
+
+
+  _buildTarget: ->
+    return new BindingNodeLine(@target.getNodeTarget())
+
+
   bind: ->
     binding = new Binding(@transform)
-    binding.bindSourceTarget(
-      @source.getNodeSource(),
-      @target.getNodeTarget()
-    )
+    binding.bindSourceTarget(@_buildSource(), @_buildTarget())

@@ -2,8 +2,6 @@
 
 NodeSource = require 'binder/binding/node_source'
 CompositeSourceBuilder = require 'binder/binding/composite_source_builder'
-CompositeSource = require 'binder/binding/composite_source'
-CompositeSourcePart = require 'binder/binding/composite_source_part'
 Transmission = require 'binder/transmission/transmission'
 
 
