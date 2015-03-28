@@ -3,10 +3,13 @@
 
 module.exports = class Query
 
+  inspect: -> "Q #{@direction.inspect()}"
+
+
   constructor: (@transmission, @createResponsePayload, @direction) ->
 
 
-  _copy: -> new Query(@transmission, @createResponsePayload)
+  _copy: -> new Query(@transmission, @createResponsePayload, @direction)
 
 
   _trySendingFromNodeTarget: (node) ->

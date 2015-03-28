@@ -16,6 +16,10 @@ module.exports = class BindingBuilder
     @transform ?= returnArg
 
 
+  inDirection: (@direction) ->
+    return this
+
+
   fromSource: (@source) ->
     return this
 
@@ -32,11 +36,11 @@ module.exports = class BindingBuilder
     if @source.create?
       return @source.create()
     else
-      return new NodeBindingLine(@source.getNodeSource())
+      return new NodeBindingLine(@source.getNodeSource(), @direction)
 
 
   _buildTarget: ->
-    return new BindingNodeLine(@target.getNodeTarget())
+    return new BindingNodeLine(@target.getNodeTarget(), @direction)
 
 
   bind: ->

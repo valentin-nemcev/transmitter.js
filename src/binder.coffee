@@ -5,6 +5,8 @@ CompositeSourceBuilder = require './binding/composite_source_builder'
 OneWayBindingBuilder = require './binding/one_way_builder'
 TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
 
+{forward, backward} = require './binding/directions'
+
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
 Transmission = require './transmission/transmission'
@@ -39,7 +41,7 @@ module.exports = new class Binder
 
   queryNodeState: (node) ->
     @startTransmission (transmission) =>
-      query = transmission.createQuery(StatePayload.create)
+      query = transmission.createQuery(StatePayload.create, forward)
       query.sendFromTargetNode(node)
 
 

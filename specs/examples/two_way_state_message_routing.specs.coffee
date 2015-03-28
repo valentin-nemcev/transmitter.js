@@ -5,8 +5,8 @@ Binder = require 'binder'
 
 
 class VariableNode
-  Binder.extendWithNodeSource(this)
 
+  Binder.extendWithNodeSource(this)
   Binder.extendWithNodeTarget(this)
 
   getValue: -> @value
@@ -16,7 +16,6 @@ class VariableNode
 
 class TextInput
   Binder.extendWithNodeSource(this)
-
   Binder.extendWithNodeTarget(this)
 
   change: (value) ->
@@ -32,28 +31,30 @@ class TextInput
 describe 'Two-way state message routing', ->
 
   beforeEach ->
-    @tagSet = new VariableNode()
+    @define = (name, value) -> value.inspect ?= (-> name); @[name] = value
+    @define 'tagSet', new VariableNode()
     @tagSet.setValue(new Set())
 
-    @tagSortedList = new VariableNode()
+    @define 'tagSortedList', new VariableNode()
     Binder.buildTwoWayBinding()
       .withOrigin @tagSet
       .withMapOrigin (tags) -> Array.from(tags).sort()
       .withDerived @tagSortedList
+      .withMapDerived (tags) -> new Set(tags)
       .bind()
 
-    @tagJSON = new VariableNode()
+    @define 'tagJSON', new VariableNode()
     Binder.buildTwoWayBinding()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> JSON.stringify(tags)
       .withDerived @tagJSON
-      .withMapDerived (tagJSON) -> JSON.parse(tagJSON)
+      .withMapDerived (tagJSON) -> tagJSON and JSON.parse(tagJSON)
       .bind()
 
-    @tagInput = new TextInput()
+    @define 'tagInput', new TextInput()
     Binder.buildTwoWayBinding()
       .withOrigin @tagSortedList
-      .withMapOrigin (tags) -> tags.join(', ')
+      .withMapOrigin (tags) -> (tags ? []).join(', ')
       .withDerived @tagInput
       .withMapDerived (tagStr) -> tagStr.split(/\s*,\s*/)
       .bind()
