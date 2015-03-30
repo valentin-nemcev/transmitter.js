@@ -17,7 +17,7 @@ class TargetStub
   receiveMessage: ->
 
 
-describe 'Transmission', ->
+describe 'Query queue', ->
 
   beforeEach ->
     @transmission = new Transmission()
