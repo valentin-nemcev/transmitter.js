@@ -37,12 +37,7 @@ module.exports = class Transmission
 
 
   enqueueQueryFromNode: (query, node, priority) ->
-    @queryQueue.push {source: node, query, priority}
-    return this
-
-
-  enqueueQueryToNode: (query, node, priority) ->
-    @queryQueue.push {target: node, query, priority}
+    @queryQueue.push {node, query, priority}
     return this
 
 
@@ -69,11 +64,8 @@ module.exports = class Transmission
 
   respondToQueries: ->
     queue = @_sortQueryQueue()
-    for {source, target, query} in queue
-      payload = query.createResponsePayload(source or target)
+    for {node, query} in queue
+      payload = query.createResponsePayload(node)
       message = @createMessage(payload)
-      if source
-        message.sendFromSourceNode(source)
-      if target
-        message.sendToTargetNode(target)
+      message.sendFromSourceNode(node)
     return this

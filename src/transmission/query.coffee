@@ -27,8 +27,7 @@ module.exports = class Query
   sendFromTargetNode: (node) ->
     return this if @transmission.hasMessageForNode(node)
     @transmission.addQueryToNode(this, node)
-    unless @_trySendingFromNodeTarget(node)
-      @transmission.enqueueQueryToNode(this, node, @pathLength)
+    @_trySendingFromNodeTarget(node)
     return this
 
 
