@@ -1,9 +1,12 @@
 'use strict'
 
 
+directions = require './directions.coffee'
+
+
 module.exports = class NodeBindingLine
 
-  constructor: (@source, @direction, opts = {}) ->
+  constructor: (@source, @direction = directions.null, opts = {}) ->
     {@queryForMergeWith} = opts
 
 

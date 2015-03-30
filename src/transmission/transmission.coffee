@@ -3,6 +3,8 @@
 Query = require './query'
 Message = require './message'
 
+stable = require 'stable'
+
 
 module.exports = class Transmission
 
@@ -34,13 +36,13 @@ module.exports = class Transmission
     @nodesToMessages.get(node)
 
 
-  enqueueQueryForResponseFromNode: (query, node) ->
-    @queryQueue.push {source: node, query}
+  enqueueQueryFromNode: (query, node, priority) ->
+    @queryQueue.push {source: node, query, priority}
     return this
 
 
-  enqueueQueryForResponseToNode: (query, node) ->
-    @queryQueue.push {target: node, query}
+  enqueueQueryToNode: (query, node, priority) ->
+    @queryQueue.push {target: node, query, priority}
     return this
 
 
@@ -57,10 +59,17 @@ module.exports = class Transmission
     @hasMessageForNode(node) or @hasQueryToNode(node)
 
 
+  _sortQueryQueue: ->
+    queue = @queryQueue.slice()
+    queue.reverse() if @reverseOrder
+    stable.inplace(queue, (a, b) -> a.priority < b.priority)
+    return queue
+
+
+
   respondToQueries: ->
-    queries = @queryQueue.slice()
-    queries.reverse() if @reverseOrder
-    for {source, target, query} in queries
+    queue = @_sortQueryQueue()
+    for {source, target, query} in queue
       payload = query.createResponsePayload(source or target)
       message = @createMessage(payload)
       if source

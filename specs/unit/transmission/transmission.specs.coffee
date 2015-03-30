@@ -36,7 +36,7 @@ describe 'Transmission', ->
   it 'responds to queries from nodes', ->
     @query = @transmission.createQuery(@createResponsePayload)
 
-    @transmission.enqueueQueryForResponseFromNode(@query, @node)
+    @transmission.enqueueQueryFromNode(@query, @node)
     @transmission.respondToQueries()
 
     @responseMessage = @target.receiveMessage.args[0][0]
@@ -47,10 +47,28 @@ describe 'Transmission', ->
     @query = @transmission.createQuery(@createResponsePayload)
     sinon.spy(@responsePayload, 'deliver')
 
-    @transmission.enqueueQueryForResponseToNode(@query, @node)
+    @transmission.enqueueQueryToNode(@query, @node)
     @transmission.respondToQueries()
 
     expect(@responsePayload.deliver).to.have.been.calledWithSame(@node)
+
+
+  it 'responds to queries with higher priority first', ->
+    @node1 = new NodeStub()
+    @node2 = new NodeStub()
+    @responsePayload1 = new StubPayload()
+    @responsePayload2 = new StubPayload()
+    @query1 = @transmission.createQuery( => @responsePayload1)
+    @query2 = @transmission.createQuery( => @responsePayload2)
+    callOrder = []
+    sinon.stub(@responsePayload1, 'deliver', -> callOrder.push 1)
+    sinon.stub(@responsePayload2, 'deliver', -> callOrder.push 2)
+
+    @transmission.enqueueQueryToNode(@query1, @node1, 2)
+    @transmission.enqueueQueryToNode(@query2, @node2, 1)
+    @transmission.respondToQueries()
+
+    expect(callOrder).to.deep.equal([1, 2])
 
 
   it 'does not respond to query when message was already sent before', ->
@@ -58,7 +76,7 @@ describe 'Transmission', ->
     @message.sendFromSourceNode(@node)
     @query = @transmission.createQuery(@createResponsePayload)
 
-    @transmission.enqueueQueryForResponseFromNode(@query, @node)
+    @transmission.enqueueQueryFromNode(@query, @node)
     @transmission.respondToQueries()
 
     expect(@target.receiveMessage).to.have.been.calledOnce

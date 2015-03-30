@@ -1,15 +1,21 @@
 'use strict'
 
 
+directions = require '../binding/directions.coffee'
+
+
 module.exports = class Query
 
   inspect: -> "Q #{@direction.inspect()}"
 
 
-  constructor: (@transmission, @createResponsePayload, @direction) ->
+  constructor: (@transmission, @createResponsePayload,
+    @direction = directions.null, @pathLength = 0) ->
 
 
-  _copy: -> new Query(@transmission, @createResponsePayload, @direction)
+  _copy: ->
+    new Query(@transmission, @createResponsePayload,
+      @direction, @pathLength + 1)
 
 
   _trySendingFromNodeTarget: (node) ->
@@ -19,18 +25,18 @@ module.exports = class Query
 
 
   sendFromTargetNode: (node) ->
-    return this if @transmission.hasQueryOrMessageForNode(node)
+    return this if @transmission.hasMessageForNode(node)
     @transmission.addQueryToNode(this, node)
     unless @_trySendingFromNodeTarget(node)
-      @transmission.enqueueQueryForResponseToNode(this, node)
+      @transmission.enqueueQueryToNode(this, node, @pathLength)
     return this
 
 
   sendToSourceNode: (node) ->
-    return this if @transmission.hasQueryOrMessageForNode(node)
+    return this if @transmission.hasMessageForNode(node)
     @transmission.addQueryToNode(this, node)
     unless @_copy()._trySendingFromNodeTarget(node)
-      @transmission.enqueueQueryForResponseFromNode(this, node)
+      @transmission.enqueueQueryFromNode(this, node, @pathLength)
     return this
 
 

@@ -21,6 +21,7 @@
     "sloc": "^0.1.9"
   },
   "dependencies": {
-    "es6-shim": "^0.24.0"
+    "es6-shim": "^0.24.0",
+    "stable": "^0.1.5"
   }
 }

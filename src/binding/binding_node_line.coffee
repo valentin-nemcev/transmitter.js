@@ -1,9 +1,12 @@
 'use strict'
 
 
+directions = require './directions.coffee'
+
+
 module.exports = class BindingNodeLine
 
-  constructor: (@target, @direction) ->
+  constructor: (@target, @direction = directions.null) ->
 
 
   bindSource: (@source) ->

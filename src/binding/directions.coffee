@@ -2,6 +2,7 @@
 
 
 module.exports = Object.freeze(
-  forward:  Object.freeze {forward: yes,  inspect: -> '→'}
-  backward: Object.freeze {backward: yes, inspect: -> '←'}
+  forward:  Object.freeze {isForward: yes,  inspect: -> '→'}
+  backward: Object.freeze {isBackward: yes, inspect: -> '←'}
+  null:     Object.freeze {isNull: yes,     inspect: -> '-'}
 )

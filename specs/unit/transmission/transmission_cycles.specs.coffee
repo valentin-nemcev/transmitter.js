@@ -78,7 +78,7 @@ describe 'Transmission cycles', ->
       expect(@payload2.deliver).to.have.been.called
 
 
-    specify 'second query should not be sent', ->
+    specify 'second query should be sent', ->
       @query1 = @transmission.createQuery(@createResponse)
       @query2 = @transmission.createQuery(@createResponse)
 
@@ -86,8 +86,7 @@ describe 'Transmission cycles', ->
       @query2.sendFromTargetNode(@targetNode)
       @transmission.respondToQueries()
 
-      expect(@source.receiveQuery).to.have.been.calledOnce
-      expect(@source.receiveQuery).to.have.been.calledWithSame(@query1)
+      expect(@source.receiveQuery).to.have.been.calledTwice
 
 
   describe 'with source node', ->
@@ -98,8 +97,7 @@ describe 'Transmission cycles', ->
       @sourceNode.getNodeSource().bindTarget(@target)
       sinon.spy(@target, 'receiveMessage')
 
-      @createResponse1 = -> new StubPayload()
-      @createResponse2 = sinon.spy -> new StubPayload()
+      @createResponse = sinon.spy -> new StubPayload()
 
 
     specify 'second message should not be sent', ->
@@ -115,21 +113,21 @@ describe 'Transmission cycles', ->
 
     specify 'query after message should not be delivered', ->
       @message1 = @transmission.createMessage(new StubPayload())
-      @query2 = @transmission.createQuery(@createResponse2)
+      @query2 = @transmission.createQuery(@createResponse)
 
       @message1.sendFromSourceNode(@sourceNode)
       @query2.sendToSourceNode(@sourceNode)
       @transmission.respondToQueries()
 
-      expect(@createResponse2).to.not.have.been.called
+      expect(@createResponse).to.not.have.been.called
 
 
-    specify 'second query should not be delivered', ->
-      @query1 = @transmission.createQuery(@createResponse1)
-      @query2 = @transmission.createQuery(@createResponse2)
+    specify 'second query should be delivered', ->
+      @query1 = @transmission.createQuery(@createResponse)
+      @query2 = @transmission.createQuery(@createResponse)
 
       @query1.sendToSourceNode(@sourceNode)
       @query2.sendToSourceNode(@sourceNode)
       @transmission.respondToQueries()
 
-      expect(@createResponse2).to.not.have.been.called
+      expect(@createResponse).to.have.been.calledTwice
