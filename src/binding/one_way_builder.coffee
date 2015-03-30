@@ -33,8 +33,8 @@ module.exports = class BindingBuilder
 
 
   _buildSource: ->
-    if @source.create?
-      return @source.create()
+    if @source.build?
+      return @source.build()
     else
       return new NodeBindingLine(@source.getNodeSource(), @direction)
 

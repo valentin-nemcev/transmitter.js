@@ -8,10 +8,6 @@ NodeBindingLine = require './node_binding_line'
 
 module.exports = class CompositeSourceBuilder
 
-  @build = =>
-    new this()
-
-
   constructor: ->
     @parts = new Map()
 
@@ -31,5 +27,5 @@ module.exports = class CompositeSourceBuilder
     return this
 
 
-  create: ->
+  build: ->
     new CompositeSource(@parts, {})

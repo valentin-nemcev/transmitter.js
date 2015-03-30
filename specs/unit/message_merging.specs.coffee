@@ -29,10 +29,10 @@ describe 'Message merging', ->
       @source1 = new NodeStub()
       @source2 = new NodeStub()
 
-      @compositeSource = CompositeSourceBuilder.build()
+      @compositeSource = new CompositeSourceBuilder()
         .withPassivePart(@source1)
         .withPassivePart(@source2)
-        .create()
+        .build()
 
       @compositeSource.bindTarget(@target)
 
@@ -85,10 +85,10 @@ describe 'Message merging', ->
       @createResponsePayload
         .returns(new StubPayload())
 
-      @compositeSource = CompositeSourceBuilder.build()
+      @compositeSource = new CompositeSourceBuilder()
         .withPart(@activeSource, queryForMergeWith: @createResponsePayload)
         .withPassivePart(@passiveSource)
-        .create()
+        .build()
 
       @compositeSource.bindTarget(@target)
 
