@@ -5,23 +5,21 @@ Binder = require 'binder'
 
 
 class Button
-  Binder.extendWithNodeSource(this)
+  Binder.extendWithEventSource(this)
 
-  click: -> Binder.sendBare(from: this)
+  click: -> Binder.sendEvent(from: this)
 
 
 class AlertEmitter
-  Binder.extendWithNodeTarget(this)
+  Binder.extendWithEventTarget(this)
 
   alert: ->
 
-  receiveValue: (messageStr) -> @alert(messageStr)
+  receiveValue: (messageStr) -> @alert(messageStr) if messageStr?
 
 
 class TextInput
-  Binder.extendWithNodeSource(this)
-
-  Binder.extendWithNodeTarget(this)
+  Binder.extendWithStatefulNode(this)
 
   change: (value) ->
     @setValue(value)
@@ -47,7 +45,8 @@ describe 'One-way binding with merge and query', ->
           .withPart @button
           .withPart @textInput
       )
-      .withTransform (messages) => messages.get(@textInput)
+      .withTransform (payloads) =>
+        payloads.get(@button).replaceWhenPresent(payloads.get(@textInput))
       .toTarget @alertEmitter
       .bind()
 

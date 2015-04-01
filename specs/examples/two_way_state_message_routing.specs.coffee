@@ -6,8 +6,7 @@ Binder = require 'binder'
 
 class VariableNode
 
-  Binder.extendWithNodeSource(this)
-  Binder.extendWithNodeTarget(this)
+  Binder.extendWithStatefulNode(this)
 
   getValue: -> @value
 
@@ -15,8 +14,8 @@ class VariableNode
 
 
 class TextInput
-  Binder.extendWithNodeSource(this)
-  Binder.extendWithNodeTarget(this)
+
+  Binder.extendWithStatefulNode(this)
 
   change: (value) ->
     @setValue(value)

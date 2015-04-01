@@ -6,8 +6,22 @@ assert = require 'assert'
 
 class exports.EventPayload
 
+  @create = => new this(no)
+
+  @createNull = => new this(yes)
+
+
+  constructor: (@isNull) ->
+
+
   toValue: (value) -> new exports.ValuePayload(value)
 
+
+  replaceWhenPresent: (payload) ->
+    if @isNull
+      new exports.ValuePayload(null)
+    else
+      payload
 
 
 class exports.ValuePayload

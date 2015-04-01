@@ -65,18 +65,24 @@ module.exports = new class Binder
     @startTransmissionWithPayloadFrom(new ValuePayload(value), node)
 
 
-  # TODO rename to sendEvent
-  sendBare: (from: node) ->
-    @startTransmissionWithPayloadFrom(new EventPayload(), node)
+  sendEvent: (from: node) ->
+    @startTransmissionWithPayloadFrom(EventPayload.create(), node)
 
 
-  extendWithNodeSource: (cls) ->
+  extendWithStatefulNode: (cls) ->
     NodeSource.extend(cls)
+    NodeTarget.extend(cls)
     cls::createResponsePayload = -> StatePayload.create(this)
     return this
 
 
-  extendWithNodeTarget: (cls) ->
+  extendWithEventSource: (cls) ->
+    NodeSource.extend(cls)
+    cls::createResponsePayload = -> EventPayload.createNull()
+    return this
+
+
+  extendWithEventTarget: (cls) ->
     NodeTarget.extend(cls)
     return this
 
