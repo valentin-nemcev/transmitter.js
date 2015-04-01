@@ -14,6 +14,7 @@ module.exports = class CompositeBindingSource
 
 
   receiveMessage: (message) ->
+    message.sendQueryForMerge(this)
     message.sendMergedTo(Array.from(@sources.keys()), @target)
     return this
 

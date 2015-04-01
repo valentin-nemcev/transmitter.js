@@ -13,15 +13,11 @@ module.exports = class CompositeSourceBuilder
 
 
   withPart: (node) ->
-    @_addSourcePart(node, {queryForMerge: yes})
+    @_addSourcePart(node)
 
 
-  withPassivePart: (node) ->
-    @_addSourcePart(node, {})
-
-
-  _addSourcePart: (node, opts) ->
-    @parts.set(node, new NodeBindingLine(node.getNodeSource(), null, opts))
+  _addSourcePart: (node) ->
+    @parts.set(node, new NodeBindingLine(node.getNodeSource(), null))
     return this
 
 

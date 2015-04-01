@@ -45,7 +45,7 @@ describe 'One-way binding with merge and query', ->
       .fromSource(
         Binder.buildCompositeSource()
           .withPart @button
-          .withPassivePart @textInput
+          .withPart @textInput
       )
       .withTransform (messages) => messages.get(@textInput)
       .toTarget @alertEmitter
