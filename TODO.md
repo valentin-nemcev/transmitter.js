@@ -5,7 +5,6 @@
 * Rename binding to connection, binder to transmitter.
 * Better message merging (symmetrical querying and caching)
 
-* Unit tests should describe units and their responsibilities
-* Replace recursive binding with centralized in binding builder (maybe)
+* Prioritize queries by directions
 
 * Don't use context in isolated tests, use context in scenarios.
