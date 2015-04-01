@@ -7,21 +7,22 @@ BindingBuilder = require 'binder/binding/one_way_builder'
 Transmission = require 'binder/transmission/transmission'
 
 
+class StubPayload
+  deliver: ->
+
 class NodeSourceStub
   NodeSource.extend(this)
+  createResponsePayload: -> new StubPayload()
 
 class NodeTargetStub
   NodeTarget.extend(this)
-
-class StubPayload
-  deliver: ->
 
 
 describe 'Message and query transmission', ->
 
   beforeEach ->
-    @source = new NodeSourceStub
-    @target = new NodeTargetStub
+    @source = new NodeSourceStub()
+    @target = new NodeTargetStub()
 
     new BindingBuilder()
       .fromSource @source
@@ -44,11 +45,8 @@ describe 'Message and query transmission', ->
   it 'transmits query from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @createStubPayload = sinon.stub()
-    @createStubPayload
-      .withArgs(sinon.match.same(@source))
-      .returns(@payload)
-    @query = @transmission.createQuery(@createStubPayload)
+    sinon.stub(@source, 'createResponsePayload').returns(@payload)
+    @query = @transmission.createQuery()
 
     @query.sendFromTargetNode(@target)
     @transmission.respondToQueries()

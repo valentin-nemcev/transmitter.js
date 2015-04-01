@@ -5,18 +5,20 @@ NodeTarget = require 'binder/binding/node_target'
 Transmission = require 'binder/transmission/transmission'
 
 
+class StubPayload
+  deliver: ->
+
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
+  createResponsePayload: -> new StubPayload()
 
 class SourceNodeStub
   NodeSource.extend(this)
+  createResponsePayload: ->
 
 class TargetNodeStub
   NodeTarget.extend(this)
-
-class StubPayload
-  deliver: ->
 
 class TargetStub
   receiveMessage: ->
@@ -44,8 +46,6 @@ describe 'Transmission cycles', ->
       @payload2 = new StubPayload()
       sinon.spy(@payload2, 'deliver')
 
-      @createResponse = -> new StubPayload()
-
 
     specify 'second message should not be delivered', ->
       @message1 = @transmission.createMessage(@payload1)
@@ -59,7 +59,7 @@ describe 'Transmission cycles', ->
 
     specify 'query after message should not be sent', ->
       @message1 = @transmission.createMessage(@payload1)
-      @query2 = @transmission.createQuery(@createResponse)
+      @query2 = @transmission.createQuery()
 
       @message1.sendToTargetNode(@targetNode)
       @query2.sendFromTargetNode(@targetNode)
@@ -69,7 +69,7 @@ describe 'Transmission cycles', ->
 
 
     specify 'message after query should be sent', ->
-      @query1 = @transmission.createQuery(@createResponse)
+      @query1 = @transmission.createQuery()
       @message2 = @transmission.createMessage(@payload2)
 
       @query1.sendFromTargetNode(@targetNode)
@@ -79,8 +79,8 @@ describe 'Transmission cycles', ->
 
 
     specify 'second query should be sent', ->
-      @query1 = @transmission.createQuery(@createResponse)
-      @query2 = @transmission.createQuery(@createResponse)
+      @query1 = @transmission.createQuery()
+      @query2 = @transmission.createQuery()
 
       @query1.sendFromTargetNode(@targetNode)
       @query2.sendFromTargetNode(@targetNode)
@@ -96,8 +96,7 @@ describe 'Transmission cycles', ->
       @target = new TargetStub()
       @sourceNode.getNodeSource().bindTarget(@target)
       sinon.spy(@target, 'receiveMessage')
-
-      @createResponse = sinon.spy -> new StubPayload()
+      sinon.stub(@sourceNode, 'createResponsePayload', -> new StubPayload())
 
 
     specify 'second message should not be sent', ->
@@ -113,21 +112,21 @@ describe 'Transmission cycles', ->
 
     specify 'query after message should not be delivered', ->
       @message1 = @transmission.createMessage(new StubPayload())
-      @query2 = @transmission.createQuery(@createResponse)
+      @query2 = @transmission.createQuery()
 
       @message1.sendFromSourceNode(@sourceNode)
       @query2.sendToSourceNode(@sourceNode)
       @transmission.respondToQueries()
 
-      expect(@createResponse).to.not.have.been.called
+      expect(@sourceNode.createResponsePayload).to.not.have.been.called
 
 
     specify 'second query should be delivered', ->
-      @query1 = @transmission.createQuery(@createResponse)
-      @query2 = @transmission.createQuery(@createResponse)
+      @query1 = @transmission.createQuery()
+      @query2 = @transmission.createQuery()
 
       @query1.sendToSourceNode(@sourceNode)
       @query2.sendToSourceNode(@sourceNode)
       @transmission.respondToQueries()
 
-      expect(@createResponse).to.have.been.calledTwice
+      expect(@sourceNode.createResponsePayload).to.have.been.calledTwice

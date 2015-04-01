@@ -56,6 +56,6 @@ module.exports = class Message
     return this
 
 
-  sendQueryForMerge: (source, createQueryResponse) ->
-    source.receiveQuery(@transmission.createQuery(createQueryResponse))
+  sendQueryForMerge: (source) ->
+    source.receiveQuery(@transmission.createQuery())
     return this

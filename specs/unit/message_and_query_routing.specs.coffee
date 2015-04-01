@@ -7,12 +7,13 @@ BindingNodeLine = require 'binder/binding/binding_node_line'
 Transmission = require 'binder/transmission/transmission'
 
 
+class StubPayload
+  deliver: ->
+
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
-
-class StubPayload
-  deliver: ->
+  createResponsePayload: -> new StubPayload()
 
 class TargetStub
   receiveMessage: ->
@@ -48,7 +49,7 @@ describe 'Message and query routing', ->
     @source = new SourceStub()
     new BindingNodeLine(@node.getNodeTarget()).bindSource(@source)
     sinon.spy(@source, 'receiveQuery')
-    @query = @transmission.createQuery(->)
+    @query = @transmission.createQuery()
 
     @query.sendToSourceNode(@node)
 
@@ -65,7 +66,7 @@ describe 'Message and query routing', ->
     new BindingNodeLine(@node.getNodeTarget(), @otherDirection)
       .bindSource(@source)
     sinon.spy(@target, 'receiveMessage')
-    @query = @transmission.createQuery((-> new StubPayload()), @queryDirection)
+    @query = @transmission.createQuery(@queryDirection)
 
     @query.sendToSourceNode(@node)
     @transmission.respondToQueries()

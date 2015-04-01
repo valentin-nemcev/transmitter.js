@@ -41,7 +41,7 @@ module.exports = new class Binder
 
   queryNodeState: (node) ->
     @startTransmission (transmission) =>
-      query = transmission.createQuery(StatePayload.create, forward)
+      query = transmission.createQuery(forward)
       query.sendFromTargetNode(node)
 
 
@@ -72,6 +72,7 @@ module.exports = new class Binder
 
   extendWithNodeSource: (cls) ->
     NodeSource.extend(cls)
+    cls::createResponsePayload = -> StatePayload.create(this)
     return this
 
 

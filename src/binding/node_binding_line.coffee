@@ -7,7 +7,7 @@ directions = require './directions.coffee'
 module.exports = class NodeBindingLine
 
   constructor: (@source, @direction = directions.null, opts = {}) ->
-    {@queryForMergeWith} = opts
+    {@queryForMerge} = opts
 
 
   bindTarget: (@target) ->
@@ -21,7 +21,7 @@ module.exports = class NodeBindingLine
 
 
   receiveMessage: (message) ->
-    if @queryForMergeWith?
-      message.sendQueryForMerge(@target, @queryForMergeWith)
+    if @queryForMerge
+      message.sendQueryForMerge(@target)
     @target.receiveMessage(message)
     return this

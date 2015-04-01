@@ -19,8 +19,8 @@ module.exports = class Transmission
     new Message(this, payload)
 
 
-  createQuery: (createResponsePayload, direction) ->
-    new Query(this, createResponsePayload, direction)
+  createQuery: (direction) ->
+    new Query(this, direction)
 
 
   hasMessageForNode: (node) ->
@@ -65,7 +65,7 @@ module.exports = class Transmission
   respondToQueries: ->
     queue = @_sortQueryQueue()
     for {node, query} in queue
-      payload = query.createResponsePayload(node)
+      payload = node.createResponsePayload()
       message = @createMessage(payload)
       message.sendFromSourceNode(node)
     return this

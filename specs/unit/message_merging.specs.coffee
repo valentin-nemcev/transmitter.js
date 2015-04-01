@@ -5,13 +5,14 @@ CompositeSourceBuilder = require 'binder/binding/composite_source_builder'
 Transmission = require 'binder/transmission/transmission'
 
 
+class StubPayload
+
 class NodeStub
   NodeSource.extend(this)
+  createResponsePayload: -> new StubPayload()
 
 class TargetStub
   receiveMessage: ->
-
-class StubPayload
 
 
 describe 'Message merging', ->
@@ -74,19 +75,14 @@ describe 'Message merging', ->
   describe 'with querying', ->
 
     beforeEach ->
-      @passiveSource = new NodeStub()
+      @passivePayload = new StubPayload()
       @activeSource = new NodeStub()
-
-      @mergeQueryResponsePayload = new StubPayload()
-      @createResponsePayload = sinon.stub()
-      @createResponsePayload
-        .withArgs(sinon.match.same(@passiveSource))
-        .returns(@mergeQueryResponsePayload)
-      @createResponsePayload
-        .returns(new StubPayload())
+      @passiveSource = new NodeStub()
+      sinon.stub(@passiveSource, 'createResponsePayload')
+        .returns(@passivePayload)
 
       @compositeSource = new CompositeSourceBuilder()
-        .withPart(@activeSource, queryForMergeWith: @createResponsePayload)
+        .withPart(@activeSource)
         .withPassivePart(@passiveSource)
         .build()
 
@@ -130,4 +126,4 @@ describe 'Message merging', ->
 
         specify 'contains query response payload for other sources', ->
           expect(@mergedPayload.get(@passiveSource))
-            .to.equal(@mergeQueryResponsePayload)
+            .to.equal(@passivePayload)

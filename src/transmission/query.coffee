@@ -9,13 +9,12 @@ module.exports = class Query
   inspect: -> "Q #{@direction.inspect()}"
 
 
-  constructor: (@transmission, @createResponsePayload,
-    @direction = directions.null, @pathLength = 0) ->
+  constructor: (@transmission, @direction, @pathLength = 0) ->
+    @direction ?= directions.null
 
 
   _copy: ->
-    new Query(@transmission, @createResponsePayload,
-      @direction, @pathLength + 1)
+    new Query(@transmission, @direction, @pathLength + 1)
 
 
   _trySendingFromNodeTarget: (node) ->

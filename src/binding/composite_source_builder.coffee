@@ -12,10 +12,8 @@ module.exports = class CompositeSourceBuilder
     @parts = new Map()
 
 
-  withPart: (node, opts = {}) ->
-    {queryForMergeWith} = opts
-    queryForMergeWith ?= StatePayload.create
-    @_addSourcePart(node, {queryForMergeWith})
+  withPart: (node) ->
+    @_addSourcePart(node, {queryForMerge: yes})
 
 
   withPassivePart: (node) ->

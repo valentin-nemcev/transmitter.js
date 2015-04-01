@@ -6,12 +6,13 @@ NodeSource = require 'binder/binding/node_source'
 NodeTarget = require 'binder/binding/node_target'
 
 
+class StubPayload
+  deliver: ->
+
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
-
-class StubPayload
-  deliver: ->
+  createResponsePayload: -> new StubPayload()
 
 class TargetStub
   receiveMessage: ->
@@ -21,12 +22,9 @@ describe 'Query queue', ->
 
   beforeEach ->
     @transmission = new Transmission()
-    @node = new NodeStub
+    @node = new NodeStub()
 
-    @createResponsePayload = sinon.stub()
-    @createResponsePayload
-      .withArgs(sinon.match.same(@node))
-      .returns(@responsePayload = new StubPayload())
+    sinon.spy(@node, 'createResponsePayload')
 
     @target = new TargetStub()
     @node.getNodeSource().bindTarget(@target)
@@ -34,13 +32,14 @@ describe 'Query queue', ->
 
 
   it 'responds to queries from nodes', ->
-    @query = @transmission.createQuery(@createResponsePayload)
+    @query = @transmission.createQuery()
 
     @transmission.enqueueQueryFromNode(@query, @node)
     @transmission.respondToQueries()
 
-    @responseMessage = @target.receiveMessage.args[0][0]
-    expect(@responseMessage.getPayload()).to.equal(@responsePayload)
+    @responseMessage = @target.receiveMessage.firstCall.args[0]
+    expect(@responseMessage.getPayload())
+      .to.equal(@node.createResponsePayload.firstCall.returnValue)
 
 
   it 'responds to queries with higher priority first', ->
@@ -50,8 +49,8 @@ describe 'Query queue', ->
     @target2 = new TargetStub()
     @node1.getNodeSource().bindTarget(@target1)
     @node2.getNodeSource().bindTarget(@target2)
-    @query1 = @transmission.createQuery( -> new StubPayload())
-    @query2 = @transmission.createQuery( -> new StubPayload())
+    @query1 = @transmission.createQuery()
+    @query2 = @transmission.createQuery()
     callOrder = []
     sinon.stub(@target1, 'receiveMessage', -> callOrder.push 1)
     sinon.stub(@target2, 'receiveMessage', -> callOrder.push 2)
@@ -66,7 +65,7 @@ describe 'Query queue', ->
   it 'does not respond to query when message was already sent before', ->
     @message = @transmission.createMessage(new StubPayload())
     @message.sendFromSourceNode(@node)
-    @query = @transmission.createQuery(@createResponsePayload)
+    @query = @transmission.createQuery()
 
     @transmission.enqueueQueryFromNode(@query, @node)
     @transmission.respondToQueries()
