@@ -1,7 +1,7 @@
 'use strict'
 
 NodeSource = require 'binder/binding/node_source'
-CompositeSourceBuilder = require 'binder/binding/composite_source_builder'
+BindingBuilder = require 'binder/binding/one_way_builder'
 Transmission = require 'binder/transmission/transmission'
 
 
@@ -29,10 +29,8 @@ describe 'Message merging', ->
     sinon.stub(@passiveSource, 'createResponsePayload')
       .returns(@passivePayload)
 
-    @compositeSource = new CompositeSourceBuilder()
-      .withPart(@activeSource)
-      .withPart(@passiveSource)
-      .build()
+    @compositeSource = new BindingBuilder()
+      .createCompositeSource([@activeSource, @passiveSource])
 
     @compositeSource.bindTarget(@target)
 

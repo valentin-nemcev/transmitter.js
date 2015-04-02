@@ -50,11 +50,8 @@ describe 'Multilevel merging', ->
         result
 
     Binder.buildOneWayBinding()
-      .fromSource(
-        Binder.buildCompositeSource()
-          .withPart @d1
-          .withPart @d2
-      )
+      .fromSource(@d1)
+      .fromSource(@d2)
       .withTransform reduceMergedPayload
       .toTarget @c1
       .bind()
@@ -70,11 +67,8 @@ describe 'Multilevel merging', ->
       .bind()
 
     Binder.buildOneWayBinding()
-      .fromSource(
-        Binder.buildCompositeSource()
-          .withPart @b1
-          .withPart @b2
-      )
+      .fromSource(@b1)
+      .fromSource(@b2)
       .withTransform reduceMergedPayload
       .toTarget @a
       .bind()

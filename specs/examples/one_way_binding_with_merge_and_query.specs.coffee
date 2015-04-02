@@ -40,11 +40,8 @@ describe 'One-way binding with merge and query', ->
     sinon.spy(@alertEmitter, 'alert')
 
     Binder.buildOneWayBinding()
-      .fromSource(
-        Binder.buildCompositeSource()
-          .withPart @button
-          .withPart @textInput
-      )
+      .fromSource(@button)
+      .fromSource(@textInput)
       .withTransform (payloads) =>
         payloads.get(@button).replaceWhenPresent(payloads.get(@textInput))
       .toTarget @alertEmitter

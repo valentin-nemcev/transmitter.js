@@ -1,7 +1,6 @@
 'use strict'
 
 
-CompositeSourceBuilder = require './binding/composite_source_builder'
 OneWayBindingBuilder = require './binding/one_way_builder'
 TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
 
@@ -90,7 +89,5 @@ module.exports = new class Binder
   buildTwoWayBinding: -> new TwoWayBindingBuilder(this)
 
   buildOneWayBinding: -> new OneWayBindingBuilder()
-
-  buildCompositeSource: -> new CompositeSourceBuilder()
 
   bind: (binding) -> binding.bind()

@@ -1,9 +1,10 @@
 'use strict'
 
 
-Binding = require './binding'
 NodeBindingLine = require './node_binding_line'
 BindingNodeLine = require './binding_node_line'
+CompositeSource = require './composite_source'
+Binding = require './binding'
 
 
 module.exports = class BindingBuilder
@@ -13,14 +14,15 @@ module.exports = class BindingBuilder
 
 
   constructor: ->
-    @transform ?= returnArg
+    @sources = []
 
 
   inDirection: (@direction) ->
     return this
 
 
-  fromSource: (@source) ->
+  fromSource: (source) ->
+    @sources.push source
     return this
 
 
@@ -32,11 +34,22 @@ module.exports = class BindingBuilder
     return this
 
 
-  _buildSource: ->
-    if @source.build?
-      return @source.build()
+  buildSource: ->
+    if @sources.length == 1
+      @createSimpleSource(@sources[0])
     else
-      return new NodeBindingLine(@source.getNodeSource(), @direction)
+      @createCompositeSource(@sources)
+
+
+  createSimpleSource: (source) ->
+    new NodeBindingLine(source.getNodeSource(), @direction)
+
+
+  createCompositeSource: (sources) ->
+    parts = for source in sources
+      line = new NodeBindingLine(source.getNodeSource(), @direction)
+      [source, line]
+    new CompositeSource(new Map(parts))
 
 
   _buildTarget: ->
@@ -44,5 +57,5 @@ module.exports = class BindingBuilder
 
 
   bind: ->
-    binding = new Binding(@transform)
-    binding.bindSourceTarget(@_buildSource(), @_buildTarget())
+    binding = new Binding(@transform ? returnArg)
+    binding.bindSourceTarget(@buildSource(), @_buildTarget())

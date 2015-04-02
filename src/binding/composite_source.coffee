@@ -3,7 +3,7 @@
 
 module.exports = class CompositeBindingSource
 
-  constructor: (@sources, {@merge}) ->
+  constructor: (@sources) ->
     @target = null
 
 
