@@ -1,12 +1,13 @@
 'use strict'
 
 
-{forward, backward} = require '../directions'
+{forward, backward} = require './directions'
+ConnectionBuilder = require './binding/builder'
 
 
 module.exports = class TwoWayBindingBuilder
 
-  constructor: (@binder) ->
+  constructor: ->
 
 
   withOrigin:  (@origin)  -> this
@@ -22,8 +23,8 @@ module.exports = class TwoWayBindingBuilder
   withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)
 
 
-  connect: (source, target, transform, direction)->
-    @binder.connection()
+  connectDirection: (source, target, transform, direction)->
+    new ConnectionBuilder()
       .inDirection direction
       .fromSource source
       .toTarget target
@@ -31,7 +32,7 @@ module.exports = class TwoWayBindingBuilder
       .connect()
 
 
-  bind: ->
-    @connect(@origin, @derived, @transformOrigin, forward)
-    @connect(@derived, @origin, @transformDerived, backward)
+  connect: ->
+    @connectDirection(@origin, @derived, @transformOrigin, forward)
+    @connectDirection(@derived, @origin, @transformDerived, backward)
     return null

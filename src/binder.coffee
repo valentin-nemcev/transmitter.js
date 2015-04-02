@@ -2,7 +2,7 @@
 
 
 BindingBuilder = require './binding/builder'
-TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
+ChannelBuilder = require './channel_builder'
 
 {forward, backward} = require './directions'
 
@@ -86,6 +86,6 @@ module.exports = new class Binder
     return this
 
 
-  buildTwoWayBinding: -> new TwoWayBindingBuilder(this)
+  channel: -> new ChannelBuilder()
 
   connection: -> new BindingBuilder()

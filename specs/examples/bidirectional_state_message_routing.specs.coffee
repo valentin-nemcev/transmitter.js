@@ -27,7 +27,7 @@ class TextInput
   getValue: -> @value
 
 
-describe 'Two-way state message routing', ->
+describe 'Bidirectional state message routing', ->
 
   beforeEach ->
     @define = (name, value) -> value.inspect ?= (-> name); @[name] = value
@@ -35,28 +35,28 @@ describe 'Two-way state message routing', ->
     @tagSet.setValue(new Set())
 
     @define 'tagSortedList', new VariableNode()
-    Binder.buildTwoWayBinding()
+    Binder.channel()
       .withOrigin @tagSet
       .withMapOrigin (tags) -> Array.from(tags).sort()
       .withDerived @tagSortedList
       .withMapDerived (tags) -> new Set(tags)
-      .bind()
+      .connect()
 
     @define 'tagJSON', new VariableNode()
-    Binder.buildTwoWayBinding()
+    Binder.channel()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> JSON.stringify(tags)
       .withDerived @tagJSON
       .withMapDerived (tagJSON) -> tagJSON and JSON.parse(tagJSON)
-      .bind()
+      .connect()
 
     @define 'tagInput', new TextInput()
-    Binder.buildTwoWayBinding()
+    Binder.channel()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> (tags ? []).join(', ')
       .withDerived @tagInput
       .withMapDerived (tagStr) -> tagStr.split(/\s*,\s*/)
-      .bind()
+      .connect()
 
 
   specify 'when derived node is queried, it gets update from origin node', ->
