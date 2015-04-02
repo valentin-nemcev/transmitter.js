@@ -7,7 +7,7 @@ describe 'Button with enabled or disabled states', ->
 describe 'Serialized value with on-demand transmission', ->
   it 'should be implemented'
 
-describe 'Two-way select box binding', ->
+describe 'Select box connection', ->
   it 'should be implemented'
 
 describe 'Changing model list order preserving view state', ->

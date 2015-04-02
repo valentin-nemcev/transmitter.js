@@ -1,9 +1,9 @@
 'use strict'
 
-NodeSource = require 'binder/binding/node_source'
-NodeTarget = require 'binder/binding/node_target'
-NodeBindingLine = require 'binder/binding/node_binding_line'
-BindingNodeLine = require 'binder/binding/binding_node_line'
+NodeSource = require 'binder/connection/node_source'
+NodeTarget = require 'binder/connection/node_target'
+NodeConnectionLine = require 'binder/connection/node_connection_line'
+ConnectionNodeLine = require 'binder/connection/connection_node_line'
 Transmission = require 'binder/transmission/transmission'
 
 
@@ -35,7 +35,7 @@ describe 'Message and query routing', ->
   specify 'message should be routed from node target to node source', ->
     @node = new NodeStub()
     @target = new TargetStub()
-    new NodeBindingLine(@node.getNodeSource()).bindTarget(@target)
+    new NodeConnectionLine(@node.getNodeSource()).connectTarget(@target)
     sinon.spy(@target, 'receiveMessage')
     @message = @transmission.createMessage(new StubPayload())
 
@@ -47,7 +47,7 @@ describe 'Message and query routing', ->
   specify 'query should be routed from node source to node target', ->
     @node = new NodeStub()
     @source = new SourceStub()
-    new BindingNodeLine(@node.getNodeTarget()).bindSource(@source)
+    new ConnectionNodeLine(@node.getNodeTarget()).connectSource(@source)
     sinon.spy(@source, 'receiveQuery')
     @query = @transmission.createQuery()
 
@@ -61,10 +61,10 @@ describe 'Message and query routing', ->
     @node = new NodeStub()
     @source = new SourceStub()
     @target = new TargetStub()
-    new NodeBindingLine(@node.getNodeSource())
-      .bindTarget(@target)
-    new BindingNodeLine(@node.getNodeTarget(), @otherDirection)
-      .bindSource(@source)
+    new NodeConnectionLine(@node.getNodeSource())
+      .connectTarget(@target)
+    new ConnectionNodeLine(@node.getNodeTarget(), @otherDirection)
+      .connectSource(@source)
     sinon.spy(@target, 'receiveMessage')
     @query = @transmission.createQuery(@queryDirection)
 

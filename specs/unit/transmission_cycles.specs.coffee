@@ -1,7 +1,7 @@
 'use strict'
 
-NodeSource = require 'binder/binding/node_source'
-NodeTarget = require 'binder/binding/node_target'
+NodeSource = require 'binder/connection/node_source'
+NodeTarget = require 'binder/connection/node_target'
 Transmission = require 'binder/transmission/transmission'
 
 
@@ -39,7 +39,7 @@ describe 'Transmission cycles', ->
     beforeEach ->
       @targetNode = new TargetNodeStub()
       @source = new SourceStub()
-      @targetNode.getNodeTarget().bindSource(@source)
+      @targetNode.getNodeTarget().connectSource(@source)
       sinon.spy(@source, 'receiveQuery')
 
       @payload1 = new StubPayload()
@@ -94,7 +94,7 @@ describe 'Transmission cycles', ->
     beforeEach ->
       @sourceNode = new SourceNodeStub()
       @target = new TargetStub()
-      @sourceNode.getNodeSource().bindTarget(@target)
+      @sourceNode.getNodeSource().connectTarget(@target)
       sinon.spy(@target, 'receiveMessage')
       sinon.stub(@sourceNode, 'createResponsePayload', -> new StubPayload())
 

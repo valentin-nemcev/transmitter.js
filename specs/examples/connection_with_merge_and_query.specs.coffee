@@ -31,7 +31,7 @@ class TextInput
   getValue: -> @value
 
 
-describe 'One-way binding with merge and query', ->
+describe 'Connection with merge and query', ->
 
   beforeEach ->
     @button = new Button()

@@ -12,7 +12,7 @@ module.exports = class NodeTarget
     @sources = new Set()
 
 
-  bindSource: (source) ->
+  connectSource: (source) ->
     @sources.add(source)
     return this
 

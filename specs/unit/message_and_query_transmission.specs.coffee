@@ -1,8 +1,8 @@
 'use strict'
 
-NodeSource = require 'binder/binding/node_source'
-NodeTarget = require 'binder/binding/node_target'
-BindingBuilder = require 'binder/binding/builder'
+NodeSource = require 'binder/connection/node_source'
+NodeTarget = require 'binder/connection/node_target'
+ConnectionBuilder = require 'binder/connection/builder'
 
 Transmission = require 'binder/transmission/transmission'
 
@@ -24,7 +24,7 @@ describe 'Message and query transmission', ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
 
-    new BindingBuilder()
+    new ConnectionBuilder()
       .fromSource @source
       .toTarget @target
       .connect()

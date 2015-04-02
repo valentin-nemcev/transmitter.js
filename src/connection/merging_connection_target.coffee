@@ -1,14 +1,14 @@
 'use strict'
 
 
-module.exports = class CompositeBindingSource
+module.exports = class MergingConnectionTarget
 
   constructor: (@sources) ->
     @target = null
 
 
-  bindTarget: (target) ->
-    @sources.forEach (source, node) => source.bindTarget(this)
+  connectTarget: (target) ->
+    @sources.forEach (source, node) => source.connectTarget(this)
     @target = target
     return this
 

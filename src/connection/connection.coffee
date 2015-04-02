@@ -1,14 +1,14 @@
 'use strict'
 
 
-module.exports = class Binding
+module.exports = class Connection
 
   constructor: (@transform) ->
 
 
-  bindSourceTarget: (@source, @target) ->
-    @source.bindTarget(this)
-    @target.bindSource(this)
+  connectSourceTarget: (@source, @target) ->
+    @source.connectTarget(this)
+    @target.connectSource(this)
     return this
 
 

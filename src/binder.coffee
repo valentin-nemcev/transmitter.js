@@ -1,7 +1,7 @@
 'use strict'
 
 
-BindingBuilder = require './binding/builder'
+ConnectionBuilder = require './connection/builder'
 ChannelBuilder = require './channel_builder'
 
 {forward, backward} = require './directions'
@@ -9,8 +9,8 @@ ChannelBuilder = require './channel_builder'
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
 Transmission = require './transmission/transmission'
-NodeSource = require './binding/node_source'
-NodeTarget = require './binding/node_target'
+NodeSource = require './connection/node_source'
+NodeTarget = require './connection/node_target'
 
 
 module.exports = new class Binder
@@ -88,4 +88,4 @@ module.exports = new class Binder
 
   channel: -> new ChannelBuilder()
 
-  connection: -> new BindingBuilder()
+  connection: -> new ConnectionBuilder()

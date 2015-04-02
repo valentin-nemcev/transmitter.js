@@ -2,10 +2,10 @@
 
 
 {forward, backward} = require './directions'
-ConnectionBuilder = require './binding/builder'
+ConnectionBuilder = require './connection/builder'
 
 
-module.exports = class TwoWayBindingBuilder
+module.exports = class ChannelBuilder
 
   constructor: ->
 

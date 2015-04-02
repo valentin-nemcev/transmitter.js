@@ -4,13 +4,13 @@
 directions = require '../directions.coffee'
 
 
-module.exports = class NodeBindingLine
+module.exports = class NodeConnectionLine
 
   constructor: (@source, @direction = directions.null) ->
 
 
-  bindTarget: (@target) ->
-    @source.bindTarget(this)
+  connectTarget: (@target) ->
+    @source.connectTarget(this)
     return this
 
 

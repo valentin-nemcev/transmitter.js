@@ -2,8 +2,8 @@
 
 
 Transmission = require 'binder/transmission/transmission'
-NodeSource = require 'binder/binding/node_source'
-NodeTarget = require 'binder/binding/node_target'
+NodeSource = require 'binder/connection/node_source'
+NodeTarget = require 'binder/connection/node_target'
 
 
 class StubPayload
@@ -27,7 +27,7 @@ describe 'Query queue', ->
     sinon.spy(@node, 'createResponsePayload')
 
     @target = new TargetStub()
-    @node.getNodeSource().bindTarget(@target)
+    @node.getNodeSource().connectTarget(@target)
     sinon.spy(@target, 'receiveMessage')
 
 
@@ -47,8 +47,8 @@ describe 'Query queue', ->
     @node2 = new NodeStub()
     @target1 = new TargetStub()
     @target2 = new TargetStub()
-    @node1.getNodeSource().bindTarget(@target1)
-    @node2.getNodeSource().bindTarget(@target2)
+    @node1.getNodeSource().connectTarget(@target1)
+    @node2.getNodeSource().connectTarget(@target2)
     @query1 = @transmission.createQuery()
     @query2 = @transmission.createQuery()
     callOrder = []
