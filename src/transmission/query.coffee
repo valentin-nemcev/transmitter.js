@@ -1,7 +1,7 @@
 'use strict'
 
 
-directions = require '../binding/directions.coffee'
+directions = require '../directions.coffee'
 
 
 module.exports = class Query

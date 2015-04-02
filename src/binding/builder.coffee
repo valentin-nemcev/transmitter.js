@@ -56,6 +56,6 @@ module.exports = class BindingBuilder
     return new BindingNodeLine(@target.getNodeTarget(), @direction)
 
 
-  bind: ->
+  connect: ->
     binding = new Binding(@transform ? returnArg)
     binding.bindSourceTarget(@buildSource(), @_buildTarget())

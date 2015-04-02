@@ -49,29 +49,29 @@ describe 'Multilevel merging', ->
         result[getVarName(node)] = value
         result
 
-    Binder.buildOneWayBinding()
+    Binder.connection()
       .fromSource(@d1)
       .fromSource(@d2)
       .withTransform reduceMergedPayload
       .toTarget @c1
-      .bind()
+      .connect()
 
-    Binder.buildOneWayBinding()
+    Binder.connection()
       .fromSource @c1
       .toTarget @b1
-      .bind()
+      .connect()
 
-    Binder.buildOneWayBinding()
+    Binder.connection()
       .fromSource @c2
       .toTarget @b1
-      .bind()
+      .connect()
 
-    Binder.buildOneWayBinding()
+    Binder.connection()
       .fromSource(@b1)
       .fromSource(@b2)
       .withTransform reduceMergedPayload
       .toTarget @a
-      .bind()
+      .connect()
 
 
   Binder.withDifferentTransmissionOrders (Binder, order) ->

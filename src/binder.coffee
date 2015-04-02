@@ -1,10 +1,10 @@
 'use strict'
 
 
-OneWayBindingBuilder = require './binding/one_way_builder'
+BindingBuilder = require './binding/builder'
 TwoWayBindingBuilder = require './complex_bindings/two_way_binding_builder'
 
-{forward, backward} = require './binding/directions'
+{forward, backward} = require './directions'
 
 {EventPayload, ValuePayload, StatePayload} = require './transmission/payloads'
 
@@ -88,6 +88,4 @@ module.exports = new class Binder
 
   buildTwoWayBinding: -> new TwoWayBindingBuilder(this)
 
-  buildOneWayBinding: -> new OneWayBindingBuilder()
-
-  bind: (binding) -> binding.bind()
+  connection: -> new BindingBuilder()

@@ -39,13 +39,13 @@ describe 'One-way binding with merge and query', ->
     @alertEmitter = new AlertEmitter()
     sinon.spy(@alertEmitter, 'alert')
 
-    Binder.buildOneWayBinding()
+    Binder.connection()
       .fromSource(@button)
       .fromSource(@textInput)
       .withTransform (payloads) =>
         payloads.get(@button).replaceWhenPresent(payloads.get(@textInput))
       .toTarget @alertEmitter
-      .bind()
+      .connect()
 
 
   it 'should emit alert with text input value when button is clicked', ->

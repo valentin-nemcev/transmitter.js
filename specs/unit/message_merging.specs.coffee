@@ -1,7 +1,7 @@
 'use strict'
 
 NodeSource = require 'binder/binding/node_source'
-BindingBuilder = require 'binder/binding/one_way_builder'
+BindingBuilder = require 'binder/binding/builder'
 Transmission = require 'binder/transmission/transmission'
 
 

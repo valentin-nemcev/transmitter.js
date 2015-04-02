@@ -2,7 +2,7 @@
 
 NodeSource = require 'binder/binding/node_source'
 NodeTarget = require 'binder/binding/node_target'
-BindingBuilder = require 'binder/binding/one_way_builder'
+BindingBuilder = require 'binder/binding/builder'
 
 Transmission = require 'binder/transmission/transmission'
 
@@ -27,7 +27,7 @@ describe 'Message and query transmission', ->
     new BindingBuilder()
       .fromSource @source
       .toTarget @target
-      .bind()
+      .connect()
 
     @transmission = new Transmission()
 
