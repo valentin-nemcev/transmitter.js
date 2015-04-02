@@ -1,8 +1,8 @@
 'use strict'
 
-NodeSource = require 'binder/connection/node_source'
-NodeTarget = require 'binder/connection/node_target'
-Transmission = require 'binder/transmission/transmission'
+NodeSource = require 'transmitter/connection/node_source'
+NodeTarget = require 'transmitter/connection/node_target'
+Transmission = require 'transmitter/transmission/transmission'
 
 
 class StubPayload

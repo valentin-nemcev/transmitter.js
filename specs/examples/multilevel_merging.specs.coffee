@@ -1,12 +1,12 @@
 'use strict'
 
 
-Binder = require 'binder'
+Transmitter = require 'transmitter'
 
 
 class VariableNode
 
-  Binder.extendWithStatefulNode(this)
+  Transmitter.extendWithStatefulNode(this)
 
   getValue: -> @value
 
@@ -49,24 +49,24 @@ describe 'Multilevel merging', ->
         result[getVarName(node)] = value
         result
 
-    Binder.connection()
+    Transmitter.connection()
       .fromSource(@d1)
       .fromSource(@d2)
       .withTransform reduceMergedPayload
       .toTarget @c1
       .connect()
 
-    Binder.connection()
+    Transmitter.connection()
       .fromSource @c1
       .toTarget @b1
       .connect()
 
-    Binder.connection()
+    Transmitter.connection()
       .fromSource @c2
       .toTarget @b1
       .connect()
 
-    Binder.connection()
+    Transmitter.connection()
       .fromSource(@b1)
       .fromSource(@b2)
       .withTransform reduceMergedPayload
@@ -74,10 +74,10 @@ describe 'Multilevel merging', ->
       .connect()
 
 
-  Binder.withDifferentTransmissionOrders (Binder, order) ->
+  Transmitter.withDifferentTransmissionOrders (Transmitter, order) ->
     specify "multiple messages are transmitted and merged \
         in correct order (#{order})", ->
-      Binder.updateNodesState(
+      Transmitter.updateNodesState(
         [@d2, 'd2UpdatedValue']
         [@b2, 'b2UpdatedValue']
       )

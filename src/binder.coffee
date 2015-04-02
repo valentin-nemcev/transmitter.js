@@ -13,7 +13,7 @@ NodeSource = require './connection/node_source'
 NodeTarget = require './connection/node_target'
 
 
-module.exports = new class Binder
+module.exports = new class Transmitter
 
   constructor: (opts = {}) ->
     {@reverseOrder} = opts

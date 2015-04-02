@@ -1,17 +1,17 @@
 'use strict'
 
 
-Binder = require 'binder'
+Transmitter = require 'transmitter'
 
 
 class Button
-  Binder.extendWithEventSource(this)
+  Transmitter.extendWithEventSource(this)
 
-  click: -> Binder.sendEvent(from: this)
+  click: -> Transmitter.sendEvent(from: this)
 
 
 class AlertEmitter
-  Binder.extendWithEventTarget(this)
+  Transmitter.extendWithEventTarget(this)
 
   alert: ->
 
@@ -19,11 +19,11 @@ class AlertEmitter
 
 
 class TextInput
-  Binder.extendWithStatefulNode(this)
+  Transmitter.extendWithStatefulNode(this)
 
   change: (value) ->
     @setValue(value)
-    Binder.sendNodeState(this)
+    Transmitter.sendNodeState(this)
     return this
 
   setValue: (@value) -> this
@@ -39,7 +39,7 @@ describe 'Connection with merge and query', ->
     @alertEmitter = new AlertEmitter()
     sinon.spy(@alertEmitter, 'alert')
 
-    Binder.connection()
+    Transmitter.connection()
       .fromSource(@button)
       .fromSource(@textInput)
       .withTransform (payloads) =>
