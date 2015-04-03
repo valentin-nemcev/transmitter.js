@@ -30,7 +30,6 @@ class TextInput
 describe 'Bidirectional state message routing', ->
 
   beforeEach ->
-    @define = (name, value) -> value.inspect ?= (-> name); @[name] = value
     @define 'tagSet', new VariableNode()
     @tagSet.setValue(new Set())
 

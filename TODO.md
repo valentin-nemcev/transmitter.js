@@ -23,6 +23,8 @@
 
 * Better message merging (symmetrical querying and caching)
 
+* Refactor payloads into source and target payloads
+
 * Prioritize queries by directions
 
 * Don't use context in isolated tests, use context in scenarios.
