@@ -24,6 +24,7 @@ class exports.EventPayload
       payload
 
 
+
 class exports.ValuePayload
 
   constructor: (@value) ->
@@ -74,6 +75,7 @@ class exports.StatePayload
     else
       targetNode.setValue(@getValue())
     return this
+
 
 
 class exports.MergedPayload
