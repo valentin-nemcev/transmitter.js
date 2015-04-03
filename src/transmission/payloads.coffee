@@ -4,30 +4,15 @@
 assert = require 'assert'
 
 
-class exports.EventPayload
-
-  @create = => new this(no)
-
-  @createNull = => new this(yes)
-
-
-  constructor: (@isNull) ->
-
-
-  toValue: (value) -> new exports.ValuePayload(value)
-
-
-  replaceWhenPresent: (payload) ->
-    if @isNull
-      new exports.ValuePayload(null)
-    else
-      payload
-
-
-
 class exports.ValuePayload
 
+  @create = (value) => new this(value)
+
   constructor: (@value) ->
+
+
+  toState: ->
+    new exports.StatePayload(this)
 
 
   getValue: ->
@@ -38,11 +23,15 @@ class exports.ValuePayload
     new exports.ValuePayload(map(@value))
 
 
-  deliver: (targetNode) ->
-    if targetNode.setValue? and not targetNode.receiveValue?
-      targetNode.setValue(@value)
+  replaceWhenPresent: (payload) ->
+    if @value?
+      payload
     else
-      targetNode.receiveValue(@value)
+      this
+
+
+  deliver: (targetNode) ->
+    targetNode.receiveValue(@value)
     return this
 
 
@@ -53,12 +42,15 @@ class exports.StatePayload
     return new this(node)
 
 
-  @updateNodeAndCreate = (node, value) =>
-    node.setValue(value)
-    return new this(node)
+  @createFromValue = (value) =>
+    return new this(getValue: -> value)
 
 
-  constructor: (@node) ->
+  constructor: (@node, @update) ->
+
+
+  toValue: ->
+    new exports.ValuePayload(@getValue())
 
 
   getValue: ->
@@ -66,14 +58,15 @@ class exports.StatePayload
 
 
   mapValue: (map) ->
-    new exports.ValuePayload(map(@getValue()))
+    new exports.StatePayload(@node, map)
 
 
   deliver: (targetNode) ->
-    if not targetNode.setValue? and targetNode.receiveValue?
-      targetNode.receiveValue(@getValue())
+    value = if @update?
+      @update(@getValue(), targetNode.getValue())
     else
-      targetNode.setValue(@getValue())
+      @getValue()
+    targetNode.setValue(value)
     return this
 
 

@@ -45,9 +45,10 @@ describe 'Multilevel merging', ->
       return name for name, value of this when value == node
 
     reduceMergedPayload = (payload) ->
-      payload.reduceValue {}, (result, node, value) ->
+      payload.reduceValue({}, (result, node, value) ->
         result[getVarName(node)] = value
         result
+      ).toState()
 
     Transmitter.connection()
       .fromSource(@d1)
@@ -77,7 +78,7 @@ describe 'Multilevel merging', ->
   Transmitter.withDifferentTransmissionOrders (Transmitter, order) ->
     specify "multiple messages are transmitted and merged \
         in correct order (#{order})", ->
-      Transmitter.updateNodesState(
+      Transmitter.updateNodeStates(
         [@d2, 'd2UpdatedValue']
         [@b2, 'b2UpdatedValue']
       )

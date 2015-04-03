@@ -7,7 +7,7 @@ Transmitter = require 'transmitter'
 class Button
   Transmitter.extendWithEventSource(this)
 
-  click: -> Transmitter.sendEvent(from: this)
+  click: -> Transmitter.originate(this, true)
 
 
 class AlertEmitter
@@ -23,7 +23,7 @@ class TextInput
 
   change: (value) ->
     @setValue(value)
-    Transmitter.sendNodeState(this)
+    Transmitter.originate(this)
     return this
 
   setValue: (@value) -> this
@@ -43,7 +43,8 @@ describe 'Connection with merge and query', ->
       .fromSource(@button)
       .fromSource(@textInput)
       .withTransform (payloads) =>
-        payloads.get(@button).replaceWhenPresent(payloads.get(@textInput))
+        payloads.get(@button)
+          .replaceWhenPresent(payloads.get(@textInput).toValue())
       .toTarget @alertEmitter
       .connect()
 

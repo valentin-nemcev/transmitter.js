@@ -23,6 +23,10 @@ module.exports = class ChannelBuilder
   withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)
 
 
+  withUpdateOrigin:  (update) -> @withMapDerived(update)
+  withUpdateDerived: (update) -> @withMapOrigin(update)
+
+
   connectDirection: (source, target, transform, direction)->
     new ConnectionBuilder()
       .inDirection direction

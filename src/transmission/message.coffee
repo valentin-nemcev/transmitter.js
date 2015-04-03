@@ -30,7 +30,8 @@ module.exports = class Message
     @transmission.addMessageForNode(this, node)
     @payload.deliver(node)
     if node.getNodeSource?
-      copy = @_copyWithPayload(@payload)
+      payload = node.createRelayPayload(@payload)
+      copy = @_copyWithPayload(payload)
       node.getNodeSource().receiveMessage(copy)
     return this
 

@@ -14,6 +14,7 @@ class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
   createResponsePayload: -> new StubPayload()
+  createRelayPayload:    -> new StubPayload()
 
 class TargetStub
   receiveMessage: ->

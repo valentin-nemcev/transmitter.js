@@ -27,9 +27,9 @@ describe 'Value updates preserve identity', ->
     Transmitter.channel()
       .withOrigin @objectVar
       .withMapOrigin (object) -> [object.name, object.value].join(':')
-      .withUpdateOrigin (object, string) ->
-        [name, value] = string.split(',')
-        if name == object.name
+      .withUpdateOrigin (string, object) ->
+        [name, value] = string.split(':')
+        if object? and name == object.name
           object.value = value
           return object
         else
@@ -40,6 +40,7 @@ describe 'Value updates preserve identity', ->
 
   specify 'state change message update target value instead of replacing', ->
     @object = new StatefulObject('nameA')
+    @objectVar.setValue(@object)
 
     Transmitter.updateNodeState(@stringVar, 'nameA:value1')
 

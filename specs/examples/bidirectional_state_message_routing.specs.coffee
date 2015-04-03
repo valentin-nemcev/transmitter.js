@@ -27,6 +27,9 @@ class TextInput
   getValue: -> @value
 
 
+Set::inspect = -> "Set(" + Array.from(this).join(', ') + ")"
+
+
 describe 'Bidirectional state message routing', ->
 
   beforeEach ->
