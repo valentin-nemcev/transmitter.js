@@ -13,8 +13,10 @@ module.exports = class ChannelBuilder
   withOrigin:  (@origin)  -> this
   withDerived: (@derived) -> this
 
+
   withTransformOrigin:  (@transformOrigin)  -> this
   withTransformDerived: (@transformDerived) -> this
+
 
   mapPayloadValue = (map) ->
     (payload) -> payload.mapValue(map)

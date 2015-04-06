@@ -6,3 +6,5 @@ describe 'Examples', ->
   require './examples/bidirectional_state_message_routing.specs'
   require './examples/multilevel_merging.specs'
   require './examples/value_updates.specs'
+  require './examples/flattening_connection.specs'
+  require './examples/nested_connection.specs'

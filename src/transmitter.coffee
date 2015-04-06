@@ -4,7 +4,7 @@
 ConnectionBuilder = require './connection/builder'
 ChannelBuilder = require './channel_builder'
 
-{forward, backward} = require './directions'
+directions = require './directions'
 
 {ValuePayload, StatePayload} = require './transmission/payloads'
 
@@ -34,9 +34,12 @@ module.exports = new class Transmitter
 
 
 
+  directions: directions
+
+
   queryNodeState: (node) ->
     @startTransmission (transmission) =>
-      query = transmission.createQuery(forward)
+      query = transmission.createQuery(@directions.forward)
       query.sendFromTargetNode(node)
 
 
@@ -59,6 +62,11 @@ module.exports = new class Transmitter
       transmission.createMessage(payload).sendFromSourceNode(node)
 
 
+  define: (name, value) ->
+    value.inspect ?= (-> name)
+    @[name] = value
+    return value
+
 
   extendWithStatefulNode: (cls) ->
     NodeSource.extend(cls)
@@ -67,6 +75,10 @@ module.exports = new class Transmitter
     cls::createOriginPayload   = -> StatePayload.create(this)
     cls::createRelayPayload    = -> StatePayload.create(this)
     return this
+
+
+  extendWithChannelNode: (cls) ->
+    NodeTarget.extend(cls)
 
 
   extendWithEventSource: (cls) ->
