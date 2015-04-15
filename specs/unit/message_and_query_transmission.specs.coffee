@@ -6,6 +6,8 @@ ConnectionBuilder = require 'transmitter/connection/builder'
 
 Transmission = require 'transmitter/transmission/transmission'
 
+Transmitter = require 'transmitter'
+
 
 class StubPayload
   deliver: ->
@@ -24,7 +26,7 @@ describe 'Message and query transmission', ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
 
-    new ConnectionBuilder()
+    new ConnectionBuilder(Transmitter)
       .fromSource @source
       .toTarget @target
       .connect()

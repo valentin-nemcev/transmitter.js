@@ -4,12 +4,14 @@
 module.exports = class MergingConnectionTarget
 
   constructor: (@sources) ->
-    @target = null
+    @sources.forEach (source, node) => source.setTarget(this)
 
 
-  connectTarget: (target) ->
-    @sources.forEach (source, node) => source.connectTarget(this)
-    @target = target
+  setTarget: (@target) -> return this
+
+
+  receiveConnectionMessage: (message) ->
+    @sources.forEach (source) -> source.receiveConnectionMessage(message)
     return this
 
 

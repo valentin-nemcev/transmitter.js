@@ -2,6 +2,7 @@
 
 
 Transmitter = require 'transmitter'
+{ConnectionPayload} = require 'transmitter/transmission/payloads'
 
 
 class VariableNode
@@ -15,11 +16,35 @@ class VariableNode
 
 class VariableChannelNode
 
-  Transmitter.extendWithChannelNode(this)
+  Transmitter.extendWithConnectionNode(this)
 
-  getValue: -> @value
+  setSource: (@source) ->
 
-  setValue: (@value) -> this
+  receiveConnectionMessage: (message) ->
+    return this
+
+
+  receiveMessage: (@message) ->
+    @message.getPayload().deliver(this)
+    @message = null
+    return this
+
+
+  connect: (channel) ->
+    payload = ConnectionPayload.createConnect()
+    @message.sendToConnectionWithPayload(channel, payload)
+    return this
+
+
+  getValue: -> @channel
+
+  setValue: (newChannel) ->
+    oldChannel = @channel
+    @channel = newChannel
+
+    # oldChannel?.disconnect(@message)
+    @connect(newChannel)
+    this
 
 
 class NestedObject
@@ -51,7 +76,7 @@ describe 'Flattening connection', ->
 
     Transmitter.connection()
       .fromSource @nestedVar
-      .toTarget @nestedChannelVar
+      .toConnectionTarget @nestedChannelVar
       .withTransform (payload) =>
         payload.mapValue (nestedObject) =>
           Transmitter.channel()
@@ -59,7 +84,6 @@ describe 'Flattening connection', ->
             .withMapOrigin (value) -> {name: nestedObject.name, value}
             .withDerived @serializedVar
             .withMapDerived (serialized) -> serialized.value
-            .connect()
       .connect()
 
 

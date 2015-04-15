@@ -36,7 +36,8 @@ describe 'Message and query routing', ->
   specify 'message should be routed from node target to node source', ->
     @node = new NodeStub()
     @target = new TargetStub()
-    new NodeConnectionLine(@node.getNodeSource()).connectTarget(@target)
+    new NodeConnectionLine(@node.getNodeSource())
+      .setTarget(@target).connect()
     sinon.spy(@target, 'receiveMessage')
     @message = @transmission.createMessage(new StubPayload())
 
@@ -48,7 +49,8 @@ describe 'Message and query routing', ->
   specify 'query should be routed from node source to node target', ->
     @node = new NodeStub()
     @source = new SourceStub()
-    new ConnectionNodeLine(@node.getNodeTarget()).connectSource(@source)
+    new ConnectionNodeLine(@node.getNodeTarget())
+      .setSource(@source).connect()
     sinon.spy(@source, 'receiveQuery')
     @query = @transmission.createQuery()
 
@@ -63,9 +65,9 @@ describe 'Message and query routing', ->
     @source = new SourceStub()
     @target = new TargetStub()
     new NodeConnectionLine(@node.getNodeSource())
-      .connectTarget(@target)
+      .setTarget(@target).connect()
     new ConnectionNodeLine(@node.getNodeTarget(), @otherDirection)
-      .connectSource(@source)
+      .setSource(@source).connect()
     sinon.spy(@target, 'receiveMessage')
     @query = @transmission.createQuery(@queryDirection)
 

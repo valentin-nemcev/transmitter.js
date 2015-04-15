@@ -19,6 +19,8 @@ module.exports = class NodeSource
 
 
   receiveMessage: (message) ->
+    # @queryForTargets()
+    # @getTargets().forEach (target) -> target.receiveMessage(message)
     @targets.forEach (target) -> target.receiveMessage(message)
     return this
 

@@ -99,3 +99,13 @@ class exports.MergedPayload
 
   isPresent: ->
     @keys.every (key) => @payloads.get(key)?
+
+
+
+class exports.ConnectionPayload
+
+  @createConnect = -> new this
+
+  deliver: (line) ->
+    line.connect()
+    return this

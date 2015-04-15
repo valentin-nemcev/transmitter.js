@@ -2,6 +2,7 @@
 
 Query = require './query'
 Message = require './message'
+ConnectionMessage = require './connection_message'
 
 stable = require 'stable'
 
@@ -16,11 +17,15 @@ module.exports = class Transmission
 
 
   createMessage: (payload) ->
-    new Message(this, payload)
+    return new Message(this, payload)
+
+
+  createConnectionMessage: (payload) ->
+    return new ConnectionMessage(this, payload)
 
 
   createQuery: (direction) ->
-    new Query(this, direction)
+    return new Query(this, direction)
 
 
   hasMessageForNode: (node) ->

@@ -1,12 +1,15 @@
 'use strict'
 
 
+assert = require 'assert'
+
 ConnectionBuilder = require './connection/builder'
 ChannelBuilder = require './channel_builder'
 
 directions = require './directions'
 
-{ValuePayload, StatePayload} = require './transmission/payloads'
+{ConnectionPayload, ValuePayload, StatePayload} =
+  require './transmission/payloads'
 
 Transmission = require './transmission/transmission'
 NodeSource = require './connection/node_source'
@@ -27,9 +30,13 @@ module.exports = new class Transmitter
 
 
   startTransmission: (doWithTransmission) ->
-    transmission = new Transmission({@reverseOrder})
-    doWithTransmission(transmission)
-    transmission.respondToQueries()
+    assert(not @transmission, "Transmissions can't be nested")
+    @transmission = new Transmission({@reverseOrder})
+    try
+      doWithTransmission(@transmission)
+      @transmission.respondToQueries()
+    finally
+      @transmission = null
     return this
 
 
@@ -62,6 +69,15 @@ module.exports = new class Transmitter
       transmission.createMessage(payload).sendFromSourceNode(node)
 
 
+  connect: (connection) ->
+    @startTransmission (transmission) =>
+      payload = ConnectionPayload.createConnect()
+      transmission.createConnectionMessage(payload)
+        .sendToConnection(connection)
+    return this
+
+
+
   define: (name, value) ->
     value.inspect ?= (-> name)
     @[name] = value
@@ -77,7 +93,7 @@ module.exports = new class Transmitter
     return this
 
 
-  extendWithChannelNode: (cls) ->
+  extendWithConnectionNode: (cls) ->
     NodeTarget.extend(cls)
 
 
@@ -94,6 +110,6 @@ module.exports = new class Transmitter
 
 
 
-  channel: -> new ChannelBuilder()
+  channel: -> new ChannelBuilder(this)
 
-  connection: -> new ConnectionBuilder()
+  connection: -> new ConnectionBuilder(this)

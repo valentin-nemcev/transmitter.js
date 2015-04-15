@@ -3,12 +3,14 @@
 
 module.exports = class Connection
 
-  constructor: (@transform) ->
+  constructor: (@source, @target, @transform) ->
+    @source.setTarget(this)
+    @target.setSource(this)
 
 
-  connectSourceTarget: (@source, @target) ->
-    @source.connectTarget(this)
-    @target.connectSource(this)
+  receiveConnectionMessage: (message) ->
+    @source.receiveConnectionMessage(message)
+    @target.receiveConnectionMessage(message)
     return this
 
 

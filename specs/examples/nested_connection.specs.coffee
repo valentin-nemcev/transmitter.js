@@ -15,4 +15,4 @@ class VariableNode
 
 describe 'Nested connection', ->
 
-  specify '.'
+  # specify '.'

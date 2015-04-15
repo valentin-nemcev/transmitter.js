@@ -1,7 +1,10 @@
 'use strict'
 
+
 assert = require 'assert'
 {MergedPayload} = require './payloads'
+ConnectionMessage = require './connection_message'
+
 
 module.exports = class Message
 
@@ -12,6 +15,11 @@ module.exports = class Message
   _copyWithPayload: (payload) ->
     copy = new Message(@transmission, payload)
     return copy
+
+
+  sendToConnectionWithPayload: (connection, payload) ->
+    new ConnectionMessage(@transmission, payload)
+      .sendToConnection(connection)
 
 
   getPayload: ->

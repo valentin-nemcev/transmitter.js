@@ -1,6 +1,8 @@
 'use strict'
 
 
+assert = require 'assert'
+
 NodeConnectionLine = require './node_connection_line'
 ConnectionNodeLine = require './connection_node_line'
 MergingConnectionTarget = require './merging_connection_target'
@@ -13,7 +15,7 @@ module.exports = class ConnectionBuilder
   returnArg = (arg) -> arg
 
 
-  constructor: ->
+  constructor: (@Transmitter) ->
     @sources = []
 
 
@@ -27,6 +29,10 @@ module.exports = class ConnectionBuilder
 
 
   toTarget: (@target) ->
+    return this
+
+
+  toConnectionTarget: (@connectionTarget) ->
     return this
 
 
@@ -53,9 +59,22 @@ module.exports = class ConnectionBuilder
 
 
   _buildTarget: ->
-    return new ConnectionNodeLine(@target.getNodeTarget(), @direction)
+    @connectionTarget ?
+      new ConnectionNodeLine(@target.getNodeTarget(), @direction)
+
+
+  getTransform: -> @transform ? returnArg
+
+
+  getConnection: ->
+    @connection ?=
+      new Connection(@buildSource(), @_buildTarget(), @getTransform())
 
 
   connect: ->
-    new Connection(@transform ? returnArg)
-      .connectSourceTarget(@buildSource(), @_buildTarget())
+    @Transmitter.connect(@getConnection())
+
+
+  receiveConnectionMessage: (message) ->
+    @getConnection().receiveConnectionMessage(message)
+    return this

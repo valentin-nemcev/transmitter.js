@@ -7,7 +7,7 @@ ConnectionBuilder = require './connection/builder'
 
 module.exports = class ChannelBuilder
 
-  constructor: ->
+  constructor: (@Transmitter) ->
 
 
   withOrigin:  (@origin)  -> this
@@ -29,16 +29,31 @@ module.exports = class ChannelBuilder
   withUpdateDerived: (update) -> @withMapOrigin(update)
 
 
-  connectDirection: (source, target, transform, direction)->
-    new ConnectionBuilder()
+  createConnection: (source, target, transform, direction) ->
+    new ConnectionBuilder(@Transmitter)
       .inDirection direction
       .fromSource source
       .toTarget target
       .withTransform transform
-      .connect()
+
+
+  getForwardConnection: ->
+    @forwardConnection ?=
+      @createConnection(@origin, @derived, @transformOrigin, forward)
+
+
+  getBackwardConnection: ->
+    @backwardConnection ?=
+      @createConnection(@derived, @origin, @transformDerived, backward)
 
 
   connect: ->
-    @connectDirection(@origin, @derived, @transformOrigin, forward)
-    @connectDirection(@derived, @origin, @transformDerived, backward)
+    @getForwardConnection().connect()
+    @getBackwardConnection().connect()
     return null
+
+
+  receiveConnectionMessage: (message) ->
+    @getForwardConnection().receiveConnectionMessage(message)
+    @getBackwardConnection().receiveConnectionMessage(message)
+    return this

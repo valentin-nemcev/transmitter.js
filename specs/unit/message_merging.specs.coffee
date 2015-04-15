@@ -4,6 +4,7 @@ NodeSource = require 'transmitter/connection/node_source'
 ConnectionBuilder = require 'transmitter/connection/builder'
 Transmission = require 'transmitter/transmission/transmission'
 
+Transmitter = require 'transmitter'
 
 class StubPayload
 
@@ -32,7 +33,8 @@ describe 'Message merging', ->
     @compositeSource = new ConnectionBuilder()
       .createMergingSource([@activeSource, @passiveSource])
 
-    @compositeSource.connectTarget(@target)
+    @compositeSource.setTarget(@target)
+    Transmitter.connect(@compositeSource)
 
 
   specify 'when one active source have sent message', ->

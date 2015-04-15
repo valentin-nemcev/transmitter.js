@@ -9,8 +9,16 @@ module.exports = class NodeConnectionLine
   constructor: (@source, @direction = directions.null) ->
 
 
-  connectTarget: (@target) ->
+  setTarget: (@target) -> this
+
+
+  connect: ->
     @source.connectTarget(this)
+    return this
+
+
+  receiveConnectionMessage: (message) ->
+    message.deliverToLine(this)
     return this
 
 
