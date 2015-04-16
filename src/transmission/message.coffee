@@ -26,6 +26,12 @@ module.exports = class Message
     return @payload
 
 
+  sendToLine: (line) ->
+    if line.isConst() or @transmission.hasMessageForNode(line)
+      line.receiveMessage(this)
+    return this
+
+
   sendFromSourceNode: (node) ->
     return this if @transmission.hasMessageForNode(node)
     @transmission.addMessageForNode(this, node)

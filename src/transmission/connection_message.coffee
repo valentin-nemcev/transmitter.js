@@ -13,6 +13,14 @@ module.exports = class ConnectionMessage
     return this
 
 
+  passMessage: (node, line) ->
+    if message = @transmission.getMessageFrom(node)
+      line.receiveMessage(message)
+    return this
+
+
   deliverToLine: (line) ->
+    return this if @transmission.hasMessageForNode(line)
+    @transmission.addMessageForNode(this, line)
     @payload.deliver(line)
     return this

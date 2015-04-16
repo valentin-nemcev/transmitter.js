@@ -18,10 +18,14 @@ module.exports = class NodeSource
     return this
 
 
+  receiveConnectionMessageFrom: (message, line) ->
+    message.passMessage(@node, line)
+    return this
+
+
   receiveMessage: (message) ->
-    # @queryForTargets()
-    # @getTargets().forEach (target) -> target.receiveMessage(message)
-    @targets.forEach (target) -> target.receiveMessage(message)
+    @targets.forEach (target) ->
+      message.sendToLine(target)
     return this
 
 

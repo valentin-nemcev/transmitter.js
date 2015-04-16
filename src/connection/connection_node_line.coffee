@@ -12,6 +12,12 @@ module.exports = class ConnectionNodeLine
   setSource: (@source) -> this
 
 
+  isConst: -> not @origin?
+
+
+  setOrigin: (@origin) -> this
+
+
   connect: ->
     @target.connectSource(this)
     return this

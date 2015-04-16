@@ -31,7 +31,7 @@ class VariableChannelNode
 
 
   connect: (channel) ->
-    payload = ConnectionPayload.createConnect()
+    payload = ConnectionPayload.createConnect(this)
     @message.sendToConnectionWithPayload(channel, payload)
     return this
 

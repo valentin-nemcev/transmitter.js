@@ -16,6 +16,7 @@ class NodeStub
 
 class TargetStub
   receiveMessage: ->
+  isConst: -> yes
 
 
 describe 'Query queue', ->

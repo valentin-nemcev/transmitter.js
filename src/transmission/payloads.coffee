@@ -104,8 +104,13 @@ class exports.MergedPayload
 
 class exports.ConnectionPayload
 
-  @createConnect = -> new this
+  @createConnect = (origin) -> new this(origin)
+
+
+  constructor: (@origin) ->
+
 
   deliver: (line) ->
+    line.setOrigin(@origin)
     line.connect()
     return this

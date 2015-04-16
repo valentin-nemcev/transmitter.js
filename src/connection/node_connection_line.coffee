@@ -12,6 +12,12 @@ module.exports = class NodeConnectionLine
   setTarget: (@target) -> this
 
 
+  isConst: -> not @origin?
+
+
+  setOrigin: (@origin) -> this
+
+
   connect: ->
     @source.connectTarget(this)
     return this
@@ -19,6 +25,7 @@ module.exports = class NodeConnectionLine
 
   receiveConnectionMessage: (message) ->
     message.deliverToLine(this)
+    @source.receiveConnectionMessageFrom(message, this)
     return this
 
 

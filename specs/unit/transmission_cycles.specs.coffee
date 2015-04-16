@@ -22,6 +22,7 @@ class TargetNodeStub
 
 class TargetStub
   receiveMessage: ->
+  isConst: -> yes
 
 class SourceStub
   receiveQuery: ->
