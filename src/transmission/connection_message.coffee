@@ -4,6 +4,9 @@ assert = require 'assert'
 
 module.exports = class ConnectionMessage
 
+  inspect: -> "CM #{@payload.inspect()}"
+
+
   constructor: (@transmission, @payload) ->
     assert(@payload, 'Message must have payload')
 

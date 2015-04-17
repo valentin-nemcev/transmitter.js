@@ -29,6 +29,12 @@ module.exports = class NodeConnectionLine
     return this
 
 
+  receiveConnectionQuery: (query) ->
+    query.setDirection(@direction)
+    @origin.receiveQuery(query)
+    return this
+
+
   receiveQuery: (query) ->
     @source.receiveQuery(query)
     return this

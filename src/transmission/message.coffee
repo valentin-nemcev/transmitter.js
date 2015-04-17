@@ -8,6 +8,9 @@ ConnectionMessage = require './connection_message'
 
 module.exports = class Message
 
+  inspect: -> "M #{@payload.inspect()}"
+
+
   constructor: (@transmission, @payload) ->
     assert(@payload, 'Message must have payload')
 
@@ -29,6 +32,8 @@ module.exports = class Message
   sendToLine: (line) ->
     if line.isConst() or @transmission.hasMessageForNode(line)
       line.receiveMessage(this)
+    else if not line.isConst()
+      line.receiveConnectionQuery(@transmission.createQuery())
     return this
 
 

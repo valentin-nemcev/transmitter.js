@@ -24,6 +24,11 @@ class VariableChannelNode
     return this
 
 
+  receiveQuery: (query) ->
+    @source.receiveQuery(query)
+    return this
+
+
   receiveMessage: (@message) ->
     @message.getPayload().deliver(this)
     @message = null
@@ -114,7 +119,9 @@ describe 'Flattening connection', ->
     nestedObject.valueVar.setValue('value1')
     @nestedVar.setValue(nestedObject)
 
-    Transmitter.queryNodeState(@serializedVar)
+    Transmitter.withLogging off, =>
+      Transmitter.updateNodeState(@nestedVar, nestedObject)
+      Transmitter.queryNodeState(@serializedVar)
 
     expect(@serializedVar.getValue())
       .to.deep.equal({name: 'objectA', value: 'value1'})

@@ -2,6 +2,7 @@
 
 
 assert = require 'assert'
+{inspect} = require 'util'
 
 
 class exports.ValuePayload
@@ -9,6 +10,9 @@ class exports.ValuePayload
   @create = (value) => new this(value)
 
   constructor: (@value) ->
+
+
+  inspect: -> "value: #{inspect @value}"
 
 
   toState: ->
@@ -47,6 +51,9 @@ class exports.StatePayload
 
 
   constructor: (@node, @update) ->
+
+
+  inspect: -> "state: #{inspect @node}"
 
 
   toValue: ->
@@ -108,6 +115,9 @@ class exports.ConnectionPayload
 
 
   constructor: (@origin) ->
+
+
+  inspect: -> "connect (#{inspect @origin})"
 
 
   deliver: (line) ->

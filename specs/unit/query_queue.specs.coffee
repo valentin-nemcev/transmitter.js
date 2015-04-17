@@ -23,16 +23,14 @@ describe 'Query queue', ->
 
   beforeEach ->
     @transmission = new Transmission()
-    @node = new NodeStub()
-
-    sinon.spy(@node, 'createResponsePayload')
-
-    @target = new TargetStub()
-    @node.getNodeSource().connectTarget(@target)
-    sinon.spy(@target, 'receiveMessage')
 
 
   it 'responds to queries from nodes', ->
+    @node = new NodeStub()
+    @target = new TargetStub()
+    @node.getNodeSource().connectTarget(@target)
+    sinon.spy(@node, 'createResponsePayload')
+    sinon.spy(@target, 'receiveMessage')
     @query = @transmission.createQuery()
 
     @transmission.enqueueQueryFromNode(@query, @node)
@@ -64,6 +62,10 @@ describe 'Query queue', ->
 
 
   it 'does not respond to query when message was already sent before', ->
+    @node = new NodeStub()
+    @target = new TargetStub()
+    @node.getNodeSource().connectTarget(@target)
+    sinon.spy(@target, 'receiveMessage')
     @message = @transmission.createMessage(new StubPayload())
     @message.sendFromSourceNode(@node)
     @query = @transmission.createQuery()
@@ -73,3 +75,23 @@ describe 'Query queue', ->
 
     expect(@target.receiveMessage).to.have.been.calledOnce
     expect(@target.receiveMessage).to.have.been.calledWithSame(@message)
+
+
+  it 'responds to queries created as a result of previous response', ->
+    @node1 = new NodeStub()
+    @node2 = new NodeStub()
+    @target1 = new TargetStub()
+    @target2 = new TargetStub()
+    @node1.getNodeSource().connectTarget(@target1)
+    @node2.getNodeSource().connectTarget(@target2)
+    @query1 = @transmission.createQuery()
+    @query2 = @transmission.createQuery()
+    sinon.stub(@target1, 'receiveMessage', =>
+      @transmission.enqueueQueryFromNode(@query2, @node2)
+    )
+    sinon.spy(@target2, 'receiveMessage')
+
+    @transmission.enqueueQueryFromNode(@query1, @node1)
+    @transmission.respondToQueries()
+
+    expect(@target2.receiveMessage).to.have.been.calledOnce

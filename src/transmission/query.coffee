@@ -13,6 +13,9 @@ module.exports = class Query
     @direction ?= directions.null
 
 
+  setDirection: (@direction) -> this
+
+
   _copy: ->
     new Query(@transmission, @direction, @pathLength + 1)
 

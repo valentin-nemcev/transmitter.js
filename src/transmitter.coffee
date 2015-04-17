@@ -22,6 +22,15 @@ module.exports = new class Transmitter
     {@reverseOrder} = opts
 
 
+  withLogging: (state, doWithLogging) ->
+    if arguments.length is 1
+      [state, doWithLogging] = [yes, state]
+    Transmission::loggingIsEnabled = state
+    doWithLogging()
+    Transmission::loggingIsEnabled = no
+    return this
+
+
   withDifferentTransmissionOrders: (doWithOrder) ->
     doWithOrder(new @constructor(reverseOrder: no), 'straight')
     doWithOrder(new @constructor(reverseOrder: yes), 'reverse')

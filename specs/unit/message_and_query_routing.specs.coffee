@@ -23,6 +23,7 @@ class SourceStub
   receiveQuery: ->
 
 class DirectionStub
+  inspect: -> '.'
 
 
 describe 'Message and query routing', ->
