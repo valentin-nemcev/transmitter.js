@@ -19,18 +19,18 @@
 
 ## Development tasks
 
-* Later
-  * Remove use strict (needs custom compiler for mocha, browserify and npm)
-
 * Refactor
-  * Message and query interaction with node sources and targets
-  * Better message merging (symmetrical querying and caching)
+  * Move payload creation into message
   * Better names for node and connection source/target
   * Don't use context in isolated tests, use context in scenarios.
-  * Move payload creation into message
   * Adding messages and queries to and from nodes
+  * Message and query interaction with node sources and targets
+  * Better message merging (symmetrical querying and caching)
 
 * Implement
+  * Node source and targets querying and queueing
   * Queue prioritization by directions
   * Queue prioritization by nesting level
-  * Node source and targets querying and queueing
+
+* Later
+  * Remove use strict (needs custom compiler for mocha, browserify and npm)
