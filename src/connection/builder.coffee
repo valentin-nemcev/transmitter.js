@@ -17,6 +17,7 @@ module.exports = class ConnectionBuilder
 
   constructor: (@Transmitter) ->
     @sources = []
+    @targets = []
 
 
   inDirection: (@direction) ->
@@ -24,11 +25,12 @@ module.exports = class ConnectionBuilder
 
 
   fromSource: (source) ->
-    @sources.push source
+    @sources.push source if source?
     return this
 
 
-  toTarget: (@target) ->
+  toTarget: (target) ->
+    @targets.push target if target?
     return this
 
 
@@ -40,15 +42,14 @@ module.exports = class ConnectionBuilder
     return this
 
 
-  buildSource: ->
-    if @sources.length == 1
-      @createSingleSource(@sources[0])
-    else
+  getSource: ->
+    @source ?= if @sources.length > 1
       @createMergingSource(@sources)
+    else @createSingleSource(@sources[0])
 
 
   createSingleSource: (source) ->
-    new NodeConnectionLine(source.getNodeSource(), @direction)
+    new NodeConnectionLine(source?.getNodeSource(), @direction)
 
 
   createMergingSource: (sources) ->
@@ -58,17 +59,19 @@ module.exports = class ConnectionBuilder
     new MergingConnectionTarget(new Map(parts))
 
 
-  _buildTarget: ->
-    @connectionTarget ?
-      new ConnectionNodeLine(@target.getNodeTarget(), @direction)
+  getTarget: ->
+    @target ?= @connectionTarget ? @createSingleTarget(@targets[0])
+
+
+  createSingleTarget: (target) ->
+    new ConnectionNodeLine(target?.getNodeTarget(), @direction)
 
 
   getTransform: -> @transform ? returnArg
 
 
   getConnection: ->
-    @connection ?=
-      new Connection(@buildSource(), @_buildTarget(), @getTransform())
+    @connection ?= new Connection(@getSource(), @getTarget(), @getTransform())
 
 
   connect: ->

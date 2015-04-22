@@ -32,7 +32,7 @@ module.exports = class Message
   sendToLine: (line) ->
     if line.isConst() or @transmission.hasMessageForNode(line)
       line.receiveMessage(this)
-    else if not line.isConst()
+    else
       line.receiveConnectionQuery(@transmission.createQuery())
     return this
 

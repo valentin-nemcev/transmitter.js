@@ -6,6 +6,9 @@ directions = require '../directions.coffee'
 
 module.exports = class NodeConnectionLine
 
+  inspect: -> (@source?.inspect() ? null) + '-'
+
+
   constructor: (@source, @direction = directions.null) ->
 
 
@@ -19,13 +22,13 @@ module.exports = class NodeConnectionLine
 
 
   connect: ->
-    @source.connectTarget(this)
+    @source?.connectTarget(this)
     return this
 
 
   receiveConnectionMessage: (message) ->
     message.deliverToLine(this)
-    @source.receiveConnectionMessageFrom(message, this)
+    @source?.receiveConnectionMessageFrom(message, this)
     return this
 
 
@@ -36,7 +39,7 @@ module.exports = class NodeConnectionLine
 
 
   receiveQuery: (query) ->
-    @source.receiveQuery(query)
+    @source?.receiveQuery(query)
     return this
 
 

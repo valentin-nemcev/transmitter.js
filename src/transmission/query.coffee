@@ -26,6 +26,14 @@ module.exports = class Query
     return @wasSent
 
 
+  sendToLine: (line) ->
+    if line.isConst() or @transmission.hasMessageForNode(line)
+      line.receiveQuery(this)
+    else
+      line.receiveConnectionQuery(@transmission.createQuery())
+    return this
+
+
   sendFromTargetNode: (node) ->
     return this if @transmission.hasMessageForNode(node)
     @transmission.addQueryToNode(this, node)

@@ -8,6 +8,9 @@ module.exports = class NodeTarget
       @nodeTarget ?= new NodeTarget(this)
 
 
+  inspect: -> '>' + @node.inspect()
+
+
   constructor: (@node) ->
     @sources = new Set()
 
@@ -17,11 +20,17 @@ module.exports = class NodeTarget
     return this
 
 
+  receiveConnectionMessageFrom: (message, line) ->
+    message.passQuery(@node, line)
+    return this
+
+
   receiveMessage: (message) ->
     message.sendToTargetNode(@node)
     return this
 
 
   receiveQuery: (query) ->
-    @sources.forEach (source) -> source.receiveQuery(query)
+    @sources.forEach (source) ->
+      query.sendToLine(source)
     return this

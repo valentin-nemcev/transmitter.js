@@ -85,11 +85,14 @@ describe 'Flattening connection', ->
       .withTransform (payload) =>
         payload.mapValue (nestedObject) =>
           Transmitter.channel()
-            .withOrigin nestedObject.valueVar
+            .withOrigin nestedObject?.valueVar
             .withMapOrigin (value) -> {name: nestedObject.name, value}
             .withDerived @serializedVar
             .withMapDerived (serialized) -> serialized.value
       .connect()
+
+    # TODO
+    Transmitter.updateNodeState(@nestedVar, null)
 
 
   specify 'creation of nested target after flat source update', ->
@@ -119,9 +122,7 @@ describe 'Flattening connection', ->
     nestedObject.valueVar.setValue('value1')
     @nestedVar.setValue(nestedObject)
 
-    Transmitter.withLogging off, =>
-      Transmitter.updateNodeState(@nestedVar, nestedObject)
-      Transmitter.queryNodeState(@serializedVar)
+    Transmitter.queryNodeState(@serializedVar)
 
     expect(@serializedVar.getValue())
       .to.deep.equal({name: 'objectA', value: 'value1'})

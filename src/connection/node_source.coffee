@@ -9,6 +9,9 @@ module.exports = class NodeSource
         @nodeSource ?= new NodeSource(this)
 
 
+  inspect: -> @node.inspect() + '<'
+
+
   constructor: (@node) ->
     @targets = new Set()
 

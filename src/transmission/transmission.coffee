@@ -1,16 +1,18 @@
 'use strict'
 
+
+stableSort = require 'stable'
+{inspect} = require 'util'
+
 Query = require './query'
 Message = require './message'
 ConnectionMessage = require './connection_message'
 
-stableSort = require 'stable'
-
 
 module.exports = class Transmission
 
-  _log: ->
-    console.log arguments... if @loggingIsEnabled
+  _log: (name, args...) ->
+    console.log name, args.map(inspect).join(', ') if @loggingIsEnabled
     return this
 
 
@@ -67,6 +69,10 @@ module.exports = class Transmission
 
   hasQueryToNode: (node) ->
     @nodesToQueries.has(node)
+
+
+  getQueryFromNode: (node) ->
+    @nodesToQueries.get(node)
 
 
   hasQueryOrMessageForNode: (node) ->
