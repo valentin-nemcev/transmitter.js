@@ -1,12 +1,15 @@
 require 'shelljs/global'
 
-bin = './node_modules/mocha/bin'
+bin = './node_modules/.bin'
 
 mochaCmd = (files...) ->
   "#{bin}/mocha --colors --opts specs/mocha.opts #{files.join(' ')}"
 
 unitSpecs = 'specs/unit.specs.coffee'
 exampleSpecs = 'specs/examples.specs.coffee'
+
+task 'build', ->
+  exec "#{bin}/coffee -o lib -c src"
 
 task 'specs', ->
   exec(mochaCmd unitSpecs, exampleSpecs)

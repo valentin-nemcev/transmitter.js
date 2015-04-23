@@ -1,7 +1,7 @@
 'use strict'
 
 
-directions = require '../directions.coffee'
+directions = require '../directions'
 
 
 module.exports = class ConnectionNodeLine
