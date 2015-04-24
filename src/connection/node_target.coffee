@@ -4,8 +4,7 @@
 module.exports = class NodeTarget
 
   @extend = (nodeClass) ->
-    nodeClass::getNodeTarget = ->
-      @nodeTarget ?= new NodeTarget(this)
+    nodeClass::getNodeTarget = -> @nodeTarget ?= new NodeTarget(this)
 
 
   inspect: -> '>' + @node.inspect()

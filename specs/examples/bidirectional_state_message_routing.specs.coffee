@@ -4,39 +4,16 @@
 Transmitter = require 'transmitter'
 
 
-class VariableNode
-
-  Transmitter.extendWithStatefulNode(this)
-
-  getValue: -> @value
-
-  setValue: (@value) -> this
-
-
-class TextInput
-
-  Transmitter.extendWithStatefulNode(this)
-
-  change: (value) ->
-    @setValue(value)
-    Transmitter.sendNodeState(this)
-    return this
-
-  setValue: (@value) -> this
-
-  getValue: -> @value
-
-
 Set::inspect = -> "Set(" + Array.from(this).join(', ') + ")"
 
 
 describe 'Bidirectional state message routing', ->
 
   beforeEach ->
-    @define 'tagSet', new VariableNode()
+    @define 'tagSet', new Transmitter.Nodes.Variable()
     @tagSet.setValue(new Set())
 
-    @define 'tagSortedList', new VariableNode()
+    @define 'tagSortedList', new Transmitter.Nodes.Variable()
     Transmitter.channel()
       .withOrigin @tagSet
       .withMapOrigin (tags) -> Array.from(tags).sort()
@@ -44,7 +21,7 @@ describe 'Bidirectional state message routing', ->
       .withMapDerived (tags) -> new Set(tags)
       .connect()
 
-    @define 'tagJSON', new VariableNode()
+    @define 'tagJSON', new Transmitter.Nodes.Variable()
     Transmitter.channel()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> JSON.stringify(tags)
@@ -52,7 +29,7 @@ describe 'Bidirectional state message routing', ->
       .withMapDerived (tagJSON) -> tagJSON and JSON.parse(tagJSON)
       .connect()
 
-    @define 'tagInput', new TextInput()
+    @define 'tagInput', new Transmitter.Nodes.Variable()
     Transmitter.channel()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> (tags ? []).join(', ')

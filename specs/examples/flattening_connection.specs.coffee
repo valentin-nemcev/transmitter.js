@@ -4,19 +4,12 @@
 Transmitter = require 'transmitter'
 {ConnectionPayload} = require 'transmitter/transmission/payloads'
 
-
-class VariableNode
-
-  Transmitter.extendWithStatefulNode(this)
-
-  getValue: -> @value
-
-  setValue: (@value) -> this
+VariableNode = Transmitter.Nodes.Variable
+ChannelNode = Transmitter.Nodes.Channel
+Record = Transmitter.Nodes.Record
 
 
-class VariableChannelNode
-
-  Transmitter.extendWithConnectionNode(this)
+class VariableChannelNode extends ChannelNode
 
   setSource: (@source) ->
 
@@ -52,12 +45,11 @@ class VariableChannelNode
     this
 
 
-class NestedObject
-
-  define: Transmitter.define
+class NestedObject extends Record
 
   constructor: (@name) ->
-    @define 'valueVar', new VariableNode()
+
+  @defineVar 'valueVar'
 
 
 describe 'Flattening connection', ->

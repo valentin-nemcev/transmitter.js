@@ -4,9 +4,7 @@
 module.exports = class NodeSource
 
   @extend = (nodeClass) ->
-    Object.assign nodeClass.prototype,
-      getNodeSource: ->
-        @nodeSource ?= new NodeSource(this)
+    nodeClass::getNodeSource = -> @nodeSource ?= new NodeSource(this)
 
 
   inspect: -> @node.inspect() + '<'

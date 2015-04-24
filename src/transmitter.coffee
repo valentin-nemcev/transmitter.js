@@ -18,6 +18,8 @@ NodeTarget = require './connection/node_target'
 
 module.exports = new class Transmitter
 
+  Nodes: require './nodes'
+
   constructor: (opts = {}) ->
     {@reverseOrder} = opts
 
@@ -83,38 +85,6 @@ module.exports = new class Transmitter
       payload = ConnectionPayload.createConnect()
       transmission.createConnectionMessage(payload)
         .sendToConnection(connection)
-    return this
-
-
-
-  define: (name, value) ->
-    value.inspect ?= (-> name)
-    @[name] = value
-    return value
-
-
-  extendWithStatefulNode: (cls) ->
-    NodeSource.extend(cls)
-    NodeTarget.extend(cls)
-    cls::createResponsePayload = -> StatePayload.create(this)
-    cls::createOriginPayload   = -> StatePayload.create(this)
-    cls::createRelayPayload    = -> StatePayload.create(this)
-    return this
-
-
-  extendWithConnectionNode: (cls) ->
-    NodeTarget.extend(cls)
-
-
-  extendWithEventSource: (cls) ->
-    NodeSource.extend(cls)
-    cls::createResponsePayload = -> ValuePayload.create(null)
-    cls::createOriginPayload = (value) -> ValuePayload.create(value)
-    return this
-
-
-  extendWithEventTarget: (cls) ->
-    NodeTarget.extend(cls)
     return this
 
 

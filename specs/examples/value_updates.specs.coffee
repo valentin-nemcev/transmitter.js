@@ -3,15 +3,7 @@
 
 Transmitter = require 'transmitter'
 
-
-class VariableNode
-
-  Transmitter.extendWithStatefulNode(this)
-
-  getValue: -> @value
-
-  setValue: (@value) -> this
-
+VariableNode = Transmitter.Nodes.Variable
 
 class StatefulObject
 
