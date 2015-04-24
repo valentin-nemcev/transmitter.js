@@ -9,7 +9,7 @@ unitSpecs = 'specs/unit.specs.coffee'
 exampleSpecs = 'specs/examples.specs.coffee'
 
 task 'build', ->
-  exec "#{bin}/coffee -o lib -c src"
+  exec "#{bin}/coffee -o build -c src"
 
 task 'specs', ->
   exec(mochaCmd unitSpecs, exampleSpecs)

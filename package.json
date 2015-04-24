@@ -2,7 +2,7 @@
   "name": "transmitter",
   "version": "0.2.0",
   "description": "Declarative data-binding framework",
-  "main": "lib/index.js",
+  "main": "build/index.js",
   "scripts": {
     "test": "./node_modules/.bin/cake specs"
   },
