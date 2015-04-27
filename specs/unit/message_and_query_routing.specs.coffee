@@ -5,6 +5,8 @@ NodeTarget = require 'transmitter/connection/node_target'
 NodeConnectionLine = require 'transmitter/connection/node_connection_line'
 ConnectionNodeLine = require 'transmitter/connection/connection_node_line'
 Transmission = require 'transmitter/transmission/transmission'
+Message = require 'transmitter/transmission/message'
+Query = require 'transmitter/transmission/query'
 
 
 class StubPayload
@@ -13,8 +15,8 @@ class StubPayload
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
-  createResponsePayload: -> new StubPayload()
-  createRelayPayload:    -> new StubPayload()
+  getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
+  getRelayedMessage:  (sender) -> sender.createMessage(new StubPayload())
 
 class TargetStub
   receiveMessage: ->
@@ -40,7 +42,7 @@ describe 'Message and query routing', ->
     new NodeConnectionLine(@node.getNodeSource())
       .setTarget(@target).connect()
     sinon.spy(@target, 'receiveMessage')
-    @message = @transmission.createMessage(new StubPayload())
+    @message = new Message(@transmission, new StubPayload())
 
     @message.sendToTargetNode(@node)
 
@@ -53,7 +55,7 @@ describe 'Message and query routing', ->
     new ConnectionNodeLine(@node.getNodeTarget())
       .setSource(@source).connect()
     sinon.spy(@source, 'receiveQuery')
-    @query = @transmission.createQuery()
+    @query = new Query(@transmission)
 
     @query.sendToSourceNode(@node)
 
@@ -70,7 +72,7 @@ describe 'Message and query routing', ->
     new ConnectionNodeLine(@node.getNodeTarget(), @otherDirection)
       .setSource(@source).connect()
     sinon.spy(@target, 'receiveMessage')
-    @query = @transmission.createQuery(@queryDirection)
+    @query = new Query(@transmission, @queryDirection)
 
     @query.sendToSourceNode(@node)
     @transmission.respondToQueries()

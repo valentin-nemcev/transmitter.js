@@ -33,7 +33,7 @@ module.exports = class Message
     if line.isConst() or @transmission.hasMessageForNode(line)
       line.receiveMessage(this)
     else
-      line.receiveConnectionQuery(@transmission.createQuery())
+      line.receiveConnectionQuery(@transmission.getSender().createQuery())
     return this
 
 
@@ -49,9 +49,8 @@ module.exports = class Message
     @transmission.addMessageForNode(this, node)
     @payload.deliver(node)
     if node.getNodeSource?
-      payload = node.createRelayPayload(@payload)
-      copy = @_copyWithPayload(payload)
-      node.getNodeSource().receiveMessage(copy)
+      relayed = node.getResponseMessage(@transmission.getSender())
+      node.getNodeSource().receiveMessage(relayed)
     return this
 
 
@@ -77,5 +76,5 @@ module.exports = class Message
 
 
   sendQueryForMerge: (source) ->
-    source.receiveQuery(@transmission.createQuery())
+    source.receiveQuery(@transmission.getSender().createQuery())
     return this

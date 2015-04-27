@@ -1,19 +1,12 @@
 'use strict'
 
 
-assert = require 'assert'
-
 ConnectionBuilder = require './connection/builder'
 ChannelBuilder = require './channel_builder'
 
 directions = require './directions'
 
-{ConnectionPayload, ValuePayload, StatePayload} =
-  require './transmission/payloads'
-
 Transmission = require './transmission/transmission'
-NodeSource = require './connection/node_source'
-NodeTarget = require './connection/node_target'
 
 
 module.exports = new class Transmitter
@@ -42,13 +35,8 @@ module.exports = new class Transmitter
 
 
   startTransmission: (doWithTransmission) ->
-    assert(not @transmission, "Transmissions can't be nested")
-    @transmission = new Transmission({@reverseOrder})
-    try
-      doWithTransmission(@transmission)
-      @transmission.respondToQueries()
-    finally
-      @transmission = null
+    Transmission::reverseOrder = @reverseOrder
+    Transmission.start(doWithTransmission)
     return this
 
 
@@ -57,35 +45,29 @@ module.exports = new class Transmitter
 
 
   queryNodeState: (node) ->
-    @startTransmission (transmission) =>
-      query = transmission.createQuery(@directions.forward)
-      query.sendFromTargetNode(node)
+    @startTransmission (sender) =>
+      sender.createQuery(@directions.forward).sendFromTargetNode(node)
 
 
   updateNodeState: (node, value) ->
-    @startTransmission (transmission) =>
-      payload = StatePayload.createFromValue(value)
-      transmission.createMessage(payload).sendToTargetNode(node)
+    @startTransmission (sender) =>
+      sender.createStateMessageWithValue(value).sendToTargetNode(node)
 
 
   updateNodeStates: (nodeValues...) ->
-    @startTransmission (transmission) =>
+    @startTransmission (sender) =>
       for [node, value] in nodeValues
-        payload = StatePayload.createFromValue(value)
-        transmission.createMessage(payload).sendToTargetNode(node)
+        sender.createStateMessageWithValue(value).sendToTargetNode(node)
 
 
   originate: (node, value) ->
-    @startTransmission (transmission) =>
-      payload = node.createOriginPayload(value)
-      transmission.createMessage(payload).sendFromSourceNode(node)
+    @startTransmission (sender) =>
+      node.getOriginMessage(sender, value).sendFromSourceNode(node)
 
 
   connect: (connection) ->
-    @startTransmission (transmission) =>
-      payload = ConnectionPayload.createConnect()
-      transmission.createConnectionMessage(payload)
-        .sendToConnection(connection)
+    @startTransmission (sender) =>
+      sender.createConnectMessage().sendToConnection(connection)
     return this
 
 

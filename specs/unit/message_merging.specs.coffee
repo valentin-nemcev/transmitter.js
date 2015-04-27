@@ -3,6 +3,7 @@
 NodeSource = require 'transmitter/connection/node_source'
 ConnectionBuilder = require 'transmitter/connection/builder'
 Transmission = require 'transmitter/transmission/transmission'
+Message = require 'transmitter/transmission/message'
 
 Transmitter = require 'transmitter'
 
@@ -10,7 +11,7 @@ class StubPayload
 
 class NodeStub
   NodeSource.extend(this)
-  createResponsePayload: -> new StubPayload()
+  getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
 
 class TargetStub
   receiveMessage: ->
@@ -27,8 +28,9 @@ describe 'Message merging', ->
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
     @passiveSource = new NodeStub()
-    sinon.stub(@passiveSource, 'createResponsePayload')
-      .returns(@passivePayload)
+    sinon.stub(@passiveSource, 'getResponseMessage', (sender) =>
+      sender.createMessage(@passivePayload)
+    )
 
     @compositeSource = new ConnectionBuilder()
       .createMergingSource([@activeSource, @passiveSource])
@@ -39,7 +41,7 @@ describe 'Message merging', ->
 
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
-    @message1 = @transmission.createMessage(@activePayload)
+    @message1 = new Message(@transmission, @activePayload)
 
     @message1.sendFromSourceNode(@activeSource)
 

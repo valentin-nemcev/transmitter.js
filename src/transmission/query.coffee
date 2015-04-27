@@ -30,7 +30,7 @@ module.exports = class Query
     if line.isConst() or @transmission.hasMessageForNode(line)
       line.receiveQuery(this)
     else
-      line.receiveConnectionQuery(@transmission.createQuery())
+      line.receiveConnectionQuery(@transmission.getSender().createQuery())
     return this
 
 

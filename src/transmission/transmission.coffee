@@ -1,38 +1,43 @@
 'use strict'
 
 
+assert = require 'assert'
+
 stableSort = require 'stable'
 {inspect} = require 'util'
 
-Query = require './query'
-Message = require './message'
-ConnectionMessage = require './connection_message'
+Sender = require './sender'
 
 
 module.exports = class Transmission
+
+  @start = (doWithTransmission) ->
+    assert(not @instance, "Transmissions can't be nested")
+    @instance = new Transmission()
+    try
+      doWithTransmission(@instance.getSender())
+      @instance.respondToQueries()
+    finally
+      @instance = null
+    return this
+
+
+  loggingIsEnabled: no
 
   _log: (name, args...) ->
     console.log name, args.map(inspect).join(', ') if @loggingIsEnabled
     return this
 
 
-  constructor: (opts = {}) ->
-    @reverseOrder = opts.reverseOrder ? no
+  reverseOrder: no
+
+  constructor: ->
     @nodesToMessages = new Map()
     @nodesToQueries = new Map()
     @queryQueue = []
 
 
-  createMessage: (payload) ->
-    return new Message(this, payload)
-
-
-  createConnectionMessage: (payload) ->
-    return new ConnectionMessage(this, payload)
-
-
-  createQuery: (direction) ->
-    return new Query(this, direction)
+  getSender: -> @sender ?= new Sender(this)
 
 
   hasMessageForNode: (node) ->
@@ -79,17 +84,8 @@ module.exports = class Transmission
     @hasMessageForNode(node) or @hasQueryToNode(node)
 
 
-  _sortQueryQueue: ->
-    queue = @queryQueue.slice()
-    queue.reverse() if @reverseOrder
-    return queue
-
-
   respondToQueries: ->
-    queue = @_sortQueryQueue()
     while @queryQueue.length
       {node, query} = @queryQueue.pop()
-      payload = node.createResponsePayload()
-      message = @createMessage(payload)
-      message.sendFromSourceNode(node)
+      node.getResponseMessage(@getSender()).sendFromSourceNode(node)
     return this

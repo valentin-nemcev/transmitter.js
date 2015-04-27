@@ -2,6 +2,8 @@
 
 
 Transmission = require 'transmitter/transmission/transmission'
+Query = require 'transmitter/transmission/query'
+Message = require 'transmitter/transmission/message'
 NodeSource = require 'transmitter/connection/node_source'
 NodeTarget = require 'transmitter/connection/node_target'
 
@@ -12,7 +14,7 @@ class StubPayload
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
-  createResponsePayload: -> new StubPayload()
+  getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
 
 class TargetStub
   receiveMessage: ->
@@ -29,16 +31,16 @@ describe 'Query queue', ->
     @node = new NodeStub()
     @target = new TargetStub()
     @node.getNodeSource().connectTarget(@target)
-    sinon.spy(@node, 'createResponsePayload')
+    sinon.spy(@node, 'getResponseMessage')
     sinon.spy(@target, 'receiveMessage')
-    @query = @transmission.createQuery()
+    @query = new Query()
 
     @transmission.enqueueQueryFromNode(@query, @node)
     @transmission.respondToQueries()
 
     @responseMessage = @target.receiveMessage.firstCall.args[0]
-    expect(@responseMessage.getPayload())
-      .to.equal(@node.createResponsePayload.firstCall.returnValue)
+    expect(@responseMessage)
+      .to.equal(@node.getResponseMessage.firstCall.returnValue)
 
 
   it 'responds to queries with higher priority first', ->
@@ -48,8 +50,8 @@ describe 'Query queue', ->
     @target2 = new TargetStub()
     @node1.getNodeSource().connectTarget(@target1)
     @node2.getNodeSource().connectTarget(@target2)
-    @query1 = @transmission.createQuery()
-    @query2 = @transmission.createQuery()
+    @query1 = new Query()
+    @query2 = new Query()
     callOrder = []
     sinon.stub(@target1, 'receiveMessage', -> callOrder.push 1)
     sinon.stub(@target2, 'receiveMessage', -> callOrder.push 2)
@@ -66,9 +68,9 @@ describe 'Query queue', ->
     @target = new TargetStub()
     @node.getNodeSource().connectTarget(@target)
     sinon.spy(@target, 'receiveMessage')
-    @message = @transmission.createMessage(new StubPayload())
+    @message = new Message(@transmission, new StubPayload())
     @message.sendFromSourceNode(@node)
-    @query = @transmission.createQuery()
+    @query = new Query()
 
     @transmission.enqueueQueryFromNode(@query, @node)
     @transmission.respondToQueries()
@@ -84,8 +86,8 @@ describe 'Query queue', ->
     @target2 = new TargetStub()
     @node1.getNodeSource().connectTarget(@target1)
     @node2.getNodeSource().connectTarget(@target2)
-    @query1 = @transmission.createQuery()
-    @query2 = @transmission.createQuery()
+    @query1 = new Query()
+    @query2 = new Query()
     sinon.stub(@target1, 'receiveMessage', =>
       @transmission.enqueueQueryFromNode(@query2, @node2)
     )
