@@ -71,10 +71,9 @@ describe 'Multilevel merging', ->
   Transmitter.withDifferentTransmissionOrders (Transmitter, order) ->
     specify "multiple messages are transmitted and merged \
         in correct order (#{order})", ->
-      Transmitter.updateNodeStates(
-        [@d2, 'd2UpdatedValue']
-        [@b2, 'b2UpdatedValue']
-      )
+      Transmitter.startTransmission (sender) =>
+        sender.updateNodeState(@d2, 'd2UpdatedValue')
+        sender.updateNodeState(@b2, 'b2UpdatedValue')
 
       expect(@a.getValue()).to.deep.equal({
         b1:

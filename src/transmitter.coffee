@@ -44,31 +44,18 @@ module.exports = new class Transmitter
   directions: directions
 
 
-  queryNodeState: (node) ->
-    @startTransmission (sender) =>
-      sender.createQuery(@directions.forward).sendFromTargetNode(node)
+  @delegateToSender = (method) ->
+    @prototype[method] = (args...) ->
+      @startTransmission (sender) -> sender[method](args...)
 
 
-  updateNodeState: (node, value) ->
-    @startTransmission (sender) =>
-      sender.createStateMessageWithValue(value).sendToTargetNode(node)
+  @delegateToSender 'queryNodeState'
 
+  @delegateToSender 'updateNodeState'
 
-  updateNodeStates: (nodeValues...) ->
-    @startTransmission (sender) =>
-      for [node, value] in nodeValues
-        sender.createStateMessageWithValue(value).sendToTargetNode(node)
+  @delegateToSender 'originate'
 
-
-  originate: (node, value) ->
-    @startTransmission (sender) =>
-      node.getOriginMessage(sender, value).sendFromSourceNode(node)
-
-
-  connect: (connection) ->
-    @startTransmission (sender) =>
-      sender.createConnectMessage().sendToConnection(connection)
-    return this
+  @delegateToSender 'connect'
 
 
 

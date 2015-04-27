@@ -2,6 +2,7 @@
 
 
 {ConnectionPayload, StatePayload, ValuePayload} = require './payloads'
+directions = require '../directions'
 
 Query = require './query'
 Message = require './message'
@@ -13,9 +14,8 @@ module.exports = class Sender
   constructor: (@transmission) ->
 
 
-  createConnectMessage: ->
-    payload = ConnectionPayload.createConnect()
-    new ConnectionMessage(@transmission, payload)
+  createQuery: (direction) ->
+    new Query(@transmission, direction)
 
 
   createMessage: (payload) ->
@@ -37,5 +37,23 @@ module.exports = class Sender
     new Message(@transmission, payload)
 
 
-  createQuery: (direction) ->
-    new Query(@transmission, direction)
+  createConnectMessage: ->
+    payload = ConnectionPayload.createConnect()
+    new ConnectionMessage(@transmission, payload)
+
+
+
+  queryNodeState: (node) ->
+    this.createQuery(directions.forward).sendFromTargetNode(node)
+
+
+  originate: (node, value) ->
+    node.getOriginMessage(this, value).sendFromSourceNode(node)
+
+
+  updateNodeState: (node, value) ->
+    this.createStateMessageWithValue(value).sendToTargetNode(node)
+
+
+  connect: (connection) ->
+    this.createConnectMessage().sendToConnection(connection)

@@ -100,10 +100,9 @@ describe 'Flattening connection', ->
   specify 'updating flat target after outer source update', ->
     nestedObject = new NestedObject('objectA')
 
-    Transmitter.updateNodeStates(
-      [nestedObject.valueVar, 'value1']
-      [@nestedVar, nestedObject]
-    )
+    Transmitter.startTransmission (sender) =>
+      sender.updateNodeState(nestedObject.valueVar, 'value1')
+      sender.updateNodeState(@nestedVar, nestedObject)
 
     expect(@serializedVar.getValue())
       .to.deep.equal({name: 'objectA', value: 'value1'})
