@@ -5,7 +5,7 @@ Transmitter = require 'transmitter'
 {ConnectionPayload} = require 'transmitter/transmission/payloads'
 
 VariableNode = Transmitter.Nodes.Variable
-ChannelNode = Transmitter.Nodes.Channel
+ChannelNode = Transmitter.Nodes.ChannelNode
 Record = Transmitter.Nodes.Record
 
 

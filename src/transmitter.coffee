@@ -19,6 +19,7 @@ NodeTarget = require './connection/node_target'
 module.exports = new class Transmitter
 
   Nodes: require './nodes'
+  DOMElement: require './dom_element'
 
   constructor: (opts = {}) ->
     {@reverseOrder} = opts
