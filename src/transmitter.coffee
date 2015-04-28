@@ -12,6 +12,7 @@ Transmission = require './transmission/transmission'
 module.exports = new class Transmitter
 
   Nodes: require './nodes'
+  Channels: require './channels'
   DOMElement: require './dom_element'
 
   constructor: (opts = {}) ->
