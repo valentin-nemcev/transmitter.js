@@ -3,6 +3,8 @@
 
 ## Proposed usage examples
 
+* Canceling todo item label change
+* Setting empty todo label removes todo
 * Button with enabled or disabled states
 * Serialized value with on-demand transmission
 * Select box connection
@@ -20,7 +22,6 @@
 ## Development tasks
 
 * Refactor
-  * Move payload creation into message
   * Better names for node and connection source/target
   * Don't use context in isolated tests, use context in scenarios.
   * Adding messages and queries to and from nodes
