@@ -2,7 +2,6 @@
 
 
 ConnectionBuilder = require './connection/builder'
-ChannelBuilder = require './channel_builder'
 
 directions = require './directions'
 
@@ -59,7 +58,5 @@ module.exports = new class Transmitter
   @delegateToSender 'connect'
 
 
-
-  channel: -> new ChannelBuilder(this)
 
   connection: -> new ConnectionBuilder(this)

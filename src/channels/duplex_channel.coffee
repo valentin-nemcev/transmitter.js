@@ -1,14 +1,11 @@
 'use strict'
 
 
-{forward, backward} = require './directions'
-ConnectionBuilder = require './connection/builder'
+{forward, backward} = require '../directions'
+ConnectionBuilder = require '../connection/builder'
 
 
-module.exports = class ChannelBuilder
-
-  constructor: (@Transmitter) ->
-
+module.exports = class DuplexChannel
 
   withOrigin:  (@origin)  -> this
   withDerived: (@derived) -> this
@@ -30,7 +27,7 @@ module.exports = class ChannelBuilder
 
 
   createConnection: (source, target, transform, direction) ->
-    new ConnectionBuilder(@Transmitter)
+    new ConnectionBuilder()
       .inDirection direction
       .fromSource source
       .toTarget target
@@ -48,8 +45,9 @@ module.exports = class ChannelBuilder
 
 
   connect: ->
-    @getForwardConnection().connect()
-    @getBackwardConnection().connect()
+    Transmitter = require '../transmitter'
+    Transmitter.connect(@getForwardConnection())
+    Transmitter.connect(@getBackwardConnection())
     return null
 
 

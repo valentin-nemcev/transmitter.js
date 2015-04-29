@@ -14,7 +14,7 @@ describe 'Bidirectional state message routing', ->
     @tagSet.setValue(new Set())
 
     @define 'tagSortedList', new Transmitter.Nodes.Variable()
-    Transmitter.channel()
+    new Transmitter.Channels.VariableChannel()
       .withOrigin @tagSet
       .withMapOrigin (tags) -> Array.from(tags).sort()
       .withDerived @tagSortedList
@@ -22,7 +22,7 @@ describe 'Bidirectional state message routing', ->
       .connect()
 
     @define 'tagJSON', new Transmitter.Nodes.Variable()
-    Transmitter.channel()
+    new Transmitter.Channels.VariableChannel()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> JSON.stringify(tags)
       .withDerived @tagJSON
@@ -30,7 +30,7 @@ describe 'Bidirectional state message routing', ->
       .connect()
 
     @define 'tagInput', new Transmitter.Nodes.Variable()
-    Transmitter.channel()
+    new Transmitter.Channels.VariableChannel()
       .withOrigin @tagSortedList
       .withMapOrigin (tags) -> (tags ? []).join(', ')
       .withDerived @tagInput

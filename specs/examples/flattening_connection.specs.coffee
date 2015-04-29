@@ -76,7 +76,7 @@ describe 'Flattening connection', ->
       .toConnectionTarget @nestedChannelVar
       .withTransform (payload) =>
         payload.mapValue (nestedObject) =>
-          Transmitter.channel()
+          new Transmitter.Channels.VariableChannel()
             .withOrigin nestedObject?.valueVar
             .withMapOrigin (value) -> {name: nestedObject.name, value}
             .withDerived @serializedVar

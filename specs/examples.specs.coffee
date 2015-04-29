@@ -7,4 +7,4 @@ describe 'Examples', ->
   require './examples/multilevel_merging.specs'
   require './examples/value_updates.specs'
   require './examples/flattening_connection.specs'
-  require './examples/nested_connection.specs'
+  require './examples/nested_list_connection.specs'

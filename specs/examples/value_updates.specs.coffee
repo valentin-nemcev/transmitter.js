@@ -16,7 +16,7 @@ describe 'Value updates preserve identity', ->
     @define 'objectVar', new VariableNode()
     @define 'stringVar', new VariableNode()
 
-    Transmitter.channel()
+    new Transmitter.Channels.VariableChannel()
       .withOrigin @objectVar
       .withMapOrigin (object) -> [object.name, object.value].join(':')
       .withUpdateOrigin (string, object) ->

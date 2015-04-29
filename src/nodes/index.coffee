@@ -7,4 +7,5 @@ module.exports = {
   ChannelNode:  require './channel_node'
   Record:       require './record'
   Variable:     require './variable'
+  List:         require './list'
 }

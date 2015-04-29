@@ -1,7 +1,7 @@
 'use strict'
 
 
-ChannelBuilder = require '../channel_builder'
+DuplexChannel = require './duplex_channel'
 
 
 module.exports = class RecordChannel
@@ -13,7 +13,7 @@ module.exports = class RecordChannel
 
   createChannels: ->
     for createChannel in @channelCreateFunctions
-      createChannel.call(this, new ChannelBuilder())
+      createChannel.call(this, new DuplexChannel())
 
 
   getChannels: -> @channels ?= @createChannels()
