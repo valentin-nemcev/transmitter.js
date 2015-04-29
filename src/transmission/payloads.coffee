@@ -95,6 +95,10 @@ class exports.MergedPayload
     new exports.ValuePayload(result)
 
 
+  replaceWithValue: (value) ->
+    new exports.ValuePayload(value)
+
+
   set: (key, payload) ->
     @payloads.set(key, payload)
     return this

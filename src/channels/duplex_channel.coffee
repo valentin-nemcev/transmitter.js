@@ -15,17 +15,6 @@ module.exports = class DuplexChannel
   withTransformDerived: (@transformDerived) -> this
 
 
-  mapPayloadValue = (map) ->
-    (payload) -> payload.mapValue(map)
-
-  withMapOrigin:  (map) -> @withTransformOrigin  mapPayloadValue(map)
-  withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)
-
-
-  withUpdateOrigin:  (update) -> @withMapDerived(update)
-  withUpdateDerived: (update) -> @withMapOrigin(update)
-
-
   createConnection: (source, target, transform, direction) ->
     new ConnectionBuilder()
       .inDirection direction

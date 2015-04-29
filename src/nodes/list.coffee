@@ -16,5 +16,5 @@ module.exports = class Variable extends StatefulNode
       this
 
 
-    getValue: -> 
+    getValue: ->
       @list.slice()

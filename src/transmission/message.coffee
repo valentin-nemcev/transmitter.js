@@ -46,11 +46,11 @@ module.exports = class Message
 
   sendToTargetNode: (node) ->
     return this if @transmission.hasMessageForNode(node)
-    @transmission.addMessageForNode(this, node)
     @payload.deliver(node)
     if node.getNodeSource?
-      relayed = node.getResponseMessage(@transmission.getSender())
-      node.getNodeSource().receiveMessage(relayed)
+      node.getResponseMessage(@transmission.getSender()).sendFromSourceNode(node)
+    else
+      @transmission.addMessageForNode(this, node)
     return this
 
 
