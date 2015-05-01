@@ -32,32 +32,45 @@ module.exports = class Transmission
   reverseOrder: no
 
   constructor: ->
-    @nodesToMessages = new Map()
-    @nodesToQueries = new Map()
+    @pointsToMessages = new Map()
+    @pointsToQueries = new Map()
     @queryQueue = []
 
 
   getSender: -> @sender ?= new Sender(this)
 
 
-  hasMessageForNode: (node) ->
-    @nodesToMessages.has(node)
 
-
-  addMessageForNode: (message, node) ->
-    @_log 'addMessageForNode', arguments...
-    @nodesToMessages.set(node, message)
+  addMessageFor: (message, point) ->
+    @_log 'addMessageFor', arguments...
+    @pointsToMessages.set(point, message)
     return this
 
 
-  getMessageFrom: (node) ->
-    @nodesToMessages.get(node)
+  hasMessageFor: (point) ->
+    @pointsToMessages.has(point)
 
 
-  enqueueQueryFromNode: (query, node, priority) ->
-    @_log 'enqueueQueryFromNode', arguments...
+  getMessageFor: (point) ->
+    @pointsToMessages.get(point)
 
-    entry = {node, query, priority}
+
+
+  addQueryFor: (query, point) ->
+    @_log 'addQueryFor', arguments...
+    @pointsToQueries.set(point, query)
+    return this
+
+
+  getQueryFor: (point) ->
+    @pointsToQueries.get(point)
+
+
+
+  enqueueQueryFor: (query, point, priority) ->
+    @_log 'enqueueQueryFor', arguments...
+
+    entry = {point, query, priority}
     if @reverseOrder
       @queryQueue.push entry
     else
@@ -66,26 +79,8 @@ module.exports = class Transmission
     return this
 
 
-  addQueryToNode: (query, node) ->
-    @_log 'addQueryToNode', arguments...
-    @nodesToQueries.set(node, query)
-    return this
-
-
-  hasQueryToNode: (node) ->
-    @nodesToQueries.has(node)
-
-
-  getQueryFromNode: (node) ->
-    @nodesToQueries.get(node)
-
-
-  hasQueryOrMessageForNode: (node) ->
-    @hasMessageForNode(node) or @hasQueryToNode(node)
-
-
   respondToQueries: ->
     while @queryQueue.length
-      {node, query} = @queryQueue.pop()
-      node.getResponseMessage(@getSender()).sendFromSourceNode(node)
+      {point, query} = @queryQueue.pop()
+      @getSender().respondToQuery(point)
     return this

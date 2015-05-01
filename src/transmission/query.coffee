@@ -27,7 +27,7 @@ module.exports = class Query
 
 
   sendToLine: (line) ->
-    if line.isConst() or @transmission.hasMessageForNode(line)
+    if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
     else
       line.receiveConnectionQuery(@transmission.getSender().createQuery())
@@ -35,17 +35,17 @@ module.exports = class Query
 
 
   sendFromTargetNode: (node) ->
-    return this if @transmission.hasMessageForNode(node)
-    @transmission.addQueryToNode(this, node)
+    return this if @transmission.hasMessageFor(node)
+    @transmission.addQueryFor(this, node)
     @_trySendingFromNodeTarget(node)
     return this
 
 
   sendToSourceNode: (node) ->
-    return this if @transmission.hasMessageForNode(node)
-    @transmission.addQueryToNode(this, node)
+    return this if @transmission.hasMessageFor(node)
+    @transmission.addQueryFor(this, node)
     unless @_copy()._trySendingFromNodeTarget(node)
-      @transmission.enqueueQueryFromNode(this, node, @pathLength)
+      @transmission.enqueueQueryFor(this, node, @pathLength)
     return this
 
 

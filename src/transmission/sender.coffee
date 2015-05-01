@@ -45,15 +45,24 @@ module.exports = class Sender
 
   queryNodeState: (node) ->
     this.createQuery(directions.forward).sendFromTargetNode(node)
+    return this
+
+
+  respondToQuery: (node) ->
+    node.getResponseMessage(this).sendFromSourceNode(node)
+    return this
 
 
   originate: (node, value) ->
     node.getOriginMessage(this, value).sendFromSourceNode(node)
+    return this
 
 
   updateNodeState: (node, value) ->
     this.createStateMessageWithValue(value).sendToTargetNode(node)
+    return this
 
 
   connect: (connection) ->
     this.createConnectMessage().sendToConnection(connection)
+    return this

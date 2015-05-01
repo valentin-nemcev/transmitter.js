@@ -35,7 +35,7 @@ describe 'Query queue', ->
     sinon.spy(@target, 'receiveMessage')
     @query = new Query()
 
-    @transmission.enqueueQueryFromNode(@query, @node)
+    @transmission.enqueueQueryFor(@query, @node)
     @transmission.respondToQueries()
 
     @responseMessage = @target.receiveMessage.firstCall.args[0]
@@ -56,8 +56,8 @@ describe 'Query queue', ->
     sinon.stub(@target1, 'receiveMessage', -> callOrder.push 1)
     sinon.stub(@target2, 'receiveMessage', -> callOrder.push 2)
 
-    @transmission.enqueueQueryFromNode(@query1, @node1, 2)
-    @transmission.enqueueQueryFromNode(@query2, @node2, 1)
+    @transmission.enqueueQueryFor(@query1, @node1, 2)
+    @transmission.enqueueQueryFor(@query2, @node2, 1)
     @transmission.respondToQueries()
 
     expect(callOrder).to.deep.equal([1, 2])
@@ -72,7 +72,7 @@ describe 'Query queue', ->
     @message.sendFromSourceNode(@node)
     @query = new Query()
 
-    @transmission.enqueueQueryFromNode(@query, @node)
+    @transmission.enqueueQueryFor(@query, @node)
     @transmission.respondToQueries()
 
     expect(@target.receiveMessage).to.have.been.calledOnce
@@ -89,11 +89,11 @@ describe 'Query queue', ->
     @query1 = new Query()
     @query2 = new Query()
     sinon.stub(@target1, 'receiveMessage', =>
-      @transmission.enqueueQueryFromNode(@query2, @node2)
+      @transmission.enqueueQueryFor(@query2, @node2)
     )
     sinon.spy(@target2, 'receiveMessage')
 
-    @transmission.enqueueQueryFromNode(@query1, @node1)
+    @transmission.enqueueQueryFor(@query1, @node1)
     @transmission.respondToQueries()
 
     expect(@target2.receiveMessage).to.have.been.calledOnce

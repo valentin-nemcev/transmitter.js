@@ -30,7 +30,7 @@ module.exports = class Message
 
 
   sendToLine: (line) ->
-    if line.isConst() or @transmission.hasMessageForNode(line)
+    if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
       line.receiveConnectionQuery(@transmission.getSender().createQuery())
@@ -38,19 +38,19 @@ module.exports = class Message
 
 
   sendFromSourceNode: (node) ->
-    return this if @transmission.hasMessageForNode(node)
-    @transmission.addMessageForNode(this, node)
+    return this if @transmission.hasMessageFor(node)
+    @transmission.addMessageFor(this, node)
     node.getNodeSource().receiveMessage(this)
     return this
 
 
   sendToTargetNode: (node) ->
-    return this if @transmission.hasMessageForNode(node)
+    return this if @transmission.hasMessageFor(node)
     @payload.deliver(node)
     if node.getNodeSource?
       node.getResponseMessage(@transmission.getSender()).sendFromSourceNode(node)
     else
-      @transmission.addMessageForNode(this, node)
+      @transmission.addMessageFor(this, node)
     return this
 
 
@@ -66,7 +66,7 @@ module.exports = class Message
   sendMergedTo: (sourceKeys, target) ->
     mergedPayload = new MergedPayload(sourceKeys)
     for key in sourceKeys
-      message = @transmission.getMessageFrom(key)
+      message = @transmission.getMessageFor(key)
       continue unless message?
       mergedPayload.set(key, message.getPayload())
 

@@ -17,19 +17,19 @@ module.exports = class ConnectionMessage
 
 
   passMessage: (node, line) ->
-    if message = @transmission.getMessageFrom(node)
+    if message = @transmission.getMessageFor(node)
       line.receiveMessage(message)
     return this
 
 
   passQuery: (node, line) ->
-    if query = @transmission.getQueryFromNode(node)
+    if query = @transmission.getQueryFor(node)
       line.receiveQuery(query)
     return this
 
 
   deliverToLine: (line) ->
-    return this if @transmission.hasMessageForNode(line)
-    @transmission.addMessageForNode(this, line)
+    return this if @transmission.hasMessageFor(line)
+    @transmission.addMessageFor(this, line)
     @payload.deliver(line)
     return this
