@@ -14,9 +14,9 @@ class AlertEmitter extends Transmitter.Nodes.EventTarget
 describe 'Connection with merge and query', ->
 
   beforeEach ->
-    @button = new Transmitter.Nodes.EventSource()
-    @textInput = new Transmitter.Nodes.Variable()
-    @alertEmitter = new AlertEmitter()
+    @define 'button', new Transmitter.Nodes.EventSource()
+    @define 'textInput', new Transmitter.Nodes.Variable()
+    @define 'alertEmitter', new AlertEmitter()
     sinon.spy(@alertEmitter, 'alert')
 
     Transmitter.connection()

@@ -20,12 +20,6 @@ module.exports = class Query
     new Query(@transmission, @direction, @pathLength + 1)
 
 
-  _trySendingFromNodeTarget: (node) ->
-    @wasSent = no
-    node.getNodeTarget?()?.receiveQuery(this)
-    return @wasSent
-
-
   sendToLine: (line) ->
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
@@ -34,18 +28,27 @@ module.exports = class Query
     return this
 
 
-  sendFromTargetNode: (node) ->
-    return this if @transmission.hasMessageFor(node)
-    @transmission.addQueryFor(this, node)
-    @_trySendingFromNodeTarget(node)
+  sendToNodeSource: (nodeSource) ->
+    return this if @transmission.hasMessageFor(nodeSource)
+    @transmission.addQueryFor(this, nodeSource)
+    nodeSource.receiveQuery(this)
     return this
 
 
-  sendToSourceNode: (node) ->
-    return this if @transmission.hasMessageFor(node)
-    @transmission.addQueryFor(this, node)
-    unless @_copy()._trySendingFromNodeTarget(node)
-      @transmission.enqueueQueryFor(this, node, @pathLength)
+  sendToNode: (node) ->
+    node.routeQuery(@_copy())
+    return this
+
+
+  completeRouting: (node) ->
+    @transmission.enqueueQueryFor(this, node, @pathLength) unless @wasSent
+    return this
+
+
+  sendToNodeTarget: (nodeTarget) ->
+    return this if @transmission.hasMessageFor(nodeTarget)
+    @transmission.addQueryFor(this, nodeTarget)
+    nodeTarget.receiveQuery(this)
     return this
 
 

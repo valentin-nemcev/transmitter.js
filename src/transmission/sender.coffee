@@ -32,7 +32,7 @@ module.exports = class Sender
     new Message(@transmission, payload)
 
 
-  createStateMessageWithValue: (value) ->
+  createStateValueMessage: (value) ->
     payload = StatePayload.createFromValue(value)
     new Message(@transmission, payload)
 
@@ -44,22 +44,17 @@ module.exports = class Sender
 
 
   queryNodeState: (node) ->
-    this.createQuery(directions.forward).sendFromTargetNode(node)
-    return this
-
-
-  respondToQuery: (node) ->
-    node.getResponseMessage(this).sendFromSourceNode(node)
+    this.createQuery(directions.forward).sendToNodeTarget(node.getNodeTarget())
     return this
 
 
   originate: (node, value) ->
-    node.getOriginMessage(this, value).sendFromSourceNode(node)
+    node.originate(value, this)
     return this
 
 
   updateNodeState: (node, value) ->
-    this.createStateMessageWithValue(value).sendToTargetNode(node)
+    node.updateState(value, this)
     return this
 
 

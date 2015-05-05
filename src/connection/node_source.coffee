@@ -20,7 +20,7 @@ module.exports = class NodeSource
 
 
   receiveConnectionMessageFrom: (message, line) ->
-    message.passMessage(@node, line)
+    message.passMessage(this, line)
     return this
 
 
@@ -31,5 +31,5 @@ module.exports = class NodeSource
 
 
   receiveQuery: (query) ->
-    query.sendToSourceNode(@node)
+    query.sendToNode(@node)
     return this

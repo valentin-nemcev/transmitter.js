@@ -14,7 +14,9 @@ class StubPayload
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
-  getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
+  respondToQuery: (sender) ->
+    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+    return this
 
 class TargetStub
   receiveMessage: ->
@@ -31,16 +33,14 @@ describe 'Query queue', ->
     @node = new NodeStub()
     @target = new TargetStub()
     @node.getNodeSource().connectTarget(@target)
-    sinon.spy(@node, 'getResponseMessage')
+    sinon.spy(@node, 'respondToQuery')
     sinon.spy(@target, 'receiveMessage')
     @query = new Query()
 
     @transmission.enqueueQueryFor(@query, @node)
     @transmission.respondToQueries()
 
-    @responseMessage = @target.receiveMessage.firstCall.args[0]
-    expect(@responseMessage)
-      .to.equal(@node.getResponseMessage.firstCall.returnValue)
+    expect(@node.respondToQuery).to.have.been.calledOnce
 
 
   it 'responds to queries with higher priority first', ->
@@ -69,7 +69,7 @@ describe 'Query queue', ->
     @node.getNodeSource().connectTarget(@target)
     sinon.spy(@target, 'receiveMessage')
     @message = new Message(@transmission, new StubPayload())
-    @message.sendFromSourceNode(@node)
+    @message.sendToNodeSource(@node.getNodeSource())
     @query = new Query()
 
     @transmission.enqueueQueryFor(@query, @node)

@@ -20,16 +20,17 @@ module.exports = class NodeTarget
 
 
   receiveConnectionMessageFrom: (message, line) ->
-    message.passQuery(@node, line)
+    message.passQuery(this, line)
     return this
 
 
   receiveMessage: (message) ->
-    message.sendToTargetNode(@node)
+    message.sendToNode(@node)
     return this
 
 
   receiveQuery: (query) ->
     @sources.forEach (source) ->
       query.sendToLine(source)
+    query.completeRouting(@node)
     return this

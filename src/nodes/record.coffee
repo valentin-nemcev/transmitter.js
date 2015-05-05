@@ -11,6 +11,7 @@ module.exports = class Record
       enumerable: yes, configurable: yes
       get: ->
         value = getValue.call(this)
+        value.inspect ?= => this.inspect() + '.' + name
         Object.defineProperty this, name,
           enumerable: yes, writable: no, value: value
         return @[name]

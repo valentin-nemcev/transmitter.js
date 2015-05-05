@@ -6,9 +6,26 @@ NodeTarget = require '../connection/node_target'
 
 module.exports = class StatefulNode
 
-    NodeSource.extend this
-    NodeTarget.extend this
+  NodeSource.extend this
+  NodeTarget.extend this
 
-    getResponseMessage: (sender) -> sender.createStateMessage(this)
-    getOriginMessage:   (sender) -> sender.createStateMessage(this)
-    getRelayedMessage:  (sender) -> sender.createStateMessage(this)
+
+  routeMessage: (payload, sender) ->
+    payload.deliver(this)
+    sender.createStateMessage(this).sendToNodeSource(@getNodeSource())
+    return this
+
+
+  routeQuery: (query) ->
+    query.sendToNodeTarget(@getNodeTarget())
+    return this
+
+
+  respondToQuery: (sender) ->
+    sender.createStateMessage(this).sendToNodeSource(@getNodeSource())
+    return this
+
+
+  updateState: (value, sender) ->
+    sender.createStateValueMessage(value).sendToNodeTarget(@getNodeTarget())
+    return this

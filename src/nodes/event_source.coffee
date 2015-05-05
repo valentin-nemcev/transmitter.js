@@ -8,5 +8,16 @@ module.exports = class EventSource
 
   NodeSource.extend this
 
-  getResponseMessage:      (sender) -> sender.createValueMessage(null)
-  getOriginMessage: (sender, value) -> sender.createValueMessage(value)
+  routeQuery: (query) ->
+    query.completeRouting(this)
+    return this
+
+
+  respondToQuery: (sender) ->
+    sender.createValueMessage(null).sendToNodeSource(@getNodeSource())
+    return this
+
+
+  originate: (value, sender) ->
+    sender.createValueMessage(value).sendToNodeSource(@getNodeSource())
+    return this

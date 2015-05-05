@@ -1,7 +1,6 @@
 'use strict'
 
-NodeSource = require 'transmitter/connection/node_source'
-NodeTarget = require 'transmitter/connection/node_target'
+StatefulNode = require 'transmitter/nodes/stateful_node'
 NodeConnectionLine = require 'transmitter/connection/node_connection_line'
 ConnectionNodeLine = require 'transmitter/connection/connection_node_line'
 Transmission = require 'transmitter/transmission/transmission'
@@ -12,9 +11,7 @@ Query = require 'transmitter/transmission/query'
 class StubPayload
   deliver: ->
 
-class NodeStub
-  NodeSource.extend(this)
-  NodeTarget.extend(this)
+class NodeStub extends StatefulNode
   getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
   getRelayedMessage:  (sender) -> sender.createMessage(new StubPayload())
 
@@ -44,7 +41,7 @@ describe 'Message and query routing', ->
     sinon.spy(@target, 'receiveMessage')
     @message = new Message(@transmission, new StubPayload())
 
-    @message.sendToTargetNode(@node)
+    @message.sendToNodeTarget(@node.getNodeTarget())
 
     expect(@target.receiveMessage).to.have.been.calledOnce
 
@@ -57,7 +54,7 @@ describe 'Message and query routing', ->
     sinon.spy(@source, 'receiveQuery')
     @query = new Query(@transmission)
 
-    @query.sendToSourceNode(@node)
+    @query.sendToNodeTarget(@node.getNodeTarget())
 
     expect(@source.receiveQuery).to.have.been.calledOnce
 
@@ -74,7 +71,7 @@ describe 'Message and query routing', ->
     sinon.spy(@target, 'receiveMessage')
     @query = new Query(@transmission, @queryDirection)
 
-    @query.sendToSourceNode(@node)
+    @query.sendToNodeTarget(@node.getNodeTarget())
     @transmission.respondToQueries()
 
     expect(@target.receiveMessage).to.have.been.calledOnce

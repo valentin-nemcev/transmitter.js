@@ -11,7 +11,13 @@ class StubPayload
 
 class NodeStub
   NodeSource.extend(this)
-  getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
+
+  routeQuery: (query) ->
+    query.completeRouting(this)
+    return this
+
+  respondToQuery: (sender) ->
+    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
 
 class TargetStub
   receiveMessage: ->
@@ -28,8 +34,9 @@ describe 'Message merging', ->
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
     @passiveSource = new NodeStub()
-    sinon.stub(@passiveSource, 'getResponseMessage', (sender) =>
+    sinon.stub(@passiveSource, 'respondToQuery', (sender) =>
       sender.createMessage(@passivePayload)
+        .sendToNodeSource(@passiveSource.getNodeSource())
     )
 
     @compositeSource = new ConnectionBuilder()
@@ -43,7 +50,7 @@ describe 'Message merging', ->
     @activePayload = new StubPayload()
     @message1 = new Message(@transmission, @activePayload)
 
-    @message1.sendFromSourceNode(@activeSource)
+    @message1.sendToNodeSource(@activeSource.getNodeSource())
 
 
   specify 'then nothing is sent', ->

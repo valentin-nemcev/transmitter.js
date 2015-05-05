@@ -39,7 +39,7 @@ module.exports = class NodeConnectionLine
 
 
   receiveQuery: (query) ->
-    @source?.receiveQuery(query)
+    query.sendToNodeSource(@source) if @source?
     return this
 
 

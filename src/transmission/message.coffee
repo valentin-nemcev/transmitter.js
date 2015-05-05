@@ -37,20 +37,22 @@ module.exports = class Message
     return this
 
 
-  sendFromSourceNode: (node) ->
-    return this if @transmission.hasMessageFor(node)
-    @transmission.addMessageFor(this, node)
-    node.getNodeSource().receiveMessage(this)
+  sendToNodeTarget: (nodeTarget) ->
+    return this if @transmission.hasMessageFor(nodeTarget)
+    @transmission.addMessageFor(this, nodeTarget)
+    nodeTarget.receiveMessage(this)
     return this
 
 
-  sendToTargetNode: (node) ->
-    return this if @transmission.hasMessageFor(node)
-    @payload.deliver(node)
-    if node.getNodeSource?
-      node.getResponseMessage(@transmission.getSender()).sendFromSourceNode(node)
-    else
-      @transmission.addMessageFor(this, node)
+  sendToNode: (node) ->
+    node.routeMessage(@payload, @transmission.getSender())
+    return this
+
+
+  sendToNodeSource: (nodeSource) ->
+    return this if @transmission.hasMessageFor(nodeSource)
+    @transmission.addMessageFor(this, nodeSource)
+    nodeSource.receiveMessage(this)
     return this
 
 
@@ -66,7 +68,7 @@ module.exports = class Message
   sendMergedTo: (sourceKeys, target) ->
     mergedPayload = new MergedPayload(sourceKeys)
     for key in sourceKeys
-      message = @transmission.getMessageFor(key)
+      message = @transmission.getMessageFor(key.getNodeSource())
       continue unless message?
       mergedPayload.set(key, message.getPayload())
 

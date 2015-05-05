@@ -16,10 +16,19 @@ class StubPayload
 
 class NodeSourceStub
   NodeSource.extend(this)
-  getResponseMessage: (sender) -> sender.createMessage(new StubPayload())
+
+  routeQuery: (query) ->
+    query.completeRouting(this)
+    return this
+
+  respondToQuery: (sender) ->
+    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+    return this
+
 
 class NodeTargetStub
   NodeTarget.extend(this)
+  routeMessage: -> return this
 
 
 describe 'Message and query transmission', ->
@@ -38,23 +47,25 @@ describe 'Message and query transmission', ->
 
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@payload, 'deliver')
+    sinon.spy(@target, 'routeMessage')
     @message = new Message(@transmission, @payload)
 
-    @message.sendFromSourceNode(@source)
+    @message.sendToNodeSource(@source.getNodeSource())
 
-    expect(@payload.deliver).to.have.been.calledWithSame(@target)
+    expect(@target.routeMessage).to.have.been
+      .calledWith(sinon.match.same(@payload))
 
 
   it 'transmits query from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@payload, 'deliver')
-    sinon.stub(@source, 'getResponseMessage', (sender) =>
-      sender.createMessage(@payload)
+    sinon.spy(@target, 'routeMessage')
+    sinon.stub(@source, 'respondToQuery', (sender) =>
+      sender.createMessage(@payload).sendToNodeSource(@source.getNodeSource())
     )
     @query = new Query(@transmission)
 
-    @query.sendFromTargetNode(@target)
+    @query.sendToNodeTarget(@target.getNodeTarget())
     @transmission.respondToQueries()
 
-    expect(@payload.deliver).to.have.been.calledWithSame(@target)
+    expect(@target.routeMessage).to.have.been
+      .calledWith(sinon.match.same(@payload))

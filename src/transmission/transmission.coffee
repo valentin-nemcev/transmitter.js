@@ -82,5 +82,5 @@ module.exports = class Transmission
   respondToQueries: ->
     while @queryQueue.length
       {point, query} = @queryQueue.pop()
-      @getSender().respondToQuery(point)
+      point.respondToQuery(@getSender())
     return this
