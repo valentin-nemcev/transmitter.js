@@ -3,7 +3,6 @@
 
 assert = require 'assert'
 {MergedPayload} = require './payloads'
-ConnectionMessage = require './connection_message'
 
 
 module.exports = class Message
@@ -21,7 +20,7 @@ module.exports = class Message
 
 
   sendToConnectionWithPayload: (connection, payload) ->
-    new ConnectionMessage(@transmission, payload)
+    @transmission.createConnectionMessage(payload)
       .sendToConnection(connection)
 
 
@@ -33,7 +32,7 @@ module.exports = class Message
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
-      line.receiveConnectionQuery(@transmission.getSender().createQuery())
+      line.receiveConnectionQuery(@transmission.createQuery())
     return this
 
 
@@ -45,7 +44,7 @@ module.exports = class Message
 
 
   sendToNode: (node) ->
-    node.routeMessage(@payload, @transmission.getSender())
+    node.routeMessage(@payload, @transmission)
     return this
 
 
@@ -78,5 +77,5 @@ module.exports = class Message
 
 
   sendQueryForMerge: (source) ->
-    source.receiveQuery(@transmission.getSender().createQuery())
+    source.receiveQuery(@transmission.createQuery())
     return this

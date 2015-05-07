@@ -19,7 +19,7 @@ describe 'Connection with merge and query', ->
     @define 'alertEmitter', new AlertEmitter()
     sinon.spy(@alertEmitter, 'alert')
 
-    Transmitter.startTransmission (sender) =>
+    Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.EventChannel()
         .fromSource(@button)
         .fromSource(@textInput)
@@ -27,18 +27,18 @@ describe 'Connection with merge and query', ->
           payloads.get(@button)
             .replaceWhenPresent(payloads.get(@textInput).toValue())
         .toTarget @alertEmitter
-        .connect(sender)
+        .connect(tr)
 
 
   it 'should emit alert with text input value when button is clicked', ->
-    Transmitter.startTransmission (sender) =>
-      @textInput.updateState('Text input value', sender)
-    Transmitter.startTransmission (sender) =>
-      @button.originate('click', sender)
+    Transmitter.startTransmission (tr) =>
+      @textInput.updateState('Text input value', tr)
+    Transmitter.startTransmission (tr) =>
+      @button.originate('click', tr)
     expect(@alertEmitter.alert).to.have.been.calledWith('Text input value')
 
 
   it 'should not emit alert when button is not clicked', ->
-    Transmitter.startTransmission (sender) =>
-      @textInput.updateState('Text input value', sender)
+    Transmitter.startTransmission (tr) =>
+      @textInput.updateState('Text input value', tr)
     expect(@alertEmitter.alert).to.not.have.been.called

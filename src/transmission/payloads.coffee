@@ -162,20 +162,3 @@ class exports.StructPayload
 
     return new exports.ListPayload(result)
 
-
-
-class exports.ConnectionPayload
-
-  @createConnect = (origin) -> new this(origin)
-
-
-  constructor: (@origin) ->
-
-
-  inspect: -> "connect (#{inspect @origin})"
-
-
-  deliver: (line) ->
-    line.setOrigin(@origin)
-    line.connect()
-    return this

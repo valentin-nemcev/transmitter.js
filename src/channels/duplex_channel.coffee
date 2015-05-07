@@ -4,6 +4,8 @@
 {forward, backward} = require '../directions'
 SimplexChannel = require './simplex_channel'
 
+ConnectionPayload = require '../payloads/connection'
+
 
 module.exports = class DuplexChannel
 
@@ -33,9 +35,10 @@ module.exports = class DuplexChannel
       @_createSimplex(@derived, @origin, @transformDerived, backward)
 
 
-  connect: (sender) ->
-    sender.connect(@_getForwardSimplex())
-    sender.connect(@_getBackwardSimplex())
+  connect: (tr) ->
+    tr.createConnectionMessage(ConnectionPayload.connect())
+      .sendToConnection(@_getForwardSimplex())
+      .sendToConnection(@_getBackwardSimplex())
     return null
 
 

@@ -4,15 +4,19 @@
 NodeSource = require '../connection/node_source'
 NodeTarget = require '../connection/node_target'
 
+{StatePayload} = require '../transmission/payloads'
+directions = require '../directions'
+
 module.exports = class StatefulNode
 
   NodeSource.extend this
   NodeTarget.extend this
 
 
-  routeMessage: (payload, sender) ->
+  routeMessage: (payload, tr) ->
     payload.deliver(this)
-    sender.createStateMessage(this).sendToNodeSource(@getNodeSource())
+    tr.createMessage(StatePayload.create(this))
+      .sendToNodeSource(@getNodeSource())
     return this
 
 
@@ -21,11 +25,18 @@ module.exports = class StatefulNode
     return this
 
 
-  respondToQuery: (sender) ->
-    sender.createStateMessage(this).sendToNodeSource(@getNodeSource())
+  respondToQuery: (tr) ->
+    tr.createMessage(StatePayload.create(this))
+      .sendToNodeSource(@getNodeSource())
     return this
 
 
-  updateState: (value, sender) ->
-    sender.createStateValueMessage(value).sendToNodeTarget(@getNodeTarget())
+  updateState: (value, tr) ->
+    tr.createMessage(StatePayload.createFromValue(value))
+      .sendToNodeTarget(@getNodeTarget())
+    return this
+
+
+  queryState: (tr) ->
+    tr.createQuery(directions.forward).sendToNodeTarget(@getNodeTarget())
     return this

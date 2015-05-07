@@ -6,7 +6,9 @@ assert = require 'assert'
 stableSort = require 'stable'
 {inspect} = require 'util'
 
-Sender = require './sender'
+Query = require './query'
+Message = require './message'
+ConnectionMessage = require './connection_message'
 
 
 module.exports = class Transmission
@@ -15,7 +17,7 @@ module.exports = class Transmission
     assert(not @instance, "Transmissions can't be nested")
     @instance = new Transmission()
     try
-      doWithTransmission(@instance.getSender())
+      doWithTransmission(@instance)
       @instance.respondToQueries()
     finally
       @instance = null
@@ -37,7 +39,17 @@ module.exports = class Transmission
     @queryQueue = []
 
 
-  getSender: -> @sender ?= new Sender(this)
+
+  createQuery: (direction) ->
+    new Query(this, direction)
+
+
+  createMessage: (payload) ->
+    new Message(this, payload)
+
+
+  createConnectionMessage: (payload) ->
+    new ConnectionMessage(this, payload)
 
 
 
@@ -82,5 +94,5 @@ module.exports = class Transmission
   respondToQueries: ->
     while @queryQueue.length
       {point, query} = @queryQueue.pop()
-      point.respondToQuery(@getSender())
+      point.respondToQuery(this)
     return this

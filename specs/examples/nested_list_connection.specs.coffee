@@ -2,7 +2,7 @@
 
 
 Transmitter = require 'transmitter'
-{ConnectionPayload} = require 'transmitter/transmission/payloads'
+ConnectionPayload = require 'transmitter/payloads/connection'
 
 class ListItem extends Transmitter.Nodes.Record
 
@@ -33,7 +33,7 @@ class NestedListChannelNode extends Transmitter.Nodes.ChannelNode
 
 
   connect: (channel) ->
-    payload = ConnectionPayload.createConnect(this)
+    payload = ConnectionPayload.connect(this)
     @message.sendToConnectionWithPayload(channel, payload)
     return this
 
@@ -69,9 +69,9 @@ describe 'Nested list connection', ->
 
     @define 'nestedListChannelNode', new NestedListChannelNode()
 
-    Transmitter.startTransmission (sender) =>
+    Transmitter.startTransmission (tr) =>
 
-      listChannel.connect(sender)
+      listChannel.connect(tr)
 
       new Transmitter.Channels.EventChannel()
         .fromSource @originList
@@ -85,17 +85,17 @@ describe 'Nested list connection', ->
                 .withMapOrigin originToDerived
                 .withDerived derivedItem.valueVar
                 .withMapDerived derivedToOrigin
-        .connect(sender)
+        .connect(tr)
 
 
   specify 'when origin list is updated', ->
-    Transmitter.startTransmission (sender) =>
+    Transmitter.startTransmission (tr) =>
       item1 = new ListItem('Origin item 1')
       item2 = new ListItem('Origin item 2')
 
-      sender.updateNodeState(item1.valueVar, 'Origin value 1')
-      sender.updateNodeState(item2.valueVar, 'Origin value 2')
-      sender.updateNodeState(@originList, [item1, item2])
+      item1.valueVar.updateState('Origin value 1', tr)
+      item2.valueVar.updateState('Origin value 2', tr)
+      @originList.updateState([item1, item2], tr)
 
 
   specify 'then update is transmitted to derived list', ->

@@ -21,8 +21,8 @@ class NodeSourceStub
     query.completeRouting(this)
     return this
 
-  respondToQuery: (sender) ->
-    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+  respondToQuery: (tr) ->
+    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
     return this
 
 
@@ -37,11 +37,11 @@ describe 'Message and query transmission', ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
 
-    Transmitter.startTransmission (sender) =>
+    Transmitter.startTransmission (tr) =>
       new SimplexChannel()
         .fromSource @source
         .toTarget @target
-        .connect(sender)
+        .connect(tr)
 
     @transmission = new Transmission()
 
@@ -60,8 +60,8 @@ describe 'Message and query transmission', ->
   it 'transmits query from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@target, 'routeMessage')
-    sinon.stub(@source, 'respondToQuery', (sender) =>
-      sender.createMessage(@payload).sendToNodeSource(@source.getNodeSource())
+    sinon.stub(@source, 'respondToQuery', (tr) =>
+      tr.createMessage(@payload).sendToNodeSource(@source.getNodeSource())
     )
     @query = new Query(@transmission)
 

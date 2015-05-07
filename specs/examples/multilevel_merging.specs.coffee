@@ -43,38 +43,38 @@ describe 'Multilevel merging', ->
         result
       ).toState()
 
-    Transmitter.startTransmission (sender) =>
+    Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.EventChannel()
         .fromSource(@d1)
         .fromSource(@d2)
         .withTransform reduceMergedPayload
         .toTarget @c1
-        .connect(sender)
+        .connect(tr)
 
       new Transmitter.Channels.EventChannel()
         .fromSource @c1
         .toTarget @b1
-        .connect(sender)
+        .connect(tr)
 
       new Transmitter.Channels.EventChannel()
         .fromSource @c2
         .toTarget @b1
-        .connect(sender)
+        .connect(tr)
 
       new Transmitter.Channels.EventChannel()
         .fromSource(@b1)
         .fromSource(@b2)
         .withTransform reduceMergedPayload
         .toTarget @a
-        .connect(sender)
+        .connect(tr)
 
 
   Transmitter.withDifferentTransmissionOrders (Transmitter, order) ->
     specify "multiple messages are transmitted and merged \
         in correct order (#{order})", ->
-      Transmitter.startTransmission (sender) =>
-        sender.updateNodeState(@d2, 'd2UpdatedValue')
-        sender.updateNodeState(@b2, 'b2UpdatedValue')
+      Transmitter.startTransmission (tr) =>
+        @d2.updateState('d2UpdatedValue', tr)
+        @b2.updateState('b2UpdatedValue', tr)
 
       expect(@a.getValue()).to.deep.equal({
         b1:

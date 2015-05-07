@@ -19,8 +19,8 @@ class SourceNodeStub
 
   NodeSource.extend(this)
 
-  respondToQuery: (sender) ->
-    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+  respondToQuery: (tr) ->
+    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
     return this
 
   routeQuery: (query) ->
@@ -34,7 +34,7 @@ class TargetNodeStub
 
   NodeTarget.extend(this)
 
-  respondToQuery: (sender) ->
+  respondToQuery: (tr) ->
     return this
 
   routeMessage: ->

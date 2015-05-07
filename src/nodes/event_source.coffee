@@ -3,6 +3,8 @@
 
 NodeSource = require '../connection/node_source'
 
+{ValuePayload} = require '../transmission/payloads'
+
 
 module.exports = class EventSource
 
@@ -13,11 +15,13 @@ module.exports = class EventSource
     return this
 
 
-  respondToQuery: (sender) ->
-    sender.createValueMessage(null).sendToNodeSource(@getNodeSource())
+  respondToQuery: (tr) ->
+    tr.createMessage(ValuePayload.create(null))
+      .sendToNodeSource(@getNodeSource())
     return this
 
 
-  originate: (value, sender) ->
-    sender.createValueMessage(value).sendToNodeSource(@getNodeSource())
+  originate: (value, tr) ->
+    tr.createMessage(ValuePayload.create(value))
+      .sendToNodeSource(@getNodeSource())
     return this

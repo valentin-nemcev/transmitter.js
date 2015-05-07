@@ -24,7 +24,7 @@ module.exports = class Query
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
     else
-      line.receiveConnectionQuery(@transmission.getSender().createQuery())
+      line.receiveConnectionQuery(@transmission.createQuery())
     return this
 
 

@@ -8,6 +8,8 @@ ConnectionNodeLine = require '../connection/connection_node_line'
 MergingConnectionTarget = require '../connection/merging_connection_target'
 Connection = require '../connection/connection'
 
+ConnectionPayload = require '../payloads/connection'
+
 
 module.exports = class SimplexChannel
 
@@ -74,8 +76,9 @@ module.exports = class SimplexChannel
     @connection ?= new Connection(@getSource(), @getTarget(), @getTransform())
 
 
-  connect: (sender) ->
-    sender.createConnectMessage().sendToConnection(@getConnection())
+  connect: (tr) ->
+    tr.createConnectionMessage(ConnectionPayload.connect())
+      .sendToConnection(@getConnection())
 
 
   receiveConnectionMessage: (message) ->

@@ -14,8 +14,8 @@ class StubPayload
 class NodeStub
   NodeSource.extend(this)
   NodeTarget.extend(this)
-  respondToQuery: (sender) ->
-    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+  respondToQuery: (tr) ->
+    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
     return this
 
 class TargetStub

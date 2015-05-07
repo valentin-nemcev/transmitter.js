@@ -2,7 +2,7 @@
 
 
 Transmitter = require 'transmitter'
-{ConnectionPayload} = require 'transmitter/transmission/payloads'
+ConnectionPayload = require 'transmitter/payloads/connection'
 
 VariableNode = Transmitter.Nodes.Variable
 ChannelNode = Transmitter.Nodes.ChannelNode
@@ -29,7 +29,7 @@ class VariableChannelNode extends ChannelNode
 
 
   connect: (channel) ->
-    payload = ConnectionPayload.createConnect(this)
+    payload = ConnectionPayload.connect(this)
     @message.sendToConnectionWithPayload(channel, payload)
     return this
 
@@ -59,7 +59,7 @@ describe 'Flattening connection', ->
     @define 'nestedVar', new VariableNode()
     @define 'nestedChannelVar', new VariableChannelNode()
 
-    Transmitter.startTransmission (sender) =>
+    Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.EventChannel()
         .inBackwardDirection()
         .fromSource @serializedVar
@@ -70,7 +70,7 @@ describe 'Flattening connection', ->
               return object
             else
               return new NestedObject(serialized.name)
-        .connect(sender)
+        .connect(tr)
 
       new Transmitter.Channels.EventChannel()
         .fromSource @nestedVar
@@ -82,17 +82,17 @@ describe 'Flattening connection', ->
               .withMapOrigin (value) -> {name: nestedObject.name, value}
               .withDerived @serializedVar
               .withMapDerived (serialized) -> serialized.value
-        .connect(sender)
+        .connect(tr)
 
       # TODO
-      @nestedVar.updateState(null, sender)
+      @nestedVar.updateState(null, tr)
 
 
   specify 'creation of nested target after flat source update', ->
     serialized = {name: 'objectA', value: 'value1'}
 
-    Transmitter.startTransmission (sender) =>
-      @serializedVar.updateState(serialized, sender)
+    Transmitter.startTransmission (tr) =>
+      @serializedVar.updateState(serialized, tr)
 
     nestedObject = @nestedVar.getValue()
     expect(nestedObject.name).to.equal('objectA')
@@ -102,9 +102,9 @@ describe 'Flattening connection', ->
   specify 'updating flat target after outer source update', ->
     nestedObject = new NestedObject('objectA')
 
-    Transmitter.startTransmission (sender) =>
-      sender.updateNodeState(nestedObject.valueVar, 'value1')
-      sender.updateNodeState(@nestedVar, nestedObject)
+    Transmitter.startTransmission (tr) =>
+      nestedObject.valueVar.updateState('value1', tr)
+      @nestedVar.updateState(nestedObject, tr)
 
     expect(@serializedVar.getValue())
       .to.deep.equal({name: 'objectA', value: 'value1'})
@@ -115,8 +115,8 @@ describe 'Flattening connection', ->
     nestedObject.valueVar.setValue('value1')
     @nestedVar.setValue(nestedObject)
 
-    Transmitter.startTransmission (sender) =>
-      sender.queryNodeState(@serializedVar)
+    Transmitter.startTransmission (tr) =>
+      @serializedVar.queryState(tr)
 
     expect(@serializedVar.getValue())
       .to.deep.equal({name: 'objectA', value: 'value1'})

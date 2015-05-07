@@ -4,6 +4,7 @@ NodeSource = require 'transmitter/connection/node_source'
 SimplexChannel = require 'transmitter/channels/simplex_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
+ConnectionPayload = require 'transmitter/payloads/connection'
 
 Transmitter = require 'transmitter'
 
@@ -16,8 +17,8 @@ class NodeStub
     query.completeRouting(this)
     return this
 
-  respondToQuery: (sender) ->
-    sender.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+  respondToQuery: (tr) ->
+    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
 
 class TargetStub
   receiveMessage: ->
@@ -34,8 +35,8 @@ describe 'Message merging', ->
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
     @passiveSource = new NodeStub()
-    sinon.stub(@passiveSource, 'respondToQuery', (sender) =>
-      sender.createMessage(@passivePayload)
+    sinon.stub(@passiveSource, 'respondToQuery', (tr) =>
+      tr.createMessage(@passivePayload)
         .sendToNodeSource(@passiveSource.getNodeSource())
     )
 
@@ -43,8 +44,9 @@ describe 'Message merging', ->
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)
-    Transmitter.startTransmission (sender) =>
-      sender.connect(@compositeSource)
+    Transmitter.startTransmission (tr) =>
+      tr.createConnectionMessage(ConnectionPayload.connect())
+        .sendToConnection(@compositeSource)
 
 
   specify 'when one active source have sent message', ->
