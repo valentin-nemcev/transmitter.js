@@ -1,10 +1,6 @@
 'use strict'
 
 
-ConnectionBuilder = require './connection/builder'
-
-directions = require './directions'
-
 Transmission = require './transmission/transmission'
 
 
@@ -38,25 +34,3 @@ module.exports = new class Transmitter
     Transmission::reverseOrder = @reverseOrder
     Transmission.start(doWithTransmission)
     return this
-
-
-
-  directions: directions
-
-
-  @delegateToSender = (method) ->
-    @prototype[method] = (args...) ->
-      @startTransmission (sender) -> sender[method](args...)
-
-
-  @delegateToSender 'queryNodeState'
-
-  @delegateToSender 'updateNodeState'
-
-  @delegateToSender 'originate'
-
-  @delegateToSender 'connect'
-
-
-
-  connection: -> new ConnectionBuilder(this)

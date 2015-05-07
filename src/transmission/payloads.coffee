@@ -27,6 +27,9 @@ class exports.ValuePayload
     new exports.ValuePayload(map(@value))
 
 
+  map: -> @mapValue(arguments...)
+
+
   replaceWhenPresent: (payload) ->
     if @value?
       payload
@@ -36,6 +39,24 @@ class exports.ValuePayload
 
   deliver: (targetNode) ->
     targetNode.receiveValue(@value)
+    return this
+
+
+
+class exports.ListPayload
+
+  constructor: (@list) ->
+
+
+  inspect: -> "list: #{inspect @value}"
+
+
+  map: (map) ->
+    return new exports.ListPayload(@list.map(map))
+
+
+  deliver: (targetNode) ->
+    targetNode.setValue(@list)
     return this
 
 
@@ -68,6 +89,9 @@ class exports.StatePayload
     new exports.StatePayload(@node, map)
 
 
+  map: -> @mapValue(arguments...)
+
+
   deliver: (targetNode) ->
     value = if @update?
       @update(@getValue(), targetNode.getValue())
@@ -95,6 +119,10 @@ class exports.MergedPayload
     new exports.ValuePayload(result)
 
 
+  fetch: (struct) ->
+    new exports.StructPayload(struct).map (key) => @payloads.get(key)
+
+
   replaceWithValue: (value) ->
     new exports.ValuePayload(value)
 
@@ -110,6 +138,29 @@ class exports.MergedPayload
 
   isPresent: ->
     @keys.every (key) => @payloads.get(key)?
+
+
+
+class exports.StructPayload
+
+  constructor: (struct = {}) ->
+    this[key] = val for own key, val of struct
+
+
+  map: (map) ->
+    result = new @constructor()
+    result[key] = map(val, key) for own key, val of this
+    return result
+
+
+  zip: ->
+    result = []
+    for own key, val of this
+      for el, i in val.getValue()
+        result[i] ?= new @constructor()
+        result[i][key] = el
+
+    return new exports.ListPayload(result)
 
 
 

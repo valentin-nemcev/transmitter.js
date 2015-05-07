@@ -67,26 +67,25 @@ describe 'Nested list connection', ->
       .withMapDerived (derivedItem) ->
         new ListItem(derivedToOrigin(derivedItem.name))
 
-    Transmitter.connect(listChannel)
-
     @define 'nestedListChannelNode', new NestedListChannelNode()
 
-    Transmitter.connection()
-      .fromSource @originList
-      .fromSource @derivedList
-      .toConnectionTarget @nestedListChannelNode
-      .withTransform (payload) =>
-        origin = payload.get(@originList).getValue()
-        derived = payload.get(@derivedList).getValue()
-        channels = for originItem, i in origin
-          derivedItem = derived[i]
-          new Transmitter.Channels.VariableChannel()
-            .withOrigin originItem.valueVar
-            .withMapOrigin originToDerived
-            .withDerived derivedItem.valueVar
-            .withMapDerived derivedToOrigin
-        payload.replaceWithValue(channels).toState()
-      .connect()
+    Transmitter.startTransmission (sender) =>
+
+      listChannel.connect(sender)
+
+      new Transmitter.Channels.EventChannel()
+        .fromSource @originList
+        .fromSource @derivedList
+        .toConnectionTarget @nestedListChannelNode
+        .withTransform (lists) =>
+          lists.fetch([@originList, @derivedList]).zip()
+            .map ([originItem, derivedItem]) ->
+              new Transmitter.Channels.VariableChannel()
+                .withOrigin originItem.valueVar
+                .withMapOrigin originToDerived
+                .withDerived derivedItem.valueVar
+                .withMapDerived derivedToOrigin
+        .connect(sender)
 
 
   specify 'when origin list is updated', ->

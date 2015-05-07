@@ -2,7 +2,7 @@
 
 NodeSource = require 'transmitter/connection/node_source'
 NodeTarget = require 'transmitter/connection/node_target'
-ConnectionBuilder = require 'transmitter/connection/builder'
+SimplexChannel = require 'transmitter/channels/simplex_channel'
 
 Message = require 'transmitter/transmission/message'
 Query = require 'transmitter/transmission/query'
@@ -37,10 +37,11 @@ describe 'Message and query transmission', ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
 
-    new ConnectionBuilder(Transmitter)
-      .fromSource @source
-      .toTarget @target
-      .connect()
+    Transmitter.startTransmission (sender) =>
+      new SimplexChannel()
+        .fromSource @source
+        .toTarget @target
+        .connect(sender)
 
     @transmission = new Transmission()
 

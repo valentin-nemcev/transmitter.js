@@ -1,7 +1,7 @@
 'use strict'
 
 NodeSource = require 'transmitter/connection/node_source'
-ConnectionBuilder = require 'transmitter/connection/builder'
+SimplexChannel = require 'transmitter/channels/simplex_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
 
@@ -39,11 +39,12 @@ describe 'Message merging', ->
         .sendToNodeSource(@passiveSource.getNodeSource())
     )
 
-    @compositeSource = new ConnectionBuilder()
+    @compositeSource = new SimplexChannel()
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)
-    Transmitter.connect(@compositeSource)
+    Transmitter.startTransmission (sender) =>
+      sender.connect(@compositeSource)
 
 
   specify 'when one active source have sent message', ->

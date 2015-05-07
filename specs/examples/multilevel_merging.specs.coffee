@@ -43,29 +43,30 @@ describe 'Multilevel merging', ->
         result
       ).toState()
 
-    Transmitter.connection()
-      .fromSource(@d1)
-      .fromSource(@d2)
-      .withTransform reduceMergedPayload
-      .toTarget @c1
-      .connect()
+    Transmitter.startTransmission (sender) =>
+      new Transmitter.Channels.EventChannel()
+        .fromSource(@d1)
+        .fromSource(@d2)
+        .withTransform reduceMergedPayload
+        .toTarget @c1
+        .connect(sender)
 
-    Transmitter.connection()
-      .fromSource @c1
-      .toTarget @b1
-      .connect()
+      new Transmitter.Channels.EventChannel()
+        .fromSource @c1
+        .toTarget @b1
+        .connect(sender)
 
-    Transmitter.connection()
-      .fromSource @c2
-      .toTarget @b1
-      .connect()
+      new Transmitter.Channels.EventChannel()
+        .fromSource @c2
+        .toTarget @b1
+        .connect(sender)
 
-    Transmitter.connection()
-      .fromSource(@b1)
-      .fromSource(@b2)
-      .withTransform reduceMergedPayload
-      .toTarget @a
-      .connect()
+      new Transmitter.Channels.EventChannel()
+        .fromSource(@b1)
+        .fromSource(@b2)
+        .withTransform reduceMergedPayload
+        .toTarget @a
+        .connect(sender)
 
 
   Transmitter.withDifferentTransmissionOrders (Transmitter, order) ->

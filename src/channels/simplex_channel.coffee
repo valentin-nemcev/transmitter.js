@@ -3,19 +3,19 @@
 
 assert = require 'assert'
 
-NodeConnectionLine = require './node_connection_line'
-ConnectionNodeLine = require './connection_node_line'
-MergingConnectionTarget = require './merging_connection_target'
-Connection = require './connection'
+NodeConnectionLine = require '../connection/node_connection_line'
+ConnectionNodeLine = require '../connection/connection_node_line'
+MergingConnectionTarget = require '../connection/merging_connection_target'
+Connection = require '../connection/connection'
 
 
-module.exports = class ConnectionBuilder
+module.exports = class SimplexChannel
 
 
   returnArg = (arg) -> arg
 
 
-  constructor: (@Transmitter) ->
+  constructor: ->
     @sources = []
     @targets = []
 
@@ -74,8 +74,8 @@ module.exports = class ConnectionBuilder
     @connection ?= new Connection(@getSource(), @getTarget(), @getTransform())
 
 
-  connect: ->
-    @Transmitter.connect(@getConnection())
+  connect: (sender) ->
+    sender.createConnectMessage().sendToConnection(@getConnection())
 
 
   receiveConnectionMessage: (message) ->

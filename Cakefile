@@ -24,3 +24,10 @@ task 'specs:unit', ->
 
 task 'specs:examples', ->
   exec(mochaCmd(exampleSpecs))
+
+
+task 'deps', ->
+  invoke 'build'
+  exec("#{bin}/madge -x '^(index|dom)' -t build | dot -Tpng", silent: yes)
+    .output.to("deps.png")
+  # exec "#{bin}/madge -x '^(index|dom)' -i deps.png build"
