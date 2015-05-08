@@ -4,19 +4,14 @@
 Transmission = require 'transmitter/transmission/transmission'
 Query = require 'transmitter/transmission/query'
 Message = require 'transmitter/transmission/message'
-NodeSource = require 'transmitter/connection/node_source'
-NodeTarget = require 'transmitter/connection/node_target'
+StatefulNode = require 'transmitter/nodes/stateful_node'
 
 
 class StubPayload
   deliver: ->
 
-class NodeStub
-  NodeSource.extend(this)
-  NodeTarget.extend(this)
-  respondToQuery: (tr) ->
-    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
-    return this
+class NodeStub extends StatefulNode
+  createResponsePayload: -> new StubPayload()
 
 class TargetStub
   receiveMessage: ->
@@ -33,14 +28,14 @@ describe 'Query queue', ->
     @node = new NodeStub()
     @target = new TargetStub()
     @node.getNodeSource().connectTarget(@target)
-    sinon.spy(@node, 'respondToQuery')
+    sinon.spy(@node, 'createResponsePayload')
     sinon.spy(@target, 'receiveMessage')
     @query = new Query()
 
     @transmission.enqueueQueryFor(@query, @node)
     @transmission.respondToQueries()
 
-    expect(@node.respondToQuery).to.have.been.calledOnce
+    expect(@node.createResponsePayload).to.have.been.calledOnce
 
 
   it 'responds to queries with higher priority first', ->

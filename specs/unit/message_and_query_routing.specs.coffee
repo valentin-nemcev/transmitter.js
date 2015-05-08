@@ -12,8 +12,6 @@ class StubPayload
   deliver: ->
 
 class NodeStub extends StatefulNode
-  getResponseMessage: (tr) -> tr.createMessage(new StubPayload())
-  getRelayedMessage:  (tr) -> tr.createMessage(new StubPayload())
 
 class TargetStub
   receiveMessage: ->

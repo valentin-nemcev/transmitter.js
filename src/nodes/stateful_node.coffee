@@ -15,7 +15,7 @@ module.exports = class StatefulNode
 
   routeMessage: (payload, tr) ->
     payload.deliver(this)
-    tr.createMessage(StatePayload.create(this))
+    tr.createMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
@@ -26,13 +26,13 @@ module.exports = class StatefulNode
 
 
   respondToQuery: (tr) ->
-    tr.createMessage(StatePayload.create(this))
+    tr.createMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
 
   updateState: (value, tr) ->
-    tr.createMessage(StatePayload.createFromValue(value))
+    tr.createMessage(@createOriginPayload(value))
       .sendToNodeTarget(@getNodeTarget())
     return this
 
@@ -40,3 +40,15 @@ module.exports = class StatefulNode
   queryState: (tr) ->
     tr.createQuery(directions.forward).sendToNodeTarget(@getNodeTarget())
     return this
+
+
+  createResponsePayload: ->
+    StatePayload.create(this)
+
+
+  createRelayPayload: ->
+    StatePayload.create(this)
+
+
+  createOriginPayload: (value) ->
+    StatePayload.createFromValue(value)

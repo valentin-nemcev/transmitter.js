@@ -2,7 +2,7 @@
 
 
 assert = require 'assert'
-{MergedPayload} = require './payloads'
+MergedPayload = require '../payloads/merged'
 
 
 module.exports = class Message

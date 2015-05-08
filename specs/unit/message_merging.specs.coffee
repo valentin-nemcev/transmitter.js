@@ -1,6 +1,6 @@
 'use strict'
 
-NodeSource = require 'transmitter/connection/node_source'
+EventSource = require 'transmitter/nodes/event_source'
 SimplexChannel = require 'transmitter/channels/simplex_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
@@ -10,15 +10,8 @@ Transmitter = require 'transmitter'
 
 class StubPayload
 
-class NodeStub
-  NodeSource.extend(this)
-
-  routeQuery: (query) ->
-    query.completeRouting(this)
-    return this
-
-  respondToQuery: (tr) ->
-    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
+class NodeStub extends EventSource
+  createResponsePayload: -> new StubPayload()
 
 class TargetStub
   receiveMessage: ->
@@ -35,10 +28,8 @@ describe 'Message merging', ->
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
     @passiveSource = new NodeStub()
-    sinon.stub(@passiveSource, 'respondToQuery', (tr) =>
-      tr.createMessage(@passivePayload)
-        .sendToNodeSource(@passiveSource.getNodeSource())
-    )
+    sinon.stub(@passiveSource, 'createResponsePayload')
+      .returns(@passivePayload)
 
     @compositeSource = new SimplexChannel()
       .createMergingSource([@activeSource, @passiveSource])

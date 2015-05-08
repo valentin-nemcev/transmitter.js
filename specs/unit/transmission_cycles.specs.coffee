@@ -1,7 +1,8 @@
 'use strict'
 
-NodeSource = require 'transmitter/connection/node_source'
-NodeTarget = require 'transmitter/connection/node_target'
+EventSource = require 'transmitter/nodes/event_source'
+EventTarget = require 'transmitter/nodes/event_target'
+StatefulNode = require 'transmitter/nodes/stateful_node'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
 Query = require 'transmitter/transmission/query'
@@ -10,34 +11,19 @@ Query = require 'transmitter/transmission/query'
 class StubPayload
   deliver: ->
 
-class NodeStub
-  NodeSource.extend(this)
-  NodeTarget.extend(this)
+class NodeStub extends StatefulNode
 
-class SourceNodeStub
+class SourceNodeStub extends EventSource
   inspect: -> '[SourceNodeStub]'
 
-  NodeSource.extend(this)
-
-  respondToQuery: (tr) ->
-    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
-    return this
-
-  routeQuery: (query) ->
-    query.completeRouting(this)
-    return this
+  createResponsePayload: -> new StubPayload()
 
 
-class TargetNodeStub
+class TargetNodeStub extends EventTarget
 
   inspect: -> '[TargetNodeStub]'
 
-  NodeTarget.extend(this)
-
-  respondToQuery: (tr) ->
-    return this
-
-  routeMessage: ->
+  createResponsePayload: -> new StubPayload()
 
 
 class TargetStub
@@ -121,7 +107,7 @@ describe 'Transmission cycles', ->
       @target = new TargetStub()
       @sourceNode.getNodeSource().connectTarget(@target)
       sinon.spy(@target, 'receiveMessage')
-      sinon.stub(@sourceNode, 'respondToQuery').returns(@sourceNode)
+      sinon.spy(@sourceNode, 'createResponsePayload')
 
 
     specify 'second message should not be sent', ->
@@ -143,7 +129,7 @@ describe 'Transmission cycles', ->
       @query2.sendToNodeSource(@sourceNode.getNodeSource())
       @transmission.respondToQueries()
 
-      expect(@sourceNode.respondToQuery).to.not.have.been.called
+      expect(@sourceNode.createResponsePayload).to.not.have.been.called
 
 
     specify 'second query should be delivered', ->
@@ -154,4 +140,4 @@ describe 'Transmission cycles', ->
       @query2.sendToNodeSource(@sourceNode.getNodeSource())
       @transmission.respondToQueries()
 
-      expect(@sourceNode.respondToQuery).to.have.been.calledTwice
+      expect(@sourceNode.createResponsePayload).to.have.been.calledTwice

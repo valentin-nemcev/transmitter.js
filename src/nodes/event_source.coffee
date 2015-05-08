@@ -16,12 +16,20 @@ module.exports = class EventSource
 
 
   respondToQuery: (tr) ->
-    tr.createMessage(ValuePayload.create(null))
+    tr.createMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
 
   originate: (value, tr) ->
-    tr.createMessage(ValuePayload.create(value))
+    tr.createMessage(@createOriginPayload(value))
       .sendToNodeSource(@getNodeSource())
     return this
+
+
+  createResponsePayload: ->
+    ValuePayload.create(null)
+
+
+  createOriginPayload: (value) ->
+    ValuePayload.create(value)

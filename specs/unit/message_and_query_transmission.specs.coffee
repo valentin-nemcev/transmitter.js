@@ -1,7 +1,7 @@
 'use strict'
 
-NodeSource = require 'transmitter/connection/node_source'
-NodeTarget = require 'transmitter/connection/node_target'
+EventSource = require 'transmitter/nodes/event_source'
+EventTarget = require 'transmitter/nodes/event_target'
 SimplexChannel = require 'transmitter/channels/simplex_channel'
 
 Message = require 'transmitter/transmission/message'
@@ -14,21 +14,10 @@ Transmitter = require 'transmitter'
 class StubPayload
   deliver: ->
 
-class NodeSourceStub
-  NodeSource.extend(this)
+class NodeSourceStub extends EventSource
+  createResponsePayload: -> new StubPayload()
 
-  routeQuery: (query) ->
-    query.completeRouting(this)
-    return this
-
-  respondToQuery: (tr) ->
-    tr.createMessage(new StubPayload()).sendToNodeSource(@getNodeSource())
-    return this
-
-
-class NodeTargetStub
-  NodeTarget.extend(this)
-  routeMessage: -> return this
+class NodeTargetStub extends EventTarget
 
 
 describe 'Message and query transmission', ->
@@ -48,25 +37,23 @@ describe 'Message and query transmission', ->
 
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@target, 'routeMessage')
+    sinon.spy(@payload, 'deliver')
     @message = new Message(@transmission, @payload)
 
     @message.sendToNodeSource(@source.getNodeSource())
 
-    expect(@target.routeMessage).to.have.been
-      .calledWith(sinon.match.same(@payload))
+    expect(@payload.deliver).to.have.been
+      .calledWith(sinon.match.same(@target))
 
 
   it 'transmits query from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@target, 'routeMessage')
-    sinon.stub(@source, 'respondToQuery', (tr) =>
-      tr.createMessage(@payload).sendToNodeSource(@source.getNodeSource())
-    )
+    sinon.spy(@payload, 'deliver')
+    sinon.stub(@source, 'createResponsePayload').returns(@payload)
     @query = new Query(@transmission)
 
     @query.sendToNodeTarget(@target.getNodeTarget())
     @transmission.respondToQueries()
 
-    expect(@target.routeMessage).to.have.been
-      .calledWith(sinon.match.same(@payload))
+    expect(@payload.deliver).to.have.been
+      .calledWith(sinon.match.same(@target))
