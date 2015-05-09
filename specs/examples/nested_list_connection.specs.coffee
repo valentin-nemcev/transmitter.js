@@ -38,7 +38,7 @@ class NestedListChannelNode extends Transmitter.Nodes.ChannelNode
     return this
 
 
-  getValue: -> @channels ? []
+  get: -> @channels ? []
 
   setValue: (newChannels) ->
     oldChannels = @channels
@@ -99,9 +99,9 @@ describe 'Nested list connection', ->
 
 
   specify 'then update is transmitted to derived list', ->
-    derivedItems = @derivedList.getValue()
+    derivedItems = @derivedList.get()
 
     expect(derivedItems.map (item) -> item.name)
       .to.deep.equal(['Derived item 1', 'Derived item 2'])
-    expect(derivedItems.map (item) -> item.valueVar.getValue())
+    expect(derivedItems.map (item) -> item.valueVar.get())
       .to.deep.equal(['Derived value 1', 'Derived value 2'])

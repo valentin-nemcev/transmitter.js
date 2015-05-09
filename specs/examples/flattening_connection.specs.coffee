@@ -34,7 +34,7 @@ class VariableChannelNode extends ChannelNode
     return this
 
 
-  getValue: -> @channel
+  get: -> @channel
 
   setValue: (newChannel) ->
     oldChannel = @channel
@@ -65,7 +65,7 @@ describe 'Flattening connection', ->
         .fromSource @serializedVar
         .toTarget @nestedVar
         .withTransform (payload) ->
-          payload.mapValue (serialized, object) ->
+          payload.map (serialized, object) ->
             if object? and serialized.name == object.name
               return object
             else
@@ -76,7 +76,7 @@ describe 'Flattening connection', ->
         .fromSource @nestedVar
         .toConnectionTarget @nestedChannelVar
         .withTransform (payload) =>
-          payload.mapValue (nestedObject) =>
+          payload.map (nestedObject) =>
             new Transmitter.Channels.VariableChannel()
               .withOrigin nestedObject?.valueVar
               .withMapOrigin (value) -> {name: nestedObject.name, value}
@@ -94,9 +94,9 @@ describe 'Flattening connection', ->
     Transmitter.startTransmission (tr) =>
       @serializedVar.updateState(serialized, tr)
 
-    nestedObject = @nestedVar.getValue()
+    nestedObject = @nestedVar.get()
     expect(nestedObject.name).to.equal('objectA')
-    expect(nestedObject.valueVar.getValue()).to.equal('value1')
+    expect(nestedObject.valueVar.get()).to.equal('value1')
 
 
   specify 'updating flat target after outer source update', ->
@@ -106,7 +106,7 @@ describe 'Flattening connection', ->
       nestedObject.valueVar.updateState('value1', tr)
       @nestedVar.updateState(nestedObject, tr)
 
-    expect(@serializedVar.getValue())
+    expect(@serializedVar.get())
       .to.deep.equal({name: 'objectA', value: 'value1'})
 
 
@@ -118,5 +118,5 @@ describe 'Flattening connection', ->
     Transmitter.startTransmission (tr) =>
       @serializedVar.queryState(tr)
 
-    expect(@serializedVar.getValue())
+    expect(@serializedVar.get())
       .to.deep.equal({name: 'objectA', value: 'value1'})

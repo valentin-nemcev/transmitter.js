@@ -12,7 +12,7 @@ Transmitter = require 'transmitter'
 
 
 class StubPayload
-  deliver: ->
+  deliverToEventTarget: ->
 
 class NodeSourceStub extends EventSource
   createResponsePayload: -> new StubPayload()
@@ -37,23 +37,23 @@ describe 'Message and query transmission', ->
 
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@payload, 'deliver')
+    sinon.spy(@payload, 'deliverToEventTarget')
     @message = new Message(@transmission, @payload)
 
     @message.sendToNodeSource(@source.getNodeSource())
 
-    expect(@payload.deliver).to.have.been
+    expect(@payload.deliverToEventTarget).to.have.been
       .calledWith(sinon.match.same(@target))
 
 
   it 'transmits query from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@payload, 'deliver')
+    sinon.spy(@payload, 'deliverToEventTarget')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
     @query = new Query(@transmission)
 
     @query.sendToNodeTarget(@target.getNodeTarget())
     @transmission.respondToQueries()
 
-    expect(@payload.deliver).to.have.been
+    expect(@payload.deliverToEventTarget).to.have.been
       .calledWith(sinon.match.same(@target))

@@ -8,7 +8,7 @@ module.exports = class ListChannel extends DuplexChannel
 
   mapPayloadValue = (map) ->
     (payload) ->
-      payload.mapValue (list) ->
+      payload.map (list) ->
         list.map map
 
   withMapOrigin:  (map) -> @withTransformOrigin  mapPayloadValue(map)

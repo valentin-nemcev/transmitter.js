@@ -38,10 +38,10 @@ describe 'Multilevel merging', ->
       return name for name, value of this when value == node
 
     reduceMergedPayload = (payload) ->
-      payload.reduceValue({}, (result, node, value) ->
+      payload.reduce({}, (result, node, value) ->
         result[getVarName(node)] = value
         result
-      ).toState()
+      )
 
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.EventChannel()
@@ -76,7 +76,7 @@ describe 'Multilevel merging', ->
         @d2.updateState('d2UpdatedValue', tr)
         @b2.updateState('b2UpdatedValue', tr)
 
-      expect(@a.getValue()).to.deep.equal({
+      expect(@a.get()).to.deep.equal({
         b1:
           d1: 'd1Value'
           d2: 'd2UpdatedValue'

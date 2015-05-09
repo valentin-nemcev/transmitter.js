@@ -11,7 +11,7 @@ module.exports = class EventTarget
   NodeTarget.extend this
 
   routeMessage: (payload, tr) ->
-    payload.deliver(this)
+    payload.deliverToEventTarget(this)
     return this
 
 

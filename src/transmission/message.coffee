@@ -69,7 +69,7 @@ module.exports = class Message
     for key in sourceKeys
       message = @transmission.getMessageFor(key.getNodeSource())
       continue unless message?
-      mergedPayload.set(key, message.getPayload())
+      mergedPayload.setAt(key, message.getPayload())
 
     if mergedPayload.isPresent()
       target.receiveMessage(@_copyWithPayload(mergedPayload))

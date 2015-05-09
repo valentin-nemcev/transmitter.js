@@ -38,5 +38,5 @@ describe 'Value updates preserve identity', ->
     Transmitter.startTransmission (tr) =>
       @stringVar.updateState('nameA:value1', tr)
 
-    expect(@objectVar.getValue()).to.equal(@object)
+    expect(@objectVar.get()).to.equal(@object)
     expect(@object.value).to.equal('value1')

@@ -14,4 +14,4 @@ module.exports = class CheckboxStateVar extends StatefulNode
 
     setValue: (value) -> @element.checked = value; this
 
-    getValue: -> @element.checked
+    get: -> @element.checked

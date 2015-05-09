@@ -6,11 +6,11 @@ Variable = require './variable'
 
 module.exports = class Record
 
-  @defineLazy = (name, getValue) ->
+  @defineLazy = (name, get) ->
     Object.defineProperty @prototype, name, 
       enumerable: yes, configurable: yes
       get: ->
-        value = getValue.call(this)
+        value = get.call(this)
         value.inspect ?= => this.inspect() + '.' + name
         Object.defineProperty this, name,
           enumerable: yes, writable: no, value: value

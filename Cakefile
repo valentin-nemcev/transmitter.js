@@ -28,6 +28,4 @@ task 'specs:examples', ->
 
 task 'deps', ->
   invoke 'build'
-  exec("#{bin}/madge -x '^(index|dom)' -t build | dot -Tpng", silent: yes)
-    .output.to("deps.png")
-  # exec "#{bin}/madge -x '^(index|dom)' -i deps.png build"
+  exec "#{bin}/madge -x '^(index|dom|assert|util)' -i deps.png build"

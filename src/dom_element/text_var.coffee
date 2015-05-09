@@ -10,4 +10,4 @@ module.exports = class TextVar extends StatefulNode
 
     setValue: (value) -> @element.textContent = value; this
 
-    getValue: -> @element.textContent
+    get: -> @element.textContent

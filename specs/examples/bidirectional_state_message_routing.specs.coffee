@@ -48,8 +48,8 @@ describe 'Bidirectional state message routing', ->
       @tagJSON.queryState(tr)
       @tagInput.queryState(tr)
 
-    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
-    expect(@tagInput.getValue()).to.equal('tagA, tagB')
+    expect(@tagJSON.get()).to.equal('["tagA","tagB"]')
+    expect(@tagInput.get()).to.equal('tagA, tagB')
 
 
   specify 'when origin node is updated, \
@@ -57,8 +57,8 @@ describe 'Bidirectional state message routing', ->
     Transmitter.startTransmission (tr) =>
       @tagSet.updateState(new Set(['tagB', 'tagA']), tr)
 
-    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
-    expect(@tagInput.getValue()).to.equal('tagA, tagB')
+    expect(@tagJSON.get()).to.equal('["tagA","tagB"]')
+    expect(@tagInput.get()).to.equal('tagA, tagB')
 
 
   specify 'when dervied node is updated, \
@@ -66,8 +66,8 @@ describe 'Bidirectional state message routing', ->
     Transmitter.startTransmission (tr) =>
       @tagInput.updateState('tagA, tagB', tr)
 
-    expect(Array.from(@tagSet.getValue())).to.deep.equal(['tagA', 'tagB'])
-    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
+    expect(Array.from(@tagSet.get())).to.deep.equal(['tagA', 'tagB'])
+    expect(@tagJSON.get()).to.equal('["tagA","tagB"]')
 
 
   specify 'when intermediate node is updated, \
@@ -75,6 +75,6 @@ describe 'Bidirectional state message routing', ->
     Transmitter.startTransmission (tr) =>
       @tagSet.updateState(['tagA', 'tagB'], tr)
 
-    expect(Array.from(@tagSet.getValue())).to.deep.equal(['tagA', 'tagB'])
-    expect(@tagJSON.getValue()).to.equal('["tagA","tagB"]')
-    expect(@tagInput.getValue()).to.equal('tagA, tagB')
+    expect(Array.from(@tagSet.get())).to.deep.equal(['tagA', 'tagB'])
+    expect(@tagJSON.get()).to.equal('["tagA","tagB"]')
+    expect(@tagInput.get()).to.equal('tagA, tagB')

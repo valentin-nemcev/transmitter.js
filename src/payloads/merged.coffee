@@ -15,27 +15,23 @@ module.exports = class MergedPayload
     assert(false, "Can't deliver MergedPayload")
 
 
-  reduceValue: (initial, reduce) ->
+  reduce: (initial, reduce) ->
     result = initial
     for [node, payload] in Array.from(@payloads.entries())
-      result = reduce(result, node, payload.getValue())
+      result = reduce(result, node, payload.get())
     new ValuePayload(result)
 
 
   fetch: (struct) ->
-    new StructPayload(struct).map (key) => @payloads.get(key)
+    new StructPayload(struct).map (key) => @getAt(key)
 
 
-  replaceWithValue: (value) ->
-    new ValuePayload(value)
-
-
-  set: (key, payload) ->
+  setAt: (key, payload) ->
     @payloads.set(key, payload)
     return this
 
 
-  get: (key) ->
+  getAt: (key) ->
     @payloads.get(key)
 
 

@@ -14,4 +14,4 @@ module.exports = class InputValueVar extends StatefulNode
 
     setValue: (value) -> @element.value = value; this
 
-    getValue: -> @element.value
+    get: -> @element.value

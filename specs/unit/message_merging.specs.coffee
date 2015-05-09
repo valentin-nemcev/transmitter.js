@@ -68,5 +68,5 @@ describe 'Message merging', ->
     mergedPayload = mergedMessage.getPayload()
 
 
-    expect(mergedPayload.get(@activeSource)).to.equal(@activePayload)
-    expect(mergedPayload.get(@passiveSource)).to.equal(@passivePayload)
+    expect(mergedPayload.getAt(@activeSource)).to.equal(@activePayload)
+    expect(mergedPayload.getAt(@passiveSource)).to.equal(@passivePayload)

@@ -8,4 +8,4 @@ module.exports = class Variable extends StatefulNode
 
     setValue: (@value) -> this
 
-    getValue: -> @value
+    get: -> @value

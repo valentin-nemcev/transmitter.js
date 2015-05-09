@@ -15,30 +15,30 @@ class exports.ValuePayload
   inspect: -> "value: #{inspect @value}"
 
 
-  toState: ->
-    new exports.StatePayload(this)
+  get: -> @value
 
 
-  getValue: ->
-    @value
-
-
-  mapValue: (map) ->
-    new exports.ValuePayload(map(@value))
-
-
-  map: -> @mapValue(arguments...)
-
-
-  replaceWhenPresent: (payload) ->
+  map: (map) ->
     if @value?
-      payload
+      new exports.ValuePayload(map(@value))
     else
       this
 
 
-  deliver: (targetNode) ->
+  flatMap: (map) ->
+    if @value?
+      map(@value)
+    else
+      this
+
+
+  deliverToEventTarget: (targetNode) ->
     targetNode.receiveValue(@value)
+    return this
+
+
+  deliver: (targetNode) ->
+    targetNode.setValue(@value)
     return this
 
 
@@ -55,6 +55,11 @@ class exports.ListPayload
     return new exports.ListPayload(@list.map(map))
 
 
+  deliverToEventTarget: (targetNode) ->
+    targetNode.receiveValue(@list)
+    return this
+
+
   deliver: (targetNode) ->
     targetNode.setValue(@list)
     return this
@@ -68,7 +73,7 @@ class exports.StatePayload
 
 
   @createFromValue = (value) =>
-    return new this(getValue: -> value)
+    return new this(get: -> value)
 
 
   constructor: (@node, @update) ->
@@ -78,25 +83,27 @@ class exports.StatePayload
 
 
   toValue: ->
-    new exports.ValuePayload(@getValue())
+    new exports.ValuePayload(@get())
 
 
-  getValue: ->
-    @node.getValue()
+  get: ->
+    @node.get()
 
 
-  mapValue: (map) ->
+  map: (map) ->
     new exports.StatePayload(@node, map)
 
 
-  map: -> @mapValue(arguments...)
+  deliverToEventTarget: (targetNode) ->
+    targetNode.receiveValue(@get())
+    return this
 
 
   deliver: (targetNode) ->
     value = if @update?
-      @update(@getValue(), targetNode.getValue())
+      @update(@get(), targetNode.get())
     else
-      @getValue()
+      @get()
     targetNode.setValue(value)
     return this
 
@@ -104,9 +111,26 @@ class exports.StatePayload
 
 class exports.StructPayload
 
-  constructor: (struct = {}) ->
-    this[key] = val for own key, val of struct
 
+  @createStructOrValue = (value) ->
+    if value?.constructor in [Object, Array]
+      new exports.StructPayload(value)
+    else
+      value
+
+
+  constructor: (value = {}) ->
+    this[key] = val for own key, val of value
+
+
+  get: ->
+    result = if @length? then [] else {}
+    result[key] = val for own key, val of this
+    return result
+
+
+  morph: (morph) ->
+    @constructor.createStructOrValue(morph(@get()))
 
   map: (map) ->
     result = new @constructor()
@@ -117,7 +141,7 @@ class exports.StructPayload
   zip: ->
     result = []
     for own key, val of this
-      for el, i in val.getValue()
+      for el, i in val.get()
         result[i] ?= new @constructor()
         result[i][key] = el
 

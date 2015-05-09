@@ -9,7 +9,7 @@ Query = require 'transmitter/transmission/query'
 
 
 class StubPayload
-  deliver: ->
+  deliverToEventTarget: ->
 
 class NodeStub extends StatefulNode
 

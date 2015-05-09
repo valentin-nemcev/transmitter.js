@@ -24,8 +24,9 @@ describe 'Connection with merge and query', ->
         .fromSource(@button)
         .fromSource(@textInput)
         .withTransform (payloads) =>
-          payloads.get(@button)
-            .replaceWhenPresent(payloads.get(@textInput).toValue())
+          payloads.fetch([@button, @textInput])
+            .morph ([buttonWasClicked, textValue]) ->
+              buttonWasClicked.flatMap -> textValue
         .toTarget @alertEmitter
         .connect(tr)
 
