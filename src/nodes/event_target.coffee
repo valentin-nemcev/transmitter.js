@@ -3,7 +3,7 @@
 
 NodeTarget = require '../connection/node_target'
 
-{ValuePayload} = require '../transmission/payloads'
+ValuePayload = require '../payloads/value'
 
 
 module.exports = class EventTarget

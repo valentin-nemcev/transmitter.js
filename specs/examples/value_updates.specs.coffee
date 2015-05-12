@@ -7,7 +7,7 @@ VariableNode = Transmitter.Nodes.Variable
 
 class StatefulObject
 
-  constructor: (@name, @value = null) ->
+  constructor: (@name) ->
 
 
 describe 'Value updates preserve identity', ->
@@ -19,15 +19,11 @@ describe 'Value updates preserve identity', ->
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.VariableChannel()
         .withOrigin @objectVar
-        .withMapOrigin (object) -> [object.name, object.value].join(':')
-        .withUpdateOrigin (string, object) ->
-          [name, value] = string.split(':')
-          if object? and name == object.name
-            object.value = value
-            return object
-          else
-            return new StatefulObject(name, value)
         .withDerived @stringVar
+        .withMapOrigin (object) -> object.name
+        .withMapDerived (string) -> new StatefulObject(string)
+        .withMatchDerivedOrigin (string, object) ->
+          object? and string == object.name
         .connect(tr)
 
 
@@ -36,7 +32,6 @@ describe 'Value updates preserve identity', ->
     @objectVar.setValue(@object)
 
     Transmitter.startTransmission (tr) =>
-      @stringVar.updateState('nameA:value1', tr)
+      @stringVar.updateState('nameA', tr)
 
     expect(@objectVar.get()).to.equal(@object)
-    expect(@object.value).to.equal('value1')

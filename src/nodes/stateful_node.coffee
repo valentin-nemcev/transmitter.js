@@ -4,7 +4,7 @@
 NodeSource = require '../connection/node_source'
 NodeTarget = require '../connection/node_target'
 
-{StatePayload} = require '../transmission/payloads'
+ValuePayload = require '../payloads/value'
 directions = require '../directions'
 
 module.exports = class StatefulNode
@@ -43,12 +43,12 @@ module.exports = class StatefulNode
 
 
   createResponsePayload: ->
-    StatePayload.create(this)
+    ValuePayload.create(this)
 
 
   createRelayPayload: ->
-    StatePayload.create(this)
+    ValuePayload.create(this)
 
 
   createOriginPayload: (value) ->
-    StatePayload.createFromValue(value)
+    ValuePayload.createFromValue(value)

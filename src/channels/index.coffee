@@ -5,4 +5,5 @@ module.exports = {
   VariableChannel: require './variable_channel'
   ListChannel:     require './list_channel'
   EventChannel:    require './event_channel'
+  ConstChannel:    require './const_channel'
 }

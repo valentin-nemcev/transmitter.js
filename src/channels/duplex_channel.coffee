@@ -17,6 +17,11 @@ module.exports = class DuplexChannel
   withTransformDerived: (@transformDerived) -> this
 
 
+  getTransformOrigin: -> @transformOrigin
+  getTransformDerived: -> @transformDerived
+
+
+
   _createSimplex: (source, target, transform, direction) ->
     new SimplexChannel()
       .inDirection direction
@@ -27,12 +32,12 @@ module.exports = class DuplexChannel
 
   _getForwardSimplex: ->
     @forwardSimplex ?=
-      @_createSimplex(@origin, @derived, @transformOrigin, forward)
+      @_createSimplex(@origin, @derived, @getTransformOrigin(), forward)
 
 
   _getBackwardSimplex: ->
     @backwardSimplex ?=
-      @_createSimplex(@derived, @origin, @transformDerived, backward)
+      @_createSimplex(@derived, @origin, @getTransformDerived(), backward)
 
 
   connect: (tr) ->

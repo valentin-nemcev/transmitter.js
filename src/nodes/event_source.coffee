@@ -3,7 +3,7 @@
 
 NodeSource = require '../connection/node_source'
 
-{ValuePayload} = require '../transmission/payloads'
+ValuePayload = require '../payloads/value'
 
 
 module.exports = class EventSource
@@ -28,8 +28,8 @@ module.exports = class EventSource
 
 
   createResponsePayload: ->
-    ValuePayload.create(null)
+    ValuePayload.createFromValue(null)
 
 
   createOriginPayload: (value) ->
-    ValuePayload.create(value)
+    ValuePayload.createFromValue(value)

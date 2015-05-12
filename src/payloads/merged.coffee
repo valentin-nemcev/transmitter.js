@@ -1,8 +1,8 @@
 'use strict'
 
 
-{ValuePayload, StructPayload} = require '../transmission/payloads'
-
+StructPayload = require './struct'
+ValuePayload = require './value'
 
 
 module.exports = class MergedPayload
@@ -19,7 +19,7 @@ module.exports = class MergedPayload
     result = initial
     for [node, payload] in Array.from(@payloads.entries())
       result = reduce(result, node, payload.get())
-    new ValuePayload(result)
+    ValuePayload.createFromValue(result)
 
 
   fetch: (struct) ->

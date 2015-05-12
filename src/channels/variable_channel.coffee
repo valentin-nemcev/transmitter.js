@@ -6,11 +6,24 @@ DuplexChannel = require './duplex_channel'
 
 module.exports = class VariableChannel extends DuplexChannel
 
-  mapPayloadValue = (map) ->
-    (payload) -> payload.map(map)
+  createTransform = (map, match) ->
+    if match?
+      (payload) -> payload.update (source, target) ->
+        if match(source, target) then target else map(source)
+    else
+      (payload) -> payload.map(map)
 
-  withMapOrigin:  (map) -> @withTransformOrigin  mapPayloadValue(map)
-  withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)
+
+  getTransformOrigin:  -> createTransform(@mapOrigin,  @matchOriginDerived)
+  getTransformDerived: -> createTransform(@mapDerived, @matchDerivedOrigin)
+
+  withMapOrigin:  (@mapOrigin)  -> this
+  withMapDerived: (@mapDerived) -> this
+
+
+  withMatchDerivedOrigin: (@matchDerivedOrigin) -> this
+  withMatchOriginDerived: (@matchOriginDerived) -> this
+
 
 
   withUpdateOrigin:  (update) -> @withMapDerived(update)
