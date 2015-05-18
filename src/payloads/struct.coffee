@@ -6,7 +6,6 @@ ListPayload = require './list'
 
 module.exports = class StructPayload
 
-
   @createStructOrValue = (value) ->
     if value?.constructor in [Object, Array]
       new StructPayload(value)
@@ -26,6 +25,7 @@ module.exports = class StructPayload
 
   morph: (morph) ->
     @constructor.createStructOrValue(morph(@get()))
+
 
   map: (map) ->
     result = new @constructor()

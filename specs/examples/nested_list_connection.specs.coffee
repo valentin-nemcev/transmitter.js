@@ -2,7 +2,7 @@
 
 
 Transmitter = require 'transmitter'
-ConnectionPayload = require 'transmitter/payloads/connection'
+
 
 class ListItem extends Transmitter.Nodes.Record
 
@@ -11,42 +11,6 @@ class ListItem extends Transmitter.Nodes.Record
   constructor: (@name) ->
 
   @defineVar 'valueVar'
-
-
-class NestedListChannelNode extends Transmitter.Nodes.ChannelNode
-
-  setSource: (@source) ->
-
-  receiveConnectionMessage: (message) ->
-    return this
-
-
-  receiveQuery: (query) ->
-    @source.receiveQuery(query)
-    return this
-
-
-  receiveMessage: (@message) ->
-    @message.getPayload().deliver(this)
-    @message = null
-    return this
-
-
-  connect: (channel) ->
-    payload = ConnectionPayload.connect(this)
-    @message.sendToConnectionWithPayload(channel, payload)
-    return this
-
-
-  get: -> @channels ? []
-
-  setValue: (newChannels) ->
-    oldChannels = @channels
-    @channels = newChannels
-
-    # oldChannel?.disconnect(@message)
-    @connect(newChannel) for newChannel in newChannels
-    this
 
 
 
@@ -67,7 +31,7 @@ describe 'Nested list connection', ->
       .withMapDerived (derivedItem) ->
         new ListItem(derivedToOrigin(derivedItem.name))
 
-    @define 'nestedListChannelNode', new NestedListChannelNode()
+    @define 'nestedListChannelNode', new Transmitter.Nodes.ListChannel()
 
     Transmitter.startTransmission (tr) =>
 

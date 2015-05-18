@@ -2,50 +2,9 @@
 
 
 Transmitter = require 'transmitter'
-ConnectionPayload = require 'transmitter/payloads/connection'
-
-VariableNode = Transmitter.Nodes.Variable
-ChannelNode = Transmitter.Nodes.ChannelNode
-Record = Transmitter.Nodes.Record
 
 
-class VariableChannelNode extends ChannelNode
-
-  setSource: (@source) ->
-
-  receiveConnectionMessage: (message) ->
-    return this
-
-
-  receiveQuery: (query) ->
-    @source.receiveQuery(query)
-    return this
-
-
-  receiveMessage: (@message) ->
-    @message.getPayload().deliver(this)
-    @message = null
-    return this
-
-
-  connect: (channel) ->
-    payload = ConnectionPayload.connect(this)
-    @message.sendToConnectionWithPayload(channel, payload)
-    return this
-
-
-  get: -> @channel
-
-  setValue: (newChannel) ->
-    oldChannel = @channel
-    @channel = newChannel
-
-    # oldChannel?.disconnect(@message)
-    @connect(newChannel)
-    this
-
-
-class NestedObject extends Record
+class NestedObject extends Transmitter.Nodes.Record
 
   constructor: (@name) ->
 
@@ -55,9 +14,9 @@ class NestedObject extends Record
 describe 'Flattening connection', ->
 
   beforeEach ->
-    @define 'serializedVar', new VariableNode()
-    @define 'nestedVar', new VariableNode()
-    @define 'nestedChannelVar', new VariableChannelNode()
+    @define 'serializedVar', new Transmitter.Nodes.Variable()
+    @define 'nestedVar', new Transmitter.Nodes.Variable()
+    @define 'nestedChannelVar', new Transmitter.Nodes.VariableChannel()
 
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.EventChannel()

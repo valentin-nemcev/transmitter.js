@@ -19,11 +19,6 @@ module.exports = class Message
     return copy
 
 
-  sendToConnectionWithPayload: (connection, payload) ->
-    @transmission.createConnectionMessage(payload)
-      .sendToConnection(connection)
-
-
   getPayload: ->
     return @payload
 

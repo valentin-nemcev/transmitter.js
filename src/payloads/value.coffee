@@ -14,7 +14,6 @@ class ConstValue
 
 class ValueUpdatePayload
 
-
   constructor: (@source, opts = {}) ->
     @updateFn = opts.update
 
