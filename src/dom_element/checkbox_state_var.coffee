@@ -8,9 +8,9 @@ Transmitter = require '../transmitter'
 module.exports = class CheckboxStateVar extends StatefulNode
 
     constructor: (@element) ->
-      @element.addEventListener 'click', @triggerUpdate
-
-    triggerUpdate: => Transmitter.originate(this)
+      @element.addEventListener 'click', =>
+        Transmitter.startTransmission (tr) =>
+          @originate(tr)
 
     setValue: (value) -> @element.checked = value; this
 

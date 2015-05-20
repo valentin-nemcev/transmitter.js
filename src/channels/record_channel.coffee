@@ -23,3 +23,9 @@ module.exports = class RecordChannel
     for channel in @getChannels()
       channel.receiveConnectionMessage(message)
     return this
+
+
+  connect: (tr) ->
+    for channel in @getChannels()
+      channel.connect(tr)
+    return this

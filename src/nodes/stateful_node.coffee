@@ -31,8 +31,14 @@ module.exports = class StatefulNode
     return this
 
 
+  originate: (tr) ->
+    tr.createMessage(@createOriginPayload())
+      .sendToNodeSource(@getNodeSource())
+    return this
+
+
   updateState: (value, tr) ->
-    tr.createMessage(@createOriginPayload(value))
+    tr.createMessage(@createUpdatePayload(value))
       .sendToNodeTarget(@getNodeTarget())
     return this
 
@@ -50,5 +56,9 @@ module.exports = class StatefulNode
     ValuePayload.create(this)
 
 
-  createOriginPayload: (value) ->
+  createOriginPayload: ->
+    ValuePayload.create(this)
+
+
+  createUpdatePayload: (value) ->
     ValuePayload.createFromValue(value)

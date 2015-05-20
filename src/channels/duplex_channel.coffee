@@ -44,7 +44,7 @@ module.exports = class DuplexChannel
     tr.createConnectionMessage(ConnectionPayload.connect())
       .sendToConnection(@_getForwardSimplex())
       .sendToConnection(@_getBackwardSimplex())
-    return null
+    return this
 
 
   receiveConnectionMessage: (message) ->

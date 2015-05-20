@@ -7,7 +7,9 @@ Transmitter = require '../transmitter'
 
 module.exports = class DOMEvent extends EventSource
 
-    constructor: (@element, @type) ->
-      @element.addEventListener @type, @triggerEvent
+  constructor: (@element, @type) ->
+    @element.addEventListener @type, @triggerEvent
 
-    triggerEvent: (ev) => Transmitter.originate(this, ev)
+  triggerEvent: (ev) =>
+    Transmitter.startTransmission (tr) =>
+      @originate(ev, tr)

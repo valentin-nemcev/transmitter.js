@@ -7,11 +7,11 @@ Transmitter = require '../transmitter'
 
 module.exports = class InputValueVar extends StatefulNode
 
-    constructor: (@element) ->
-      @element.addEventListener 'input', @triggerUpdate
+  constructor: (@element) ->
+    @element.addEventListener 'input', =>
+      Transmitter.startTransmission (tr) =>
+        @originate(tr)
 
-    triggerUpdate: => Transmitter.originate(this)
+  setValue: (value) -> @element.value = value; this
 
-    setValue: (value) -> @element.value = value; this
-
-    get: -> @element.value
+  get: -> @element.value
