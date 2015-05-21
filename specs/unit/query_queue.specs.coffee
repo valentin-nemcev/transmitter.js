@@ -4,13 +4,13 @@
 Transmission = require 'transmitter/transmission/transmission'
 Query = require 'transmitter/transmission/query'
 Message = require 'transmitter/transmission/message'
-StatefulNode = require 'transmitter/nodes/stateful_node'
+RelayNode = require 'transmitter/nodes/relay_node'
 
 
 class StubPayload
   deliver: ->
 
-class NodeStub extends StatefulNode
+class NodeStub extends RelayNode
   createResponsePayload: -> new StubPayload()
 
 class TargetStub

@@ -1,6 +1,6 @@
 'use strict'
 
-StatefulNode = require 'transmitter/nodes/stateful_node'
+RelayNode = require 'transmitter/nodes/relay_node'
 NodeConnectionLine = require 'transmitter/connection/node_connection_line'
 ConnectionNodeLine = require 'transmitter/connection/connection_node_line'
 Transmission = require 'transmitter/transmission/transmission'
@@ -11,7 +11,7 @@ Query = require 'transmitter/transmission/query'
 class StubPayload
   deliver: ->
 
-class NodeStub extends StatefulNode
+class NodeStub extends RelayNode
 
 class TargetStub
   receiveMessage: ->

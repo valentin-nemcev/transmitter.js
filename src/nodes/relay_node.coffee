@@ -7,7 +7,7 @@ NodeTarget = require '../connection/node_target'
 ValuePayload = require '../payloads/value'
 directions = require '../directions'
 
-module.exports = class StatefulNode
+module.exports = class RelayNode
 
   NodeSource.extend this
   NodeTarget.extend this

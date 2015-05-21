@@ -1,7 +1,7 @@
 'use strict'
 
-EventSource = require 'transmitter/nodes/event_source'
-EventTarget = require 'transmitter/nodes/event_target'
+SourceNode = require 'transmitter/nodes/source_node'
+TargetNode = require 'transmitter/nodes/target_node'
 SimplexChannel = require 'transmitter/channels/simplex_channel'
 
 Message = require 'transmitter/transmission/message'
@@ -12,12 +12,12 @@ Transmitter = require 'transmitter'
 
 
 class StubPayload
-  deliverToEventTarget: ->
+  deliverToTargetNode: ->
 
-class NodeSourceStub extends EventSource
+class NodeSourceStub extends SourceNode
   createResponsePayload: -> new StubPayload()
 
-class NodeTargetStub extends EventTarget
+class NodeTargetStub extends TargetNode
 
 
 describe 'Message and query transmission', ->
@@ -37,23 +37,23 @@ describe 'Message and query transmission', ->
 
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@payload, 'deliverToEventTarget')
+    sinon.spy(@payload, 'deliverToTargetNode')
     @message = new Message(@transmission, @payload)
 
     @message.sendToNodeSource(@source.getNodeSource())
 
-    expect(@payload.deliverToEventTarget).to.have.been
+    expect(@payload.deliverToTargetNode).to.have.been
       .calledWith(sinon.match.same(@target))
 
 
   it 'transmits query from source to target', ->
     @payload = new StubPayload()
-    sinon.spy(@payload, 'deliverToEventTarget')
+    sinon.spy(@payload, 'deliverToTargetNode')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
     @query = new Query(@transmission)
 
     @query.sendToNodeTarget(@target.getNodeTarget())
     @transmission.respondToQueries()
 
-    expect(@payload.deliverToEventTarget).to.have.been
+    expect(@payload.deliverToTargetNode).to.have.been
       .calledWith(sinon.match.same(@target))

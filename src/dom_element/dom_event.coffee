@@ -1,11 +1,11 @@
 'use strict'
 
 
-EventSource = require '../nodes/event_source'
+SourceNode = require '../nodes/source_node'
 Transmitter = require '../transmitter'
 
 
-module.exports = class DOMEvent extends EventSource
+module.exports = class DOMEvent extends SourceNode
 
   constructor: (@element, @type) ->
     @element.addEventListener @type, @triggerEvent

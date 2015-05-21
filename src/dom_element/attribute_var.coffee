@@ -1,10 +1,10 @@
 'use strict'
 
 
-StatefulNode = require '../nodes/stateful_node'
+RelayNode = require '../nodes/relay_node'
 
 
-module.exports = class TextVar extends StatefulNode
+module.exports = class TextVar extends RelayNode
 
     constructor: (@element, @attributeName) ->
 

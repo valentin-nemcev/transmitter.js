@@ -1,10 +1,10 @@
 'use strict'
 
 
-StatefulNode = require './stateful_node'
+RelayNode = require './relay_node'
 
 
-module.exports = class Variable extends StatefulNode
+module.exports = class Variable extends RelayNode
 
     setValue: (@value) -> this
 

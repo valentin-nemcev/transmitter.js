@@ -1,6 +1,6 @@
 'use strict'
 
-EventSource = require 'transmitter/nodes/event_source'
+SourceNode = require 'transmitter/nodes/source_node'
 SimplexChannel = require 'transmitter/channels/simplex_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
@@ -10,7 +10,7 @@ Transmitter = require 'transmitter'
 
 class StubPayload
 
-class NodeStub extends EventSource
+class NodeStub extends SourceNode
   createResponsePayload: -> new StubPayload()
 
 class TargetStub

@@ -16,7 +16,7 @@ module.exports = class ListPayload
     return new ListPayload(@list.map(map))
 
 
-  deliverToEventTarget: (targetNode) ->
+  deliverToTargetNode: (targetNode) ->
     targetNode.receiveValue(@list)
     return this
 

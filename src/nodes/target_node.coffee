@@ -6,12 +6,12 @@ NodeTarget = require '../connection/node_target'
 ValuePayload = require '../payloads/value'
 
 
-module.exports = class EventTarget
+module.exports = class TargetNode
 
   NodeTarget.extend this
 
   routeMessage: (payload, tr) ->
-    payload.deliverToEventTarget(this)
+    payload.deliverToTargetNode(this)
     return this
 
 

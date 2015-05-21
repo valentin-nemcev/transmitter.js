@@ -1,11 +1,11 @@
 'use strict'
 
 
-StatefulNode = require '../nodes/stateful_node'
+RelayNode = require '../nodes/relay_node'
 Transmitter = require '../transmitter'
 
 
-module.exports = class InputValueVar extends StatefulNode
+module.exports = class InputValueVar extends RelayNode
 
   constructor: (@element) ->
     @element.addEventListener 'input', =>

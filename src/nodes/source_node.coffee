@@ -6,7 +6,7 @@ NodeSource = require '../connection/node_source'
 ValuePayload = require '../payloads/value'
 
 
-module.exports = class EventSource
+module.exports = class SourceNode
 
   NodeSource.extend this
 

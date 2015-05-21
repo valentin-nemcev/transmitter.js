@@ -1,25 +1,25 @@
 'use strict'
 
-EventSource = require 'transmitter/nodes/event_source'
-EventTarget = require 'transmitter/nodes/event_target'
-StatefulNode = require 'transmitter/nodes/stateful_node'
+SourceNode = require 'transmitter/nodes/source_node'
+TargetNode = require 'transmitter/nodes/target_node'
+RelayNode = require 'transmitter/nodes/relay_node'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
 Query = require 'transmitter/transmission/query'
 
 
 class StubPayload
-  deliverToEventTarget: ->
+  deliverToTargetNode: ->
 
-class NodeStub extends StatefulNode
+class NodeStub extends RelayNode
 
-class SourceNodeStub extends EventSource
+class SourceNodeStub extends SourceNode
   inspect: -> '[SourceNodeStub]'
 
   createResponsePayload: -> new StubPayload()
 
 
-class TargetNodeStub extends EventTarget
+class TargetNodeStub extends TargetNode
 
   inspect: -> '[TargetNodeStub]'
 

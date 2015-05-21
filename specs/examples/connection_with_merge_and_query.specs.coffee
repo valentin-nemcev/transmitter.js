@@ -4,7 +4,7 @@
 Transmitter = require 'transmitter'
 
 
-class AlertEmitter extends Transmitter.Nodes.EventTarget
+class AlertEmitter extends Transmitter.Nodes.TargetNode
 
   alert: ->
 
@@ -14,7 +14,7 @@ class AlertEmitter extends Transmitter.Nodes.EventTarget
 describe 'Connection with merge and query', ->
 
   beforeEach ->
-    @define 'button', new Transmitter.Nodes.EventSource()
+    @define 'button', new Transmitter.Nodes.SourceNode()
     @define 'textInput', new Transmitter.Nodes.Variable()
     @define 'alertEmitter', new AlertEmitter()
     sinon.spy(@alertEmitter, 'alert')

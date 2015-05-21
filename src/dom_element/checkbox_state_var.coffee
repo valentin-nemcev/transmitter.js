@@ -1,11 +1,11 @@
 'use strict'
 
 
-StatefulNode = require '../nodes/stateful_node'
+RelayNode = require '../nodes/relay_node'
 Transmitter = require '../transmitter'
 
 
-module.exports = class CheckboxStateVar extends StatefulNode
+module.exports = class CheckboxStateVar extends RelayNode
 
     constructor: (@element) ->
       @element.addEventListener 'click', =>

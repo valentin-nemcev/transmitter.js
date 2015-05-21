@@ -1,9 +1,9 @@
 'use strict'
 
 module.exports = {
-  EventSource:  require './event_source'
-  EventTarget:  require './event_target'
-  StatefulNode: require './stateful_node'
+  SourceNode:  require './source_node'
+  TargetNode:  require './target_node'
+  RelayNode: require './relay_node'
 
   ChannelNode:     require './channel_node'
   VariableChannel: require './variable_channel'

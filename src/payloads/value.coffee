@@ -68,7 +68,7 @@ module.exports = class ValuePayload
     @map (value) -> map(value).get()
 
 
-  deliverToEventTarget: (targetNode) ->
+  deliverToTargetNode: (targetNode) ->
     targetNode.receiveValue(@get())
     return this
 
