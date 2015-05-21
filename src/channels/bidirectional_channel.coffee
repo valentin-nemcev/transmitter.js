@@ -2,12 +2,12 @@
 
 
 {forward, backward} = require '../directions'
-SimplexChannel = require './simplex_channel'
+SimpleChannel = require './simple_channel'
 
 ConnectionPayload = require '../payloads/connection'
 
 
-module.exports = class DuplexChannel
+module.exports = class BidirectionalChannel
 
   withOrigin:  (@origin)  -> this
   withDerived: (@derived) -> this
@@ -22,32 +22,32 @@ module.exports = class DuplexChannel
 
 
 
-  _createSimplex: (source, target, transform, direction) ->
-    new SimplexChannel()
+  _createSimple: (source, target, transform, direction) ->
+    new SimpleChannel()
       .inDirection direction
       .fromSource source
       .toTarget target
       .withTransform transform
 
 
-  _getForwardSimplex: ->
-    @forwardSimplex ?=
-      @_createSimplex(@origin, @derived, @getTransformOrigin(), forward)
+  _getForwardSimple: ->
+    @forwardSimple ?=
+      @_createSimple(@origin, @derived, @getTransformOrigin(), forward)
 
 
-  _getBackwardSimplex: ->
-    @backwardSimplex ?=
-      @_createSimplex(@derived, @origin, @getTransformDerived(), backward)
+  _getBackwardSimple: ->
+    @backwardSimple ?=
+      @_createSimple(@derived, @origin, @getTransformDerived(), backward)
 
 
   connect: (tr) ->
     tr.createConnectionMessage(ConnectionPayload.connect())
-      .sendToConnection(@_getForwardSimplex())
-      .sendToConnection(@_getBackwardSimplex())
+      .sendToConnection(@_getForwardSimple())
+      .sendToConnection(@_getBackwardSimple())
     return this
 
 
   receiveConnectionMessage: (message) ->
-    @_getForwardSimplex().receiveConnectionMessage(message)
-    @_getBackwardSimplex().receiveConnectionMessage(message)
+    @_getForwardSimple().receiveConnectionMessage(message)
+    @_getBackwardSimple().receiveConnectionMessage(message)
     return this

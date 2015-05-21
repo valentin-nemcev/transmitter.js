@@ -1,7 +1,7 @@
 'use strict'
 
 
-DuplexChannel = require './duplex_channel'
+BidirectionalChannel = require './bidirectional_channel'
 
 
 module.exports = class RecordChannel
@@ -13,7 +13,7 @@ module.exports = class RecordChannel
 
   createChannels: ->
     for createChannel in @channelCreateFunctions
-      createChannel.call(this, new DuplexChannel())
+      createChannel.call(this, new BidirectionalChannel())
 
 
   getChannels: -> @channels ?= @createChannels()

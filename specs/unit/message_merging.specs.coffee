@@ -1,7 +1,7 @@
 'use strict'
 
 SourceNode = require 'transmitter/nodes/source_node'
-SimplexChannel = require 'transmitter/channels/simplex_channel'
+SimpleChannel = require 'transmitter/channels/simple_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
 ConnectionPayload = require 'transmitter/payloads/connection'
@@ -31,7 +31,7 @@ describe 'Message merging', ->
     sinon.stub(@passiveSource, 'createResponsePayload')
       .returns(@passivePayload)
 
-    @compositeSource = new SimplexChannel()
+    @compositeSource = new SimpleChannel()
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)

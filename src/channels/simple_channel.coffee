@@ -11,7 +11,7 @@ Connection = require '../connection/connection'
 ConnectionPayload = require '../payloads/connection'
 
 
-module.exports = class SimplexChannel
+module.exports = class SimpleChannel
 
 
   returnArg = (arg) -> arg

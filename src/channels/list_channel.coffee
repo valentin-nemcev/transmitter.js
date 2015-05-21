@@ -1,10 +1,10 @@
 'use strict'
 
 
-DuplexChannel = require './duplex_channel'
+BidirectionalChannel = require './bidirectional_channel'
 
 
-module.exports = class ListChannel extends DuplexChannel
+module.exports = class ListChannel extends BidirectionalChannel
 
   mapPayloadValue = (map) ->
     (payload) ->

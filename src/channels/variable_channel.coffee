@@ -1,10 +1,10 @@
 'use strict'
 
 
-DuplexChannel = require './duplex_channel'
+BidirectionalChannel = require './bidirectional_channel'
 
 
-module.exports = class VariableChannel extends DuplexChannel
+module.exports = class VariableChannel extends BidirectionalChannel
 
   createTransform = (map, match) ->
     if match?
