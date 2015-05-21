@@ -11,6 +11,9 @@ exampleSpecs = 'specs/examples.specs.coffee'
 task 'build', ->
   exec "#{bin}/coffee -o build -c src"
 
+task 'clean', ->
+  rm '-rf', 'build/*'
+
 task 'specs', ->
   exec(mochaCmd unitSpecs, exampleSpecs)
 
