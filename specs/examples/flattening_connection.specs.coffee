@@ -19,7 +19,7 @@ describe 'Flattening connection', ->
     @define 'nestedChannelVar', new Transmitter.ChannelNodes.ChannelVariable()
 
     Transmitter.startTransmission (tr) =>
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSource @serializedVar
         .toTarget @nestedVar
@@ -31,7 +31,7 @@ describe 'Flattening connection', ->
               return new NestedObject(serialized.name)
         .connect(tr)
 
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource @nestedVar
         .toConnectionTarget @nestedChannelVar
         .withTransform (payload) =>

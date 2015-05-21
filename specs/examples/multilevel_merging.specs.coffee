@@ -44,24 +44,24 @@ describe 'Multilevel merging', ->
       )
 
     Transmitter.startTransmission (tr) =>
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource(@d1)
         .fromSource(@d2)
         .withTransform reduceMergedPayload
         .toTarget @c1
         .connect(tr)
 
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource @c1
         .toTarget @b1
         .connect(tr)
 
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource @c2
         .toTarget @b1
         .connect(tr)
 
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource(@b1)
         .fromSource(@b2)
         .withTransform reduceMergedPayload

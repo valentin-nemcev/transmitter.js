@@ -37,7 +37,7 @@ describe 'Nested list connection', ->
 
       listChannel.connect(tr)
 
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource @originList
         .fromSource @derivedList
         .toConnectionTarget @nestedListChannelNode

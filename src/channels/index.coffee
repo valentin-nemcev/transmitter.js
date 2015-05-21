@@ -1,9 +1,9 @@
 'use strict'
 
 module.exports = {
-  RecordChannel:   require './record_channel'
-  VariableChannel: require './variable_channel'
-  ListChannel:     require './list_channel'
-  EventChannel:    require './event_channel'
-  ConstChannel:    require './const_channel'
+  SimpleChannel:    require './simple_channel'
+  CompositeChannel: require './composite_channel'
+  ConstChannel:     require './const_channel'
+  VariableChannel:  require './variable_channel'
+  ListChannel:      require './list_channel'
 }

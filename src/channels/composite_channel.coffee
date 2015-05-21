@@ -1,10 +1,7 @@
 'use strict'
 
 
-BidirectionalChannel = require './bidirectional_channel'
-
-
-module.exports = class RecordChannel
+module.exports = class CompositeChannel
 
   @defineChannel = (createChannel) ->
     (@::channelCreateFunctions ?= []).push createChannel
@@ -13,7 +10,7 @@ module.exports = class RecordChannel
 
   createChannels: ->
     for createChannel in @channelCreateFunctions
-      createChannel.call(this, new BidirectionalChannel())
+      createChannel.call(this)
 
 
   getChannels: -> @channels ?= @createChannels()

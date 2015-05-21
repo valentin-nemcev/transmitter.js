@@ -20,7 +20,7 @@ describe 'Connection with merge and query', ->
     sinon.spy(@alertEmitter, 'alert')
 
     Transmitter.startTransmission (tr) =>
-      new Transmitter.Channels.EventChannel()
+      new Transmitter.Channels.SimpleChannel()
         .fromSource(@button)
         .fromSource(@textInput)
         .withTransform (payloads) =>

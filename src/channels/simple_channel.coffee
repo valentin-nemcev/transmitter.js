@@ -3,6 +3,8 @@
 
 assert = require 'assert'
 
+{forward, backward} = require '../directions'
+
 NodeConnectionLine = require '../connection/node_connection_line'
 ConnectionNodeLine = require '../connection/connection_node_line'
 MergingConnectionTarget = require '../connection/merging_connection_target'
@@ -21,6 +23,9 @@ module.exports = class SimpleChannel
     @sources = []
     @targets = []
 
+
+  inForwardDirection: -> @inDirection(forward)
+  inBackwardDirection: -> @inDirection(backward)
 
   inDirection: (@direction) ->
     return this

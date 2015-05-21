@@ -2,12 +2,14 @@
 
 
 {forward, backward} = require '../directions'
+
 SimpleChannel = require './simple_channel'
+CompositeChannel = require './composite_channel'
 
 ConnectionPayload = require '../payloads/connection'
 
 
-module.exports = class BidirectionalChannel
+module.exports = class BidirectionalChannel extends CompositeChannel
 
   withOrigin:  (@origin)  -> this
   withDerived: (@derived) -> this
@@ -21,8 +23,7 @@ module.exports = class BidirectionalChannel
   getTransformDerived: -> @transformDerived
 
 
-
-  _createSimple: (source, target, transform, direction) ->
+  createSimple = (source, target, transform, direction) ->
     new SimpleChannel()
       .inDirection direction
       .fromSource source
@@ -30,24 +31,9 @@ module.exports = class BidirectionalChannel
       .withTransform transform
 
 
-  _getForwardSimple: ->
-    @forwardSimple ?=
-      @_createSimple(@origin, @derived, @getTransformOrigin(), forward)
+  @defineChannel ->
+    createSimple(@origin, @derived, @getTransformOrigin(), forward)
 
 
-  _getBackwardSimple: ->
-    @backwardSimple ?=
-      @_createSimple(@derived, @origin, @getTransformDerived(), backward)
-
-
-  connect: (tr) ->
-    tr.createConnectionMessage(ConnectionPayload.connect())
-      .sendToConnection(@_getForwardSimple())
-      .sendToConnection(@_getBackwardSimple())
-    return this
-
-
-  receiveConnectionMessage: (message) ->
-    @_getForwardSimple().receiveConnectionMessage(message)
-    @_getBackwardSimple().receiveConnectionMessage(message)
-    return this
+  @defineChannel ->
+    createSimple(@derived, @origin, @getTransformDerived(), backward)
