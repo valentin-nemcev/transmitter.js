@@ -4,7 +4,7 @@
 ChannelNode = require './channel_node'
 
 
-module.exports = class ListChannel extends ChannelNode
+module.exports = class ChannelList extends ChannelNode
 
   get: -> @channels ? []
 

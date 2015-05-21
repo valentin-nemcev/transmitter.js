@@ -16,7 +16,7 @@ describe 'Flattening connection', ->
   beforeEach ->
     @define 'serializedVar', new Transmitter.Nodes.Variable()
     @define 'nestedVar', new Transmitter.Nodes.Variable()
-    @define 'nestedChannelVar', new Transmitter.Nodes.VariableChannel()
+    @define 'nestedChannelVar', new Transmitter.ChannelNodes.ChannelVariable()
 
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.EventChannel()

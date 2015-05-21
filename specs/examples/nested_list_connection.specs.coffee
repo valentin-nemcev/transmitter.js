@@ -31,7 +31,7 @@ describe 'Nested list connection', ->
       .withMapDerived (derivedItem) ->
         new ListItem(derivedToOrigin(derivedItem.name))
 
-    @define 'nestedListChannelNode', new Transmitter.Nodes.ListChannel()
+    @define 'nestedListChannelNode', new Transmitter.ChannelNodes.ChannelList()
 
     Transmitter.startTransmission (tr) =>
 

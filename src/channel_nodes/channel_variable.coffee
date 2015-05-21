@@ -4,7 +4,7 @@
 ChannelNode = require './channel_node'
 
 
-module.exports = class VariableChannel extends ChannelNode
+module.exports = class ChannelVariable extends ChannelNode
 
   get: -> @channel
 
