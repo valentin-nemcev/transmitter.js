@@ -52,7 +52,7 @@ module.exports = class Message
 
   sendTransformedTo: (transform, target) ->
     copy = if transform?
-      @_copyWithPayload(transform(@payload))
+      @_copyWithPayload(transform(@payload, @transmission))
     else
       this
     target.receiveMessage(copy)

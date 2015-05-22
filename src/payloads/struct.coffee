@@ -40,4 +40,4 @@ module.exports = class StructPayload
         result[i] ?= new @constructor()
         result[i][key] = el
 
-    return new ListPayload(result)
+    return ListPayload.createFromValue(result)

@@ -4,13 +4,14 @@
 NodeSource = require '../connection/node_source'
 NodeTarget = require '../connection/node_target'
 
-ValuePayload = require '../payloads/value'
 directions = require '../directions'
 
 module.exports = class RelayNode
 
   NodeSource.extend this
   NodeTarget.extend this
+
+  inspect: -> '[' + @constructor.name + ']'
 
 
   routeMessage: (payload, tr) ->
@@ -49,16 +50,12 @@ module.exports = class RelayNode
 
 
   createResponsePayload: ->
-    ValuePayload.create(this)
 
 
   createRelayPayload: ->
-    ValuePayload.create(this)
 
 
   createOriginPayload: ->
-    ValuePayload.create(this)
 
 
   createUpdatePayload: (value) ->
-    ValuePayload.createFromValue(value)

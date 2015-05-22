@@ -10,6 +10,9 @@ module.exports = class TargetNode
 
   NodeTarget.extend this
 
+  inspect: -> '[' + @constructor.name + ']'
+
+
   routeMessage: (payload, tr) ->
     payload.deliverToTargetNode(this)
     return this

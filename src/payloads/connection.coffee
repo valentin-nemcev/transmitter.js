@@ -1,6 +1,9 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
+
 module.exports = class ConnectionPayload
 
   @connect = (origin) -> new this(origin)

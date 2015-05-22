@@ -2,19 +2,36 @@
 
 
 RelayNode = require './relay_node'
+ListPayload = require '../payloads/list'
 
 
-module.exports = class Variable extends RelayNode
+module.exports = class List extends RelayNode
 
-    constructor: ->
-      @list = []
-
-
-    setValue: (list) ->
-      @list.length = 0
-      @list.push list...
-      this
+  createResponsePayload: ->
+    ListPayload.create(this)
 
 
-    get: ->
-      @list.slice()
+  createRelayPayload: ->
+    ListPayload.create(this)
+
+
+  createOriginPayload: ->
+    ListPayload.create(this)
+
+
+  createUpdatePayload: (value) ->
+    ListPayload.createFromValue(value)
+
+
+  constructor: ->
+    @list = []
+
+
+  setValue: (list) ->
+    @list.length = 0
+    @list.push list...
+    this
+
+
+  get: ->
+    @list.slice()

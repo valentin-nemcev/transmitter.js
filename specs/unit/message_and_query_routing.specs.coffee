@@ -12,6 +12,12 @@ class StubPayload
   deliver: ->
 
 class NodeStub extends RelayNode
+  createResponsePayload: ->
+    new StubPayload()
+
+  createRelayPayload: ->
+    new StubPayload()
+
 
 class TargetStub
   receiveMessage: ->

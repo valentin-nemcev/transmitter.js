@@ -2,10 +2,27 @@
 
 
 RelayNode = require './relay_node'
+ValuePayload = require '../payloads/value'
 
 
 module.exports = class Variable extends RelayNode
 
-    setValue: (@value) -> this
+  createResponsePayload: ->
+    ValuePayload.create(this)
 
-    get: -> @value
+
+  createRelayPayload: ->
+    ValuePayload.create(this)
+
+
+  createOriginPayload: ->
+    ValuePayload.create(this)
+
+
+  createUpdatePayload: (value) ->
+    ValuePayload.createFromValue(value)
+
+
+  setValue: (@value) -> this
+
+  get: -> @value

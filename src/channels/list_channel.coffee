@@ -10,8 +10,7 @@ module.exports = class ListChannel extends BidirectionalChannel
 
   mapPayloadValue = (map) ->
     (payload) ->
-      payload.map (list) ->
-        list.map map
+      payload.map map
 
   withMapOrigin:  (map) -> @withTransformOrigin  mapPayloadValue(map)
   withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)

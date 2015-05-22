@@ -1,13 +1,13 @@
 'use strict'
 
 
-RelayNode = require '../nodes/relay_node'
+Variable = require '../nodes/variable'
 
 
-module.exports = class TextVar extends RelayNode
+module.exports = class TextVar extends Variable
 
-    constructor: (@element) ->
+  constructor: (@element) ->
 
-    setValue: (value) -> @element.textContent = value; this
+  setValue: (value) -> @element.textContent = value; this
 
-    get: -> @element.textContent
+  get: -> @element.textContent

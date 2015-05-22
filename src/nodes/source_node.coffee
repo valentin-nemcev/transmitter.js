@@ -10,6 +10,9 @@ module.exports = class SourceNode
 
   NodeSource.extend this
 
+  inspect: -> '[' + @constructor.name + ']'
+
+
   routeQuery: (query) ->
     query.completeRouting(this)
     return this

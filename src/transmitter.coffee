@@ -1,6 +1,8 @@
 'use strict'
 
 
+require 'es6-shim'
+
 Transmission = require './transmission/transmission'
 
 
@@ -15,12 +17,8 @@ module.exports = new class Transmitter
     {@reverseOrder} = opts
 
 
-  withLogging: (state, doWithLogging) ->
-    if arguments.length is 1
-      [state, doWithLogging] = [yes, state]
+  setLogging: (state) ->
     Transmission::loggingIsEnabled = state
-    doWithLogging()
-    Transmission::loggingIsEnabled = no
     return this
 
 
