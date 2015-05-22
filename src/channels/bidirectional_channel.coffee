@@ -19,8 +19,25 @@ module.exports = class BidirectionalChannel extends CompositeChannel
   withTransformDerived: (@transformDerived) -> this
 
 
-  getTransformOrigin: -> @transformOrigin
-  getTransformDerived: -> @transformDerived
+  withMapOrigin:  (@mapOrigin)  -> this
+  withMapDerived: (@mapDerived) -> this
+
+  withMatchDerivedOrigin: (@matchDerivedOrigin) -> this
+  withMatchOriginDerived: (@matchOriginDerived) -> this
+
+
+  createTransform = (map, match) ->
+    if match?
+      (payload) -> payload.mapIfMatch(map, match)
+    else
+      (payload) -> payload.map(map)
+
+
+  getTransformOrigin:  ->
+    @transformOrigin ? createTransform(@mapOrigin,  @matchOriginDerived)
+
+  getTransformDerived: ->
+    @transformDerived ? createTransform(@mapDerived, @matchDerivedOrigin)
 
 
   createSimple = (source, target, transform, direction) ->

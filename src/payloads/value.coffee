@@ -15,12 +15,15 @@ class ConstValue
 class ValueUpdatePayload
 
   constructor: (@source, opts = {}) ->
-    @updateFn = opts.update
+    @mapFn = opts.map
+    @matchFn = opts.match
 
 
-  deliver: (targetNode) ->
-    value = @updateFn.call(null, @source.get(), targetNode.get())
-    targetNode.setValue(value)
+  deliver: (target) ->
+    sourceValue = @source.get()
+    targetValue = target.get()
+    unless @matchFn.call(null, sourceValue, targetValue)
+      target.setValue(@mapFn.call(null, sourceValue))
     return this
 
 
@@ -60,8 +63,8 @@ module.exports = class ValuePayload
     new ValuePayload(this, {ifEmpty})
 
 
-  update: (update) ->
-    new ValueUpdatePayload(this, {update})
+  mapIfMatch: (map, match) ->
+    new ValueUpdatePayload(this, {map, match})
 
 
   flatMap: (map) ->

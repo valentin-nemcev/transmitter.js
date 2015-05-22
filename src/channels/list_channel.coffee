@@ -8,17 +8,6 @@ ChannelList = require '../channel_nodes/channel_list'
 
 module.exports = class ListChannel extends BidirectionalChannel
 
-  mapPayloadValue = (map) ->
-    (payload) ->
-      payload.map map
-
-  withMapOrigin:  (map) -> @withTransformOrigin  mapPayloadValue(map)
-  withMapDerived: (map) -> @withTransformDerived mapPayloadValue(map)
-
-
-  withUpdateOrigin:  (update) -> @withMapDerived(update)
-  withUpdateDerived: (update) -> @withMapOrigin(update)
-
   withOriginDerivedChannel: (createOriginDerivedChannel) ->
     @nestedListChannelNode = new ChannelList()
     @defineChannel ->
