@@ -22,10 +22,10 @@
 ## Development tasks
 
 * Refactor
+  * Rename set/receiveValue and deliver methods
+  * Put transmission method argument to the first place
   * Better names for node and connection source/target
   * Don't use context in isolated tests, use context in scenarios.
-  * Adding messages and queries to and from nodes
-  * Message and query interaction with node sources and targets
   * Better message merging (symmetrical querying and caching)
 
 * Implement
