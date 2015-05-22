@@ -22,22 +22,43 @@ module.exports = class BidirectionalChannel extends CompositeChannel
   withMapOrigin:  (@mapOrigin)  -> this
   withMapDerived: (@mapDerived) -> this
 
+  initOrigin:  -> @initsOrigin = yes;  this
+  initDerived: -> @initsDerived = yes; this
+
   withMatchDerivedOrigin: (@matchDerivedOrigin) -> this
   withMatchOriginDerived: (@matchOriginDerived) -> this
 
 
-  createTransform = (map, match) ->
-    if match?
-      (payload) -> payload.mapIfMatch(map, match)
+  getMatchOriginDerived: ->
+      @matchOriginDerived or
+        if @matchDerivedOrigin?
+          (origin, derived) => @matchDerivedOrigin(derived, origin)
+
+  getMatchDerivedOrigin: ->
+      @matchDerivedOrigin or
+        if @matchOriginDerived?
+          (derived, origin) => @matchOriginDerived(origin, derived)
+
+
+  wrapMap = (map, tr, inits) ->
+    if inits
+      -> map(arguments...).init(tr)
     else
-      (payload) -> payload.map(map)
+      map
 
 
-  getTransformOrigin:  ->
-    @transformOrigin ? createTransform(@mapOrigin,  @matchOriginDerived)
+  createTransform = (map, match, inits) ->
+    if match?
+      (payload, tr) -> payload.mapIfMatch(wrapMap(map, tr, inits), match)
+    else
+      (payload, tr) -> payload.map(wrapMap(map, tr, inits))
 
-  getTransformDerived: ->
-    @transformDerived ? createTransform(@mapDerived, @matchDerivedOrigin)
+
+  getTransformOrigin:  -> @transformOrigin ?
+    createTransform(@mapOrigin,  @getMatchOriginDerived(), @initsOrigin)
+
+  getTransformDerived: -> @transformDerived ?
+    createTransform(@mapDerived, @getMatchDerivedOrigin(), @initsDerived)
 
 
   createSimple = (source, target, transform, direction) ->
