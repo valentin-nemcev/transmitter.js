@@ -30,8 +30,39 @@ module.exports = class List extends RelayNode
   set: (list) ->
     @list.length = 0
     @list.push list...
-    this
+    return this
+
+
+  setAt: (el, pos) ->
+    @list[pos] = el
+    return this
+
+
+  addAt: (el, pos) ->
+    if pos == @list.length
+      @list.push el
+    else
+      @list.splice(pos, 0, el)
+    return this
+
+
+  removeAt: (pos) ->
+    @list.splice(pos, 1)
+    return this
+
+
+  move: (fromPos, toPos) ->
+    @list.splice(toPos, 0, @list.splice(fromPos, 1)[0])
+    return this
 
 
   get: ->
     @list.slice()
+
+
+  getAt: (pos) ->
+    @list[pos]
+
+
+  getSize: ->
+    @list.length

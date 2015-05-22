@@ -10,6 +10,58 @@ class ConstValue
 
   get: -> @value
 
+  getAt: (pos) ->
+    @value[pos]
+
+  getSize: -> @value.length
+
+
+
+class ListUpdatePayload
+
+  constructor: (@source, opts = {}) ->
+    @mapFn = opts.map
+    @matchFn = opts.match
+
+
+  deliver: (target) ->
+    targetLength = target.getSize()
+    sourceLength = @source.getSize()
+
+    targetPos = sourcePos = 0
+    loop
+      if sourcePos < sourceLength
+        sourceEl = @source.getAt(sourcePos)
+
+        sourcePosInTarget = targetPos
+        while sourcePosInTarget < targetLength
+          targetElAtSourcePos = target.getAt(sourcePosInTarget)
+          break if @matchFn.call(null, sourceEl, targetElAtSourcePos)
+          sourcePosInTarget++
+
+        if sourcePosInTarget < targetLength # Target contains source element
+          if sourcePosInTarget != targetPos
+            target.move(sourcePosInTarget, targetPos)
+          targetPos++
+        else
+          target.addAt(@mapFn.call(null, sourceEl), targetPos)
+          targetLength++
+          targetPos++
+
+        sourcePos++
+
+      else if sourceLength <= sourcePos and targetPos < targetLength
+        if true # target.shouldRemoveAt(targetPos)
+          target.removeAt(targetPos)
+          targetLength--
+        else
+          targetPos++
+
+      else
+        break
+
+    return this
+
 
 
 module.exports = class ListPayload
@@ -39,6 +91,14 @@ module.exports = class ListPayload
       @ifEmptyFn.call(null)
 
 
+  getAt: (pos) ->
+    @mapFn.call(null, @source.getAt(pos))
+
+
+  getSize: ->
+    @source.getSize()
+
+
   map: (map) ->
     new ListPayload(this, {map})
 
@@ -47,11 +107,15 @@ module.exports = class ListPayload
     new ListPayload(this, {ifEmpty})
 
 
+  mapIfMatch: (map, match) ->
+    new ListUpdatePayload(this, {map, match})
+
+
   deliverToTargetNode: (targetNode) ->
     targetNode.receiveValue(@get())
     return this
 
 
   deliver: (targetNode) ->
-    targetNode.setValue(@get())
+    targetNode.set(@get())
     return this
