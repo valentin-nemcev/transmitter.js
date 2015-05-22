@@ -27,7 +27,7 @@ module.exports = class List extends RelayNode
     @list = []
 
 
-  setValue: (list) ->
+  set: (list) ->
     @list.length = 0
     @list.push list...
     this

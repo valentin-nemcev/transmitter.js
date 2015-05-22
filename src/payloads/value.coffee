@@ -23,7 +23,7 @@ class ValueUpdatePayload
     sourceValue = @source.get()
     targetValue = target.get()
     unless @matchFn.call(null, sourceValue, targetValue)
-      target.setValue(@mapFn.call(null, sourceValue))
+      target.set(@mapFn.call(null, sourceValue))
     return this
 
 
@@ -77,5 +77,5 @@ module.exports = class ValuePayload
 
 
   deliver: (targetNode) ->
-    targetNode.setValue(@get())
+    targetNode.set(@get())
     return this

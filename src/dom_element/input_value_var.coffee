@@ -12,6 +12,6 @@ module.exports = class InputValueVar extends Variable
       Transmitter.startTransmission (tr) =>
         @originate(tr)
 
-  setValue: (value) -> @element.value = value; this
+  set: (value) -> @element.value = value; this
 
   get: -> @element.value

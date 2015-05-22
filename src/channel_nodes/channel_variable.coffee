@@ -8,7 +8,7 @@ module.exports = class ChannelVariable extends ChannelNode
 
   get: -> @channel
 
-  setValue: (newChannel) ->
+  set: (newChannel) ->
     oldChannel = @channel
     @channel = newChannel
 

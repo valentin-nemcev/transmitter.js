@@ -29,7 +29,7 @@ describe 'Value updates preserve identity', ->
 
     specify 'state change message update target value instead of replacing', ->
       @object = new StatefulObject('nameA')
-      @objectVar.setValue(@object)
+      @objectVar.set(@object)
 
       Transmitter.startTransmission (tr) =>
         @stringVar.updateState('nameA', tr)
@@ -57,7 +57,7 @@ describe 'Value updates preserve identity', ->
     specify 'state change message update target value instead of replacing', ->
       @objectA = new StatefulObject('nameA')
       @objectB = new StatefulObject('nameB')
-      @objectList.setValue([@objectA, @objectB])
+      @objectList.set([@objectA, @objectB])
 
       Transmitter.startTransmission (tr) =>
         @stringList.updateState(['nameB', 'nameA'], tr)

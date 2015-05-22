@@ -23,6 +23,6 @@ module.exports = class Variable extends RelayNode
     ValuePayload.createFromValue(value)
 
 
-  setValue: (@value) -> this
+  set: (@value) -> this
 
   get: -> @value

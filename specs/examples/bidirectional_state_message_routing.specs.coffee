@@ -11,7 +11,7 @@ describe 'Bidirectional state message routing', ->
 
   beforeEach ->
     @define 'tagSet', new Transmitter.Nodes.Variable()
-    @tagSet.setValue(new Set())
+    @tagSet.set(new Set())
 
     @define 'tagSortedList', new Transmitter.Nodes.Variable()
     Transmitter.startTransmission (tr) =>
@@ -42,7 +42,7 @@ describe 'Bidirectional state message routing', ->
 
 
   specify 'when derived node is queried, it gets update from origin node', ->
-    @tagSet.setValue(new Set(['tagB', 'tagA']))
+    @tagSet.set(new Set(['tagB', 'tagA']))
 
     Transmitter.startTransmission (tr) =>
       @tagJSON.queryState(tr)

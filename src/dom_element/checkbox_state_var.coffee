@@ -12,6 +12,6 @@ module.exports = class CheckboxStateVar extends Variable
         Transmitter.startTransmission (tr) =>
           @originate(tr)
 
-    setValue: (value) -> @element.checked = value; this
+    set: (value) -> @element.checked = value; this
 
     get: -> @element.checked

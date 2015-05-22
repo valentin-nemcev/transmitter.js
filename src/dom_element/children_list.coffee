@@ -9,7 +9,7 @@ module.exports = class ChildrenList extends List
   constructor: (@element) ->
 
 
-  setValue: (elementList) ->
+  set: (elementList) ->
     while (el = @element.lastChild)?
       @element.removeChild(el)
 

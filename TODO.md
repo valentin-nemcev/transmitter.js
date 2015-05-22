@@ -22,7 +22,7 @@
 ## Development tasks
 
 * Refactor
-  * Rename set/receiveValue and deliver methods
+  * Rename receiveValue and deliver methods
   * Put transmission method argument to the first place
   * Better names for node and connection source/target
   * Don't use context in isolated tests, use context in scenarios.

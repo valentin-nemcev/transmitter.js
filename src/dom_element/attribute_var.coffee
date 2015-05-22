@@ -8,6 +8,6 @@ module.exports = class TextVar extends Variable
 
   constructor: (@element, @attributeName) ->
 
-  setValue: (value) -> @element[@attributeName] = value; this
+  set: (value) -> @element[@attributeName] = value; this
 
   get: -> @element[@attributeName]

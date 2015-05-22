@@ -19,20 +19,20 @@ describe 'Multilevel merging', ->
     @b1 = new VariableNode()
     @b2 = new VariableNode()
 
-    @b2.setValue('b2Value')
+    @b2.set('b2Value')
 
     @c1 = new VariableNode()
     @c2 = new VariableNode()
 
     # c2 should always have same value as c1, but this particular test
     # assertions should never see it
-    @c2.setValue('UnusedValue')
+    @c2.set('UnusedValue')
 
     @d1 = new VariableNode()
     @d2 = new VariableNode()
 
-    @d1.setValue('d1Value')
-    @d2.setValue('d2Value')
+    @d1.set('d1Value')
+    @d2.set('d2Value')
 
     getVarName = (node) =>
       return name for name, value of this when value == node

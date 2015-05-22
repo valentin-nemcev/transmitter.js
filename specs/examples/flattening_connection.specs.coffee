@@ -77,8 +77,8 @@ describe 'Flattening connection', ->
 
   specify 'querying flat target after outer source update', ->
     nestedObject = new NestedObject('objectA')
-    nestedObject.valueVar.setValue('value1')
-    @nestedVar.setValue(nestedObject)
+    nestedObject.valueVar.set('value1')
+    @nestedVar.set(nestedObject)
 
     Transmitter.startTransmission (tr) =>
       @serializedVar.queryState(tr)

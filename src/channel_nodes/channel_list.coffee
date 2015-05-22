@@ -8,7 +8,7 @@ module.exports = class ChannelList extends ChannelNode
 
   get: -> @channels ? []
 
-  setValue: (newChannels) ->
+  set: (newChannels) ->
     oldChannels = @channels
     @channels = newChannels
 
