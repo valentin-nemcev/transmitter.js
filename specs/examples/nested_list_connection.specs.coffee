@@ -30,26 +30,15 @@ describe 'Nested list connection', ->
       .withDerived @derivedList
       .withMapDerived (derivedItem) ->
         new ListItem(derivedToOrigin(derivedItem.name))
-
-    @define 'nestedListChannelNode', new Transmitter.ChannelNodes.ChannelList()
+      .withOriginDerivedChannel (originItem, derivedItem) ->
+        new Transmitter.Channels.VariableChannel()
+          .withOrigin originItem.valueVar
+          .withMapOrigin originToDerived
+          .withDerived derivedItem.valueVar
+          .withMapDerived derivedToOrigin
 
     Transmitter.startTransmission (tr) =>
-
       listChannel.connect(tr)
-
-      new Transmitter.Channels.SimpleChannel()
-        .fromSource @originList
-        .fromSource @derivedList
-        .toConnectionTarget @nestedListChannelNode
-        .withTransform (lists) =>
-          lists.fetch([@originList, @derivedList]).zip()
-            .map ([originItem, derivedItem]) ->
-              new Transmitter.Channels.VariableChannel()
-                .withOrigin originItem.valueVar
-                .withMapOrigin originToDerived
-                .withDerived derivedItem.valueVar
-                .withMapDerived derivedToOrigin
-        .connect(tr)
 
 
   specify 'when origin list is updated', ->
