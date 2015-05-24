@@ -14,7 +14,7 @@ module.exports = class TargetNode
 
 
   routeMessage: (tr, payload) ->
-    payload.deliverToTargetNode(this)
+    @acceptPayload(payload)
     return this
 
 

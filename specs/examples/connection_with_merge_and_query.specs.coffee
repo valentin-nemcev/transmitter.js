@@ -8,6 +8,10 @@ class AlertEmitter extends Transmitter.Nodes.TargetNode
 
   alert: ->
 
+  acceptPayload: (payload) ->
+    payload.deliverValue(this)
+    return this
+
   receiveValue: (messageStr) -> @alert(messageStr) if messageStr?
 
 

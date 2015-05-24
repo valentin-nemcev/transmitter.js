@@ -27,7 +27,7 @@ module.exports = class ConnectionNodeLine
 
 
   receiveConnectionMessage: (message) ->
-    message.deliverToLine(this)
+    message.sendToLine(this)
     @target?.receiveConnectionMessageFrom(message, this)
     return this
 

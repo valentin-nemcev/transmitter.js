@@ -29,7 +29,7 @@ module.exports = class ConnectionMessage
     return this
 
 
-  deliverToLine: (line) ->
+  sendToLine: (line) ->
     return this if @transmission.hasMessageFor(line)
     @transmission.addMessageFor(this, line)
     @payload.deliver(line)

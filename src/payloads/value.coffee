@@ -19,7 +19,7 @@ class ValueUpdatePayload
     @matchFn = opts.match
 
 
-  deliver: (target) ->
+  deliverValueState: (target) ->
     sourceValue = @source.get()
     targetValue = target.get()
     unless @matchFn.call(null, sourceValue, targetValue)
@@ -71,11 +71,11 @@ module.exports = class ValuePayload
     @map (value) -> map(value).get()
 
 
-  deliverToTargetNode: (targetNode) ->
+  deliverValue: (targetNode) ->
     targetNode.receiveValue(@get())
     return this
 
 
-  deliver: (targetNode) ->
+  deliverValueState: (targetNode) ->
     targetNode.set(@get())
     return this

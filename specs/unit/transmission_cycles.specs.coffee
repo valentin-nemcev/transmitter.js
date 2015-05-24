@@ -9,7 +9,7 @@ Query = require 'transmitter/transmission/query'
 
 
 class StubPayload
-  deliverToTargetNode: ->
+  deliver: ->
 
 class NodeStub extends RelayNode
 
@@ -24,6 +24,10 @@ class TargetNodeStub extends TargetNode
   inspect: -> '[TargetNodeStub]'
 
   createResponsePayload: -> new StubPayload()
+
+  acceptPayload: (payload) ->
+    payload.deliver(this)
+    return this
 
 
 class TargetStub

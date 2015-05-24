@@ -24,7 +24,7 @@ class ListUpdatePayload
     @matchFn = opts.match
 
 
-  deliver: (target) ->
+  deliverListState: (target) ->
     targetLength = target.getSize()
     sourceLength = @source.getSize()
 
@@ -111,11 +111,16 @@ module.exports = class ListPayload
     new ListUpdatePayload(this, {map, match})
 
 
-  deliverToTargetNode: (targetNode) ->
+  deliverValue: (targetNode) ->
     targetNode.receiveValue(@get())
     return this
 
 
-  deliver: (targetNode) ->
+  deliverValueState: (targetNode) ->
+    targetNode.set(@get())
+    return this
+
+
+  deliverListState: (targetNode) ->
     targetNode.set(@get())
     return this

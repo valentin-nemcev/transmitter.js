@@ -18,6 +18,10 @@ class NodeStub extends RelayNode
   createRelayPayload: ->
     new StubPayload()
 
+  acceptPayload: (payload) ->
+    payload.deliver(this)
+    return this
+
 
 class TargetStub
   receiveMessage: ->

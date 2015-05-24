@@ -27,6 +27,11 @@ module.exports = class List extends RelayNode
     @list = []
 
 
+  acceptPayload: (payload) ->
+    payload.deliverListState(this)
+    return this
+
+
   set: (list) ->
     @list.length = 0
     @list.push list...

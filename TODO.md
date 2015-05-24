@@ -22,7 +22,6 @@
 ## Development tasks
 
 * Refactor
-  * Rename receiveValue and deliver methods
   * Better names for node and connection source/target
   * Don't use context in isolated tests, use context in scenarios.
   * Better message merging (symmetrical querying and caching)

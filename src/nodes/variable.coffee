@@ -23,6 +23,11 @@ module.exports = class Variable extends RelayNode
     ValuePayload.createFromValue(value)
 
 
+  acceptPayload: (payload) ->
+    payload.deliverValueState(this)
+    return this
+
+
   set: (@value) -> this
 
   get: -> @value
