@@ -24,7 +24,7 @@ module.exports = class SourceNode
     return this
 
 
-  originate: (value, tr) ->
+  originate: (tr, value) ->
     tr.createMessage(@createOriginPayload(value))
       .sendToNodeSource(@getNodeSource())
     return this

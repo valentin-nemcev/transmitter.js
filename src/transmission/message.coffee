@@ -39,7 +39,7 @@ module.exports = class Message
 
 
   sendToNode: (node) ->
-    node.routeMessage(@payload, @transmission)
+    node.routeMessage(@transmission, @payload)
     return this
 
 

@@ -13,7 +13,7 @@ module.exports = class TargetNode
   inspect: -> '[' + @constructor.name + ']'
 
 
-  routeMessage: (payload, tr) ->
+  routeMessage: (tr, payload) ->
     payload.deliverToTargetNode(this)
     return this
 

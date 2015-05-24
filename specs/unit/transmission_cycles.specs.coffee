@@ -64,7 +64,7 @@ describe 'Transmission cycles', ->
 
       expect(@targetNode.routeMessage).to.have.been.calledOnce
       expect(@targetNode.routeMessage)
-        .to.have.been.calledWith(sinon.match.same(@payload1))
+        .to.have.been.calledWith(sinon.match.any, sinon.match.same(@payload1))
 
 
     specify 'query after message should not be sent', ->
@@ -86,7 +86,7 @@ describe 'Transmission cycles', ->
       @message2.sendToNodeTarget(@targetNode.getNodeTarget())
 
       expect(@targetNode.routeMessage)
-        .to.have.been.calledWith(sinon.match.same(@payload2))
+        .to.have.been.calledWith(sinon.match.any, sinon.match.same(@payload2))
 
 
     specify 'second query should be sent', ->

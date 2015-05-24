@@ -46,9 +46,9 @@ describe 'Nested list connection', ->
       item1 = new ListItem('Origin item 1')
       item2 = new ListItem('Origin item 2')
 
-      item1.valueVar.updateState('Origin value 1', tr)
-      item2.valueVar.updateState('Origin value 2', tr)
-      @originList.updateState([item1, item2], tr)
+      item1.valueVar.updateState(tr, 'Origin value 1')
+      item2.valueVar.updateState(tr, 'Origin value 2')
+      @originList.updateState(tr, [item1, item2])
 
 
   specify 'then update is transmitted to derived list', ->

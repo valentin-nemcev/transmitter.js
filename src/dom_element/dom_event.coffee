@@ -12,4 +12,4 @@ module.exports = class DOMEvent extends SourceNode
 
   triggerEvent: (ev) =>
     Transmitter.startTransmission (tr) =>
-      @originate(ev, tr)
+      @originate(tr, ev)

@@ -26,7 +26,7 @@ module.exports = class ChannelNode
     return this
 
 
-  routeMessage: (payload, tr) ->
+  routeMessage: (tr, payload) ->
     @tr = tr
     payload.deliver(this)
     @tr = null

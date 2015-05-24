@@ -14,7 +14,7 @@ module.exports = class RelayNode
   inspect: -> '[' + @constructor.name + ']'
 
 
-  routeMessage: (payload, tr) ->
+  routeMessage: (tr, payload) ->
     payload.deliver(this)
     tr.createMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
@@ -38,7 +38,7 @@ module.exports = class RelayNode
     return this
 
 
-  updateState: (value, tr) ->
+  updateState: (tr, value) ->
     tr.createMessage(@createUpdatePayload(value))
       .sendToNodeTarget(@getNodeTarget())
     return this

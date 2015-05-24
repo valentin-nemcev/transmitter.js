@@ -32,7 +32,7 @@ describe 'Value updates preserve identity', ->
       @objectVar.set(@object)
 
       Transmitter.startTransmission (tr) =>
-        @stringVar.updateState('nameA', tr)
+        @stringVar.updateState(tr, 'nameA')
 
       expect(@objectVar.get()).to.equal(@object)
 
@@ -60,7 +60,7 @@ describe 'Value updates preserve identity', ->
       @objectList.set([@objectA, @objectB])
 
       Transmitter.startTransmission (tr) =>
-        @stringList.updateState(['nameB', 'nameA'], tr)
+        @stringList.updateState(tr, ['nameB', 'nameA'])
 
       objects = @objectList.get()
       expect(objects[0]).to.equal(@objectB)
