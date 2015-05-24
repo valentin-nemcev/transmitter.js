@@ -19,5 +19,38 @@ module.exports = class ChildrenList extends List
     return this
 
 
+  setAt: (el, pos) ->
+    @element.replaceChild(el, @getAt(pos))
+    return this
+
+
+  addAt: (el, pos) ->
+    if pos == @getSize()
+      @element.appendChild(el)
+    else
+      @element.insertBefore(el, @getAt(pos))
+    return this
+
+
+  removeAt: (pos) ->
+    @element.removeChild(@getAt(pos))
+    return this
+
+
+  move: (fromPos, toPos) ->
+    el = @getAt(fromPos)
+    @removeAt(fromPos)
+    @addAt(toPos)
+    return this
+
+
   get: ->
     @element.children
+
+
+  getAt: (pos) ->
+    @element.children[pos]
+
+
+  getSize: ->
+    @element.children.length
