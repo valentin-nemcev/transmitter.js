@@ -19,11 +19,15 @@ class ValueUpdatePayload
     @matchFn = opts.match
 
 
+  inspect: -> "valueUpdate(#{inspect @source})"
+
+
   deliverValueState: (target) ->
     sourceValue = @source.get()
     targetValue = target.get()
-    unless @matchFn.call(null, sourceValue, targetValue)
-      target.set(@mapFn.call(null, sourceValue))
+    unless sourceValue? and targetValue? \
+      and @matchFn.call(null, sourceValue, targetValue)
+        target.set(@mapFn.call(null, sourceValue))
     return this
 
 
@@ -45,7 +49,7 @@ module.exports = class ValuePayload
     @ifEmptyFn = opts.ifEmpty ? -> null
 
 
-  inspect: -> "state: #{inspect @source}"
+  inspect: -> "value(#{inspect @get()})"
 
 
   get: ->

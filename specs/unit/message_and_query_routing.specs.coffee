@@ -68,7 +68,7 @@ describe 'Message and query routing', ->
 
 
   specify 'query should be queued for response \
-      when node targe has no sources with same direction', ->
+      when node target has no sources with same direction', ->
     @node = new NodeStub()
     @source = new SourceStub()
     @target = new TargetStub()

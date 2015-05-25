@@ -3,6 +3,6 @@
 
 before ->
   @define = (name, value) ->
-    value.inspect ?= (-> name)
+    value.inspect = (-> name)
     @[name] = value
     return value

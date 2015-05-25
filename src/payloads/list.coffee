@@ -23,6 +23,8 @@ class ListUpdatePayload
     @mapFn = opts.map
     @matchFn = opts.match
 
+  inspect: -> "listUpdate(#{inspect @source})"
+
 
   deliverListState: (target) ->
     targetLength = target.getSize()
@@ -81,7 +83,7 @@ module.exports = class ListPayload
     @ifEmptyFn = opts.ifEmpty ? -> []
 
 
-  inspect: -> "state: #{inspect @source}"
+  inspect: -> "list(#{inspect @get()})"
 
 
   get: ->
