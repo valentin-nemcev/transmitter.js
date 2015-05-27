@@ -2,8 +2,8 @@ require 'shelljs/global'
 
 bin = './node_modules/.bin'
 
-mochaCmd = (files...) ->
-  "#{bin}/mocha --colors --opts specs/mocha.opts #{files.join(' ')}"
+mochaCmd = (args...) ->
+  "#{bin}/mocha --colors --opts specs/mocha.opts #{args.join(' ')}"
 
 unitSpecs = 'specs/unit.specs.coffee'
 exampleSpecs = 'specs/examples.specs.coffee'
@@ -14,8 +14,9 @@ task 'build', ->
 task 'clean', ->
   rm '-rf', 'build/*'
 
+option '-d', '--debug', 'Enable node debugger'
 task 'specs', ->
-  exec(mochaCmd unitSpecs, exampleSpecs)
+  exec(mochaCmd(unitSpecs, exampleSpecs))
 
 task 'specs:coverage', ->
   cmd =
