@@ -27,6 +27,7 @@
   * Better message merging (symmetrical querying and caching)
 
 * Implement
+  * Transmission precedence
   * Node source and targets querying and queueing
   * Queue prioritization by directions
   * Queue prioritization by nesting level
