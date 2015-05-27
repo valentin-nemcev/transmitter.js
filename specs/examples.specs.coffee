@@ -8,3 +8,4 @@ describe 'Examples', ->
   require './examples/value_updates.specs'
   require './examples/flattening_connection.specs'
   require './examples/nested_list_connection.specs'
+  require './examples/flattening_with_nested_connections.specs'

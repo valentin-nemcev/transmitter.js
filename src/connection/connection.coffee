@@ -7,6 +7,8 @@ module.exports = class Connection
     @source.setTarget(this)
     @target.setSource(this)
 
+  inspect: -> @source.inspect() + @target.inspect()
+
 
   receiveConnectionMessage: (message) ->
     @source.receiveConnectionMessage(message)
