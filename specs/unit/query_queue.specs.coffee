@@ -38,7 +38,7 @@ describe 'Query queue', ->
     expect(@node.createResponsePayload).to.have.been.calledOnce
 
 
-  it 'responds to queries with higher priority first', ->
+  it 'responds to queries with lower order first', ->
     @node1 = new NodeStub()
     @node2 = new NodeStub()
     @target1 = new TargetStub()
@@ -51,8 +51,8 @@ describe 'Query queue', ->
     sinon.stub(@target1, 'receiveMessage', -> callOrder.push 1)
     sinon.stub(@target2, 'receiveMessage', -> callOrder.push 2)
 
-    @transmission.enqueueQueryFor(@query1, @node1, 2)
-    @transmission.enqueueQueryFor(@query2, @node2, 1)
+    @transmission.enqueueQueryFor(@query2, @node2, 2)
+    @transmission.enqueueQueryFor(@query1, @node1, 1)
     @transmission.respondToQueries()
 
     expect(callOrder).to.deep.equal([1, 2])

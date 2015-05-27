@@ -23,13 +23,21 @@ module.exports = new class Transmitter
 
 
   withDifferentTransmissionOrders: (doWithOrder) ->
-    doWithOrder(new @constructor(reverseOrder: no), 'straight')
-    doWithOrder(new @constructor(reverseOrder: yes), 'reverse')
+    for order in ['straight', 'reverse']
+      doWithOrder(order)
     return this
 
 
+  setTransmissionOrder: (order) ->
+    Transmission::reverseOrder = order is 'reverse'
+    return this
+
+
+  startTransmissionWithLogging: (doWithTransmission) ->
+    @setLogging on
+    @startTransmission(doWithTransmission)
+    @setLogging off
 
   startTransmission: (doWithTransmission) ->
-    Transmission::reverseOrder = @reverseOrder
     Transmission.start(doWithTransmission)
     return this
