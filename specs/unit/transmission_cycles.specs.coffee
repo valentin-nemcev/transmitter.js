@@ -40,6 +40,7 @@ class SourceStub
 
 
 
+#TODO: Remove
 describe 'Transmission cycles', ->
 
   beforeEach ->
@@ -59,9 +60,10 @@ describe 'Transmission cycles', ->
       @payload2 = new StubPayload()
 
 
-    specify 'second message should not be delivered', ->
-      @message1 = new Message(@transmission, @payload1)
-      @message2 = new Message(@transmission, @payload2)
+    specify 'second message with same or lower precedence
+              should not be delivered', ->
+      @message1 = new Message(@transmission, @payload1, precedence: 0)
+      @message2 = new Message(@transmission, @payload2, precedence: 0)
 
       @message1.sendToNodeTarget(@targetNode.getNodeTarget())
       @message2.sendToNodeTarget(@targetNode.getNodeTarget())
@@ -69,6 +71,17 @@ describe 'Transmission cycles', ->
       expect(@targetNode.routeMessage).to.have.been.calledOnce
       expect(@targetNode.routeMessage)
         .to.have.been.calledWith(sinon.match.any, sinon.match.same(@payload1))
+
+
+    specify 'second message with higher precedence
+              should be delivered', ->
+      @message1 = new Message(@transmission, @payload1, precedence: 0)
+      @message2 = new Message(@transmission, @payload2, precedence: 1)
+
+      @message1.sendToNodeTarget(@targetNode.getNodeTarget())
+      @message2.sendToNodeTarget(@targetNode.getNodeTarget())
+
+      expect(@targetNode.routeMessage).to.have.been.calledTwice
 
 
     specify 'query after message should not be sent', ->
@@ -114,15 +127,27 @@ describe 'Transmission cycles', ->
       sinon.spy(@sourceNode, 'createResponsePayload')
 
 
-    specify 'second message should not be sent', ->
-      @message1 = new Message(@transmission, new StubPayload())
-      @message2 = new Message(@transmission, new StubPayload())
+    specify 'second message with same or lower precedence
+              should not be sent', ->
+      @message1 = new Message(@transmission, new StubPayload(), precedence: 0)
+      @message2 = new Message(@transmission, new StubPayload(), precedence: 0)
 
       @message1.sendToNodeSource(@sourceNode.getNodeSource())
       @message2.sendToNodeSource(@sourceNode.getNodeSource())
 
       expect(@target.receiveMessage).to.have.been.calledOnce
       expect(@target.receiveMessage).to.have.been.calledWithSame(@message1)
+
+
+    specify 'second message with higher precedence
+              should not be sent', ->
+      @message1 = new Message(@transmission, new StubPayload(), precedence: 0)
+      @message2 = new Message(@transmission, new StubPayload(), precedence: 1)
+
+      @message1.sendToNodeSource(@sourceNode.getNodeSource())
+      @message2.sendToNodeSource(@sourceNode.getNodeSource())
+
+      expect(@target.receiveMessage).to.have.been.calledTwice
 
 
     specify 'query after message should not be delivered', ->

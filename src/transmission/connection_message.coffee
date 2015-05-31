@@ -8,6 +8,7 @@ module.exports = class ConnectionMessage
 
 
   constructor: (@transmission, @payload) ->
+    #TODO: precedence
     assert(@payload, 'Message must have payload')
 
 

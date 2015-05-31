@@ -4,6 +4,7 @@
 assert = require 'assert'
 
 stableSort = require 'stable'
+directions = require '../directions'
 {inspect} = require 'util'
 
 Query = require './query'
@@ -40,16 +41,28 @@ module.exports = class Transmission
 
 
 
-  createQuery: (direction) ->
-    new Query(this, direction)
+  createInitialQuery: ->
+    @createQuery({direction: directions.forward, precedence: 0})
 
 
-  createMessage: (payload) ->
-    new Message(this, payload)
+  createInitialMessage: (payload) ->
+    @createMessage(payload, precedence: 0)
 
 
-  createConnectionMessage: (payload) ->
-    new ConnectionMessage(this, payload)
+  createInitialConnectionMessage: (payload) ->
+    @createConnectionMessage(payload)
+
+
+  createQuery: (opts) ->
+    new Query(this, opts)
+
+
+  createMessage: (payload, opts) ->
+    new Message(this, payload, opts)
+
+
+  createConnectionMessage: (payload, opts) ->
+    new ConnectionMessage(this, payload, opts)
 
 
 
@@ -96,5 +109,5 @@ module.exports = class Transmission
     while @queryQueue.length
       {point, query, order} = @queryQueue.shift()
       @_log 'popQueue', point, order
-      point.respondToQuery(this)
+      point.respondToQuery(query)
     return this

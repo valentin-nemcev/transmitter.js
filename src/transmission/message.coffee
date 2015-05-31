@@ -10,13 +10,21 @@ module.exports = class Message
   inspect: -> "M #{@payload.inspect()}"
 
 
-  constructor: (@transmission, @payload) ->
+  constructor: (@transmission, @payload, opts = {}) ->
+    @precedence = opts.precedence
     assert(@payload, 'Message must have payload')
 
 
-  _copyWithPayload: (payload) ->
-    copy = new Message(@transmission, payload)
-    return copy
+  createNextQuery: ->
+    @transmission.createQuery({@precedence})
+
+
+  createNextMessage: (payload) ->
+    @transmission.createMessage(payload, {@precedence})
+
+
+  createNextConnectionMessage: (payload) ->
+    @transmission.createConnectionMessage(payload, {@precedence})
 
 
   getPayload: ->
@@ -27,32 +35,35 @@ module.exports = class Message
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
-      line.receiveConnectionQuery(@transmission.createQuery())
+      line.receiveConnectionQuery(@createNextQuery())
     return this
 
 
-  sendToNodeTarget: (nodeTarget) ->
-    return this if @transmission.hasMessageFor(nodeTarget)
-    @transmission.addMessageFor(this, nodeTarget)
-    nodeTarget.receiveMessage(this)
+  hasPrecedenceOver: (prev) ->
+    not prev? or this.precedence > prev.precedence
+
+
+  _sendToNodePoint: (point) ->
+    return this unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+    @transmission.addMessageFor(this, point)
+    point.receiveMessage(this)
     return this
+
+
+  sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
 
 
   sendToNode: (node) ->
-    node.routeMessage(@transmission, @payload)
+    node.routeMessage(this, @payload)
     return this
 
 
-  sendToNodeSource: (nodeSource) ->
-    return this if @transmission.hasMessageFor(nodeSource)
-    @transmission.addMessageFor(this, nodeSource)
-    nodeSource.receiveMessage(this)
-    return this
+  sendToNodeSource: (nodeSource) -> @_sendToNodePoint(nodeSource)
 
 
   sendTransformedTo: (transform, target) ->
     copy = if transform?
-      @_copyWithPayload(transform(@payload, @transmission))
+      @createNextMessage(transform(@payload, @transmission))
     else
       this
     target.receiveMessage(copy)
@@ -67,10 +78,10 @@ module.exports = class Message
       mergedPayload.setAt(key, message.getPayload())
 
     if mergedPayload.isPresent()
-      target.receiveMessage(@_copyWithPayload(mergedPayload))
+      target.receiveMessage(@createNextMessage(mergedPayload))
     return this
 
 
   sendQueryForMerge: (source) ->
-    source.receiveQuery(@transmission.createQuery())
+    source.receiveQuery(@createNextQuery())
     return this

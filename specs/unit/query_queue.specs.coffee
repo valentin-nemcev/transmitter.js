@@ -30,7 +30,7 @@ describe 'Query queue', ->
     @node.getNodeSource().connectTarget(@target)
     sinon.spy(@node, 'createResponsePayload')
     sinon.spy(@target, 'receiveMessage')
-    @query = new Query()
+    @query = new Query(@transmission)
 
     @transmission.enqueueQueryFor(@query, @node)
     @transmission.respondToQueries()
@@ -45,8 +45,8 @@ describe 'Query queue', ->
     @target2 = new TargetStub()
     @node1.getNodeSource().connectTarget(@target1)
     @node2.getNodeSource().connectTarget(@target2)
-    @query1 = new Query()
-    @query2 = new Query()
+    @query1 = new Query(@transmission)
+    @query2 = new Query(@transmission)
     callOrder = []
     sinon.stub(@target1, 'receiveMessage', -> callOrder.push 1)
     sinon.stub(@target2, 'receiveMessage', -> callOrder.push 2)
@@ -65,7 +65,7 @@ describe 'Query queue', ->
     sinon.spy(@target, 'receiveMessage')
     @message = new Message(@transmission, new StubPayload())
     @message.sendToNodeSource(@node.getNodeSource())
-    @query = new Query()
+    @query = new Query(@transmission)
 
     @transmission.enqueueQueryFor(@query, @node)
     @transmission.respondToQueries()
@@ -81,8 +81,8 @@ describe 'Query queue', ->
     @target2 = new TargetStub()
     @node1.getNodeSource().connectTarget(@target1)
     @node2.getNodeSource().connectTarget(@target2)
-    @query1 = new Query()
-    @query2 = new Query()
+    @query1 = new Query(@transmission)
+    @query2 = new Query(@transmission)
     sinon.stub(@target1, 'receiveMessage', =>
       @transmission.enqueueQueryFor(@query2, @node2)
     )

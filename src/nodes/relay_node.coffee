@@ -4,8 +4,6 @@
 NodeSource = require '../connection/node_source'
 NodeTarget = require '../connection/node_target'
 
-directions = require '../directions'
-
 module.exports = class RelayNode
 
   NodeSource.extend this
@@ -16,36 +14,36 @@ module.exports = class RelayNode
 
   routeMessage: (tr, payload) ->
     @acceptPayload(payload)
-    tr.createMessage(@createResponsePayload())
+    tr.createNextMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
 
-  routeQuery: (query) ->
-    query.sendToNodeTarget(@getNodeTarget())
+  routeQuery: (tr) ->
+    tr.createNextQuery().sendToNodeTarget(@getNodeTarget())
     return this
 
 
   respondToQuery: (tr) ->
-    tr.createMessage(@createResponsePayload())
+    tr.createNextMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
 
   originate: (tr) ->
-    tr.createMessage(@createOriginPayload())
+    tr.createInitialMessage(@createOriginPayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
 
   updateState: (tr, value) ->
-    tr.createMessage(@createUpdatePayload(value))
+    tr.createInitialMessage(@createUpdatePayload(value))
       .sendToNodeTarget(@getNodeTarget())
     return this
 
 
   queryState: (tr) ->
-    tr.createQuery(directions.forward).sendToNodeTarget(@getNodeTarget())
+    tr.createInitialQuery().sendToNodeTarget(@getNodeTarget())
     return this
 
 

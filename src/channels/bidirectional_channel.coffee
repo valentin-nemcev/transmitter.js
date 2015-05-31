@@ -1,8 +1,6 @@
 'use strict'
 
 
-{forward, backward} = require '../directions'
-
 SimpleChannel = require './simple_channel'
 CompositeChannel = require './composite_channel'
 
@@ -70,8 +68,10 @@ module.exports = class BidirectionalChannel extends CompositeChannel
 
 
   @defineChannel ->
-    createSimple(@origin, @derived, @getTransformOrigin(), forward)
+    createSimple(@origin, @derived, @getTransformOrigin())
+      .inForwardDirection()
 
 
   @defineChannel ->
-    createSimple(@derived, @origin, @getTransformDerived(), backward)
+    createSimple(@derived, @origin, @getTransformDerived())
+      .inBackwardDirection()

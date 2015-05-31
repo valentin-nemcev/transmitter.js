@@ -19,7 +19,7 @@ module.exports = class TargetNode
 
 
   respondToQuery: (tr) ->
-    tr.createMessage(@createResponsePayload())
+    tr.createNextMessage(@createResponsePayload())
       .sendToNodeTarget(@getNodeTarget())
     return this
 

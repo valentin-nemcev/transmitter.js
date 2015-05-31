@@ -82,7 +82,7 @@ module.exports = class SimpleChannel
 
 
   connect: (tr) ->
-    tr.createConnectionMessage(ConnectionPayload.connect())
+    tr.createInitialConnectionMessage(ConnectionPayload.connect())
       .sendToConnection(@getConnection())
 
 

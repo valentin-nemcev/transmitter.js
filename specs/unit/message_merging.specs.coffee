@@ -36,7 +36,7 @@ describe 'Message merging', ->
 
     @compositeSource.setTarget(@target)
     Transmitter.startTransmission (tr) =>
-      tr.createConnectionMessage(ConnectionPayload.connect())
+      tr.createInitialConnectionMessage(ConnectionPayload.connect())
         .sendToConnection(@compositeSource)
 
 

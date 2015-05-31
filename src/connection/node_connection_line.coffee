@@ -1,15 +1,13 @@
 'use strict'
 
 
-directions = require '../directions'
-
 
 module.exports = class NodeConnectionLine
 
   inspect: -> (@source?.inspect() ? null) + '-'
 
 
-  constructor: (@source, @direction = directions.null) ->
+  constructor: (@source, @direction) ->
 
 
   setTarget: (@target) -> this

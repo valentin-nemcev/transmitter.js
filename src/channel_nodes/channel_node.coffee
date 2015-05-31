@@ -35,6 +35,6 @@ module.exports = class ChannelNode
 
   connect: (channel) ->
     payload = ConnectionPayload.connect(this)
-    @tr.createConnectionMessage(payload)
+    @tr.createNextConnectionMessage(payload)
       .sendToConnection(channel)
     return this

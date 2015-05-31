@@ -13,19 +13,19 @@ module.exports = class SourceNode
   inspect: -> '[' + @constructor.name + ']'
 
 
-  routeQuery: (query) ->
-    query.completeRouting(this)
+  routeQuery: (tr) ->
+    tr.createNextQuery().completeRouting(this)
     return this
 
 
   respondToQuery: (tr) ->
-    tr.createMessage(@createResponsePayload())
+    tr.createNextMessage(@createResponsePayload())
       .sendToNodeSource(@getNodeSource())
     return this
 
 
   originate: (tr, value) ->
-    tr.createMessage(@createOriginPayload(value))
+    tr.createInitialMessage(@createOriginPayload(value))
       .sendToNodeSource(@getNodeSource())
     return this
 

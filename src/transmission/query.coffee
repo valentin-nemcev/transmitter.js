@@ -1,42 +1,56 @@
 'use strict'
 
 
-directions = require '../directions'
-
-
 module.exports = class Query
 
   inspect: -> "Q #{@direction.inspect()}"
 
 
-  constructor: (@transmission, @direction, @pathLength = 0) ->
-    @direction ?= directions.null
+  constructor: (@transmission, opts = {}) ->
+    @pathLength = opts.pathLength ? 0
+    @precedence = opts.precedence
+    @direction = opts.direction
 
 
   setDirection: (@direction) -> this
 
 
-  _copy: ->
-    new Query(@transmission, @direction, @pathLength + 1)
+  createNextQuery: ->
+    @transmission.createQuery({
+      pathLength: @pathLength + 1
+      @precedence
+      @direction
+    })
+
+
+  createNextMessage: (payload) ->
+    @transmission.createMessage(payload, {@precedence})
 
 
   sendToLine: (line) ->
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
     else
-      line.receiveConnectionQuery(@transmission.createQuery())
+      line.receiveConnectionQuery(@createNextQuery())
     return this
 
 
-  sendToNodeSource: (nodeSource) ->
-    return this if @transmission.hasMessageFor(nodeSource)
-    @transmission.addQueryFor(this, nodeSource)
-    nodeSource.receiveQuery(this)
+  hasPrecedenceOver: (prev) ->
+    not prev? or this.precedence > prev.precedence
+
+
+  _sendToNodePoint: (point) ->
+    return this unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+    @transmission.addQueryFor(this, point)
+    point.receiveQuery(this)
     return this
+
+
+  sendToNodeSource: (nodeSource) -> @_sendToNodePoint(nodeSource)
 
 
   sendToNode: (node) ->
-    node.routeQuery(@_copy())
+    node.routeQuery(this)
     return this
 
 
@@ -45,11 +59,7 @@ module.exports = class Query
     return this
 
 
-  sendToNodeTarget: (nodeTarget) ->
-    return this if @transmission.hasMessageFor(nodeTarget)
-    @transmission.addQueryFor(this, nodeTarget)
-    nodeTarget.receiveQuery(this)
-    return this
+  sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
 
 
   sendToSourceAlongDirection: (source, direction) ->
