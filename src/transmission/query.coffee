@@ -54,12 +54,21 @@ module.exports = class Query
     return this
 
 
-  completeRouting: (node) ->
-    @transmission.enqueueQueryFor(this, node, @pathLength) unless @wasSent
+  sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
+
+
+  shouldGetResponseAfter: (other) ->
+    this.pathLength > other.pathLength
+
+
+  enqueue: (@node) ->
+    @transmission.enqueueQuery(this, @pathLength)
     return this
 
 
-  sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
+  respond: ->
+    @node.respondToQuery(this) unless @wasSent
+    return this
 
 
   sendToSourceAlongDirection: (source, direction) ->

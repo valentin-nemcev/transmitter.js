@@ -92,22 +92,21 @@ module.exports = class Transmission
 
 
 
-  enqueueQueryFor: (query, point, order) ->
-    @_log 'enqueueQueryFor', arguments...
+  enqueueQuery: (query) ->
+    @_log 'enqueueQuery', arguments...
 
-    entry = {point, query, order}
     if @reverseOrder
-      @queryQueue.push entry
+      @queryQueue.push query
     else
-      @queryQueue.unshift entry
-    stableSort.inplace @queryQueue, (afterEntry, beforeEntry) ->
-      afterEntry.order > beforeEntry.order
+      @queryQueue.unshift query
+    stableSort.inplace @queryQueue, (queryAfter, queryBefore) ->
+      queryAfter.shouldGetResponseAfter(queryBefore)
     return this
 
 
   respondToQueries: ->
     while @queryQueue.length
-      {point, query, order} = @queryQueue.shift()
-      @_log 'popQueue', point, order
-      point.respondToQuery(query)
+      query = @queryQueue.shift()
+      @_log 'dequeueQuery', query
+      query.respond()
     return this

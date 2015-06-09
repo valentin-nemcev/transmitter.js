@@ -32,5 +32,4 @@ module.exports = class NodeTarget
   receiveQuery: (query) ->
     @sources.forEach (source) ->
       query.sendToLine(source)
-    query.completeRouting(@node)
     return this

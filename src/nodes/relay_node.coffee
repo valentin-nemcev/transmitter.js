@@ -20,7 +20,7 @@ module.exports = class RelayNode
 
 
   routeQuery: (tr) ->
-    tr.createNextQuery().sendToNodeTarget(@getNodeTarget())
+    tr.createNextQuery().sendToNodeTarget(@getNodeTarget()).enqueue(this)
     return this
 
 

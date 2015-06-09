@@ -79,7 +79,7 @@ describe 'Message and query routing', ->
     sinon.spy(@target, 'receiveMessage')
     @query = new Query(@transmission, @queryDirection)
 
-    @query.sendToNodeTarget(@node.getNodeTarget())
+    @query.sendToNodeTarget(@node.getNodeTarget()).enqueue(@node)
     @transmission.respondToQueries()
 
     expect(@target.receiveMessage).to.have.been.calledOnce

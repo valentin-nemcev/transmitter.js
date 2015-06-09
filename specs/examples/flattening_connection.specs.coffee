@@ -75,7 +75,7 @@ describe 'Flattening connection', ->
       .to.deep.equal({name: 'objectA', value: 'value1'})
 
 
-  specify.skip 'querying flat target after outer source update', ->
+  specify 'querying flat target after outer source update', ->
     nestedObject = new NestedObject('objectA')
     nestedObject.valueVar.set('value1')
     @nestedVar.set(nestedObject)
