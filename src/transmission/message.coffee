@@ -11,20 +11,27 @@ module.exports = class Message
 
 
   constructor: (@transmission, @payload, opts = {}) ->
-    @precedence = opts.precedence
     assert(@payload, 'Message must have payload')
+    {@precedence, @direction, @nesting} = opts
 
 
-  createNextQuery: ->
-    @transmission.createQuery({@precedence})
+  createNextConnectionQuery: -> @createNextQuery(-1)
+
+
+  createNextQuery: (nestingDelta = 0) ->
+    @transmission.createQuery({
+      @precedence,
+      @direction,
+      nesting: @nesting + nestingDelta
+    })
 
 
   createNextMessage: (payload) ->
-    @transmission.createMessage(payload, {@precedence})
+    @transmission.createMessage(payload, {@precedence, @direction, @nesting})
 
 
   createNextConnectionMessage: (payload) ->
-    @transmission.createConnectionMessage(payload, {@precedence})
+    @transmission.createConnectionMessage(payload)
 
 
   getPayload: ->
@@ -32,10 +39,11 @@ module.exports = class Message
 
 
   sendToLine: (line) ->
+    @direction = line.direction
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
-      line.receiveConnectionQuery(@createNextQuery())
+      line.receiveConnectionQuery(@createNextConnectionQuery())
     return this
 
 

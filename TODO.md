@@ -28,9 +28,6 @@
 
 * Implement
   * Transmission precedence
-  * Node source and targets querying and queueing
-  * Queue prioritization by directions
-  * Queue prioritization by nesting level
 
 * Later
   * Remove use strict (needs custom compiler for mocha, browserify and npm)

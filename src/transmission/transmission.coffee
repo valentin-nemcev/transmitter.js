@@ -42,11 +42,11 @@ module.exports = class Transmission
 
 
   createInitialQuery: ->
-    @createQuery({direction: directions.forward, precedence: 0})
+    @createQuery({direction: directions.forward, precedence: 0, nesting: 0})
 
 
   createInitialMessage: (payload) ->
-    @createMessage(payload, precedence: 0)
+    @createMessage(payload, precedence: 0, nesting: 0)
 
 
   createInitialConnectionMessage: (payload) ->

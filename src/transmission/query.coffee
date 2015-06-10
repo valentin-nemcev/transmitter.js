@@ -8,30 +8,32 @@ module.exports = class Query
 
   constructor: (@transmission, opts = {}) ->
     @pathLength = opts.pathLength ? 0
-    @precedence = opts.precedence
-    @direction = opts.direction
+    {@precedence, @direction, @nesting} = opts
 
 
-  setDirection: (@direction) -> this
+  createNextConnectionQuery: -> @createNextQuery(-1)
 
 
-  createNextQuery: ->
+  createNextQuery: (nestingDelta = 0) ->
     @transmission.createQuery({
       pathLength: @pathLength + 1
       @precedence
       @direction
+      nesting: @nesting + nestingDelta
     })
 
 
   createNextMessage: (payload) ->
-    @transmission.createMessage(payload, {@precedence})
+    @transmission.createMessage(payload, {@precedence, @direction, @nesting})
 
 
   sendToLine: (line) ->
+    if not line.directionMatches(@direction)
+      return this
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
     else
-      line.receiveConnectionQuery(@createNextQuery())
+      line.receiveConnectionQuery(@createNextConnectionQuery())
     return this
 
 
@@ -50,6 +52,7 @@ module.exports = class Query
 
 
   sendToNode: (node) ->
+    @wasRelayed = yes
     node.routeQuery(this)
     return this
 
@@ -58,21 +61,19 @@ module.exports = class Query
 
 
   shouldGetResponseAfter: (other) ->
-    this.pathLength > other.pathLength
+    if this.nesting > other.nesting then yes
+    else if this.nesting == other.nesting
+      this.pathLength > other.pathLength
+    else
+      no
 
 
-  enqueue: (@node) ->
+  enqueueForSourceNode: (@node) ->
+    @wasRelayed = no
     @transmission.enqueueQuery(this, @pathLength)
     return this
 
 
   respond: ->
-    @node.respondToQuery(this) unless @wasSent
-    return this
-
-
-  sendToSourceAlongDirection: (source, direction) ->
-    if @direction == direction
-      @wasSent = yes
-      source.receiveQuery(this)
+    @node.respondToQuery(this) unless @wasRelayed
     return this

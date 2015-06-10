@@ -37,6 +37,7 @@ class TargetStub
 class SourceStub
   receiveQuery: ->
   isConst: -> yes
+  directionMatches: -> yes
 
 
 

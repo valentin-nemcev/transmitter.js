@@ -14,7 +14,7 @@ module.exports = class SourceNode
 
 
   routeQuery: (tr) ->
-    tr.createNextQuery().enqueue(this)
+    tr.createNextQuery().enqueueForSourceNode(this)
     return this
 
 
