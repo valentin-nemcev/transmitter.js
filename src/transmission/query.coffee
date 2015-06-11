@@ -7,7 +7,6 @@ module.exports = class Query
 
 
   constructor: (@transmission, opts = {}) ->
-    @pathLength = opts.pathLength ? 0
     {@precedence, @direction, @nesting} = opts
 
 
@@ -16,7 +15,6 @@ module.exports = class Query
 
   createNextQuery: (nestingDelta = 0) ->
     @transmission.createQuery({
-      pathLength: @pathLength + 1
       @precedence
       @direction
       nesting: @nesting + nestingDelta
@@ -42,7 +40,10 @@ module.exports = class Query
 
 
   _sendToNodePoint: (point) ->
-    return this unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+    unless @hasPrecedenceOver(@transmission.getMessageFor(point)) and
+      @hasPrecedenceOver(@transmission.getQueryFor(point))
+        @wasRelayed = yes
+        return this
     @transmission.addQueryFor(this, point)
     point.receiveQuery(this)
     return this
@@ -62,15 +63,11 @@ module.exports = class Query
 
   shouldGetResponseAfter: (other) ->
     if this.nesting > other.nesting then yes
-    else if this.nesting == other.nesting
-      this.pathLength > other.pathLength
-    else
-      no
+    else no
 
 
   enqueueForSourceNode: (@node) ->
-    @wasRelayed = no
-    @transmission.enqueueQuery(this, @pathLength)
+    @transmission.enqueueQuery(this)
     return this
 
 

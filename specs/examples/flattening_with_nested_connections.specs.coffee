@@ -16,7 +16,7 @@ class View
     @removeEvt = new Transmitter.Nodes.SourceNode()
 
 
-describe.skip 'Flattening with nested connections', ->
+describe 'Flattening with nested connections', ->
 
   before ->
     @define 'derivedVar', new Transmitter.Nodes.Variable()
