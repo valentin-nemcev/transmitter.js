@@ -41,6 +41,7 @@ describe 'Multilevel merging 1', ->
 
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.SimpleChannel()
+        .inBackwardDirection()
         .fromSource(@d1)
         .fromSource(@d2)
         .withTransform reduceMergedPayload
@@ -48,11 +49,13 @@ describe 'Multilevel merging 1', ->
         .connect(tr)
 
       new Transmitter.Channels.SimpleChannel()
+        .inBackwardDirection()
         .fromSource @c1
         .toTarget @b1
         .connect(tr)
 
       new Transmitter.Channels.SimpleChannel()
+        .inBackwardDirection()
         .fromSource(@b1)
         .fromSource(@b2)
         .withTransform reduceMergedPayload
@@ -92,6 +95,7 @@ describe 'Multilevel merging 2', ->
 
     @bind1 = (tr) =>
       new Transmitter.Channels.SimpleChannel()
+        .inBackwardDirection()
         .fromSource(@b1)
         .fromSource(@b2)
         .withTransform reduceMergedPayload
@@ -100,6 +104,7 @@ describe 'Multilevel merging 2', ->
 
     @bind2 = (tr) =>
       new Transmitter.Channels.SimpleChannel()
+        .inBackwardDirection()
         .fromSource @b2
         .toTarget @a
         .connect(tr)

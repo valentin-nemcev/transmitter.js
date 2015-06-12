@@ -20,7 +20,7 @@ module.exports = class ConnectionMessage
   passMessage: (point, line) ->
     if message = @transmission.getMessageFor(point)
       line.receiveMessage(message)
-    @transmission._log 'passMessage', this, point, line, message
+      @transmission._log 'passMessage', this, point, line, message
     return this
 
 

@@ -8,6 +8,9 @@ ConnectionPayload = require 'transmitter/payloads/connection'
 
 Transmitter = require 'transmitter'
 
+class DirectionStub
+  matches: (other) -> this == other
+
 class StubPayload
 
 class NodeStub extends SourceNode
@@ -24,6 +27,7 @@ describe 'Message merging', ->
     sinon.spy(@target, 'receiveMessage')
 
     @transmission = new Transmission()
+    @directionStub = new DirectionStub()
 
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
@@ -32,6 +36,7 @@ describe 'Message merging', ->
       .returns(@passivePayload)
 
     @compositeSource = new SimpleChannel()
+      .inDirection @directionStub
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)
@@ -42,7 +47,8 @@ describe 'Message merging', ->
 
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
-    @message1 = new Message(@transmission, @activePayload)
+    @message1 = new Message(@transmission, @activePayload,
+      {direction: @directionStub})
 
     @message1.sendToNodeSource(@activeSource.getNodeSource())
 
@@ -52,7 +58,7 @@ describe 'Message merging', ->
 
 
   specify 'when queries got responses', ->
-    @transmission.respondToQueries()
+    @transmission.respond()
 
 
   specify 'then merged message is sent', ->
@@ -62,7 +68,7 @@ describe 'Message merging', ->
 
 
   specify 'and merged message payload contains source payloads', ->
-    @transmission.respondToQueries()
+    @transmission.respond()
 
     mergedMessage = @target.receiveMessage.firstCall.args[0]
     mergedPayload = mergedMessage.getPayload()

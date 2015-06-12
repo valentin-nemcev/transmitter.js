@@ -81,7 +81,6 @@ describe 'Flattening connection', ->
     @nestedVar.set(nestedObject)
 
     Transmitter.startTransmission (tr) =>
-      # tr.loggingIsEnabled = yes
       @serializedVar.queryState(tr)
 
     expect(@serializedVar.get())

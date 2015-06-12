@@ -6,7 +6,7 @@ Transmission = require 'transmitter/transmission/transmission'
 
 class QueryStub
   respond: -> this
-  shouldGetResponseAfter: -> no
+  getQueueOrder: ->
 
 
 describe 'Query queue', ->
@@ -19,8 +19,8 @@ describe 'Query queue', ->
     @query = new QueryStub()
     sinon.spy(@query, 'respond')
 
-    @transmission.enqueueQuery(@query)
-    @transmission.respondToQueries()
+    @transmission.enqueue(@query)
+    @transmission.respond()
 
     expect(@query.respond).to.have.been.calledOnce
 
@@ -29,18 +29,14 @@ describe 'Query queue', ->
     @query1 = new QueryStub()
     @query2 = new QueryStub()
     callOrder = []
-    sinon.stub(@query1, 'shouldGetResponseAfter')
-      .withArgs(sinon.match.same(@query2))
-      .returns(no)
-    sinon.stub(@query2, 'shouldGetResponseAfter')
-      .withArgs(sinon.match.same(@query1))
-      .returns(yes)
+    sinon.stub(@query1, 'getQueueOrder').returns(1)
+    sinon.stub(@query2, 'getQueueOrder').returns(2)
     sinon.stub(@query1, 'respond', -> callOrder.push 1)
     sinon.stub(@query2, 'respond', -> callOrder.push 2)
 
-    @transmission.enqueueQuery(@query2)
-    @transmission.enqueueQuery(@query1)
-    @transmission.respondToQueries()
+    @transmission.enqueue(@query2)
+    @transmission.enqueue(@query1)
+    @transmission.respond()
 
     expect(callOrder).to.deep.equal([1, 2])
 
@@ -49,11 +45,11 @@ describe 'Query queue', ->
     @query1 = new QueryStub()
     @query2 = new QueryStub()
     sinon.stub(@query1, 'respond', =>
-      @transmission.enqueueQuery(@query2)
+      @transmission.enqueue(@query2)
     )
     sinon.spy(@query2, 'respond')
 
-    @transmission.enqueueQuery(@query1)
-    @transmission.respondToQueries()
+    @transmission.enqueue(@query1)
+    @transmission.respond()
 
     expect(@query2.respond).to.have.been.calledOnce

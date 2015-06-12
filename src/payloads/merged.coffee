@@ -7,8 +7,10 @@ ValuePayload = require './value'
 
 module.exports = class MergedPayload
 
-  constructor: (@keys) ->
+  constructor: (payloads) ->
     @payloads = new Map()
+    for [key, payload] in payloads
+      @payloads.set(key, payload)
 
 
   deliver: ->
@@ -24,11 +26,6 @@ module.exports = class MergedPayload
 
   fetch: (struct) ->
     new StructPayload(struct).map (key) => @getAt(key)
-
-
-  setAt: (key, payload) ->
-    @payloads.set(key, payload)
-    return this
 
 
   getAt: (key) ->

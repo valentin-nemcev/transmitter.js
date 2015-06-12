@@ -31,12 +31,14 @@ class SourceStub
 
 class DirectionStub
   inspect: -> '.'
+  matches: (other) -> this == other
 
 
 describe 'Message and query routing', ->
 
   beforeEach ->
     @transmission = new Transmission()
+    @directionStub = new DirectionStub()
     @otherDirection = new DirectionStub()
     @queryDirection = new DirectionStub()
 
@@ -44,10 +46,11 @@ describe 'Message and query routing', ->
   specify 'message should be routed from node target to node source', ->
     @node = new NodeStub()
     @target = new TargetStub()
-    new NodeConnectionLine(@node.getNodeSource())
+    new NodeConnectionLine(@node.getNodeSource(), @directionStub)
       .setTarget(@target).connect()
     sinon.spy(@target, 'receiveMessage')
-    @message = new Message(@transmission, new StubPayload())
+    @message =
+      new Message(@transmission, new StubPayload(), direction: @directionStub)
 
     @message.sendToNodeTarget(@node.getNodeTarget())
 
@@ -57,10 +60,10 @@ describe 'Message and query routing', ->
   specify 'query should be routed from node source to node target', ->
     @node = new NodeStub()
     @source = new SourceStub()
-    new ConnectionNodeLine(@node.getNodeTarget())
+    new ConnectionNodeLine(@node.getNodeTarget(), @directionStub)
       .setSource(@source).connect()
     sinon.spy(@source, 'receiveQuery')
-    @query = new Query(@transmission)
+    @query = new Query(@transmission, direction: @directionStub)
 
     @query.sendToNodeTarget(@node.getNodeTarget())
 
@@ -72,14 +75,14 @@ describe 'Message and query routing', ->
     @node = new NodeStub()
     @source = new SourceStub()
     @target = new TargetStub()
-    new NodeConnectionLine(@node.getNodeSource())
+    new NodeConnectionLine(@node.getNodeSource(), @queryDirection)
       .setTarget(@target).connect()
     new ConnectionNodeLine(@node.getNodeTarget(), @otherDirection)
       .setSource(@source).connect()
     sinon.spy(@target, 'receiveMessage')
-    @query = new Query(@transmission, @queryDirection)
+    @query = new Query(@transmission, direction: @queryDirection)
 
     @query.enqueueForSourceNode(@node).sendToNodeTarget(@node.getNodeTarget())
-    @transmission.respondToQueries()
+    @transmission.respond()
 
     expect(@target.receiveMessage).to.have.been.calledOnce

@@ -23,7 +23,7 @@ module.exports = class ConnectionNodeLine
     return this
 
 
-  directionMatches: (direction) -> @direction == direction
+  directionMatches: (direction) -> @direction.matches(direction)
 
 
   receiveConnectionMessage: (message) ->

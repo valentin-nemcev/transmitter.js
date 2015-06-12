@@ -3,7 +3,7 @@
 
 assert = require 'assert'
 
-{forward, backward} = require '../directions'
+directions = require '../directions'
 
 NodeConnectionLine = require '../connection/node_connection_line'
 ConnectionNodeLine = require '../connection/connection_node_line'
@@ -24,11 +24,17 @@ module.exports = class SimpleChannel
     @targets = []
 
 
-  inForwardDirection: -> @inDirection(forward)
-  inBackwardDirection: -> @inDirection(backward)
+  inForwardDirection: -> @inDirection(directions.forward)
+  inBackwardDirection: -> @inDirection(directions.backward)
 
   inDirection: (@direction) ->
     return this
+
+  getDirection: -> 
+    if @connectionTarget?
+      directions.omni
+    else
+      @direction ? directions.null
 
 
   fromSource: (source) ->
@@ -56,12 +62,12 @@ module.exports = class SimpleChannel
 
 
   createSingleSource: (source) ->
-    new NodeConnectionLine(source?.getNodeSource(), @direction)
+    new NodeConnectionLine(source?.getNodeSource(), @getDirection())
 
 
   createMergingSource: (sources) ->
     parts = for source in sources
-      line = new NodeConnectionLine(source.getNodeSource(), @direction)
+      line = new NodeConnectionLine(source.getNodeSource(), @getDirection())
       [source, line]
     new MergingConnectionTarget(new Map(parts))
 
@@ -71,7 +77,7 @@ module.exports = class SimpleChannel
 
 
   createSingleTarget: (target) ->
-    new ConnectionNodeLine(target?.getNodeTarget(), @direction)
+    new ConnectionNodeLine(target?.getNodeTarget(), @getDirection())
 
 
   getTransform: -> @transform ? returnArg

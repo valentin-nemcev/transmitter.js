@@ -27,6 +27,7 @@ describe 'Connection with merge and query', ->
       new Transmitter.Channels.SimpleChannel()
         .fromSource(@button)
         .fromSource(@textInput)
+        .inBackwardDirection()
         .withTransform (payloads) =>
           payloads.fetch([@button, @textInput])
             .morph ([buttonWasClicked, textValue]) ->

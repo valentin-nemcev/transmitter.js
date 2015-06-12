@@ -19,7 +19,7 @@ module.exports = class Transmission
     @instance = new Transmission()
     try
       doWithTransmission(@instance)
-      @instance.respondToQueries()
+      @instance.respond()
     finally
       @instance = null
     return this
@@ -37,16 +37,17 @@ module.exports = class Transmission
   constructor: ->
     @pointsToMessages = new Map()
     @pointsToQueries = new Map()
-    @queryQueue = []
+    @queue = []
 
 
 
   createInitialQuery: ->
-    @createQuery({direction: directions.forward, precedence: 0, nesting: 0})
+    @createQuery({direction: directions.forward, precedence: 1, nesting: 0})
 
 
   createInitialMessage: (payload) ->
-    @createMessage(payload, precedence: 0, nesting: 0)
+    @createMessage(payload,
+      direction: directions.backward, precedence: 0, nesting: 0)
 
 
   createInitialConnectionMessage: (payload) ->
@@ -92,21 +93,21 @@ module.exports = class Transmission
 
 
 
-  enqueueQuery: (query) ->
-    @_log 'enqueueQuery', arguments...
+  enqueue: (entry) ->
+    @_log 'enqueue', arguments...
 
     if @reverseOrder
-      @queryQueue.push query
+      @queue.push entry
     else
-      @queryQueue.unshift query
-    stableSort.inplace @queryQueue, (queryAfter, queryBefore) ->
-      queryAfter.shouldGetResponseAfter(queryBefore)
+      @queue.unshift entry
+    stableSort.inplace @queue, (entryBefore, entryAfter) ->
+      entryBefore.getQueueOrder() > entryAfter.getQueueOrder()
     return this
 
 
-  respondToQueries: ->
-    while @queryQueue.length
-      query = @queryQueue.shift()
-      @_log 'dequeueQuery', query
-      query.respond()
+  respond: ->
+    while @queue.length
+      entry = @queue.shift()
+      @_log 'dequeue', entry
+      entry.respond()
     return this

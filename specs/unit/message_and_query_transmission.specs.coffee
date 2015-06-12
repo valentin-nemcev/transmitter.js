@@ -12,6 +12,7 @@ Transmitter = require 'transmitter'
 
 
 class DirectionStub
+  matches: (other) -> this == other
 
 class StubPayload
   deliver: ->
@@ -30,7 +31,7 @@ describe 'Message and query transmission', ->
   beforeEach ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
-    @directionStub = new DirectionStub
+    @directionStub = new DirectionStub()
 
     Transmitter.startTransmission (tr) =>
       new SimpleChannel()
@@ -45,7 +46,7 @@ describe 'Message and query transmission', ->
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload)
+    @message = new Message(@transmission, @payload, {direction: @directionStub})
 
     @message.sendToNodeSource(@source.getNodeSource())
 
@@ -60,7 +61,7 @@ describe 'Message and query transmission', ->
     @query = new Query(@transmission, {direction: @directionStub})
 
     @query.sendToNodeTarget(@target.getNodeTarget())
-    @transmission.respondToQueries()
+    @transmission.respond()
 
     expect(@payload.deliver).to.have.been
       .calledWith(sinon.match.same(@target))

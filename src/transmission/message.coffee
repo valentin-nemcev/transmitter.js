@@ -26,8 +26,36 @@ module.exports = class Message
     })
 
 
+  createQueryForMerge: ->
+    @transmission.createQuery({
+      precedence: Math.ceil(@precedence) - 1,
+      @direction,
+      @nesting
+    })
+
+
   createNextMessage: (payload) ->
     @transmission.createMessage(payload, {@precedence, @direction, @nesting})
+
+
+  createMergedMessage: (messages) ->
+    payload = new MergedPayload(
+      messages.map ([key, message]) -> [key, message.getPayload()]
+    )
+    precedence = messages
+      .map(([key, message]) -> message.precedence)
+      .reduce((a, b) -> a + b) /
+        messages.length
+    nesting = Math.max.apply(null,
+      messages.map(([key, message]) -> message.nesting)
+    )
+    @transmission.createMessage(payload, {precedence, @direction, nesting})
+
+
+  createResponseMessage: ->
+    precedence = Math.min(1, Math.floor(@precedence) + 1)
+    @transmission.createMessage(@payload,
+      {precedence, direction: @direction.reverse(), @nesting})
 
 
   createNextConnectionMessage: (payload) ->
@@ -39,7 +67,8 @@ module.exports = class Message
 
 
   sendToLine: (line) ->
-    @direction = line.direction
+    if not line.directionMatches(@direction)
+      return this
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
@@ -52,7 +81,9 @@ module.exports = class Message
 
 
   _sendToNodePoint: (point) ->
-    return this unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+    unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+      @wasRelayed = yes
+      return this
     @transmission.addMessageFor(this, point)
     point.receiveMessage(this)
     return this
@@ -62,11 +93,29 @@ module.exports = class Message
 
 
   sendToNode: (node) ->
+    @wasRelayed = yes
     node.routeMessage(this, @payload)
     return this
 
 
   sendToNodeSource: (nodeSource) -> @_sendToNodePoint(nodeSource)
+
+
+  typeOrder: 1
+
+
+  getQueueOrder: ->
+    [@precedence, @typeOrder, @nesting]
+
+
+  enqueueForSourceNode: (@node) ->
+    @transmission.enqueue(this)
+    return this
+
+
+  respond: ->
+    @node.respondToMessage(this) unless @wasRelayed
+    return this
 
 
   sendTransformedTo: (transform, target) ->
@@ -78,18 +127,22 @@ module.exports = class Message
     return this
 
 
-  sendMergedTo: (sourceKeys, target) ->
-    mergedPayload = new MergedPayload(sourceKeys)
+  getMessagesToMerge = (tr, sourceKeys) ->
+    messages = []
     for key in sourceKeys
-      message = @transmission.getMessageFor(key.getNodeSource())
-      continue unless message?
-      mergedPayload.setAt(key, message.getPayload())
+      message = tr.getMessageFor(key.getNodeSource())
+      return unless message?
+      messages.push [key, message]
 
-    if mergedPayload.isPresent()
-      target.receiveMessage(@createNextMessage(mergedPayload))
+    return messages
+
+
+  sendMergedTo: (sourceKeys, target) ->
+    if (messages = getMessagesToMerge(@transmission, sourceKeys))?
+      target.receiveMessage(@createMergedMessage(messages))
     return this
 
 
   sendQueryForMerge: (source) ->
-    source.receiveQuery(@createNextQuery())
+    source.receiveQuery(@createQueryForMerge())
     return this

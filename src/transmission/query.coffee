@@ -61,13 +61,15 @@ module.exports = class Query
   sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
 
 
-  shouldGetResponseAfter: (other) ->
-    if this.nesting > other.nesting then yes
-    else no
+  typeOrder: 0
+
+
+  getQueueOrder: ->
+    [@precedence, @typeOrder, @nesting]
 
 
   enqueueForSourceNode: (@node) ->
-    @transmission.enqueueQuery(this)
+    @transmission.enqueue(this)
     return this
 
 
