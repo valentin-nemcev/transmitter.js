@@ -15,8 +15,7 @@ module.exports = class RelayNode
   routeMessage: (tr, payload) ->
     @acceptPayload(payload)
     tr.createNextMessage(@createResponsePayload())
-      .enqueueForSourceNode(this)
-      .sendToNodeSource(@getNodeSource())
+      .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
 
@@ -28,20 +27,19 @@ module.exports = class RelayNode
 
   respondToMessage: (tr) ->
     tr.createResponseMessage()
-      .sendToNodeSource(@getNodeSource())
+      .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
 
   respondToQuery: (tr) ->
     tr.createNextMessage(@createResponsePayload())
-      .sendToNodeSource(@getNodeSource())
+      .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
 
   originate: (tr) ->
     tr.createInitialMessage(@createOriginPayload())
-      .enqueueForSourceNode(this)
-      .sendToNodeSource(@getNodeSource())
+      .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
 

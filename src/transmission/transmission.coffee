@@ -27,7 +27,7 @@ module.exports = class Transmission
 
   loggingIsEnabled: no
 
-  _log: (name, args...) ->
+  log: (name, args...) ->
     console.log name, args.map(inspect).join(', ') if @loggingIsEnabled
     return this
 
@@ -68,7 +68,7 @@ module.exports = class Transmission
 
 
   addMessageFor: (message, point) ->
-    @_log 'addMessageFor', arguments...
+    @log 'addMessageFor', arguments...
     @pointsToMessages.set(point, message)
     return this
 
@@ -83,7 +83,7 @@ module.exports = class Transmission
 
 
   addQueryFor: (query, point) ->
-    @_log 'addQueryFor', arguments...
+    @log 'addQueryFor', arguments...
     @pointsToQueries.set(point, query)
     return this
 
@@ -94,7 +94,7 @@ module.exports = class Transmission
 
 
   enqueue: (entry) ->
-    @_log 'enqueue', arguments...
+    @log 'enqueue', entry, entry.node
 
     if @reverseOrder
       @queue.push entry
@@ -108,6 +108,6 @@ module.exports = class Transmission
   respond: ->
     while @queue.length
       entry = @queue.shift()
-      @_log 'dequeue', entry
+      @log 'dequeue', entry, entry.node
       entry.respond()
     return this

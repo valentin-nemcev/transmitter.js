@@ -20,13 +20,14 @@ module.exports = class ConnectionMessage
   passMessage: (point, line) ->
     if message = @transmission.getMessageFor(point)
       line.receiveMessage(message)
-      @transmission._log 'passMessage', this, point, line, message
+      @transmission.log 'passMessage', this, line, message
     return this
 
 
   passQuery: (point, line) ->
     if query = @transmission.getQueryFor(point)
       line.receiveQuery(query)
+      @transmission.log 'passQuery', this, line, query
     return this
 
 

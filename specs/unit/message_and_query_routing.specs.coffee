@@ -32,6 +32,7 @@ class SourceStub
 class DirectionStub
   inspect: -> '.'
   matches: (other) -> this == other
+  reverse: -> new DirectionStub()
 
 
 describe 'Message and query routing', ->

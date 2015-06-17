@@ -35,13 +35,20 @@ describe 'Flattening with nested connections', ->
       .fromSource @derivedVar
       .toConnectionTarget @flatteningChannelVar
       .withTransform (viewVal) =>
-        viewVal.map (view) =>
+        viewVal.map((view) =>
           new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
             .fromSource view.removeEvt
             .toTarget @originVar
             .withTransform (ev) ->
               ev.map( -> null)
+        ).ifEmpty( =>
+          # TODO: Null channel
+          new Transmitter.Channels.ConstChannel()
+            .toTarget @originVar
+            .inBackwardDirection()
+            .withValue -> null
+        )
 
     Transmitter.startTransmission (tr) =>
       originDerivedChannel.connect(tr)

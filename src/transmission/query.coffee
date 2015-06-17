@@ -3,21 +3,32 @@
 
 module.exports = class Query
 
-  inspect: -> "Q #{@direction.inspect()}"
+  inspect: ->
+    [
+      'Q',
+      'P:' + @precedence
+      @direction.inspect(),
+      @wasRelayed and 'R' or ''
+    ].filter( (s) -> s.length).join(' ')
 
 
   constructor: (@transmission, opts = {}) ->
     {@precedence, @direction, @nesting} = opts
 
 
-  createNextConnectionQuery: -> @createNextQuery(-1)
+  createNextConnectionQuery: ->
+    @transmission.createQuery({
+      precedence: Math.ceil(@precedence) - 1
+      @direction
+      nesting: @nesting - 1
+    })
 
 
-  createNextQuery: (nestingDelta = 0) ->
+  createNextQuery: ->
     @transmission.createQuery({
       @precedence
       @direction
-      nesting: @nesting + nestingDelta
+      @nesting
     })
 
 
@@ -25,9 +36,10 @@ module.exports = class Query
     @transmission.createMessage(payload, {@precedence, @direction, @nesting})
 
 
+  directionMatches: (direction) -> @direction.matches(direction)
+
+
   sendToLine: (line) ->
-    if not line.directionMatches(@direction)
-      return this
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
     else

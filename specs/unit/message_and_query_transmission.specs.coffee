@@ -13,6 +13,7 @@ Transmitter = require 'transmitter'
 
 class DirectionStub
   matches: (other) -> this == other
+  reverse: -> new DirectionStub()
 
 class StubPayload
   deliver: ->
@@ -48,7 +49,7 @@ describe 'Message and query transmission', ->
     sinon.spy(@payload, 'deliver')
     @message = new Message(@transmission, @payload, {direction: @directionStub})
 
-    @message.sendToNodeSource(@source.getNodeSource())
+    @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
 
     expect(@payload.deliver).to.have.been
       .calledWith(sinon.match.same(@target))

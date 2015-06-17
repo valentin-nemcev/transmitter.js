@@ -10,6 +10,7 @@ Transmitter = require 'transmitter'
 
 class DirectionStub
   matches: (other) -> this == other
+  reverse: -> new DirectionStub()
 
 class StubPayload
 
@@ -50,7 +51,8 @@ describe 'Message merging', ->
     @message1 = new Message(@transmission, @activePayload,
       {direction: @directionStub})
 
-    @message1.sendToNodeSource(@activeSource.getNodeSource())
+    @message1.sendFromNodeToNodeSource(@activeSource,
+      @activeSource.getNodeSource())
 
 
   specify 'then nothing is sent', ->

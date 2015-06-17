@@ -23,9 +23,6 @@ module.exports = class ConnectionNodeLine
     return this
 
 
-  directionMatches: (direction) -> @direction.matches(direction)
-
-
   receiveConnectionMessage: (message) ->
     message.sendToLine(this)
     @target?.receiveConnectionMessageFrom(message, this)
@@ -38,7 +35,8 @@ module.exports = class ConnectionNodeLine
 
 
   receiveQuery: (query) ->
-    @source.receiveQuery(query)
+    if query.directionMatches(@direction)
+      @source.receiveQuery(query)
     return this
 
 

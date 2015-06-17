@@ -5,37 +5,66 @@ assert = require 'assert'
 MergedPayload = require '../payloads/merged'
 
 
+class NullMessage
+  sendFromNodeToNodeSource: -> this
+
+
 module.exports = class Message
 
-  inspect: -> "M #{@payload.inspect()}"
+  @getNullMessage = -> @nullMessage ?= new NullMessage()
+
+  inspect: ->
+    [
+      'M'
+      'P:' + @precedence
+      @direction.inspect()
+      @wasDelivered and 'D' or ''
+      @payload.inspect()
+    ].filter( (s) -> s.length).join(' ')
+
+
+  getNullMessage: -> Message.getNullMessage()
 
 
   constructor: (@transmission, @payload, opts = {}) ->
     assert(@payload, 'Message must have payload')
-    {@precedence, @direction, @nesting} = opts
+    {@precedence, @direction, @nesting, @sourceMessage} = opts
 
 
-  createNextConnectionQuery: -> @createNextQuery(-1)
-
-
-  createNextQuery: (nestingDelta = 0) ->
+  createNextConnectionQuery: ->
     @transmission.createQuery({
-      @precedence,
-      @direction,
-      nesting: @nesting + nestingDelta
+      precedence: Math.ceil(@precedence) - 1
+      @direction
+      nesting: @nesting - 1
+    })
+
+
+  createNextQuery: ->
+    @transmission.createQuery({
+      @precedence
+      @direction
+      @nesting
     })
 
 
   createQueryForMerge: ->
+    precedence = Math.ceil(@precedence)
+    if precedence == 0
+      precedence = -1
     @transmission.createQuery({
-      precedence: Math.ceil(@precedence) - 1,
-      @direction,
+      precedence
+      @direction
       @nesting
     })
 
 
   createNextMessage: (payload) ->
     @transmission.createMessage(payload, {@precedence, @direction, @nesting})
+
+
+  createTransformedMessage: (payload) ->
+    @transmission.createMessage(payload,
+      {@precedence, @direction, @nesting, sourceMessage: this})
 
 
   createMergedMessage: (messages) ->
@@ -49,26 +78,39 @@ module.exports = class Message
     nesting = Math.max.apply(null,
       messages.map(([key, message]) -> message.nesting)
     )
-    @transmission.createMessage(payload, {precedence, @direction, nesting})
+    @transmission.createMessage(payload,
+      {precedence, @direction, nesting, sourceMessage: this})
 
 
   createResponseMessage: ->
-    precedence = Math.min(1, Math.floor(@precedence) + 1)
-    @transmission.createMessage(@payload,
-      {precedence, direction: @direction.reverse(), @nesting})
+    precedence = Math.ceil(@precedence) + 1
+    if precedence == 1
+      @transmission.createMessage(@payload,
+        {precedence, direction: @direction.reverse(), @nesting})
+    else
+      @getNullMessage()
 
 
   createNextConnectionMessage: (payload) ->
     @transmission.createConnectionMessage(payload)
 
 
+  markSourceMessageAsDelivered: ->
+    if @sourceMessage?
+      @sourceMessage.markSourceMessageAsDelivered()
+    else
+      @wasDelivered = yes
+    return this
+
+
   getPayload: ->
     return @payload
 
 
+  directionMatches: (direction) -> @direction.matches(direction)
+
+
   sendToLine: (line) ->
-    if not line.directionMatches(@direction)
-      return this
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
@@ -82,7 +124,7 @@ module.exports = class Message
 
   _sendToNodePoint: (point) ->
     unless @hasPrecedenceOver(@transmission.getMessageFor(point))
-      @wasRelayed = yes
+      @markSourceMessageAsDelivered()
       return this
     @transmission.addMessageFor(this, point)
     point.receiveMessage(this)
@@ -93,12 +135,14 @@ module.exports = class Message
 
 
   sendToNode: (node) ->
-    @wasRelayed = yes
+    @markSourceMessageAsDelivered()
     node.routeMessage(this, @payload)
     return this
 
 
-  sendToNodeSource: (nodeSource) -> @_sendToNodePoint(nodeSource)
+  sendFromNodeToNodeSource: (@node, nodeSource) ->
+    @transmission.enqueue(this)
+    @_sendToNodePoint(nodeSource)
 
 
   typeOrder: 1
@@ -108,19 +152,14 @@ module.exports = class Message
     [@precedence, @typeOrder, @nesting]
 
 
-  enqueueForSourceNode: (@node) ->
-    @transmission.enqueue(this)
-    return this
-
-
   respond: ->
-    @node.respondToMessage(this) unless @wasRelayed
+    @node.respondToMessage(this) unless @wasDelivered
     return this
 
 
   sendTransformedTo: (transform, target) ->
     copy = if transform?
-      @createNextMessage(transform(@payload, @transmission))
+      @createTransformedMessage(transform(@payload, @transmission))
     else
       this
     target.receiveMessage(copy)

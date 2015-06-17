@@ -5,19 +5,19 @@ forward  = {
   isForward: yes
   inspect: -> '→'
   reverse: -> backward
-  matches: (other) -> other.isForward
+  matches: (other) -> other.isOmni || other.isForward
 }
 backward = {
   isBackward: yes
   inspect: -> '←'
   reverse: -> forward
-  matches: (other) -> other.isBackward
+  matches: (other) -> other.isOmni || other.isBackward
 }
 nullDir = {
   isNull: yes
   inspect: -> '-'
   reverse: -> nullDir
-  matches: (other) -> other.isNull
+  matches: (other) -> other.isOmni || other.isNull
 }
 omni = {
   isOmni: yes

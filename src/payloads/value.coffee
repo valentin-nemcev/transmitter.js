@@ -11,12 +11,16 @@ class ConstValue
   get: -> @value
 
 
+id = (a) -> a
+getNull = -> null
+
 
 class ValueUpdatePayload
 
   constructor: (@source, opts = {}) ->
-    @mapFn = opts.map
+    @mapFn = opts.map ? id
     @matchFn = opts.match
+    @ifEmptyFn = opts.ifEmpty ? getNull
 
 
   inspect: -> "valueUpdate(#{inspect @source})"
@@ -25,9 +29,14 @@ class ValueUpdatePayload
   deliverValueState: (target) ->
     sourceValue = @source.get()
     targetValue = target.get()
-    unless sourceValue? and targetValue? \
+    return this if sourceValue? and targetValue? \
       and @matchFn.call(null, sourceValue, targetValue)
-        target.set(@mapFn.call(null, sourceValue))
+
+    newTargetValue = if sourceValue?
+      @mapFn.call(null, sourceValue)
+    else
+      @ifEmptyFn.call(null)
+    target.set(newTargetValue)
     return this
 
 
@@ -42,11 +51,9 @@ module.exports = class ValuePayload
     return new this(new ConstValue(value))
 
 
-  id = (a) -> a
-
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
-    @ifEmptyFn = opts.ifEmpty ? -> null
+    @ifEmptyFn = opts.ifEmpty ? getNull
 
 
   inspect: -> "value(#{inspect @get()})"
@@ -67,8 +74,8 @@ module.exports = class ValuePayload
     new ValuePayload(this, {ifEmpty})
 
 
-  mapIfMatch: (map, match) ->
-    new ValueUpdatePayload(this, {map, match})
+  mapIfMatch: (map, match, ifEmpty) ->
+    new ValueUpdatePayload(this, {map, match, ifEmpty})
 
 
   flatMap: (map) ->
