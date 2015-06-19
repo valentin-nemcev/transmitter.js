@@ -3,6 +3,7 @@
 
 assert = require 'assert'
 MergedPayload = require '../payloads/merged'
+directions = require '../directions'
 
 
 class NullMessage
@@ -10,8 +11,6 @@ class NullMessage
 
 
 module.exports = class Message
-
-  @getNullMessage = -> @nullMessage ?= new NullMessage()
 
   inspect: ->
     [
@@ -24,7 +23,72 @@ module.exports = class Message
     ].filter( (s) -> s.length).join(' ')
 
 
+  @getNullMessage = -> @nullMessage ?= new NullMessage()
+
   getNullMessage: -> Message.getNullMessage()
+
+
+  @createInitial = (transmission, payload) ->
+    new this(transmission, payload,
+      direction: directions.backward, precedence: 0, nesting: 0)
+
+
+  @createNext = (prevMessage, payload) ->
+    new this(prevMessage.transmission, payload, {
+      precedence: prevMessage.precedence
+      direction:  prevMessage.direction
+      nesting:    prevMessage.nesting
+    })
+
+
+  @createQueryResponse = (queuedQuery, payload) ->
+    new this(queuedQuery.transmission, payload, {
+      precedence: queuedQuery.precedence
+      direction:  queuedQuery.direction
+      nesting:    queuedQuery.nesting
+    })
+
+
+  @createMessageResponse = (queuedMessage, payload) ->
+    precedence = Math.ceil(queuedMessage.precedence) + 1
+    if precedence == 1
+      new this(queuedMessage.transmission, payload, {
+        precedence
+        direction: queuedMessage.direction.reverse()
+        nesting: queuedMessage.nesting
+      })
+    else
+      @getNullMessage()
+
+
+  @createTransformed = (prevMessage, payload) ->
+    new this(prevMessage.transmission, payload, {
+      precedence: prevMessage.precedence
+      direction:  prevMessage.direction
+      nesting:    prevMessage.nesting
+      sourceMessage: prevMessage
+    })
+
+
+  @createMerged = (prevMessages) ->
+    payload = new MergedPayload(
+      prevMessages.map ([key, message]) -> [key, message.payload]
+    )
+    precedence = prevMessages
+      .map(([key, message]) -> message.precedence)
+      .reduce((a, b) -> a + b) /
+        prevMessages.length
+    nesting = Math.max.apply(null,
+      prevMessages.map(([key, message]) -> message.nesting)
+    )
+    prevMessage = prevMessages[0][1]
+    new this(prevMessage.transmission, payload, {
+      precedence
+      direction: prevMessage.direction #TODO
+      nesting
+      sourceMessage: prevMessage #TODO
+    })
+
 
 
   constructor: (@transmission, @payload, opts = {}) ->
@@ -32,97 +96,30 @@ module.exports = class Message
     {@precedence, @direction, @nesting, @sourceMessage} = opts
 
 
-  createNextConnectionQuery: ->
-    @transmission.createQuery({
-      precedence: Math.ceil(@precedence) - 1
-      @direction
-      nesting: @nesting - 1
-    })
-
-
-  createNextQuery: ->
-    @transmission.createQuery({
-      @precedence
-      @direction
-      @nesting
-    })
-
-
-  createQueryForMerge: ->
-    precedence = Math.ceil(@precedence)
-    if precedence == 0
-      precedence = -1
-    @transmission.createQuery({
-      precedence
-      @direction
-      @nesting
-    })
-
-
   createNextMessage: (payload) ->
-    @transmission.createMessage(payload, {@precedence, @direction, @nesting})
+    Message.createNext(this, payload)
 
 
-  createTransformedMessage: (payload) ->
-    @transmission.createMessage(payload,
-      {@precedence, @direction, @nesting, sourceMessage: this})
-
-
-  createMergedMessage: (messages) ->
-    payload = new MergedPayload(
-      messages.map ([key, message]) -> [key, message.getPayload()]
-    )
-    precedence = messages
-      .map(([key, message]) -> message.precedence)
-      .reduce((a, b) -> a + b) /
-        messages.length
-    nesting = Math.max.apply(null,
-      messages.map(([key, message]) -> message.nesting)
-    )
-    @transmission.createMessage(payload,
-      {precedence, @direction, nesting, sourceMessage: this})
-
-
-  createResponseMessage: (payload) ->
-    precedence = Math.ceil(@precedence) + 1
-    if precedence == 1
-      @transmission.createMessage(payload,
-        {precedence, direction: @direction.reverse(), @nesting})
-    else
-      @getNullMessage()
+  createMessageResponseMessage: (payload) ->
+    Message.createMessageResponse(this, payload)
 
 
   createNextConnectionMessage: (payload) ->
-    @transmission.createConnectionMessage(payload)
+    @transmission.ConnectionMessage.createNext(this, payload)
 
-
-  getSourceNode: ->
-    if @sourceMessage?
-      @sourceMessage.getSourceNode()
-    else
-      @node
-
-
-  markSourceMessageAsDelivered: ->
-    if @sourceMessage?
-      @sourceMessage.markSourceMessageAsDelivered()
-    else
-      @wasDelivered = yes
-    return this
-
-
-  getPayload: ->
-    return @payload
 
 
   directionMatches: (direction) -> @direction.matches(direction)
 
 
   sendToLine: (line) ->
+    # TODO: Check connection message precedence
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveMessage(this)
     else
-      line.receiveConnectionQuery(@createNextConnectionQuery())
+      line.receiveConnectionQuery(
+        @transmission.Query.createNextConnection(this)
+      )
     return this
 
 
@@ -170,9 +167,25 @@ module.exports = class Message
     return this
 
 
+
+  getSourceNode: ->
+    if @sourceMessage?
+      @sourceMessage.getSourceNode()
+    else
+      @node
+
+
+  markSourceMessageAsDelivered: ->
+    if @sourceMessage?
+      @sourceMessage.markSourceMessageAsDelivered()
+    else
+      @wasDelivered = yes
+    return this
+
+
   sendTransformedTo: (transform, target) ->
     copy = if transform?
-      @createTransformedMessage(transform(@payload, @transmission))
+      Message.createTransformed(this, transform(@payload, @transmission))
     else
       this
     target.receiveMessage(copy)
@@ -191,10 +204,10 @@ module.exports = class Message
 
   sendMergedTo: (sourceKeys, target) ->
     if (messages = getMessagesToMerge(@transmission, sourceKeys))?
-      target.receiveMessage(@createMergedMessage(messages))
+      target.receiveMessage(Message.createMerged(messages))
     return this
 
 
   sendQueryForMerge: (source) ->
-    source.receiveQuery(@createQueryForMerge())
+    source.receiveQuery(@transmission.Query.createForMerge(this))
     return this

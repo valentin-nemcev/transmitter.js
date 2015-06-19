@@ -21,18 +21,18 @@ module.exports = class RelayNode
 
   routeQuery: (tr) ->
     tr.createNextQuery()
-      .enqueueForSourceNode(this).sendToNodeTarget(@getNodeTarget())
+      .sendFromNodeToNodeTarget(this, @getNodeTarget())
     return this
 
 
   respondToMessage: (tr) ->
-    tr.createResponseMessage(@createResponsePayload())
+    tr.createMessageResponseMessage(@createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
 
   respondToQuery: (tr) ->
-    tr.createNextMessage(@createResponsePayload())
+    tr.createQueryResponseMessage(@createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
@@ -51,7 +51,7 @@ module.exports = class RelayNode
 
   queryState: (tr) ->
     tr.createInitialQuery()
-      .enqueueForSourceNode(this).sendToNodeTarget(@getNodeTarget())
+      .sendFromNodeToNodeTarget(this, @getNodeTarget())
     return this
 
 

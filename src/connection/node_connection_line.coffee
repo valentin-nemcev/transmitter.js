@@ -26,7 +26,7 @@ module.exports = class NodeConnectionLine
 
   receiveConnectionMessage: (message) ->
     message.sendToLine(this)
-    @source?.receiveConnectionMessageFrom(message, this)
+    message.passMessage(@source, this) if @source?
     return this
 
 

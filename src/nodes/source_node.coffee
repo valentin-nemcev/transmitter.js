@@ -19,13 +19,13 @@ module.exports = class SourceNode
 
 
   respondToMessage: (tr) ->
-    tr.createResponseMessage(@createResponsePayload())
+    tr.createMessageResponseMessage(@createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
 
   respondToQuery: (tr) ->
-    tr.createNextMessage(@createResponsePayload())
+    tr.createQueryResponseMessage(@createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 

@@ -19,11 +19,6 @@ module.exports = class NodeSource
     return this
 
 
-  receiveConnectionMessageFrom: (message, line) ->
-    message.passMessage(this, line)
-    return this
-
-
   receiveMessage: (message) ->
     @targets.forEach (target) ->
       message.sendToLine(target)

@@ -1,6 +1,9 @@
 'use strict'
 
 
+directions = require '../directions'
+
+
 module.exports = class Query
 
   inspect: ->
@@ -12,38 +15,63 @@ module.exports = class Query
     ].filter( (s) -> s.length).join(' ')
 
 
+  @createInitial = (transmission) ->
+    new this(transmission,
+      {direction: directions.forward, precedence: 1, nesting: 0})
+
+
+  @createNext = (prevQuery) ->
+    new this(prevQuery.transmission, {
+      precedence: prevQuery.precedence
+      direction:  prevQuery.direction
+      nesting:    prevQuery.nesting
+    })
+
+
+  @createNextConnection = (prevMessageOrQuery) ->
+    new this(prevMessageOrQuery.transmission, {
+      precedence: Math.ceil(prevMessageOrQuery.precedence) - 1
+      direction:  prevMessageOrQuery.direction
+      nesting:    prevMessageOrQuery.nesting - 1
+    })
+
+
+  @createForMerge = (prevMessage) ->
+    precedence = Math.ceil(prevMessage.precedence)
+    if precedence == 0
+      precedence = -1
+    new this(prevMessage.transmission, {
+      precedence
+      direction: prevMessage.direction
+      nesting: prevMessage.nesting
+    })
+
+
+
   constructor: (@transmission, opts = {}) ->
     {@precedence, @direction, @nesting} = opts
 
 
-  createNextConnectionQuery: ->
-    @transmission.createQuery({
-      precedence: Math.ceil(@precedence) - 1
-      @direction
-      nesting: @nesting - 1
-    })
-
-
   createNextQuery: ->
-    @transmission.createQuery({
-      @precedence
-      @direction
-      @nesting
-    })
+    Query.createNext(this)
 
 
-  createNextMessage: (payload) ->
-    @transmission.createMessage(payload, {@precedence, @direction, @nesting})
+  createQueryResponseMessage: (payload) ->
+    @transmission.Message.createQueryResponse(this, payload)
+
 
 
   directionMatches: (direction) -> @direction.matches(direction)
 
 
   sendToLine: (line) ->
+    # TODO: Check connection message precedence
     if line.isConst() or @transmission.hasMessageFor(line)
       line.receiveQuery(this)
     else
-      line.receiveConnectionQuery(@createNextConnectionQuery())
+      line.receiveConnectionQuery(
+        @transmission.Query.createNextConnection(this)
+      )
     return this
 
 
@@ -70,7 +98,14 @@ module.exports = class Query
     return this
 
 
-  sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
+  sendFromNodeToNodeTarget: (node, nodeTarget) ->
+    @enqueueForSourceNode(node)
+    @_sendToNodePoint(nodeTarget)
+
+
+  enqueueForSourceNode: (@node) ->
+    @transmission.enqueue(this)
+    return this
 
 
   typeOrder: 0
@@ -78,11 +113,6 @@ module.exports = class Query
 
   getQueueOrder: ->
     [@precedence, @typeOrder, @nesting]
-
-
-  enqueueForSourceNode: (@node) ->
-    @transmission.enqueue(this)
-    return this
 
 
   respond: ->

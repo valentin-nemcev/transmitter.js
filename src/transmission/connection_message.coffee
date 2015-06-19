@@ -7,6 +7,14 @@ module.exports = class ConnectionMessage
   inspect: -> "CM #{@payload.inspect()}"
 
 
+  @createInitial = (transmission, payload) ->
+    new this(transmission, payload)
+
+
+  @createNext = (prevMessage, payload) ->
+    new this(prevMessage.transmission, payload)
+
+
   constructor: (@transmission, @payload) ->
     #TODO: precedence
     assert(@payload, 'Message must have payload')

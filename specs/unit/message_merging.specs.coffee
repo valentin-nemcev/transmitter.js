@@ -73,7 +73,7 @@ describe 'Message merging', ->
     @transmission.respond()
 
     mergedMessage = @target.receiveMessage.firstCall.args[0]
-    mergedPayload = mergedMessage.getPayload()
+    mergedPayload = mergedMessage.payload
 
 
     expect(mergedPayload.getAt(@activeSource)).to.equal(@activePayload)

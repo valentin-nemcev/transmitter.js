@@ -19,11 +19,6 @@ module.exports = class NodeTarget
     return this
 
 
-  receiveConnectionMessageFrom: (message, line) ->
-    message.passQuery(this, line)
-    return this
-
-
   receiveMessage: (message) ->
     message.sendToNode(@node)
     return this

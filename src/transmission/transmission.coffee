@@ -4,15 +4,15 @@
 assert = require 'assert'
 
 stableSort = require 'stable'
-directions = require '../directions'
 {inspect} = require 'util'
 
-Query = require './query'
-Message = require './message'
-ConnectionMessage = require './connection_message'
 
 
 module.exports = class Transmission
+
+  Query             : require './query'
+  Message           : require './message'
+  ConnectionMessage : require './connection_message'
 
   @start = (doWithTransmission) ->
     assert(not @instance, "Transmissions can't be nested")
@@ -46,28 +46,13 @@ module.exports = class Transmission
 
 
   createInitialQuery: ->
-    @createQuery({direction: directions.forward, precedence: 1, nesting: 0})
-
+    @Query.createInitial(this)
 
   createInitialMessage: (payload) ->
-    @createMessage(payload,
-      direction: directions.backward, precedence: 0, nesting: 0)
-
+    @Message.createInitial(this, payload)
 
   createInitialConnectionMessage: (payload) ->
-    @createConnectionMessage(payload)
-
-
-  createQuery: (opts) ->
-    new Query(this, opts)
-
-
-  createMessage: (payload, opts) ->
-    new Message(this, payload, opts)
-
-
-  createConnectionMessage: (payload, opts) ->
-    new ConnectionMessage(this, payload, opts)
+    @ConnectionMessage.createInitial(this, payload)
 
 
 
