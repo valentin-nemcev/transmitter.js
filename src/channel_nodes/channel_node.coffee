@@ -22,7 +22,7 @@ module.exports = class ChannelNode
 
 
   receiveMessage: (@message) ->
-    @message.sendToNode(this)
+    @message.sendToChannelNode(this)
     return this
 
 

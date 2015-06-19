@@ -7,6 +7,11 @@ ListPayload = require '../payloads/list'
 
 module.exports = class List extends RelayNode
 
+  payloads:
+    remove: (el) -> ListPayload.createRemove(el)
+    noOp:        -> ListPayload.createNoOp()
+
+
   createResponsePayload: ->
     ListPayload.create(this)
 
@@ -28,7 +33,10 @@ module.exports = class List extends RelayNode
 
 
   acceptPayload: (payload) ->
-    payload.deliverListState(this)
+    if payload.deliverListState?
+      payload.deliverListState(this)
+    else
+      payload.deliverValueState(this)
     return this
 
 

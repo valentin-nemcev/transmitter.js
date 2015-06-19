@@ -27,8 +27,12 @@ module.exports = class Transmission
 
   loggingIsEnabled: no
 
+  loggingFilter: -> true
+
   log: (name, args...) ->
-    console.log name, args.map(inspect).join(', ') if @loggingIsEnabled
+    return this unless @loggingIsEnabled
+    msg = args.map(inspect).join(', ')
+    console.log name, msg if @loggingFilter(msg)
     return this
 
 

@@ -18,6 +18,7 @@ module.exports = class Message
       'M'
       'P:' + @precedence
       @direction.inspect()
+      @getSourceNode()?.inspect() ? ''
       @wasDelivered and 'D' or ''
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
@@ -82,10 +83,10 @@ module.exports = class Message
       {precedence, @direction, nesting, sourceMessage: this})
 
 
-  createResponseMessage: ->
+  createResponseMessage: (payload) ->
     precedence = Math.ceil(@precedence) + 1
     if precedence == 1
-      @transmission.createMessage(@payload,
+      @transmission.createMessage(payload,
         {precedence, direction: @direction.reverse(), @nesting})
     else
       @getNullMessage()
@@ -93,6 +94,13 @@ module.exports = class Message
 
   createNextConnectionMessage: (payload) ->
     @transmission.createConnectionMessage(payload)
+
+
+  getSourceNode: ->
+    if @sourceMessage?
+      @sourceMessage.getSourceNode()
+    else
+      @node
 
 
   markSourceMessageAsDelivered: ->
@@ -132,6 +140,11 @@ module.exports = class Message
 
 
   sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
+
+
+  sendToChannelNode: (node) ->
+    node.routeMessage(this, @payload)
+    return this
 
 
   sendToNode: (node) ->

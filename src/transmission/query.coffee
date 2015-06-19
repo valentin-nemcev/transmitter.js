@@ -8,7 +8,7 @@ module.exports = class Query
       'Q',
       'P:' + @precedence
       @direction.inspect(),
-      @wasRelayed and 'R' or ''
+      @wasDelivered and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
 
 
@@ -54,7 +54,7 @@ module.exports = class Query
   _sendToNodePoint: (point) ->
     unless @hasPrecedenceOver(@transmission.getMessageFor(point)) and
       @hasPrecedenceOver(@transmission.getQueryFor(point))
-        @wasRelayed = yes
+        @wasDelivered = yes
         return this
     @transmission.addQueryFor(this, point)
     point.receiveQuery(this)
@@ -65,7 +65,7 @@ module.exports = class Query
 
 
   sendToNode: (node) ->
-    @wasRelayed = yes
+    @wasDelivered = yes
     node.routeQuery(this)
     return this
 
@@ -86,5 +86,5 @@ module.exports = class Query
 
 
   respond: ->
-    @node.respondToQuery(this) unless @wasRelayed
+    @node.respondToQuery(this) unless @wasDelivered
     return this

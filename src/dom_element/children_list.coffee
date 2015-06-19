@@ -40,7 +40,7 @@ module.exports = class ChildrenList extends List
   move: (fromPos, toPos) ->
     el = @getAt(fromPos)
     @removeAt(fromPos)
-    @addAt(toPos)
+    @addAt(el, toPos)
     return this
 
 

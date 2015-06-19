@@ -12,6 +12,7 @@ module.exports = new class Transmitter
   Channels:     require './channels'
   ChannelNodes: require './channel_nodes'
   DOMElement:   require './dom_element'
+  Transmission: Transmission
 
   constructor: (opts = {}) ->
     {@reverseOrder} = opts

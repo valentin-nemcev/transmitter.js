@@ -26,7 +26,7 @@ module.exports = class RelayNode
 
 
   respondToMessage: (tr) ->
-    tr.createResponseMessage()
+    tr.createResponseMessage(@createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 

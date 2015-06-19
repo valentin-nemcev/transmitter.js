@@ -17,6 +17,28 @@ class ConstValue
 
 
 
+class ListNoOpPayload
+
+  constructor: ->
+
+  inspect: -> "listNoOp()"
+
+  deliverListState: (target) ->
+    return this
+
+
+class ListRemovePayload
+
+  constructor: (@element) ->
+
+  inspect: -> "listRemove(#{inspect @element})"
+
+  deliverListState: (target) ->
+    for el, pos in target.get() when el == @element
+      target.removeAt(pos)
+    return this
+
+
 class ListUpdatePayload
 
   constructor: (@source, opts = {}) ->
@@ -76,6 +98,14 @@ module.exports = class ListPayload
     return new this(new ConstValue(value))
 
 
+  @createRemove = (element) =>
+    return new ListRemovePayload(element)
+
+
+  @createNoOp = =>
+    return new ListNoOpPayload()
+
+
   id = (a) -> a
 
   constructor: (@source, opts = {}) ->
@@ -88,7 +118,7 @@ module.exports = class ListPayload
 
   get: ->
     if (value = @source.get()).length
-      value.map(@mapFn)
+      @mapFn.call(null, el) for el in value
     else
       @ifEmptyFn.call(null)
 

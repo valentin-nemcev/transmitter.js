@@ -7,6 +7,12 @@ ValuePayload = require './value'
 
 module.exports = class MergedPayload
 
+  inspect: ->
+    payloads = for [node, payload] in Array.from(@payloads.entries())
+      node.inspect() + ': ' + payload.inspect()
+    "merged(#{payloads.join(', ')})"
+
+
   constructor: (payloads) ->
     @payloads = new Map()
     for [key, payload] in payloads

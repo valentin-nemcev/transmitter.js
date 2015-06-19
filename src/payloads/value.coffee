@@ -74,6 +74,17 @@ module.exports = class ValuePayload
     new ValuePayload(this, {ifEmpty})
 
 
+  transform: (transform, ifEmpty) ->
+    if (value = @get())?
+      transform(value)
+    else
+      ifEmpty()
+
+
+  ifEmpty: (ifEmpty) ->
+    new ValuePayload(this, {ifEmpty})
+
+
   mapIfMatch: (map, match, ifEmpty) ->
     new ValueUpdatePayload(this, {map, match, ifEmpty})
 

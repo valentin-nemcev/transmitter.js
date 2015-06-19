@@ -32,10 +32,12 @@ describe 'Nested list connection', ->
         new ListItem(derivedToOrigin(derivedItem.name))
       .withOriginDerivedChannel (originItem, derivedItem) ->
         # TODO: Enforce consistency
+        unless originItem? and derivedItem?
+          return Transmitter.Channels.getNullChannel()
         new Transmitter.Channels.VariableChannel()
-          .withOrigin originItem?.valueVar
+          .withOrigin originItem.valueVar
           .withMapOrigin originToDerived
-          .withDerived derivedItem?.valueVar
+          .withDerived derivedItem.valueVar
           .withMapDerived derivedToOrigin
 
     Transmitter.startTransmission (tr) =>
