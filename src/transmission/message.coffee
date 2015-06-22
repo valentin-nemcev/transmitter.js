@@ -111,19 +111,18 @@ module.exports = class Message
   directionMatches: (direction) -> @direction.matches(direction)
 
 
+  hasPrecedenceOver: (prev) ->
+    not prev? or this.precedence > prev.precedence
+
+
   sendToLine: (line) ->
-    # TODO: Check connection message precedence
-    if line.isConst() or @transmission.hasMessageFor(line)
-      line.receiveMessage(this)
+    if line.isConst() or not @hasPrecedenceOver(@transmission.getMessageFor(line))
+      line.receiveOutgoingMessage(this)
     else
       line.receiveConnectionQuery(
         @transmission.Query.createNextConnection(this)
       )
     return this
-
-
-  hasPrecedenceOver: (prev) ->
-    not prev? or this.precedence > prev.precedence
 
 
   _sendToNodePoint: (point) ->

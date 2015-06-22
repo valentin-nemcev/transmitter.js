@@ -34,7 +34,11 @@ module.exports = class ConnectionNodeLine
     return this
 
 
-  receiveQuery: (query) ->
+  receiveOutgoingMessage: ->
+    return this
+
+
+  receiveOutgoingQuery: (query) ->
     if query.directionMatches(@direction)
       @source.receiveQuery(query)
     return this

@@ -1,6 +1,5 @@
 'use strict'
 
-assert = require 'assert'
 
 module.exports = class ConnectionMessage
 
@@ -15,9 +14,8 @@ module.exports = class ConnectionMessage
     new this(prevMessage.transmission, payload)
 
 
-  constructor: (@transmission, @payload) ->
-    #TODO: precedence
-    assert(@payload, 'Message must have payload')
+  constructor: (@transmission, @payload, opts = {}) ->
+    {@precedence} = opts
 
 
   sendToConnection: (connection) ->
@@ -27,20 +25,25 @@ module.exports = class ConnectionMessage
 
   passMessage: (point, line) ->
     if message = @transmission.getMessageFor(point)
-      line.receiveMessage(message)
+      message.sendToLine(line)
       @transmission.log 'passMessage', this, line, message
     return this
 
 
   passQuery: (point, line) ->
     if query = @transmission.getQueryFor(point)
-      line.receiveQuery(query)
+      query.sendToLine(line)
       @transmission.log 'passQuery', this, line, query
     return this
 
 
+  hasPrecedenceOver: (prev) ->
+    not prev? or this.precedence > prev.precedence
+
+
   sendToLine: (line) ->
-    return this if @transmission.hasMessageFor(line)
+    unless @hasPrecedenceOver(@transmission.getMessageFor(line))
+      return this
     @transmission.addMessageFor(this, line)
     @payload.deliver(line)
     return this

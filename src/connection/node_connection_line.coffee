@@ -1,7 +1,6 @@
 'use strict'
 
 
-
 module.exports = class NodeConnectionLine
 
   inspect: -> (@source?.inspect() ? null) + '-'
@@ -40,7 +39,11 @@ module.exports = class NodeConnectionLine
     return this
 
 
-  receiveMessage: (message) ->
+  receiveOutgoingQuery: ->
+    return this
+
+
+  receiveOutgoingMessage: (message) ->
     if message.directionMatches(@direction)
       @target.receiveMessage(message)
     return this
