@@ -1,7 +1,6 @@
 'use strict'
 
 
-assert = require 'assert'
 MergedPayload = require '../payloads/merged'
 directions = require '../directions'
 
@@ -17,7 +16,7 @@ module.exports = class Message
       'M'
       'P:' + @precedence
       @direction.inspect()
-      @getSourceNode()?.inspect() ? ''
+      @getSourceNodes().map((n) -> n.inspect()).join(' ')
       @wasDelivered and 'D' or ''
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
@@ -63,10 +62,10 @@ module.exports = class Message
 
   @createTransformed = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
-      precedence: prevMessage.precedence
-      direction:  prevMessage.direction
-      nesting:    prevMessage.nesting
-      sourceMessage: prevMessage
+      precedence:     prevMessage.precedence
+      direction:      prevMessage.direction
+      nesting:        prevMessage.nesting
+      sourceMessages: [prevMessage]
     })
 
 
@@ -86,14 +85,14 @@ module.exports = class Message
       precedence
       direction: prevMessage.direction #TODO
       nesting
-      sourceMessage: prevMessage #TODO
+      sourceMessages: prevMessages.map ([key, message]) -> message
     })
 
 
 
   constructor: (@transmission, @payload, opts = {}) ->
-    assert(@payload, 'Message must have payload')
-    {@precedence, @direction, @nesting, @sourceMessage} = opts
+    {@precedence, @direction, @nesting} = opts
+    @sourceMessages = opts.sourceMessages ? []
 
 
   createNextMessage: (payload) ->
@@ -168,16 +167,20 @@ module.exports = class Message
 
 
 
-  getSourceNode: ->
-    if @sourceMessage?
-      @sourceMessage.getSourceNode()
+  getSourceNodes: ->
+    if @sourceMessages.length
+      sourceNodes = []
+      for message in @sourceMessages
+        sourceNodes.push @sourceMessages.getSourceNodes()...
+      sourceNodes
     else
-      @node
+      [@node]
 
 
   markSourceMessageAsDelivered: ->
-    if @sourceMessage?
-      @sourceMessage.markSourceMessageAsDelivered()
+    if @sourceMessages.length
+      for message in @sourceMessages
+        message.markSourceMessageAsDelivered()
     else
       @wasDelivered = yes
     return this
