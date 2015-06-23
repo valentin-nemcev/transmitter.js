@@ -16,7 +16,7 @@ module.exports = class Message
       'M'
       'P:' + @precedence
       @direction.inspect()
-      @getSourceNodes().map((n) -> n.inspect()).join(' ')
+      @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
       @wasDelivered and 'D' or ''
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
@@ -112,11 +112,11 @@ module.exports = class Message
 
 
   hasPrecedenceOver: (prev) ->
-    not prev? or this.precedence > prev.precedence
+    not prev? or [this.precedence, this.typeOrder] > [prev.precedence, prev.typeOrder]
 
 
   sendToLine: (line) ->
-    if line.isConst() or not @hasPrecedenceOver(@transmission.getMessageFor(line))
+    if line.isConst() or not @hasPrecedenceOver(@transmission.getCommunicationFor(line))
       line.receiveOutgoingMessage(this)
     else
       line.receiveConnectionQuery(
@@ -126,11 +126,16 @@ module.exports = class Message
 
 
   _sendToNodePoint: (point) ->
-    unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+    if @hasPrecedenceOver(@transmission.getCommunicationFor(point))
+      @transmission.addCommunicationFor(this, point)
+      point.receiveMessage(this)
+    else
       @markSourceMessageAsDelivered()
-      return this
-    @transmission.addMessageFor(this, point)
-    point.receiveMessage(this)
+    # unless @hasPrecedenceOver(@transmission.getMessageFor(point))
+    #   @markSourceMessageAsDelivered()
+    #   return this
+    # @transmission.addMessageFor(this, point)
+    # point.receiveMessage(this)
     return this
 
 
@@ -170,7 +175,7 @@ module.exports = class Message
     if @sourceMessages.length
       sourceNodes = []
       for message in @sourceMessages
-        sourceNodes.push @sourceMessages.getSourceNodes()...
+        sourceNodes.push message.getSourceNodes()...
       sourceNodes
     else
       [@node]
@@ -197,9 +202,9 @@ module.exports = class Message
   getMessagesToMerge = (tr, sourceKeys) ->
     messages = []
     for key in sourceKeys
-      message = tr.getMessageFor(key.getNodeSource())
-      return unless message?
-      messages.push [key, message]
+      comm = tr.getCommunicationFor(key.getNodeSource())
+      return unless comm? and comm instanceof Message
+      messages.push [key, comm]
 
     return messages
 

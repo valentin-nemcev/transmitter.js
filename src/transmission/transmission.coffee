@@ -39,8 +39,7 @@ module.exports = class Transmission
   reverseOrder: no
 
   constructor: ->
-    @pointsToMessages = new Map()
-    @pointsToQueries = new Map()
+    @pointsToComms = new Map()
     @queue = []
 
 
@@ -56,29 +55,13 @@ module.exports = class Transmission
 
 
 
-  addMessageFor: (message, point) ->
-    @log 'addMessageFor', arguments...
-    @pointsToMessages.set(point, message)
-    return this
+  addCommunicationFor: (comm, point) ->
+    @log 'addCommunicationFor', comm, point
+    @pointsToComms.set(point, comm)
 
 
-  hasMessageFor: (point) ->
-    @pointsToMessages.has(point)
-
-
-  getMessageFor: (point) ->
-    @pointsToMessages.get(point)
-
-
-
-  addQueryFor: (query, point) ->
-    @log 'addQueryFor', arguments...
-    @pointsToQueries.set(point, query)
-    return this
-
-
-  getQueryFor: (point) ->
-    @pointsToQueries.get(point)
+  getCommunicationFor: (point) ->
+    @pointsToComms.get(point)
 
 
 
@@ -89,14 +72,14 @@ module.exports = class Transmission
       @queue.push entry
     else
       @queue.unshift entry
-    stableSort.inplace @queue, (entryBefore, entryAfter) ->
-      entryBefore.getQueueOrder() > entryAfter.getQueueOrder()
+    stableSort.inplace @queue, (entryAfter, entryBefore) ->
+      entryBefore.getQueueOrder() < entryAfter.getQueueOrder()
     return this
 
 
   respond: ->
     while @queue.length
       entry = @queue.shift()
-      @log 'dequeue', entry, entry.node
+      @log 'dequeue', entry, entry.getQueueOrder(), entry.node
       entry.respond()
     return this

@@ -9,10 +9,12 @@ ConnectionPayload = require 'transmitter/payloads/connection'
 Transmitter = require 'transmitter'
 
 class DirectionStub
+  inspect: -> '.'
   matches: (other) -> this == other
   reverse: -> new DirectionStub()
 
 class StubPayload
+  inspect: -> 'stub()'
 
 class NodeStub extends SourceNode
   createResponsePayload: -> new StubPayload()
@@ -49,7 +51,7 @@ describe 'Message merging', ->
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
     @message1 = new Message(@transmission, @activePayload,
-      {direction: @directionStub})
+      {direction: @directionStub, precedence: 0})
 
     @message1.sendFromNodeToNodeSource(@activeSource,
       @activeSource.getNodeSource())
@@ -70,7 +72,6 @@ describe 'Message merging', ->
 
 
   specify 'and merged message payload contains source payloads', ->
-    @transmission.respond()
 
     mergedMessage = @target.receiveMessage.firstCall.args[0]
     mergedPayload = mergedMessage.payload

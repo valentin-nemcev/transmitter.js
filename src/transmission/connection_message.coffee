@@ -23,17 +23,10 @@ module.exports = class ConnectionMessage
     return this
 
 
-  passMessage: (point, line) ->
-    if message = @transmission.getMessageFor(point)
-      message.sendToLine(line)
-      @transmission.log 'passMessage', this, line, message
-    return this
-
-
-  passQuery: (point, line) ->
-    if query = @transmission.getQueryFor(point)
-      query.sendToLine(line)
-      @transmission.log 'passQuery', this, line, query
+  passCommunication: (point, line) ->
+    if comm = @transmission.getCommunicationFor(point)
+      comm.sendToLine(line)
+      @transmission.log 'passCommunication', this, line, comm
     return this
 
 
@@ -42,8 +35,11 @@ module.exports = class ConnectionMessage
 
 
   sendToLine: (line) ->
-    unless @hasPrecedenceOver(@transmission.getMessageFor(line))
-      return this
-    @transmission.addMessageFor(this, line)
-    @payload.deliver(line)
+    if @hasPrecedenceOver(@transmission.getCommunicationFor(line))
+      @transmission.addCommunicationFor(this, line)
+      @payload.deliver(line)
+    # unless @hasPrecedenceOver(@transmission.getMessageFor(line))
+    #   return this
+    # @transmission.addMessageFor(this, line)
+    # @payload.deliver(line)
     return this

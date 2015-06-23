@@ -65,12 +65,11 @@ module.exports = class Query
 
 
   hasPrecedenceOver: (prev) ->
-    not prev? or this.precedence > prev.precedence
+    not prev? or [this.precedence, this.typeOrder] > [prev.precedence, prev.typeOrder]
 
 
   sendToLine: (line) ->
-    # TODO: Check connection message precedence
-    if line.isConst() or not @hasPrecedenceOver(@transmission.getMessageFor(line))
+    if line.isConst() or not @hasPrecedenceOver(@transmission.getCommunicationFor(line))
       line.receiveOutgoingQuery(this)
     else
       line.receiveConnectionQuery(
@@ -80,12 +79,17 @@ module.exports = class Query
 
 
   _sendToNodePoint: (point) ->
-    unless @hasPrecedenceOver(@transmission.getMessageFor(point)) and
-      @hasPrecedenceOver(@transmission.getQueryFor(point))
-        @wasDelivered = yes
-        return this
-    @transmission.addQueryFor(this, point)
-    point.receiveQuery(this)
+    if @hasPrecedenceOver(@transmission.getCommunicationFor(point))
+      @transmission.addCommunicationFor(this, point)
+      point.receiveQuery(this)
+    else
+      @wasDelivered = yes
+
+    # unless @hasPrecedenceOver(@transmission.getMessageFor(point)) and
+    #   @hasPrecedenceOver(@transmission.getQueryFor(point))
+    #     @wasDelivered = yes
+    #     return this
+    # @transmission.addQueryFor(this, point)
     return this
 
 
