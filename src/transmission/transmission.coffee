@@ -65,7 +65,8 @@ module.exports = class Transmission
 
 
 
-  compareArrays = (a, b) ->
+  # TODO: Move to Communication
+  compareArrays: (a, b) ->
     for i in [0...Math.max(a.length, b.length)]
       [elA, elB] = [a[i], b[i]]
       if elA > elB then return  1
@@ -80,8 +81,8 @@ module.exports = class Transmission
       @queue.push entry
     else
       @queue.unshift entry
-    stableSort.inplace @queue, (entryA, entryB) ->
-      compareArrays(entryA.getQueueOrder(), entryB.getQueueOrder())
+    stableSort.inplace @queue, (entryA, entryB) =>
+      @compareArrays(entryA.getQueueOrder(), entryB.getQueueOrder())
     return this
 
 

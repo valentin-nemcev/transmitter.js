@@ -112,7 +112,10 @@ module.exports = class Message
 
 
   hasPrecedenceOver: (prev) ->
-    not prev? or [this.precedence, this.typeOrder] > [prev.precedence, prev.typeOrder]
+    return yes if not prev?
+    thisPrecedence = [this.precedence, this.typeOrder]
+    prevPrecedence = [prev.precedence, prev.typeOrder]
+    @transmission.compareArrays(thisPrecedence, prevPrecedence) == 1
 
 
   sendToLine: (line) ->
@@ -131,11 +134,6 @@ module.exports = class Message
       point.receiveMessage(this)
     else
       @markSourceMessageAsDelivered()
-    # unless @hasPrecedenceOver(@transmission.getMessageFor(point))
-    #   @markSourceMessageAsDelivered()
-    #   return this
-    # @transmission.addMessageFor(this, point)
-    # point.receiveMessage(this)
     return this
 
 

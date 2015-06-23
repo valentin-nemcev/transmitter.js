@@ -7,6 +7,10 @@ module.exports = class MergingConnectionTarget
     @sources.forEach (source, node) => source.setTarget(this)
 
 
+  inspect: ->
+    '[' + Array.from(@sources.keys()).map( (s) -> s.inspect()).join(', ') + ']:'
+
+
   setTarget: (@target) -> return this
 
 

@@ -65,7 +65,10 @@ module.exports = class Query
 
 
   hasPrecedenceOver: (prev) ->
-    not prev? or [this.precedence, this.typeOrder] > [prev.precedence, prev.typeOrder]
+    return yes if not prev?
+    thisPrecedence = [this.precedence, this.typeOrder]
+    prevPrecedence = [prev.precedence, prev.typeOrder]
+    @transmission.compareArrays(thisPrecedence, prevPrecedence) == 1
 
 
   sendToLine: (line) ->
@@ -84,12 +87,6 @@ module.exports = class Query
       point.receiveQuery(this)
     else
       @wasDelivered = yes
-
-    # unless @hasPrecedenceOver(@transmission.getMessageFor(point)) and
-    #   @hasPrecedenceOver(@transmission.getQueryFor(point))
-    #     @wasDelivered = yes
-    #     return this
-    # @transmission.addQueryFor(this, point)
     return this
 
 
