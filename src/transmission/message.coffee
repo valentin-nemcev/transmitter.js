@@ -111,29 +111,24 @@ module.exports = class Message
   directionMatches: (direction) -> @direction.matches(direction)
 
 
-  hasPrecedenceOver: (prev) ->
-    return yes if not prev?
-    thisPrecedence = [this.precedence, this.typeOrder]
-    prevPrecedence = [prev.precedence, prev.typeOrder]
-    @transmission.compareArrays(thisPrecedence, prevPrecedence) == 1
+  communicationTypeOrder: 1
+
+
+  getPrecedence: ->
+    [@precedence, @communicationTypeOrder]
 
 
   sendToLine: (line) ->
-    if line.isConst() or not @hasPrecedenceOver(@transmission.getCommunicationFor(line))
+    if @transmission.tryQueryLine(this, line)
       line.receiveOutgoingMessage(this)
-    else
-      line.receiveConnectionQuery(
-        @transmission.Query.createNextConnection(this)
-      )
     return this
 
 
   _sendToNodePoint: (point) ->
-    if @hasPrecedenceOver(@transmission.getCommunicationFor(point))
-      @transmission.addCommunicationFor(this, point)
+    if @transmission.tryAddCommunicationFor(this, point)
       point.receiveMessage(this)
     else
-      @markSourceMessageAsDelivered()
+      @markAsDelivered()
     return this
 
 
@@ -146,7 +141,7 @@ module.exports = class Message
 
 
   sendToNode: (node) ->
-    @markSourceMessageAsDelivered()
+    @markAsDelivered()
     node.routeMessage(this, @payload)
     return this
 
@@ -156,11 +151,8 @@ module.exports = class Message
     @_sendToNodePoint(nodeSource)
 
 
-  typeOrder: 1
-
-
   getQueueOrder: ->
-    [@precedence, @typeOrder, @nesting]
+    [@precedence, @communicationTypeOrder, @nesting]
 
 
   respond: ->
@@ -179,10 +171,10 @@ module.exports = class Message
       [@node]
 
 
-  markSourceMessageAsDelivered: ->
+  markAsDelivered: ->
     if @sourceMessages.length
       for message in @sourceMessages
-        message.markSourceMessageAsDelivered()
+        message.markAsDelivered()
     else
       @wasDelivered = yes
     return this

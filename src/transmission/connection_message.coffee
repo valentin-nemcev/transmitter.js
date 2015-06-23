@@ -7,14 +7,19 @@ module.exports = class ConnectionMessage
 
 
   @createInitial = (transmission, payload) ->
-    new this(transmission, payload)
+    new this(transmission, payload, {
+      # precedence: 0
+    })
 
 
   @createNext = (prevMessage, payload) ->
-    new this(prevMessage.transmission, payload)
+    new this(prevMessage.transmission, payload, {
+      # precedence: prevMessage.precedence
+    })
 
 
   constructor: (@transmission, @payload, opts = {}) ->
+    # TODO
     {@precedence} = opts
 
 
@@ -30,16 +35,14 @@ module.exports = class ConnectionMessage
     return this
 
 
-  hasPrecedenceOver: (prev) ->
-    not prev? or this.precedence > prev.precedence
+  communicationTypeOrder: 2
+
+
+  getPrecedence: ->
+    [@precedence, @communicationTypeOrder]
 
 
   sendToLine: (line) ->
-    if @hasPrecedenceOver(@transmission.getCommunicationFor(line))
-      @transmission.addCommunicationFor(this, line)
+    if @transmission.tryAddCommunicationFor(this, line)
       @payload.deliver(line)
-    # unless @hasPrecedenceOver(@transmission.getMessageFor(line))
-    #   return this
-    # @transmission.addMessageFor(this, line)
-    # @payload.deliver(line)
     return this

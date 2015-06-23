@@ -55,23 +55,45 @@ module.exports = class Transmission
 
 
 
+  tryQueryLine: (comm, line) ->
+    if not line.isConst() and @communicationSuccedsExistingFor(comm, line)
+      line.receiveConnectionQuery(@Query.createNextConnection(comm))
+      false
+    else
+      true
+
+
+  tryAddCommunicationFor: (comm, point) ->
+    if @communicationSuccedsExistingFor(comm, point)
+      @addCommunicationFor(comm, point)
+      true
+    else
+      false
+
+
   addCommunicationFor: (comm, point) ->
     @log 'addCommunicationFor', comm, point
     @pointsToComms.set(point, comm)
+    return this
 
 
-  getCommunicationFor: (point) ->
-    @pointsToComms.get(point)
-
-
-
-  # TODO: Move to Communication
-  compareArrays: (a, b) ->
+  compareArrays = (a, b) ->
     for i in [0...Math.max(a.length, b.length)]
       [elA, elB] = [a[i], b[i]]
       if elA > elB then return  1
       if elA < elB then return -1
     return 0
+
+
+  communicationSuccedsExistingFor: (succComm, point) ->
+    exisitingComm = @getCommunicationFor(point)
+    return true if not exisitingComm?
+    compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence()) == 1
+
+
+  getCommunicationFor: (point) ->
+    @pointsToComms.get(point)
+
 
 
   enqueue: (entry) ->
@@ -81,8 +103,8 @@ module.exports = class Transmission
       @queue.push entry
     else
       @queue.unshift entry
-    stableSort.inplace @queue, (entryA, entryB) =>
-      @compareArrays(entryA.getQueueOrder(), entryB.getQueueOrder())
+    stableSort.inplace @queue, (entryA, entryB) ->
+      compareArrays(entryA.getQueueOrder(), entryB.getQueueOrder())
     return this
 
 

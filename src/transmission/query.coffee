@@ -64,29 +64,24 @@ module.exports = class Query
   directionMatches: (direction) -> @direction.matches(direction)
 
 
-  hasPrecedenceOver: (prev) ->
-    return yes if not prev?
-    thisPrecedence = [this.precedence, this.typeOrder]
-    prevPrecedence = [prev.precedence, prev.typeOrder]
-    @transmission.compareArrays(thisPrecedence, prevPrecedence) == 1
+  communicationTypeOrder: 0
+
+
+  getPrecedence: ->
+    [@precedence, @communicationTypeOrder]
 
 
   sendToLine: (line) ->
-    if line.isConst() or not @hasPrecedenceOver(@transmission.getCommunicationFor(line))
+    if @transmission.tryQueryLine(this, line)
       line.receiveOutgoingQuery(this)
-    else
-      line.receiveConnectionQuery(
-        @transmission.Query.createNextConnection(this)
-      )
     return this
 
 
   _sendToNodePoint: (point) ->
-    if @hasPrecedenceOver(@transmission.getCommunicationFor(point))
-      @transmission.addCommunicationFor(this, point)
+    if @transmission.tryAddCommunicationFor(this, point)
       point.receiveQuery(this)
     else
-      @wasDelivered = yes
+      @markAsDelivered()
     return this
 
 
@@ -94,7 +89,7 @@ module.exports = class Query
 
 
   sendToNode: (node) ->
-    @wasDelivered = yes
+    @markAsDelivered()
     node.routeQuery(this)
     return this
 
@@ -109,13 +104,16 @@ module.exports = class Query
     return this
 
 
-  typeOrder: 0
-
-
   getQueueOrder: ->
-    [@precedence, @typeOrder, @nesting]
+    [@precedence, @communicationTypeOrder, @nesting]
 
 
   respond: ->
     @node.respondToQuery(this) unless @wasDelivered
+    return this
+
+
+
+  markAsDelivered: ->
+    @wasDelivered = yes
     return this
