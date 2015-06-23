@@ -65,21 +65,29 @@ module.exports = class Transmission
 
 
 
+  compareArrays = (a, b) ->
+    for i in [0...Math.max(a.length, b.length)]
+      [elA, elB] = [a[i], b[i]]
+      if elA > elB then return  1
+      if elA < elB then return -1
+    return 0
+
+
   enqueue: (entry) ->
-    @log 'enqueue', entry, entry.node
+    @log 'enqueue', entry, entry.getQueueOrder()
 
     if @reverseOrder
       @queue.push entry
     else
       @queue.unshift entry
-    stableSort.inplace @queue, (entryAfter, entryBefore) ->
-      entryBefore.getQueueOrder() < entryAfter.getQueueOrder()
+    stableSort.inplace @queue, (entryA, entryB) ->
+      compareArrays(entryA.getQueueOrder(), entryB.getQueueOrder())
     return this
 
 
   respond: ->
     while @queue.length
       entry = @queue.shift()
-      @log 'dequeue', entry, entry.getQueueOrder(), entry.node
+      @log 'dequeue', entry, entry.getQueueOrder()
       entry.respond()
     return this
