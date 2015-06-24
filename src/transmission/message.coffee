@@ -147,7 +147,7 @@ module.exports = class Message
 
 
   sendFromNodeToNodeSource: (@node, nodeSource) ->
-    @transmission.enqueue(this)
+    @transmission.enqueueCommunication(this)
     @_sendToNodePoint(nodeSource)
 
 

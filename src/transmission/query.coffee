@@ -100,7 +100,7 @@ module.exports = class Query
 
 
   enqueueForSourceNode: (@node) ->
-    @transmission.enqueue(this)
+    @transmission.enqueueCommunication(this)
     return this
 
 

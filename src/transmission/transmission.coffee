@@ -40,7 +40,7 @@ module.exports = class Transmission
 
   constructor: ->
     @pointsToComms = new Map()
-    @queue = []
+    @commQueue = []
 
 
 
@@ -96,21 +96,21 @@ module.exports = class Transmission
 
 
 
-  enqueue: (entry) ->
-    @log 'enqueue', entry, entry.getQueueOrder()
+  enqueueCommunication: (comm) ->
+    @log 'enqueue', comm, comm.getQueueOrder()
 
     if @reverseOrder
-      @queue.push entry
+      @commQueue.push comm
     else
-      @queue.unshift entry
-    stableSort.inplace @queue, (entryA, entryB) ->
-      compareArrays(entryA.getQueueOrder(), entryB.getQueueOrder())
+      @commQueue.unshift comm
+    stableSort.inplace @commQueue, (commA, commB) ->
+      compareArrays(commA.getQueueOrder(), commB.getQueueOrder())
     return this
 
 
   respond: ->
-    while @queue.length
-      entry = @queue.shift()
-      @log 'dequeue', entry, entry.getQueueOrder()
-      entry.respond()
+    while @commQueue.length
+      comm = @commQueue.shift()
+      @log 'dequeue', comm, comm.getQueueOrder()
+      comm.respond()
     return this

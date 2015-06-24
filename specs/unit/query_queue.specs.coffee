@@ -19,7 +19,7 @@ describe 'Query queue', ->
     @query = new QueryStub()
     sinon.spy(@query, 'respond')
 
-    @transmission.enqueue(@query)
+    @transmission.enqueueCommunication(@query)
     @transmission.respond()
 
     expect(@query.respond).to.have.been.calledOnce
@@ -37,9 +37,9 @@ describe 'Query queue', ->
     sinon.stub(@query2, 'respond', -> callOrder.push 2)
     sinon.stub(@query3, 'respond', -> callOrder.push 3)
 
-    @transmission.enqueue(@query2)
-    @transmission.enqueue(@query3)
-    @transmission.enqueue(@query1)
+    @transmission.enqueueCommunication(@query2)
+    @transmission.enqueueCommunication(@query3)
+    @transmission.enqueueCommunication(@query1)
     @transmission.respond()
 
     expect(callOrder).to.deep.equal([1, 2, 3])
@@ -49,11 +49,11 @@ describe 'Query queue', ->
     @query1 = new QueryStub()
     @query2 = new QueryStub()
     sinon.stub(@query1, 'respond', =>
-      @transmission.enqueue(@query2)
+      @transmission.enqueueCommunication(@query2)
     )
     sinon.spy(@query2, 'respond')
 
-    @transmission.enqueue(@query1)
+    @transmission.enqueueCommunication(@query1)
     @transmission.respond()
 
     expect(@query2.respond).to.have.been.calledOnce
