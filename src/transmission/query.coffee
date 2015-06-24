@@ -10,7 +10,8 @@ module.exports = class Query
     [
       'Q',
       'P:' + @precedence
-      @direction.inspect(),
+      @direction.inspect()
+      @node?.inspect() ? ''
       @wasDelivered and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
 

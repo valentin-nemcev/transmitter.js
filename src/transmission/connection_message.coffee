@@ -3,7 +3,12 @@
 
 module.exports = class ConnectionMessage
 
-  inspect: -> "CM #{@payload.inspect()}"
+  inspect: ->
+    [
+      'CM'
+      'P:' + @precedence
+      @payload.inspect()
+    ].join(' ')
 
 
   @createInitial = (transmission, payload) ->
