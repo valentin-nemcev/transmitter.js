@@ -2,7 +2,7 @@
 
 
 MergedPayload = require '../payloads/merged'
-directions = require '../directions'
+Precedence = require './precedence'
 
 
 class NullMessage
@@ -14,8 +14,7 @@ module.exports = class Message
   inspect: ->
     [
       'M'
-      'P:' + @precedence
-      @direction.inspect()
+      @precedence.inspect()
       @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
       @wasDelivered and 'D' or ''
       @payload.inspect()
@@ -29,13 +28,12 @@ module.exports = class Message
 
   @createInitial = (transmission, payload) ->
     new this(transmission, payload,
-      direction: directions.backward, precedence: 0, nesting: 0)
+      precedence: Precedence.createMessageDefault(), nesting: 0)
 
 
   @createNext = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
       precedence: prevMessage.precedence
-      direction:  prevMessage.direction
       nesting:    prevMessage.nesting
     })
 
@@ -43,17 +41,15 @@ module.exports = class Message
   @createQueryResponse = (queuedQuery, payload) ->
     new this(queuedQuery.transmission, payload, {
       precedence: queuedQuery.precedence
-      direction:  queuedQuery.direction
       nesting:    queuedQuery.nesting
     })
 
 
   @createMessageResponse = (queuedMessage, payload) ->
-    precedence = Math.ceil(queuedMessage.precedence) + 1
-    if precedence == 1
+    precedence = queuedMessage.precedence.getFinal()
+    if precedence?
       new this(queuedMessage.transmission, payload, {
         precedence
-        direction: queuedMessage.direction.reverse()
         nesting: queuedMessage.nesting
       })
     else
@@ -63,7 +59,6 @@ module.exports = class Message
   @createTransformed = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
       precedence:     prevMessage.precedence
-      direction:      prevMessage.direction
       nesting:        prevMessage.nesting
       sourceMessages: [prevMessage]
     })
@@ -73,17 +68,15 @@ module.exports = class Message
     payload = new MergedPayload(
       prevMessages.map ([key, message]) -> [key, message.payload]
     )
-    precedence = prevMessages
-      .map(([key, message]) -> message.precedence)
-      .reduce((a, b) -> a + b) /
-        prevMessages.length
+    precedence = Precedence.merge(
+      prevMessages.map(([key, message]) -> message.precedence)
+    )
     nesting = Math.max.apply(null,
       prevMessages.map(([key, message]) -> message.nesting)
     )
     prevMessage = prevMessages[0][1]
     new this(prevMessage.transmission, payload, {
       precedence
-      direction: prevMessage.direction #TODO
       nesting
       sourceMessages: prevMessages.map ([key, message]) -> message
     })
@@ -91,7 +84,7 @@ module.exports = class Message
 
 
   constructor: (@transmission, @payload, opts = {}) ->
-    {@precedence, @direction, @nesting} = opts
+    {@precedence, @nesting} = opts
     @sourceMessages = opts.sourceMessages ? []
 
 
@@ -108,14 +101,14 @@ module.exports = class Message
 
 
 
-  directionMatches: (direction) -> @direction.matches(direction)
+  directionMatches: (direction) -> @precedence.directionMatches(direction)
 
 
   communicationTypeOrder: 1
 
 
   getPrecedence: ->
-    [@precedence, @communicationTypeOrder]
+    [@precedence.level, @communicationTypeOrder]
 
 
   sendToLine: (line) ->
@@ -152,7 +145,7 @@ module.exports = class Message
 
 
   getQueueOrder: ->
-    [@precedence, @communicationTypeOrder, @nesting]
+    [@precedence.level, @communicationTypeOrder, @nesting]
 
 
   respond: ->

@@ -18,6 +18,10 @@ class DirectionStub
 class StubPayload
   deliver: ->
 
+class PrecedenceStub
+  constructor: (@direction) ->
+  directionMatches: (direction) -> direction == @direction
+
 class NodeSourceStub extends SourceNode
   createResponsePayload: -> new StubPayload()
 
@@ -32,11 +36,12 @@ describe 'Message and query transmission', ->
   beforeEach ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
-    @directionStub = new DirectionStub()
+    @direction = new DirectionStub()
+    @precedence = new PrecedenceStub(@direction)
 
     Transmitter.startTransmission (tr) =>
       new SimpleChannel()
-        .inDirection @directionStub
+        .inDirection @direction
         .fromSource @source
         .toTarget @target
         .connect(tr)
@@ -47,7 +52,7 @@ describe 'Message and query transmission', ->
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload, {direction: @directionStub})
+    @message = new Message(@transmission, @payload, {@precedence})
 
     @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
 
@@ -59,7 +64,7 @@ describe 'Message and query transmission', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
-    @query = new Query(@transmission, {direction: @directionStub})
+    @query = new Query(@transmission, {@precedence})
 
     @query.sendFromNodeToNodeTarget(@target, @target.getNodeTarget())
     @transmission.respond()

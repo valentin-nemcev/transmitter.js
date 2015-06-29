@@ -1,7 +1,7 @@
 'use strict'
 
 
-directions = require '../directions'
+Precedence = require './precedence'
 
 
 module.exports = class Query
@@ -9,8 +9,7 @@ module.exports = class Query
   inspect: ->
     [
       'Q',
-      'P:' + @precedence
-      @direction.inspect()
+      @precedence.inspect()
       @node?.inspect() ? ''
       @wasDelivered and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
@@ -18,39 +17,33 @@ module.exports = class Query
 
   @createInitial = (transmission) ->
     new this(transmission,
-      {direction: directions.forward, precedence: 1, nesting: 0})
+      precedence: Precedence.createQueryDefault(), nesting: 0)
 
 
   @createNext = (prevQuery) ->
     new this(prevQuery.transmission, {
       precedence: prevQuery.precedence
-      direction:  prevQuery.direction
       nesting:    prevQuery.nesting
     })
 
 
   @createNextConnection = (prevMessageOrQuery) ->
     new this(prevMessageOrQuery.transmission, {
-      precedence: Math.ceil(prevMessageOrQuery.precedence) - 1
-      direction:  prevMessageOrQuery.direction
+      precedence: prevMessageOrQuery.precedence.getPrevious()
       nesting:    prevMessageOrQuery.nesting - 1
     })
 
 
   @createForMerge = (prevMessage) ->
-    precedence = Math.ceil(prevMessage.precedence)
-    if precedence == 0
-      precedence = -1
     new this(prevMessage.transmission, {
-      precedence
-      direction: prevMessage.direction
+      precedence: prevMessage.precedence.getPrevious()
       nesting: prevMessage.nesting
     })
 
 
 
   constructor: (@transmission, opts = {}) ->
-    {@precedence, @direction, @nesting} = opts
+    {@precedence, @nesting} = opts
 
 
   createNextQuery: ->
@@ -62,14 +55,14 @@ module.exports = class Query
 
 
 
-  directionMatches: (direction) -> @direction.matches(direction)
+  directionMatches: (direction) -> @precedence.directionMatches(direction)
 
 
   communicationTypeOrder: 0
 
 
   getPrecedence: ->
-    [@precedence, @communicationTypeOrder]
+    [@precedence.level, @communicationTypeOrder]
 
 
   sendToLine: (line) ->
@@ -106,7 +99,7 @@ module.exports = class Query
 
 
   getQueueOrder: ->
-    [@precedence, @communicationTypeOrder, @nesting]
+    [@precedence.level, @communicationTypeOrder, @nesting]
 
 
   respond: ->

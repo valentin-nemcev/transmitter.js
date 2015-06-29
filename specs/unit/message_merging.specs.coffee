@@ -13,6 +13,12 @@ class DirectionStub
   matches: (other) -> this == other
   reverse: -> new DirectionStub()
 
+class PrecedenceStub
+  constructor: (@direction) ->
+  directionMatches: (direction) -> direction == @direction
+  getPrevious: -> this
+  getFinal: -> null
+
 class StubPayload
   inspect: -> 'stub()'
 
@@ -30,7 +36,8 @@ describe 'Message merging', ->
     sinon.spy(@target, 'receiveMessage')
 
     @transmission = new Transmission()
-    @directionStub = new DirectionStub()
+    @direction = new DirectionStub()
+    @precedence = new PrecedenceStub(@direction)
 
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
@@ -39,7 +46,7 @@ describe 'Message merging', ->
       .returns(@passivePayload)
 
     @compositeSource = new SimpleChannel()
-      .inDirection @directionStub
+      .inDirection @direction
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)
@@ -50,8 +57,7 @@ describe 'Message merging', ->
 
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
-    @message1 = new Message(@transmission, @activePayload,
-      {direction: @directionStub, precedence: 0})
+    @message1 = new Message(@transmission, @activePayload, {@precedence})
 
     @message1.sendFromNodeToNodeSource(@activeSource,
       @activeSource.getNodeSource())

@@ -35,7 +35,7 @@ class DirectionStub
   reverse: -> new DirectionStub()
 
 
-describe 'Message and query routing', ->
+describe.skip 'Message and query routing', ->
 
   beforeEach ->
     @transmission = new Transmission()
