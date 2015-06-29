@@ -27,7 +27,13 @@
   * Better message merging (symmetrical querying and caching)
 
 * Implement
-  * Transmission precedence
+  * Implement connection message precence with correct merging with regular
+    messages and queries
+  * Implement nested node querying after nested connection changes
+  * Improve or remove query routing specs
+  * Enforcing consistency for merging connections to channel nodes when
+    intermediate node is updated (send query backwards prohibiting lower
+    precedence updates)
 
 * Later
   * Remove use strict (needs custom compiler for mocha, browserify and npm)

@@ -43,11 +43,7 @@ describe 'Flattening with nested connections', ->
             .withTransform (ev) ->
               ev.map( -> null)
         ).ifEmpty( =>
-          # TODO: Null channel
-          new Transmitter.Channels.ConstChannel()
-            .toTarget @originVar
-            .inBackwardDirection()
-            .withValue -> null
+          Transmitter.Channels.getNullChannel()
         )
 
     Transmitter.startTransmission (tr) =>
