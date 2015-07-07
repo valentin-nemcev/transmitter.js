@@ -26,6 +26,9 @@ class ListNoOpPayload
   deliverListState: (target) ->
     return this
 
+  deliverValueState: (target) ->
+    return this
+
 
 class ListRemovePayload
 
@@ -36,6 +39,17 @@ class ListRemovePayload
   deliverListState: (target) ->
     for el, pos in target.get() when el == @element
       target.removeAt(pos)
+    return this
+
+
+class ListAddAtPayload
+
+  constructor: (@element, @pos) ->
+
+  inspect: -> "listAddAt(#{inspect @element}, #{@pos})"
+
+  deliverListState: (target) ->
+    target.addAt(@element, @pos)
     return this
 
 
@@ -100,6 +114,10 @@ module.exports = class ListPayload
 
   @createRemove = (element) =>
     return new ListRemovePayload(element)
+
+
+  @createAddAt = (element, pos) =>
+    return new ListAddAtPayload(element, pos)
 
 
   @createNoOp = =>
