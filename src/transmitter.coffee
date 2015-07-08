@@ -7,6 +7,7 @@ Transmission = require './transmission/transmission'
 module.exports = new class Transmitter
 
   Nodes:        require './nodes'
+  Payloads:     require './payloads'
   Channels:     require './channels'
   ChannelNodes: require './channel_nodes'
   DOMElement:   require './dom_element'

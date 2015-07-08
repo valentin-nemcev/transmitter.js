@@ -1,7 +1,8 @@
 'use strict'
 
 
-MergedPayload = require '../payloads/merged'
+# MergedPayload = require '../payloads/merged'
+Map = require 'collections/map'
 Precedence = require './precedence'
 
 
@@ -65,7 +66,7 @@ module.exports = class Message
 
 
   @createMerged = (prevMessages) ->
-    payload = new MergedPayload(
+    payloads = new Map(
       prevMessages.map ([key, message]) -> [key, message.payload]
     )
     precedence = Precedence.merge(
@@ -75,7 +76,7 @@ module.exports = class Message
       prevMessages.map(([key, message]) -> message.nesting)
     )
     prevMessage = prevMessages[0][1]
-    new this(prevMessage.transmission, payload, {
+    new this(prevMessage.transmission, payloads, {
       precedence
       nesting
       sourceMessages: prevMessages.map ([key, message]) -> message

@@ -29,9 +29,12 @@ describe 'Connection with merge and query', ->
         .fromSource(@textInput)
         .inBackwardDirection()
         .withTransform (payloads) =>
-          payloads.fetch([@button, @textInput])
-            .morph ([buttonWasClicked, textValue]) ->
-              buttonWasClicked.flatMap -> textValue
+          buttonWasClicked = payloads.get(@button)
+          textValue        = payloads.get(@textInput)
+          if buttonWasClicked.get()
+            textValue
+          else
+            Transmitter.Payloads.noop()
         .toTarget @alertEmitter
         .connect(tr)
 

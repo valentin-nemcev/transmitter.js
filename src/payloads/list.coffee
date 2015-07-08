@@ -17,19 +17,6 @@ class ConstValue
 
 
 
-class ListNoOpPayload
-
-  constructor: ->
-
-  inspect: -> "listNoOp()"
-
-  deliverListState: (target) ->
-    return this
-
-  deliverValueState: (target) ->
-    return this
-
-
 class ListRemovePayload
 
   constructor: (@element) ->

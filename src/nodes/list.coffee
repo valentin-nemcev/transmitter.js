@@ -10,7 +10,6 @@ module.exports = class List extends RelayNode
   payloads:
     remove: (el) -> ListPayload.createRemove(el)
     append: (el) -> ListPayload.createAddAt(el, null)
-    noOp:        -> ListPayload.createNoOp()
 
 
   createResponsePayload: ->

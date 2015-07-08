@@ -5,11 +5,12 @@ Transmitter = require 'transmitter'
 
 VariableNode = Transmitter.Nodes.Variable
 
-reduceMergedPayload = (payload) ->
-  payload.reduce({}, (result, node, value) ->
-    result[node.inspect()] = value
-    result
-  )
+reduceMergedPayload = (payloads) ->
+  Transmitter.Payloads.set ->
+    payloads.reduce((result, value, node) ->
+      result[node.inspect()] = value.get()
+      result
+    , {})
 
 
 describe 'Multilevel merging 1', ->
