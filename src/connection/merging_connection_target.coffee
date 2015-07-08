@@ -8,7 +8,7 @@ module.exports = class MergingConnectionTarget
 
 
   inspect: ->
-    '[' + Array.from(@sources.keys()).map( (s) -> s.inspect()).join(', ') + ']:'
+    '[' + @sources.keys().map( (s) -> s.inspect()).join(', ') + ']:'
 
 
   setTarget: (@target) -> return this
@@ -21,7 +21,7 @@ module.exports = class MergingConnectionTarget
 
   receiveMessage: (message) ->
     message.sendQueryForMerge(this)
-    message.sendMergedTo(Array.from(@sources.keys()), @target)
+    message.sendMergedTo(@sources.keys(), @target)
     return this
 
 

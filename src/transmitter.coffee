@@ -1,8 +1,6 @@
 'use strict'
 
 
-require 'es6-shim'
-
 Transmission = require './transmission/transmission'
 
 

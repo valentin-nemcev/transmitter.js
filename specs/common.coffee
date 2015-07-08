@@ -1,7 +1,5 @@
 'use strict'
 
-require 'es6-shim'
-
 Error.stackTraceLimit = 5
 
 chai = require 'chai'

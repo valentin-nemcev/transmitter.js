@@ -1,6 +1,8 @@
 'use strict'
 
 
+Map = require 'collections/map'
+
 StructPayload = require './struct'
 ValuePayload = require './value'
 
@@ -8,7 +10,7 @@ ValuePayload = require './value'
 module.exports = class MergedPayload
 
   inspect: ->
-    payloads = for [node, payload] in Array.from(@payloads.entries())
+    payloads = @payloads.map (payload, node) ->
       node.inspect() + ': ' + payload.inspect()
     "merged(#{payloads.join(', ')})"
 
@@ -25,7 +27,7 @@ module.exports = class MergedPayload
 
   reduce: (initial, reduce) ->
     result = initial
-    for [node, payload] in Array.from(@payloads.entries())
+    @payloads.forEach (payload, node) ->
       result = reduce(result, node, payload.get())
     ValuePayload.createFromValue(result)
 

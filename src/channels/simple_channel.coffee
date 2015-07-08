@@ -2,6 +2,7 @@
 
 
 assert = require 'assert'
+Map = require 'collections/map'
 
 directions = require '../directions'
 

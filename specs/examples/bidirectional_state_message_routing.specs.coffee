@@ -4,7 +4,8 @@
 Transmitter = require 'transmitter'
 
 
-Set::inspect = -> "Set(" + Array.from(this).join(', ') + ")"
+Set = require 'collections/set'
+Set::inspect = -> "Set(" + this.join(', ') + ")"
 
 
 describe 'Bidirectional state message routing', ->
@@ -17,7 +18,7 @@ describe 'Bidirectional state message routing', ->
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.VariableChannel()
         .withOrigin @tagSet
-        .withMapOrigin (tags) -> Array.from(tags).sort()
+        .withMapOrigin (tags) -> tags.sorted()
         .withDerived @tagSortedList
         .withMapDerived (tags) -> new Set(tags)
         .connect(tr)

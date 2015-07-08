@@ -45,6 +45,39 @@ describe 'Query queue', ->
     expect(callOrder).to.deep.equal([1, 2, 3])
 
 
+  it 'behaves like LIFO for queries with the same order', ->
+    @query1 = new QueryStub()
+    @query2 = new QueryStub()
+    callOrder = []
+    sinon.stub(@query1, 'getQueueOrder').returns([0, 0])
+    sinon.stub(@query2, 'getQueueOrder').returns([0, 0])
+    sinon.stub(@query1, 'respond', -> callOrder.push 1)
+    sinon.stub(@query2, 'respond', -> callOrder.push 2)
+
+    @transmission.enqueueCommunication(@query2)
+    @transmission.enqueueCommunication(@query1)
+    @transmission.respond()
+
+    expect(callOrder).to.deep.equal([1, 2])
+
+
+  it 'has option to reverse queries with the same order for testing', ->
+    @query1 = new QueryStub()
+    @query2 = new QueryStub()
+    callOrder = []
+    sinon.stub(@query1, 'getQueueOrder').returns([0, 0])
+    sinon.stub(@query2, 'getQueueOrder').returns([0, 0])
+    sinon.stub(@query1, 'respond', -> callOrder.push 1)
+    sinon.stub(@query2, 'respond', -> callOrder.push 2)
+
+    @transmission.reverseOrder = yes
+    @transmission.enqueueCommunication(@query2)
+    @transmission.enqueueCommunication(@query1)
+    @transmission.respond()
+
+    expect(callOrder).to.deep.equal([2, 1])
+
+
   it 'responds to queries created as a result of previous response', ->
     @query1 = new QueryStub()
     @query2 = new QueryStub()

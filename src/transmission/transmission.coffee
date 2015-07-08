@@ -2,10 +2,10 @@
 
 
 assert = require 'assert'
+WeakMap = require 'collections/weak-map'
+SortedArray = require 'collections/sorted-array'
 
-stableSort = require 'stable'
 {inspect} = require 'util'
-
 
 
 module.exports = class Transmission
@@ -39,8 +39,9 @@ module.exports = class Transmission
   reverseOrder: no
 
   constructor: ->
-    @pointsToComms = new Map()
-    @commQueue = []
+    @pointsToComms = new WeakMap()
+    @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
+    @lastCommSeqNum = 0
 
 
 
@@ -98,19 +99,21 @@ module.exports = class Transmission
 
   enqueueCommunication: (comm) ->
     @log 'enqueue', comm, comm.getQueueOrder()
-
-    if @reverseOrder
-      @commQueue.push comm
-    else
-      @commQueue.unshift comm
-    stableSort.inplace @commQueue, (commA, commB) ->
-      compareArrays(commA.getQueueOrder(), commB.getQueueOrder())
+    @commQueue.add([@lastCommSeqNum++, comm])
     return this
+
+
+  compareComms: ([commASeqNum, commA], [commBSeqNum, commB]) ->
+    r = if @reverseOrder then 1 else -1
+    compareArrays(
+      [commA.getQueueOrder()..., r * commASeqNum],
+      [commB.getQueueOrder()..., r * commBSeqNum]
+    )
 
 
   respond: ->
     while @commQueue.length
-      comm = @commQueue.shift()
+      [commSeqNum, comm] = @commQueue.shift()
       @log 'dequeue', comm, comm.getQueueOrder()
       comm.respond()
     return this
