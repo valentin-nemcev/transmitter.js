@@ -18,8 +18,8 @@ module.exports = class SourceNode
     return this
 
 
-  respondToMessage: (tr) ->
-    tr.createMessageResponseMessage(@createResponsePayload())
+  respondToMessage: (tr, payload) ->
+    tr.createMessageResponseMessage(payload)
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 

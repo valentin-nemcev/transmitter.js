@@ -12,6 +12,8 @@ class SetPayload
   id = (a) -> a
   getNull = -> null
 
+  inspect: -> "value(#{inspect @get()})"
+
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
     @ifEmptyFn = opts.ifEmpty ? getNull

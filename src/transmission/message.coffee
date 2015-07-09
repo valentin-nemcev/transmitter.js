@@ -151,7 +151,7 @@ module.exports = class Message
 
 
   respond: ->
-    @node.respondToMessage(this) unless @wasDelivered
+    @node.respondToMessage(this, @payload) unless @wasDelivered
     return this
 
 
@@ -166,7 +166,7 @@ module.exports = class Message
 
   getSourceNodes: ->
     if @sourceMessages.length
-      @sourceMessages.flatMap (message) -> message.getSourceNodes()
+      @sourceMessages.map((message) -> message.getSourceNodes()).flatten()
     else
       [@node]
 
