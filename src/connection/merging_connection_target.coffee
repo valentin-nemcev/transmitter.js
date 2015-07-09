@@ -20,8 +20,7 @@ module.exports = class MergingConnectionTarget
 
 
   receiveMessage: (message) ->
-    message.sendQueryForMerge(this)
-    message.sendMergedTo(@sources.keys(), @target)
+    message.sendMergedTo(this, @sources.keys(), @target)
     return this
 
 

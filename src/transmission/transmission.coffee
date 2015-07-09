@@ -3,6 +3,8 @@
 
 assert = require 'assert'
 WeakMap = require 'collections/weak-map'
+FastMap = require 'collections/fast-map'
+MultiMap = require 'collections/multi-map'
 SortedArray = require 'collections/sorted-array'
 
 {inspect} = require 'util'
@@ -40,6 +42,7 @@ module.exports = class Transmission
 
   constructor: ->
     @pointsToComms = new WeakMap()
+    @cachedMessagesForMerge = new MultiMap([], -> new FastMap())
     @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
     @lastCommSeqNum = 0
 
@@ -56,8 +59,9 @@ module.exports = class Transmission
 
 
 
+  # Common code for communications (queries and messages)
   tryQueryLine: (comm, line) ->
-    if not line.isConst() and @communicationSuccedsExistingFor(comm, line)
+    if not line.isConst() and @communicationSucceedsExistingFor(comm, line)
       line.receiveConnectionQuery(@Query.createNextConnection(comm))
       false
     else
@@ -65,7 +69,7 @@ module.exports = class Transmission
 
 
   tryAddCommunicationFor: (comm, point) ->
-    if @communicationSuccedsExistingFor(comm, point)
+    if @communicationSucceedsExistingFor(comm, point)
       @addCommunicationFor(comm, point)
       true
     else
@@ -86,7 +90,7 @@ module.exports = class Transmission
     return 0
 
 
-  communicationSuccedsExistingFor: (succComm, point) ->
+  communicationSucceedsExistingFor: (succComm, point) ->
     exisitingComm = @getCommunicationFor(point)
     return true if not exisitingComm?
     compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence()) == 1
@@ -94,6 +98,11 @@ module.exports = class Transmission
 
   getCommunicationFor: (point) ->
     @pointsToComms.get(point)
+
+
+
+  getCachedMessagesForMergeAt: (point) ->
+    @cachedMessagesForMerge.get(point)
 
 
 

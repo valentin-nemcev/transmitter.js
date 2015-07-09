@@ -77,11 +77,9 @@ describe 'Message merging', ->
       .to.have.been.calledWith(sinon.match.instanceOf(Message))
 
 
-  specify 'and merged message payload contains source payloads', ->
-
+  specify 'and merged message has source payloads', ->
     mergedMessage = @target.receiveMessage.firstCall.args[0]
     mergedPayload = mergedMessage.payload
-
 
     expect(mergedPayload.get(@activeSource)).to.equal(@activePayload)
     expect(mergedPayload.get(@passiveSource)).to.equal(@passivePayload)

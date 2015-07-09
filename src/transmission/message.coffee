@@ -65,21 +65,22 @@ module.exports = class Message
     })
 
 
-  @createMerged = (prevMessages) ->
+  @createMerged = (prevNodesToMessages) ->
     payloads = new Map(
-      prevMessages.map ([key, message]) -> [key, message.payload]
+      prevNodesToMessages.map (message, node) -> [node, message.payload]
     )
+    prevMessages = prevNodesToMessages.values()
     precedence = Precedence.merge(
-      prevMessages.map(([key, message]) -> message.precedence)
+      prevMessages.map((message) -> message.precedence)
     )
     nesting = Math.max.apply(null,
-      prevMessages.map(([key, message]) -> message.nesting)
+      prevMessages.map((message) -> message.nesting)
     )
-    prevMessage = prevMessages[0][1]
+    prevMessage = prevMessages[0]
     new this(prevMessage.transmission, payloads, {
       precedence
       nesting
-      sourceMessages: prevMessages.map ([key, message]) -> message
+      sourceMessages: prevMessages
     })
 
 
@@ -155,14 +156,20 @@ module.exports = class Message
 
 
 
+  getSourceNode: ->
+    switch @sourceMessages.length
+      when 0 then @node
+      when 1 then @sourceMessages[0].getSourceNode()
+      else
+        throw new Error('Expected single source node')
+
+
   getSourceNodes: ->
     if @sourceMessages.length
-      sourceNodes = []
-      for message in @sourceMessages
-        sourceNodes.push message.getSourceNodes()...
-      sourceNodes
+      @sourceMessages.flatMap (message) -> message.getSourceNodes()
     else
       [@node]
+
 
 
   markAsDelivered: ->
@@ -193,12 +200,17 @@ module.exports = class Message
     return messages
 
 
-  sendMergedTo: (sourceKeys, target) ->
-    if (messages = getMessagesToMerge(@transmission, sourceKeys))?
-      target.receiveMessage(Message.createMerged(messages))
-    return this
+  # TODO: Refactor by using object instead of Map for cached messages, add
+  # better check for keys
+  sendMergedTo: (source, sourceKeys, target) ->
+    cachedForMerge = @transmission.getCachedMessagesForMergeAt(source)
 
+    if cachedForMerge.length is 0
+      source.receiveQuery(@transmission.Query.createForMerge(this))
 
-  sendQueryForMerge: (source) ->
-    source.receiveQuery(@transmission.Query.createForMerge(this))
+    cachedForMerge.set(this.getSourceNode(), this)
+
+    if cachedForMerge.length == sourceKeys.length
+      target.receiveMessage(Message.createMerged(cachedForMerge))
+
     return this
