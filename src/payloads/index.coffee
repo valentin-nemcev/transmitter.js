@@ -1,6 +1,7 @@
 'use strict'
 
 module.exports = {
-  noop: require './noop'
-  set:  require './set'
+  noop:     require './noop'
+  Variable: require './variable'
+  List:     require './list'
 }

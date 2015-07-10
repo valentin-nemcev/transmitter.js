@@ -2,8 +2,8 @@
 
 
 NodeSource = require '../connection/node_source'
-
-ValuePayload = require '../payloads/value'
+VariablePayload = require '../payloads/variable'
+noop = require '../payloads/noop'
 
 
 module.exports = class SourceNode
@@ -37,8 +37,8 @@ module.exports = class SourceNode
 
 
   createResponsePayload: ->
-    ValuePayload.createFromValue(null)
+    noop()
 
 
   createOriginPayload: (value) ->
-    ValuePayload.createFromValue(value)
+    VariablePayload.setConst(value)

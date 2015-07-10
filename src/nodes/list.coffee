@@ -7,25 +7,23 @@ ListPayload = require '../payloads/list'
 
 module.exports = class List extends RelayNode
 
-  payloads:
-    remove: (el) -> ListPayload.createRemove(el)
-    append: (el) -> ListPayload.createAddAt(el, null)
+  payload: ListPayload
 
 
   createResponsePayload: ->
-    ListPayload.create(this)
+    @payload.set(this)
 
 
   createRelayPayload: ->
-    ListPayload.create(this)
+    @payload.set(this)
 
 
   createOriginPayload: ->
-    ListPayload.create(this)
+    @payload.set(this)
 
 
   createUpdatePayload: (value) ->
-    ListPayload.createFromValue(value)
+    @payload.setConst(value)
 
 
   constructor: ->
@@ -33,10 +31,10 @@ module.exports = class List extends RelayNode
 
 
   acceptPayload: (payload) ->
-    if payload.deliverListState?
-      payload.deliverListState(this)
+    if payload.deliverToList?
+      payload.deliverToList(this)
     else
-      payload.deliverValueState(this)
+      payload.deliverToVariable(this)
     return this
 
 

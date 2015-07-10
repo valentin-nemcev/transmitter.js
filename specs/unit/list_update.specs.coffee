@@ -17,8 +17,8 @@ describe 'List update', ->
 
     @target = new List()
     @updateTarget = (list) =>
-      new ListPayload.createFromValue(list).mapIfMatch(id, equals)
-        .deliverListState(@target)
+      ListPayload.setConst(list).updateMatching(id, equals)
+        .deliverToList(@target)
 
     @added   = sinon.spy(@target, 'addAt')
     @removed = sinon.spy(@target, 'removeAt')

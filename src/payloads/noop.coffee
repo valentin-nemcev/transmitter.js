@@ -5,12 +5,12 @@ class NoopPayload
 
   constructor: ->
 
-  inspect: -> "listNoOp()"
+  inspect: -> "noop()"
 
-  deliverListState: (target) ->
+  deliverToVariable: (variable) ->
     return this
 
-  deliverValueState: (target) ->
+  deliverToList: (list) ->
     return this
 
   deliverValue: (target) ->

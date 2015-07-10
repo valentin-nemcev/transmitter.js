@@ -7,7 +7,7 @@ ChannelNode = require './channel_node'
 module.exports = class ChannelList extends ChannelNode
 
   acceptPayload: (payload) ->
-    payload.deliverValueState(this)
+    payload.deliverToList(this)
     return this
 
 

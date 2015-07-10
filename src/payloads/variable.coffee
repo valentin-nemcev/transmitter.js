@@ -4,29 +4,37 @@
 {inspect} = require 'util'
 
 
-class ConstValue
+class SetConstPayload
+
+  @create = (value) => new this(value)
 
   constructor: (@value) ->
 
+  map: (map) ->
+    new SetPayload(this, {map})
+
   get: -> @value
+
+  deliverToVariable: (variable) ->
+    variable.set(@value)
+    return this
 
 
 id = (a) -> a
 getNull = -> null
 
 
-class ValueUpdatePayload
+class UpdateMatchingPayload
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
     @matchFn = opts.match
-    @ifEmptyFn = opts.ifEmpty ? getNull
 
 
   inspect: -> "valueUpdate(#{inspect @source})"
 
 
-  deliverValueState: (target) ->
+  deliverToVariable: (target) ->
     sourceValue = @source.get()
     targetValue = target.get()
     return this if sourceValue? and targetValue? \
@@ -35,58 +43,35 @@ class ValueUpdatePayload
     newTargetValue = if sourceValue?
       @mapFn.call(null, sourceValue)
     else
-      @ifEmptyFn.call(null)
+      null
     target.set(newTargetValue)
     return this
 
 
 
-module.exports = class ValuePayload
+class SetPayload
 
   @create = (source) =>
     return new this(source)
 
 
-  @createFromValue = (value) =>
-    return new this(new ConstValue(value))
-
-
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
-    @ifEmptyFn = opts.ifEmpty ? getNull
 
 
   inspect: -> "value(#{inspect @get()})"
 
 
   get: ->
-    if (value = @source.get())?
-      @mapFn.call(null, value)
-    else
-      @ifEmptyFn.call(null)
+    @mapFn.call(null, @source.get())
 
 
   map: (map) ->
-    new ValuePayload(this, {map})
+    new SetPayload(this, {map})
 
 
-  ifEmpty: (ifEmpty) ->
-    new ValuePayload(this, {ifEmpty})
-
-
-  transform: (transform, ifEmpty) ->
-    if (value = @get())?
-      transform(value)
-    else
-      ifEmpty()
-
-
-  ifEmpty: (ifEmpty) ->
-    new ValuePayload(this, {ifEmpty})
-
-
-  mapIfMatch: (map, match, ifEmpty) ->
-    new ValueUpdatePayload(this, {map, match, ifEmpty})
+  updateMatching: (map, match) ->
+    new UpdateMatchingPayload(this, {map, match})
 
 
   flatMap: (map) ->
@@ -98,6 +83,14 @@ module.exports = class ValuePayload
     return this
 
 
-  deliverValueState: (targetNode) ->
-    targetNode.set(@get())
+  deliverToVariable: (variable) ->
+    variable.set(@get())
     return this
+
+
+
+module.exports = {
+  set: SetPayload.create
+  setLazy: (getValue) -> SetPayload.create(get: getValue)
+  setConst: SetConstPayload.create
+}

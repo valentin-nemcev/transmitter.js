@@ -3,7 +3,7 @@
 
 NodeTarget = require '../connection/node_target'
 
-ValuePayload = require '../payloads/value'
+# ValuePayload = require '../payloads/value'
 
 
 module.exports = class TargetNode
@@ -25,4 +25,4 @@ module.exports = class TargetNode
 
 
   createResponsePayload: ->
-    ValuePayload.create(null)
+    # ValuePayload.create(null)

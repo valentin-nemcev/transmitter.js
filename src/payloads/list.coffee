@@ -4,9 +4,14 @@
 {inspect} = require 'util'
 
 
-class ConstValue
+class SetConstPayload
+
+  @create = (value) => new this(value)
 
   constructor: (@value) ->
+
+  updateMatching: (map, match) ->
+    new UpdateMatchingPayload(this, {map, match})
 
   get: -> @value
 
@@ -16,31 +21,46 @@ class ConstValue
   getSize: -> @value.length
 
 
+  deliverToVariable: (variable) ->
+    variable.set(@get())
+    return this
 
-class ListRemovePayload
 
-  constructor: (@element) ->
+  deliverToList: (list) ->
+    list.set(@get())
+    return this
 
-  inspect: -> "listRemove(#{inspect @element})"
 
-  deliverListState: (target) ->
-    for el, pos in target.get() when el == @element
+
+class RemovePayload
+
+  @create = (@source) => new this(@source)
+
+  constructor: (@source) ->
+
+  inspect: -> "listRemove(#{inspect @source})"
+
+  deliverToList: (target) ->
+    element = @source.get()
+    for el, pos in target.get() when el == element
       target.removeAt(pos)
     return this
 
 
-class ListAddAtPayload
+class AddAtPayload
 
-  constructor: (@element, @pos) ->
+  @create = (@source) => new this(@source)
 
-  inspect: -> "listAddAt(#{inspect @element}, #{@pos})"
+  constructor: (@source) ->
 
-  deliverListState: (target) ->
-    target.addAt(@element, @pos)
+  inspect: -> "listAddAt(#{inspect @source.get()})"
+
+  deliverToList: (target) ->
+    target.addAt(@source.get()...)
     return this
 
 
-class ListUpdatePayload
+class UpdateMatchingPayload
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map
@@ -49,7 +69,7 @@ class ListUpdatePayload
   inspect: -> "listUpdate(#{inspect @source})"
 
 
-  deliverListState: (target) ->
+  deliverToList: (target) ->
     targetLength = target.getSize()
     sourceLength = @source.getSize()
 
@@ -89,43 +109,23 @@ class ListUpdatePayload
 
 
 
-module.exports = class ListPayload
+class SetPayload
 
   @create = (source) =>
     return new this(source)
-
-
-  @createFromValue = (value) =>
-    return new this(new ConstValue(value))
-
-
-  @createRemove = (element) =>
-    return new ListRemovePayload(element)
-
-
-  @createAddAt = (element, pos) =>
-    return new ListAddAtPayload(element, pos)
-
-
-  @createNoOp = =>
-    return new ListNoOpPayload()
 
 
   id = (a) -> a
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
-    @ifEmptyFn = opts.ifEmpty ? -> []
 
 
   inspect: -> "list(#{inspect @get()})"
 
 
   get: ->
-    if (value = @source.get()).length
-      @mapFn.call(null, el) for el in value
-    else
-      @ifEmptyFn.call(null)
+    @mapFn.call(null, el) for el in @source.get()
 
 
   getAt: (pos) ->
@@ -137,15 +137,11 @@ module.exports = class ListPayload
 
 
   map: (map) ->
-    new ListPayload(this, {map})
+    new SetPayload(this, {map})
 
 
-  ifEmpty: (ifEmpty) ->
-    new ListPayload(this, {ifEmpty})
-
-
-  mapIfMatch: (map, match) ->
-    new ListUpdatePayload(this, {map, match})
+  updateMatching: (map, match) ->
+    new UpdateMatchingPayload(this, {map, match})
 
 
   deliverValue: (targetNode) ->
@@ -153,11 +149,25 @@ module.exports = class ListPayload
     return this
 
 
-  deliverValueState: (targetNode) ->
-    targetNode.set(@get())
+  deliverToVariable: (variable) ->
+    variable.set(@get())
     return this
 
 
-  deliverListState: (targetNode) ->
-    targetNode.set(@get())
+  deliverToList: (list) ->
+    list.set(@get())
     return this
+
+
+
+module.exports = {
+  set: SetPayload.create
+  setLazy: (getValue) -> SetPayload.create(get: getValue)
+  setConst: SetConstPayload.create
+  append: (elementSource) ->
+    AddAtPayload.create(elementSource.map (el) -> [el, null])
+  appendConst: (element) ->
+    AddAtPayload.create(get: -> [element, null])
+  removeConst: (element) ->
+    RemovePayload.create(get: -> element)
+}

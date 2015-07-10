@@ -47,7 +47,7 @@ module.exports = class BidirectionalChannel extends CompositeChannel
 
   createTransform = (map, match, inits) ->
     if match?
-      (payload, tr) -> payload.mapIfMatch(wrapMap(map, tr, inits), match)
+      (payload, tr) -> payload.updateMatching(wrapMap(map, tr, inits), match)
     else
       (payload, tr) -> payload.map(wrapMap(map, tr, inits))
 

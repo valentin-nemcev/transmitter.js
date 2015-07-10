@@ -6,7 +6,7 @@ Transmitter = require 'transmitter'
 VariableNode = Transmitter.Nodes.Variable
 
 reduceMergedPayload = (payloads) ->
-  Transmitter.Payloads.set ->
+  Transmitter.Payloads.Variable.setLazy ->
     payloads.reduce((result, value, node) ->
       result[node.inspect()] = value.get()
       result

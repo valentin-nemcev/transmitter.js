@@ -35,18 +35,18 @@ describe 'Flattening connection', ->
         .fromSource @nestedVar
         .toConnectionTarget @nestedChannelVar
         .withTransform (payload) =>
-          payload.map((nestedObject) =>
-            new Transmitter.Channels.VariableChannel()
-              .withOrigin nestedObject.valueVar
-              .withMapOrigin (value) -> {name: nestedObject.name, value}
-              .withDerived @serializedVar
-              .withMapDerived (serialized) -> serialized.value
-          ).ifEmpty( =>
-            new Transmitter.Channels.ConstChannel()
-              .toTarget @serializedVar
-              .inForwardDirection()
-              .withValue -> null
-          )
+          payload.map (nestedObject) =>
+            if nestedObject?
+              new Transmitter.Channels.VariableChannel()
+                .withOrigin nestedObject.valueVar
+                .withMapOrigin (value) -> {name: nestedObject.name, value}
+                .withDerived @serializedVar
+                .withMapDerived (serialized) -> serialized.value
+            else
+              new Transmitter.Channels.ConstChannel()
+                .toTarget @serializedVar
+                .inForwardDirection()
+                .withValue -> null
         .connect(tr)
 
       # TODO

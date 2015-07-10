@@ -19,8 +19,8 @@ describe 'Reversing messages in the middle of the chain', ->
         .withTransform (payloads) =>
           buttonWasClicked = payloads.get(@button)
           textValue        = payloads.get(@textInput)
-          if buttonWasClicked.get()
-            @tagList.payloads.append(textValue.get())
+          if buttonWasClicked.get?
+            Transmitter.Payloads.List.append(textValue)
           else
             Transmitter.Payloads.noop()
         .toTarget @tagList
@@ -30,8 +30,8 @@ describe 'Reversing messages in the middle of the chain', ->
         .fromSource(@button)
         .inForwardDirection()
         .withTransform (buttonWasClicked) =>
-          if buttonWasClicked.get()
-            Transmitter.Payloads.set( -> '')
+          if buttonWasClicked.get?
+            Transmitter.Payloads.Variable.setConst('')
           else
             Transmitter.Payloads.noop()
         .toTarget @textInput

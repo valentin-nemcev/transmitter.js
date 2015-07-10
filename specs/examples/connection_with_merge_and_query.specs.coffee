@@ -15,6 +15,7 @@ class AlertEmitter extends Transmitter.Nodes.TargetNode
   receiveValue: (messageStr) -> @alert(messageStr) if messageStr?
 
 
+
 describe 'Connection with merge and query', ->
 
   beforeEach ->
@@ -31,7 +32,7 @@ describe 'Connection with merge and query', ->
         .withTransform (payloads) =>
           buttonWasClicked = payloads.get(@button)
           textValue        = payloads.get(@textInput)
-          if buttonWasClicked.get()
+          if buttonWasClicked.get?
             textValue
           else
             Transmitter.Payloads.noop()
