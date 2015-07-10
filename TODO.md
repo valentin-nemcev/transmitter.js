@@ -34,8 +34,6 @@
   * Enforcing consistency for merging connections to channel nodes when
     intermediate node is updated (send query backwards prohibiting lower
     precedence updates)
-  * Improve message routing, reversing message not when end of direct chain is
-    reached but when beginning of reverse chain is reached
 
 * Later
   * Remove use strict (needs custom compiler for mocha, browserify and npm)

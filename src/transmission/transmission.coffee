@@ -42,6 +42,7 @@ module.exports = class Transmission
 
   constructor: ->
     @pointsToComms = new WeakMap()
+    @nodesToPayloads = new WeakMap()
     @cachedMessagesForMerge = new MultiMap([], -> new FastMap())
     @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
     @lastCommSeqNum = 0
@@ -103,6 +104,16 @@ module.exports = class Transmission
 
   getCachedMessagesForMergeAt: (point) ->
     @cachedMessagesForMerge.get(point)
+
+
+
+  addPayloadFor: (payload, node) ->
+    @nodesToPayloads.set(node, payload)
+    return this
+
+
+  getPayloadFor: (node) ->
+    @nodesToPayloads.get(node)
 
 
 

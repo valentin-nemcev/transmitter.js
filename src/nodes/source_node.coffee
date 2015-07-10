@@ -18,14 +18,14 @@ module.exports = class SourceNode
     return this
 
 
-  respondToMessage: (tr, payload) ->
-    tr.createMessageResponseMessage(payload)
-      .sendFromNodeToNodeSource(this, @getNodeSource())
+  respondToMessage: (tr) ->
+    tr.createQueryForResponseMessage()
+      .enqueueForSourceNode(this)
     return this
 
 
-  respondToQuery: (tr) ->
-    tr.createQueryResponseMessage(@createResponsePayload())
+  respondToQuery: (tr, prevPayload) ->
+    tr.createQueryResponseMessage(prevPayload ? @createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 

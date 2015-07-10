@@ -6,10 +6,6 @@ Map = require 'collections/map'
 Precedence = require './precedence'
 
 
-class NullMessage
-  sendFromNodeToNodeSource: -> this
-
-
 module.exports = class Message
 
   inspect: ->
@@ -17,14 +13,8 @@ module.exports = class Message
       'M'
       @precedence.inspect()
       @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
-      @wasDelivered and 'D' or ''
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
-
-
-  @getNullMessage = -> @nullMessage ?= new NullMessage()
-
-  getNullMessage: -> Message.getNullMessage()
 
 
   @createInitial = (transmission, payload) ->
@@ -44,17 +34,6 @@ module.exports = class Message
       precedence: queuedQuery.precedence
       nesting:    queuedQuery.nesting
     })
-
-
-  @createMessageResponse = (queuedMessage, payload) ->
-    precedence = queuedMessage.precedence.getFinal()
-    if precedence?
-      new this(queuedMessage.transmission, payload, {
-        precedence
-        nesting: queuedMessage.nesting
-      })
-    else
-      @getNullMessage()
 
 
   @createTransformed = (prevMessage, payload) ->
@@ -94,8 +73,8 @@ module.exports = class Message
     Message.createNext(this, payload)
 
 
-  createMessageResponseMessage: (payload) ->
-    Message.createMessageResponse(this, payload)
+  createQueryForResponseMessage: ->
+    @transmission.Query.createForResponseMessage(this)
 
 
   createNextConnectionMessage: (payload) ->
@@ -122,8 +101,6 @@ module.exports = class Message
   _sendToNodePoint: (point) ->
     if @transmission.tryAddCommunicationFor(this, point)
       point.receiveMessage(this)
-    else
-      @markAsDelivered()
     return this
 
 
@@ -136,13 +113,13 @@ module.exports = class Message
 
 
   sendToNode: (node) ->
-    @markAsDelivered()
     node.routeMessage(this, @payload)
     return this
 
 
   sendFromNodeToNodeSource: (@node, nodeSource) ->
     @transmission.enqueueCommunication(this)
+    @transmission.addPayloadFor(@payload, @node)
     @_sendToNodePoint(nodeSource)
 
 
@@ -151,7 +128,7 @@ module.exports = class Message
 
 
   respond: ->
-    @node.respondToMessage(this, @payload) unless @wasDelivered
+    @node.respondToMessage(this)
     return this
 
 
@@ -170,15 +147,6 @@ module.exports = class Message
     else
       [@node]
 
-
-
-  markAsDelivered: ->
-    if @sourceMessages.length
-      for message in @sourceMessages
-        message.markAsDelivered()
-    else
-      @wasDelivered = yes
-    return this
 
 
   sendTransformedTo: (transform, target) ->

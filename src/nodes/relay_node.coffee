@@ -25,14 +25,14 @@ module.exports = class RelayNode
     return this
 
 
-  respondToMessage: (tr, payload) ->
-    tr.createMessageResponseMessage(@createResponsePayload())
-      .sendFromNodeToNodeSource(this, @getNodeSource())
+  respondToMessage: (tr) ->
+    tr.createQueryForResponseMessage()
+      .sendFromNodeToNodeTarget(this, @getNodeTarget())
     return this
 
 
-  respondToQuery: (tr) ->
-    tr.createQueryResponseMessage(@createResponsePayload())
+  respondToQuery: (tr, prevPayload) ->
+    tr.createQueryResponseMessage(prevPayload ? @createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 

@@ -4,6 +4,11 @@
 Precedence = require './precedence'
 
 
+class NullQuery
+  sendFromNodeToNodeTarget: -> this
+  enqueueForSourceNode: -> this
+
+
 module.exports = class Query
 
   inspect: ->
@@ -13,6 +18,11 @@ module.exports = class Query
       @node?.inspect() ? ''
       @wasDelivered and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
+
+
+  @getNullQuery = -> @nullQuery ?= new NullQuery()
+
+  getNullQuery: -> Query.getNullQuery()
 
 
   @createInitial = (transmission) ->
@@ -39,6 +49,17 @@ module.exports = class Query
       precedence: prevMessage.precedence.getPrevious()
       nesting: prevMessage.nesting
     })
+
+
+  @createForResponseMessage = (queuedMessage) ->
+    precedence = queuedMessage.precedence.getFinal()
+    if precedence?
+      new this(queuedMessage.transmission, {
+        precedence
+        nesting: queuedMessage.nesting
+      })
+    else
+      @getNullQuery()
 
 
 
@@ -103,7 +124,8 @@ module.exports = class Query
 
 
   respond: ->
-    @node.respondToQuery(this) unless @wasDelivered
+    unless @wasDelivered
+      @node.respondToQuery(this, @transmission.getPayloadFor(@node))
     return this
 
 

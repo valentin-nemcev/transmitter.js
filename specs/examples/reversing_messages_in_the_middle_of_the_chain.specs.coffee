@@ -30,7 +30,6 @@ describe 'Reversing messages in the middle of the chain', ->
         .fromSource(@button)
         .inForwardDirection()
         .withTransform (buttonWasClicked) =>
-          console.log buttonWasClicked
           if buttonWasClicked.get()
             Transmitter.Payloads.set( -> '')
           else
