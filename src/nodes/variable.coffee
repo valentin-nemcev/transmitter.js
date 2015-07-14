@@ -14,10 +14,6 @@ module.exports = class Variable extends RelayNode
     @payload.set(this)
 
 
-  createRelayPayload: ->
-    @payload.set(this)
-
-
   createOriginPayload: ->
     @payload.set(this)
 

@@ -15,11 +15,7 @@ module.exports = class Record
       enumerable: yes, configurable: yes
       get: ->
         value = get.call(this)
-        valueInspect = if Object::hasOwnProperty.call(value, 'inspect')
-          -> value.inspect()
-        else
-          -> name
-        value.inspect = => inspect(this) + '.' + valueInspect()
+        value.inspect = => inspect(this) + '.' + name
         Object.defineProperty this, name,
           enumerable: yes, writable: no, value: value
         return @[name]

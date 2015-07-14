@@ -10,6 +10,9 @@ class SetConstPayload
 
   constructor: (@value) ->
 
+  inspect: -> "setConst(#{inspect @value})"
+  inspect: -> "setConst()"
+
   updateMatching: (map, match) ->
     new UpdateMatchingPayload(this, {map, match})
 

@@ -3,6 +3,7 @@
 
 NodeSource = require '../connection/node_source'
 NodeTarget = require '../connection/node_target'
+noop = require '../payloads/noop'
 
 module.exports = class RelayNode
 
@@ -14,7 +15,7 @@ module.exports = class RelayNode
 
   routeMessage: (tr, payload) ->
     @acceptPayload(payload)
-    tr.createNextMessage(@createResponsePayload())
+    tr.createNextMessage(@createResponsePayload(payload))
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
@@ -32,7 +33,7 @@ module.exports = class RelayNode
 
 
   respondToQuery: (tr, prevPayload) ->
-    tr.createQueryResponseMessage(prevPayload ? @createResponsePayload())
+    tr.createQueryResponseMessage(@createResponsePayload(prevPayload))
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
 
@@ -55,10 +56,10 @@ module.exports = class RelayNode
     return this
 
 
-  createResponsePayload: ->
+  acceptPayload: -> this
 
 
-  createRelayPayload: ->
+  createResponsePayload: (payload) -> payload
 
 
   createOriginPayload: ->
