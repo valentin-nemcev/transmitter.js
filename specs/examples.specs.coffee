@@ -11,3 +11,4 @@ describe 'Examples', ->
   require './examples/flattening_with_nested_connections.specs'
   require './examples/flattening_with_nested_connections.specs'
   require './examples/reversing_messages_in_the_middle_of_the_chain.specs'
+  require './examples/merging_after_splitting.specs'
