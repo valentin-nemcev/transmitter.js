@@ -1,6 +1,9 @@
 'use strict'
 
 
+Set = require 'collections/set'
+
+
 module.exports = class NodeTarget
 
   @extend = (nodeClass) ->
