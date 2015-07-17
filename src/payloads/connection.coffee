@@ -16,8 +16,7 @@ class ConnectPayload
 
 
   deliver: (line) ->
-    line.setOrigin(@origin)
-    line.connect()
+    line.connect(@origin)
     return this
 
 
@@ -33,7 +32,6 @@ class DisconnectPayload
 
 
   deliver: (line) ->
-    line.setOrigin(@origin)
     line.disconnect()
     return this
 

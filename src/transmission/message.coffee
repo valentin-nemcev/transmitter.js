@@ -182,3 +182,8 @@ module.exports = class Message
       target.receiveMessage(Message.createMerged(cachedForMerge))
 
     return this
+
+
+  sendMergedToNode: (nodeTarget, origins, node) ->
+    @sendToNode(node)
+    return this

@@ -16,17 +16,14 @@ module.exports = class ConnectionNodeLine
   isConst: -> not @origin?
 
 
-  setOrigin: (@origin) -> this
-
-
-  connect: ->
-    @target?.connectSource(this)
+  connect: (@origin) ->
+    @target?.connectSource(@origin, this)
     @isConnected = yes
     return this
 
 
   disconnect: ->
-    @target?.disconnectSource(this)
+    @target?.disconnectSource(@origin, this)
     @isConnected = no
     return this
 

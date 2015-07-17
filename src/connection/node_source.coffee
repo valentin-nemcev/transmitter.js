@@ -1,6 +1,7 @@
 'use strict'
 
 
+MultiMap = require 'collections/multi-map'
 FastSet = require 'collections/fast-set'
 
 
@@ -14,22 +15,25 @@ module.exports = class NodeSource
 
 
   constructor: (@node) ->
-    @targets = new FastSet()
+    @targets = new MultiMap(null, -> new FastSet())
 
 
-  connectTarget: (target) ->
-    @targets.add(target)
+  connectTarget: (origin, target) ->
+    @targets.get(origin).add(target)
     return this
 
 
-  disconnectTarget: (target) ->
-    @targets.delete(target)
+  disconnectTarget: (origin, target) ->
+    originTargets = @targets.get(origin)
+    originTargets.delete(target)
+    @targets.delete(originTargets) if originTargets.length is 0
     return this
 
 
   receiveMessage: (message) ->
-    @targets.forEach (target) ->
-      message.sendToLine(target)
+    @targets.forEach (originTargets) ->
+      originTargets.forEach (target) ->
+        message.sendToLine(target)
     return this
 
 
