@@ -21,8 +21,8 @@ module.exports = class ChannelNode
     return this
 
 
-  receiveMessage: (@message) ->
-    @message.sendToChannelNode(this)
+  receiveMessage: (message) ->
+    message.sendToChannelNode(this)
     return this
 
 
@@ -35,6 +35,13 @@ module.exports = class ChannelNode
 
   connect: (channel) ->
     payload = ConnectionPayload.connect(this)
+    @tr.createNextConnectionMessage(payload)
+      .sendToConnection(channel)
+    return this
+
+
+  disconnect: (channel) ->
+    payload = ConnectionPayload.disconnect(this)
     @tr.createNextConnectionMessage(payload)
       .sendToConnection(channel)
     return this

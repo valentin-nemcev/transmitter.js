@@ -1,7 +1,7 @@
 'use strict'
 
 
-Set = require 'collections/set'
+FastSet = require 'collections/fast-set'
 
 
 module.exports = class NodeTarget
@@ -14,11 +14,16 @@ module.exports = class NodeTarget
 
 
   constructor: (@node) ->
-    @sources = new Set()
+    @sources = new FastSet()
 
 
   connectSource: (source) ->
     @sources.add(source)
+    return this
+
+
+  disconnectSource: (source) ->
+    @sources.delete(source)
     return this
 
 

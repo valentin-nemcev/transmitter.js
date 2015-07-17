@@ -7,6 +7,7 @@ module.exports = class ConnectionNodeLine
 
 
   constructor: (@target, @direction) ->
+    @isConnected = no
 
 
   setSource: (@source) -> this
@@ -20,12 +21,19 @@ module.exports = class ConnectionNodeLine
 
   connect: ->
     @target?.connectSource(this)
+    @isConnected = yes
+    return this
+
+
+  disconnect: ->
+    @target?.disconnectSource(this)
+    @isConnected = no
     return this
 
 
   receiveConnectionMessage: (message) ->
     message.sendToLine(this)
-    message.passCommunication(@target, this) if @target?
+    message.passCommunication(@target, this) if @target? and @isConnected
     return this
 
 

@@ -4,9 +4,9 @@
 {inspect} = require 'util'
 
 
-module.exports = class ConnectionPayload
+class ConnectPayload
 
-  @connect = (origin) -> new this(origin)
+  @create = (origin) => new this(origin)
 
 
   constructor: (@origin) ->
@@ -19,3 +19,25 @@ module.exports = class ConnectionPayload
     line.setOrigin(@origin)
     line.connect()
     return this
+
+
+class DisconnectPayload
+
+  @create = (origin) => new this(origin)
+
+
+  constructor: (@origin) ->
+
+
+  inspect: -> "disconnect (#{inspect @origin})"
+
+
+  deliver: (line) ->
+    line.setOrigin(@origin)
+    line.disconnect()
+    return this
+
+
+module.exports =
+  connect: ConnectPayload.create
+  disconnect: DisconnectPayload.create
