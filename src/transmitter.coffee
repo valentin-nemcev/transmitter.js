@@ -14,7 +14,6 @@ module.exports = new class Transmitter
   Transmission: Transmission
 
   constructor: (opts = {}) ->
-    {@reverseOrder} = opts
 
 
   setLogging: (state) ->
@@ -25,11 +24,6 @@ module.exports = new class Transmitter
   withDifferentTransmissionOrders: (doWithOrder) ->
     for order in ['straight', 'reverse']
       doWithOrder(order)
-    return this
-
-
-  setTransmissionOrder: (order) ->
-    Transmission::reverseOrder = order is 'reverse'
     return this
 
 

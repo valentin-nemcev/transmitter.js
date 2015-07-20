@@ -64,11 +64,11 @@ describe 'Multilevel merging 1', ->
         .connect(tr)
 
 
-  Transmitter.withDifferentTransmissionOrders (order) ->
+  ['straight', 'reverse'].forEach (order) ->
     specify "multiple messages are transmitted and merged \
         in correct order (#{order})", ->
-      Transmitter.setTransmissionOrder order
       Transmitter.startTransmission (tr) =>
+        tr.reverseOrder = order is 'reverse'
         @d2.updateState(tr, 'd2UpdatedValue')
         @b2.updateState(tr, 'b2UpdatedValue')
 
@@ -123,7 +123,6 @@ describe 'Multilevel merging 2', ->
           @bind2(tr)
           @bind1(tr)
 
-      Transmitter.setTransmissionOrder order
       Transmitter.startTransmission (tr) =>
         @b1.updateState(tr, 'b1Value')
 
