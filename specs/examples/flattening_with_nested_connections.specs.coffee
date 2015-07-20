@@ -47,9 +47,9 @@ describe 'Flattening with nested connections', ->
             Transmitter.Channels.getNullChannel()
 
     Transmitter.startTransmission (tr) =>
-      originDerivedChannel.connect(tr)
-      flatteningChannel.connect(tr)
-      @originVar.updateState(tr, new Model())
+      originDerivedChannel.init(tr)
+      flatteningChannel.init(tr)
+      @originVar.init(tr, new Model())
 
 
   specify 'when derived nested node originates update', ->

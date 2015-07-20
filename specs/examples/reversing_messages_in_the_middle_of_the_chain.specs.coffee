@@ -24,7 +24,7 @@ describe 'Reversing messages in the middle of the chain', ->
           else
             Transmitter.Payloads.noop()
         .toTarget @tagList
-        .connect(tr)
+        .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
         .fromSource(@button)
@@ -35,10 +35,10 @@ describe 'Reversing messages in the middle of the chain', ->
           else
             Transmitter.Payloads.noop()
         .toTarget @textInput
-        .connect(tr)
+        .init(tr)
 
-      @tagList.updateState(tr, ['value 1'])
-      @textInput.updateState(tr, 'value 2')
+      @tagList.init(tr, ['value 1'])
+      @textInput.init(tr, 'value 2')
 
 
   specify 'when button is clicked', ->

@@ -24,7 +24,7 @@ describe 'Value updates preserve identity', ->
           .withMapDerived (string) -> new StatefulObject(string)
           .withMatchDerivedOrigin (string, object) ->
             object? and string == object.name
-          .connect(tr)
+          .init(tr)
 
 
     specify 'state change message update target value instead of replacing', ->
@@ -32,7 +32,7 @@ describe 'Value updates preserve identity', ->
       @objectVar.set(@object)
 
       Transmitter.startTransmission (tr) =>
-        @stringVar.updateState(tr, 'nameA')
+        @stringVar.init(tr, 'nameA')
 
       expect(@objectVar.get()).to.equal(@object)
 
@@ -51,7 +51,7 @@ describe 'Value updates preserve identity', ->
           .withMapDerived (string) -> new StatefulObject(string)
           .withMatchDerivedOrigin (string, object) ->
             object? and string == object.name
-          .connect(tr)
+          .init(tr)
 
 
     specify 'state change message update target value instead of replacing', ->
@@ -60,7 +60,7 @@ describe 'Value updates preserve identity', ->
       @objectList.set([@objectA, @objectB])
 
       Transmitter.startTransmission (tr) =>
-        @stringList.updateState(tr, ['nameB', 'nameA'])
+        @stringList.init(tr, ['nameB', 'nameA'])
 
       objects = @objectList.get()
       expect(objects[0]).to.equal(@objectB)

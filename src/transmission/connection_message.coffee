@@ -19,10 +19,10 @@ module.exports = class ConnectionMessage
     return this
 
 
-  # @createInitial = (transmission, payload) ->
-  #   new this(transmission, payload, {
-  #     # precedence: 0
-  #   })
+  @createInitial = (transmission) ->
+    new this(transmission, null, {
+      # precedence: 0
+    })
 
 
   @createNext = (prevMessage, origin) ->

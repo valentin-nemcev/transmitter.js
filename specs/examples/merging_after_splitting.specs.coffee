@@ -22,7 +22,7 @@ describe 'Merging after splitting', ->
             Transmitter.Payloads.Variable.setConst(on)
           else
             Transmitter.Payloads.noop()
-        .connect(tr)
+        .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
@@ -33,7 +33,7 @@ describe 'Merging after splitting', ->
             Transmitter.Payloads.Variable.setConst(off)
           else
             Transmitter.Payloads.noop()
-        .connect(tr)
+        .init(tr)
 
 
   specify 'splitted message is merged correctly', ->

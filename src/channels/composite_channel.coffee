@@ -1,6 +1,9 @@
 'use strict'
 
 
+SimpleChannel = require './simple_channel'
+
+
 module.exports = class CompositeChannel
 
   @defineChannel = (createChannel) ->
@@ -32,3 +35,6 @@ module.exports = class CompositeChannel
     for channel in @getChannels()
       channel.disconnect(message)
     return this
+
+
+  init: SimpleChannel::init

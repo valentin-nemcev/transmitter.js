@@ -55,8 +55,8 @@ module.exports = class Transmission
   createInitialMessage: (payload) ->
     @Message.createInitial(this, payload)
 
-  createInitialConnectionMessage: (payload) ->
-    @ConnectionMessage.createInitial(this, payload)
+  createInitialConnectionMessage: ->
+    @ConnectionMessage.createInitial(this)
 
 
 

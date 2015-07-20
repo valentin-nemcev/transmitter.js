@@ -19,21 +19,15 @@ module.exports = class NodeTarget
 
 
   connectSource: (message, source) ->
-    if message?.getOrigin?
-      origin = message.getOrigin()
-      message.addPoint(this)
-    else
-      origin = null
+    origin = message.getOrigin()
+    message.addPoint(this)
     @sources.get(origin).add(source)
     return this
 
 
   disconnectSource: (message, source) ->
-    if message?.getOrigin?
-      origin = message.getOrigin()
-      message.addPoint(this)
-    else
-      origin = null
+    origin = message.getOrigin()
+    message.addPoint(this)
     originSources = @sources.get(origin)
     originSources.delete(source)
     @sources.delete(origin) if originSources.length is 0

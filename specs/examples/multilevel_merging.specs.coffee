@@ -47,13 +47,13 @@ describe 'Multilevel merging 1', ->
         .fromSource(@d2)
         .withTransform reduceMergedPayload
         .toTarget @b1
-        .connect(tr)
+        .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSource @c1
         .toTarget @b1
-        .connect(tr)
+        .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
@@ -61,7 +61,7 @@ describe 'Multilevel merging 1', ->
         .fromSource(@b2)
         .withTransform reduceMergedPayload
         .toTarget @a
-        .connect(tr)
+        .init(tr)
 
 
   ['straight', 'reverse'].forEach (order) ->
@@ -69,8 +69,8 @@ describe 'Multilevel merging 1', ->
         in correct order (#{order})", ->
       Transmitter.startTransmission (tr) =>
         tr.reverseOrder = order is 'reverse'
-        @d2.updateState(tr, 'd2UpdatedValue')
-        @b2.updateState(tr, 'b2UpdatedValue')
+        @d2.init(tr, 'd2UpdatedValue')
+        @b2.init(tr, 'b2UpdatedValue')
 
       expect(@a.get()).to.deep.equal({
         b1:
@@ -101,14 +101,14 @@ describe 'Multilevel merging 2', ->
         .fromSource(@b2)
         .withTransform reduceMergedPayload
         .toTarget @a
-        .connect(tr)
+        .init(tr)
 
     @bind2 = (tr) =>
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSource @b2
         .toTarget @a
-        .connect(tr)
+        .init(tr)
 
 
 
@@ -124,7 +124,7 @@ describe 'Multilevel merging 2', ->
           @bind1(tr)
 
       Transmitter.startTransmission (tr) =>
-        @b1.updateState(tr, 'b1Value')
+        @b1.init(tr, 'b1Value')
 
       expect(@a.get()).to.deep.equal({
         b1: 'b1Value'

@@ -45,7 +45,7 @@ describe 'Message and query transmission', ->
         .inDirection @direction
         .fromSource @source
         .toTarget @target
-        .connect(tr)
+        .init(tr)
 
     @transmission = new Transmission()
 

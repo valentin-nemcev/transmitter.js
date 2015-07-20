@@ -44,7 +44,7 @@ module.exports = class RelayNode
     return this
 
 
-  updateState: (tr, value) ->
+  init: (tr, value) ->
     tr.createInitialMessage(@createUpdatePayload(value))
       .sendToNodeTarget(@getNodeTarget())
     return this

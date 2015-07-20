@@ -41,7 +41,7 @@ describe 'Nested list connection', ->
           .withMapDerived derivedToOrigin
 
     Transmitter.startTransmission (tr) =>
-      listChannel.connect(tr)
+      listChannel.init(tr)
 
 
   specify 'when origin list is updated', ->
@@ -49,9 +49,9 @@ describe 'Nested list connection', ->
       item1 = new ListItem('Origin item 1')
       item2 = new ListItem('Origin item 2')
 
-      item1.valueVar.updateState(tr, 'Origin value 1')
-      item2.valueVar.updateState(tr, 'Origin value 2')
-      @originList.updateState(tr, [item1, item2])
+      item1.valueVar.init(tr, 'Origin value 1')
+      item2.valueVar.init(tr, 'Origin value 2')
+      @originList.init(tr, [item1, item2])
 
 
   specify 'then update is transmitted to derived list', ->

@@ -37,12 +37,12 @@ describe 'Connection with merge and query', ->
           else
             Transmitter.Payloads.noop()
         .toTarget @alertEmitter
-        .connect(tr)
+        .init(tr)
 
 
   it 'should emit alert with text input value when button is clicked', ->
     Transmitter.startTransmission (tr) =>
-      @textInput.updateState(tr, 'Text input value')
+      @textInput.init(tr, 'Text input value')
     Transmitter.startTransmission (tr) =>
       @button.originate(tr, 'click')
     expect(@alertEmitter.alert).to.have.been.calledWith('Text input value')
@@ -50,5 +50,5 @@ describe 'Connection with merge and query', ->
 
   it 'should not emit alert when button is not clicked', ->
     Transmitter.startTransmission (tr) =>
-      @textInput.updateState(tr, 'Text input value')
+      @textInput.init(tr, 'Text input value')
     expect(@alertEmitter.alert).to.not.have.been.called

@@ -29,7 +29,7 @@ describe 'Flattening connection', ->
               return object
             else
               return new NestedObject(serialized.name)
-        .connect(tr)
+        .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
         .fromSource @nestedVar
@@ -47,18 +47,17 @@ describe 'Flattening connection', ->
                 .toTarget @serializedVar
                 .inForwardDirection()
                 .withValue -> null
-        .connect(tr)
+        .init(tr)
 
       # TODO
-    Transmitter.startTransmission (tr) =>
-      @nestedVar.updateState(tr, null)
+      @nestedVar.init(tr, null)
 
 
   specify 'creation of nested target after flat source update', ->
     serialized = {name: 'objectA', value: 'value1'}
 
     Transmitter.startTransmission (tr) =>
-      @serializedVar.updateState(tr, serialized)
+      @serializedVar.init(tr, serialized)
 
     nestedObject = @nestedVar.get()
     expect(nestedObject.name).to.equal('objectA')
@@ -69,8 +68,8 @@ describe 'Flattening connection', ->
     nestedObject = new NestedObject('objectA')
 
     Transmitter.startTransmission (tr) =>
-      nestedObject.valueVar.updateState(tr, 'value1')
-      @nestedVar.updateState(tr, nestedObject)
+      nestedObject.valueVar.init(tr, 'value1')
+      @nestedVar.init(tr, nestedObject)
 
     expect(@serializedVar.get())
       .to.deep.equal({name: 'objectA', value: 'value1'})

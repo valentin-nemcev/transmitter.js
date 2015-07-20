@@ -96,3 +96,10 @@ module.exports = class SimpleChannel
   disconnect: (message) ->
     @getConnection().connect(message)
     return this
+
+
+  init: (tr) ->
+    message = tr.createInitialConnectionMessage()
+    @connect(message)
+    message.updatePoints()
+    return this
