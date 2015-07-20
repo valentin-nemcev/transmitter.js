@@ -72,7 +72,6 @@ sources and targets?)
     Query existing lines
     Ensure no more lines will be added (can't do this)
     When more lines are added, merge their messages and check that result doesn't change (otherwise raise an error)
-      Handle line replacement, get message directly from origin channel node
   Automatically merge messages, selecting only one
     Assign priority to payloads, chose one with top priority, assert that it is
 the only one

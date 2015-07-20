@@ -1,9 +1,6 @@
 'use strict'
 
 
-ConnectionPayload = require '../payloads/connection'
-
-
 module.exports = class ChannelNode
 
   inspect: -> '[' + @constructor.name + ']'

@@ -11,8 +11,6 @@ ConnectionNodeLine = require '../connection/connection_node_line'
 MergingConnectionTarget = require '../connection/merging_connection_target'
 Connection = require '../connection/connection'
 
-ConnectionPayload = require '../payloads/connection'
-
 
 module.exports = class SimpleChannel
 
@@ -31,7 +29,7 @@ module.exports = class SimpleChannel
   inDirection: (@direction) ->
     return this
 
-  getDirection: -> 
+  getDirection: ->
     if @connectionTarget?
       directions.omni
     else

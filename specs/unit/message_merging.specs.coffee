@@ -4,7 +4,6 @@ SourceNode = require 'transmitter/nodes/source_node'
 SimpleChannel = require 'transmitter/channels/simple_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
-ConnectionPayload = require 'transmitter/payloads/connection'
 
 Transmitter = require 'transmitter'
 

@@ -1,8 +1,7 @@
 'use strict'
 
 
-MultiMap = require 'collections/multi-map'
-FastSet = require 'collections/fast-set'
+NodeLineMap = require './node_line_map'
 
 
 module.exports = class NodeSource
@@ -15,38 +14,32 @@ module.exports = class NodeSource
 
 
   constructor: (@node) ->
-    @targets = new MultiMap(null, -> new FastSet())
+    @targets = new NodeLineMap(this)
 
 
   connectTarget: (message, target) ->
-    origin = message.getOrigin()
-    message.addPoint(this)
-    @targets.get(origin).add(target)
+    @targets.connect(message, target)
     return this
 
 
   disconnectTarget: (message, target) ->
-    origin = message.getOrigin()
-    message.addPoint(this)
-    originTargets = @targets.get(origin)
-    originTargets.delete(target)
-    @targets.delete(originTargets) if originTargets.length is 0
-    return this
-
-
-  passCommunication: (message, origin) ->
-    @targets.get(origin).forEach (target) ->
-      message.sendToLine(target)
-    return this
-
-
-  receiveMessage: (message) ->
-    @targets.forEach (targets, origin) ->
-      if not origin? or message.tryQueryOrigin(origin)
-        targets.forEach (target) -> message.sendToLine(target)
+    @targets.disconnect(message, target)
     return this
 
 
   receiveQuery: (query) ->
     query.sendToNode(@node)
+    return this
+
+
+  resendQuery: -> this
+
+
+  resendMessage: (message, channelNode) ->
+    @targets.resendCommunication(message, channelNode)
+    return this
+
+
+  receiveMessage: (message) ->
+    @targets.sendCommunication(message)
     return this

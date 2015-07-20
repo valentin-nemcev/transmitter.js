@@ -62,8 +62,8 @@ module.exports = class Transmission
 
   # Common code for communications (queries and messages)
   tryQueryChannelNode: (comm, channelNode) ->
-    if @communicationSucceedsExistingFor(comm, channelNode)
-      channelNode.receiveQuery(@Query.createNextConnection(comm))
+    if channelNode? and @communicationSucceedsExistingFor(comm, channelNode)
+      @Query.createNextConnection(comm).sendToChannelNode(channelNode)
       false
     else
       true
@@ -92,11 +92,6 @@ module.exports = class Transmission
 
   communicationSucceedsExistingFor: (succComm, point) ->
     exisitingComm = @getCommunicationFor(point)
-    if exisitingComm?
-      @log point, succComm, exisitingComm,
-        compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence())
-    else
-      @log point, succComm, exisitingComm
     return true if not exisitingComm?
     compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence()) == 1
 

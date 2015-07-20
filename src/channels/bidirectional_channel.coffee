@@ -4,8 +4,6 @@
 SimpleChannel = require './simple_channel'
 CompositeChannel = require './composite_channel'
 
-ConnectionPayload = require '../payloads/connection'
-
 
 module.exports = class BidirectionalChannel extends CompositeChannel
 

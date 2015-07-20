@@ -91,14 +91,13 @@ module.exports = class Query
     [@precedence.level, @communicationTypeOrder]
 
 
-  tryQueryOrigin: (origin) ->
-    @transmission.tryQueryChannelNode(this, origin)
+  tryQueryChannelNode: (channelNode) ->
+    @transmission.tryQueryChannelNode(this, channelNode)
 
 
   sendToLine: (line) ->
-    # if @transmission.tryQueryLine(this, line)
     @log line
-    line.receiveOutgoingQuery(this)
+    line.receiveQuery(this)
     return this
 
 
@@ -110,9 +109,20 @@ module.exports = class Query
     return this
 
 
+  resendFromNodePoint: (point, channelNode) ->
+    point.resendQuery(this, channelNode)
+    return this
+
+
   sendToNodeSource: (nodeSource) ->
     @log nodeSource
     @_sendToNodePoint(nodeSource)
+
+
+  sendToChannelNode: (node) ->
+    @log node
+    node.receiveQuery(this)
+    return this
 
 
   sendToNode: (node) ->

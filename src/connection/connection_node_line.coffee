@@ -7,43 +7,22 @@ module.exports = class ConnectionNodeLine
 
 
   constructor: (@target, @direction) ->
-    @isConnected = no
 
 
   setSource: (@source) -> this
 
 
-  isConst: -> not @origin?
-
-
   connect: (message) ->
     @target?.connectSource(message, this)
-    @isConnected = yes
     return this
 
 
   disconnect: ->
     @target?.disconnectSource(message, this)
-    @isConnected = no
     return this
 
 
-  receiveConnectionMessage: (message) ->
-    message.sendToLine(this)
-    message.passCommunication(@target, this) if @target? and @isConnected
-    return this
-
-
-  receiveConnectionQuery: (query) ->
-    @origin.receiveQuery(query)
-    return this
-
-
-  receiveOutgoingMessage: ->
-    return this
-
-
-  receiveOutgoingQuery: (query) ->
+  receiveQuery: (query) ->
     if query.directionMatches(@direction)
       @source.receiveQuery(query)
     return this

@@ -82,8 +82,8 @@ module.exports = class Message
     @transmission.Query.createForResponseMessage(this)
 
 
-  createNextConnectionMessage: (origin) ->
-    @transmission.ConnectionMessage.createNext(this, origin)
+  createNextConnectionMessage: (channelNode) ->
+    @transmission.ConnectionMessage.createNext(this, channelNode)
 
 
 
@@ -97,20 +97,24 @@ module.exports = class Message
     [@precedence.level, @communicationTypeOrder]
 
 
-  tryQueryOrigin: (origin) ->
-    @transmission.tryQueryChannelNode(this, origin)
+  tryQueryChannelNode: (channelNode) ->
+    @transmission.tryQueryChannelNode(this, channelNode)
 
 
   sendToLine: (line) ->
-    # if @transmission.tryQueryLine(this, line)
     @log line
-    line.receiveOutgoingMessage(this)
+    line.receiveMessage(this)
     return this
 
 
   _sendToNodePoint: (point) ->
     if @transmission.tryAddCommunicationFor(this, point)
       point.receiveMessage(this)
+    return this
+
+
+  resendFromNodePoint: (point, channelNode) ->
+    point.resendMessage(this, channelNode)
     return this
 
 
@@ -121,7 +125,8 @@ module.exports = class Message
 
   sendToChannelNode: (node) ->
     @log node
-    @transmission.addCommunicationFor(this, node)
+    @transmission.tryAddCommunicationFor(this, node) \
+      or throw new Error("Can't send message to same channel node twice")
     node.routeMessage(this, @payload)
     return this
 
@@ -200,6 +205,6 @@ module.exports = class Message
     return this
 
 
-  sendMergedToNode: (nodeTarget, origins, node) ->
+  sendMergedToNode: (nodeTarget, channelNodes, node) ->
     @sendToNode(node)
     return this
