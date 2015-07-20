@@ -31,10 +31,10 @@ module.exports = class Transmission
 
   loggingFilter: -> true
 
-  log: (name, args...) ->
+  log: (args...) ->
     return this unless @loggingIsEnabled
     msg = args.map(inspect).join(', ')
-    console.log name, msg if @loggingFilter(msg)
+    console.log msg if @loggingFilter(msg)
     return this
 
 
@@ -61,9 +61,9 @@ module.exports = class Transmission
 
 
   # Common code for communications (queries and messages)
-  tryQueryLine: (comm, line) ->
-    if not line.isConst() and @communicationSucceedsExistingFor(comm, line)
-      line.receiveConnectionQuery(@Query.createNextConnection(comm))
+  tryQueryChannelNode: (comm, channelNode) ->
+    if @communicationSucceedsExistingFor(comm, channelNode)
+      channelNode.receiveQuery(@Query.createNextConnection(comm))
       false
     else
       true
@@ -78,7 +78,6 @@ module.exports = class Transmission
 
 
   addCommunicationFor: (comm, point) ->
-    @log 'addCommunicationFor', comm, point
     @pointsToComms.set(point, comm)
     return this
 
@@ -93,6 +92,11 @@ module.exports = class Transmission
 
   communicationSucceedsExistingFor: (succComm, point) ->
     exisitingComm = @getCommunicationFor(point)
+    if exisitingComm?
+      @log point, succComm, exisitingComm,
+        compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence())
+    else
+      @log point, succComm, exisitingComm
     return true if not exisitingComm?
     compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence()) == 1
 
@@ -118,7 +122,6 @@ module.exports = class Transmission
 
 
   enqueueCommunication: (comm) ->
-    @log 'enqueue', comm, comm.getQueueOrder()
     @commQueue.add([@lastCommSeqNum++, comm])
     return this
 
@@ -134,6 +137,5 @@ module.exports = class Transmission
   respond: ->
     while @commQueue.length
       [commSeqNum, comm] = @commQueue.shift()
-      @log 'dequeue', comm, comm.getQueueOrder()
       comm.respond()
     return this

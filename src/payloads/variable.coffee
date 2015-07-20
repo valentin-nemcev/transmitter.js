@@ -11,7 +11,6 @@ class SetConstPayload
   constructor: (@value) ->
 
   inspect: -> "setConst(#{inspect @value})"
-  inspect: -> "setConst()"
 
   map: (map) ->
     new SetPayload(this, {map})

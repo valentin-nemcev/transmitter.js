@@ -20,6 +20,11 @@ module.exports = class Query
     ].filter( (s) -> s.length).join(' ')
 
 
+  log: ->
+    @transmission.log this, arguments...
+    return this
+
+
   @getNullQuery = -> @nullQuery ?= new NullQuery()
 
   getNullQuery: -> Query.getNullQuery()
@@ -86,9 +91,14 @@ module.exports = class Query
     [@precedence.level, @communicationTypeOrder]
 
 
+  tryQueryOrigin: (origin) ->
+    @transmission.tryQueryChannelNode(this, origin)
+
+
   sendToLine: (line) ->
-    if @transmission.tryQueryLine(this, line)
-      line.receiveOutgoingQuery(this)
+    # if @transmission.tryQueryLine(this, line)
+    @log line
+    line.receiveOutgoingQuery(this)
     return this
 
 
@@ -100,16 +110,20 @@ module.exports = class Query
     return this
 
 
-  sendToNodeSource: (nodeSource) -> @_sendToNodePoint(nodeSource)
+  sendToNodeSource: (nodeSource) ->
+    @log nodeSource
+    @_sendToNodePoint(nodeSource)
 
 
   sendToNode: (node) ->
+    @log node
     @markAsDelivered()
     node.routeQuery(this)
     return this
 
 
   sendFromNodeToNodeTarget: (node, nodeTarget) ->
+    @log nodeTarget
     @enqueueForSourceNode(node)
     @_sendToNodePoint(nodeTarget)
 

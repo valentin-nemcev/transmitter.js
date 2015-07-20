@@ -2,7 +2,8 @@
 
 class NullChannel
 
-  receiveConnectionMessage: -> this
+  connect: -> this
+  disconnect: -> this
 
 
 nullChannel = null

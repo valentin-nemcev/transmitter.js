@@ -16,8 +16,8 @@ module.exports = class ChannelVariable extends ChannelNode
   set: (newChannel) ->
     oldChannel = @channel
 
-    @disconnect(oldChannel) if oldChannel?
+    oldChannel.disconnect(@message) if oldChannel?
 
     @channel = newChannel
-    @connect(newChannel) if newChannel?
+    newChannel.connect(@message) if newChannel?
     this

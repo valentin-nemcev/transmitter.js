@@ -12,9 +12,14 @@ module.exports = class Message
     [
       'M'
       @precedence.inspect()
-      @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
+      # @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
+
+
+  log: ->
+    @transmission.log this, arguments...
+    return this
 
 
   @createInitial = (transmission, payload) ->
@@ -77,8 +82,8 @@ module.exports = class Message
     @transmission.Query.createForResponseMessage(this)
 
 
-  createNextConnectionMessage: (payload) ->
-    @transmission.ConnectionMessage.createNext(this, payload)
+  createNextConnectionMessage: (origin) ->
+    @transmission.ConnectionMessage.createNext(this, origin)
 
 
 
@@ -92,9 +97,14 @@ module.exports = class Message
     [@precedence.level, @communicationTypeOrder]
 
 
+  tryQueryOrigin: (origin) ->
+    @transmission.tryQueryChannelNode(this, origin)
+
+
   sendToLine: (line) ->
-    if @transmission.tryQueryLine(this, line)
-      line.receiveOutgoingMessage(this)
+    # if @transmission.tryQueryLine(this, line)
+    @log line
+    line.receiveOutgoingMessage(this)
     return this
 
 
@@ -104,20 +114,26 @@ module.exports = class Message
     return this
 
 
-  sendToNodeTarget: (nodeTarget) -> @_sendToNodePoint(nodeTarget)
+  sendToNodeTarget: (nodeTarget) ->
+    @log nodeTarget
+    @_sendToNodePoint(nodeTarget)
 
 
   sendToChannelNode: (node) ->
+    @log node
+    @transmission.addCommunicationFor(this, node)
     node.routeMessage(this, @payload)
     return this
 
 
   sendToNode: (node) ->
+    @log node
     node.routeMessage(this, @payload)
     return this
 
 
   sendFromNodeToNodeSource: (@node, nodeSource) ->
+    @log nodeSource
     @transmission.enqueueCommunication(this)
     @transmission.addPayloadFor(@payload, @node)
     @_sendToNodePoint(nodeSource)

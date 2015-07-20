@@ -12,7 +12,7 @@ module.exports = class ChannelNode
   setSource: (@source) ->
 
 
-  receiveConnectionMessage: (message) ->
+  connect: (message) ->
     return this
 
 
@@ -27,21 +27,8 @@ module.exports = class ChannelNode
 
 
   routeMessage: (tr, payload) ->
-    @tr = tr
+    @message = tr.createNextConnectionMessage(this)
     @acceptPayload(payload)
-    @tr = null
-    return this
-
-
-  connect: (channel) ->
-    payload = ConnectionPayload.connect(this)
-    @tr.createNextConnectionMessage(payload)
-      .sendToConnection(channel)
-    return this
-
-
-  disconnect: (channel) ->
-    payload = ConnectionPayload.disconnect(this)
-    @tr.createNextConnectionMessage(payload)
-      .sendToConnection(channel)
+    @message.updatePoints()
+    @message = null
     return this

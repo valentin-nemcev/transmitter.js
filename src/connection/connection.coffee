@@ -10,9 +10,15 @@ module.exports = class Connection
   inspect: -> @source.inspect() + @target.inspect()
 
 
-  receiveConnectionMessage: (message) ->
-    @source.receiveConnectionMessage(message)
-    @target.receiveConnectionMessage(message)
+  connect: (message) ->
+    @source.connect(message)
+    @target.connect(message)
+    return this
+
+
+  disconnect: (message) ->
+    @source.disconnect(message)
+    @target.disconnect(message)
     return this
 
 

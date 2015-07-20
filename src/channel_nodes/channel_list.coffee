@@ -20,9 +20,9 @@ module.exports = class ChannelList extends ChannelNode
   set: (newChannels) ->
     oldChannels = @channels
 
-    @disconnect(oldChannel) for oldChannel in oldChannels
+    oldChannel.disconnect(@message) for oldChannel in oldChannels
 
     @channels.length = 0
     @channels.push newChannels...
-    @connect(newChannel) for newChannel in newChannels
+    newChannel.connect(@message) for newChannel in newChannels
     this

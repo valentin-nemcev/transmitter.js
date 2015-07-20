@@ -22,13 +22,13 @@ module.exports = class CompositeChannel
   getChannels: -> @channels ?= @createChannels()
 
 
-  receiveConnectionMessage: (message) ->
+  connect: (message) ->
     for channel in @getChannels()
-      channel.receiveConnectionMessage(message)
+      channel.connect(message)
     return this
 
 
-  connect: (tr) ->
+  disconnect: (message) ->
     for channel in @getChannels()
-      channel.connect(tr)
+      channel.disconnect(message)
     return this

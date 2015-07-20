@@ -88,11 +88,11 @@ module.exports = class SimpleChannel
     @connection ?= new Connection(@getSource(), @getTarget(), @getTransform())
 
 
-  connect: (tr) ->
-    tr.createInitialConnectionMessage(ConnectionPayload.connect())
-      .sendToConnection(@getConnection())
+  connect: (message) ->
+    @getConnection().connect(message)
+    return this
 
 
-  receiveConnectionMessage: (message) ->
-    @getConnection().receiveConnectionMessage(message)
+  disconnect: (message) ->
+    @getConnection().connect(message)
     return this

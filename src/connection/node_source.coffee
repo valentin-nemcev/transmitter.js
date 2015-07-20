@@ -18,22 +18,38 @@ module.exports = class NodeSource
     @targets = new MultiMap(null, -> new FastSet())
 
 
-  connectTarget: (origin, target) ->
+  connectTarget: (message, target) ->
+    if message?.getOrigin?
+      origin = message.getOrigin()
+      message.addPoint(this)
+    else
+      origin = null
     @targets.get(origin).add(target)
     return this
 
 
-  disconnectTarget: (origin, target) ->
+  disconnectTarget: (message, target) ->
+    if message?.getOrigin?
+      origin = message.getOrigin()
+      message.addPoint(this)
+    else
+      origin = null
     originTargets = @targets.get(origin)
     originTargets.delete(target)
     @targets.delete(originTargets) if originTargets.length is 0
     return this
 
 
+  passCommunication: (message, origin) ->
+    @targets.get(origin).forEach (target) ->
+      message.sendToLine(target)
+    return this
+
+
   receiveMessage: (message) ->
-    @targets.forEach (originTargets) ->
-      originTargets.forEach (target) ->
-        message.sendToLine(target)
+    @targets.forEach (targets, origin) ->
+      if not origin? or message.tryQueryOrigin(origin)
+        targets.forEach (target) -> message.sendToLine(target)
     return this
 
 

@@ -50,6 +50,7 @@ describe 'Flattening connection', ->
         .connect(tr)
 
       # TODO
+    Transmitter.startTransmission (tr) =>
       @nestedVar.updateState(tr, null)
 
 

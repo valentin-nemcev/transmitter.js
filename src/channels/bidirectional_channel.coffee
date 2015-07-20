@@ -9,6 +9,9 @@ ConnectionPayload = require '../payloads/connection'
 
 module.exports = class BidirectionalChannel extends CompositeChannel
 
+  inspect: -> '[' + @constructor.name + ']'
+
+
   withOrigin:  (@origin)  -> this
   withDerived: (@derived) -> this
 

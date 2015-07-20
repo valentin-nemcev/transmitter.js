@@ -50,9 +50,7 @@ describe 'Message merging', ->
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)
-    Transmitter.startTransmission (tr) =>
-      tr.createInitialConnectionMessage(ConnectionPayload.connect())
-        .sendToConnection(@compositeSource)
+    @compositeSource.connect()
 
 
   specify 'when one active source have sent message', ->
