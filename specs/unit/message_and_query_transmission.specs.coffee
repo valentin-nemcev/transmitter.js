@@ -16,9 +16,11 @@ class DirectionStub
   reverse: -> new DirectionStub()
 
 class StubPayload
+  inspect: -> 'stub()'
   deliver: ->
 
 class PrecedenceStub
+  inspect: -> 'P:s'
   constructor: (@direction) ->
   directionMatches: (direction) -> direction == @direction
   getFinal: -> null

@@ -1,9 +1,10 @@
 'use strict'
 
 
-# MergedPayload = require '../payloads/merged'
 Map = require 'collections/map'
 Precedence = require './precedence'
+
+SelectedMessage = require './selected_message'
 
 
 module.exports = class Message
@@ -66,15 +67,6 @@ module.exports = class Message
       nesting
       sourceMessages: prevMessages
     })
-
-
-  @chooseForNodeTarget = (messages) ->
-    # TODO: refactor
-    messages = messages.sorted (a, b) ->
-      -1 * Object.compare(a.precedence.level, b.precedence.level)
-    messages[0].transmission.log 'choose', messages...
-    return messages[0]
-
 
 
   constructor: (@transmission, @payload, opts = {}) ->
@@ -200,7 +192,8 @@ module.exports = class Message
   # TODO: Refactor by using object instead of Map for cached messages, add
   # better check for keys
   sendMergedTo: (source, sourceKeys, target) ->
-    cachedForMerge = @transmission.getCachedMessagesForMergeAt(source)
+    cachedForMerge =
+      @transmission.getOrCreateCachedMessage(source, -> new Map())
 
     if cachedForMerge.length is 0
       source.receiveQuery(@transmission.Query.createForMerge(this))
@@ -217,41 +210,12 @@ module.exports = class Message
   sendToMergingNodeTarget: (line, nodeTarget) ->
     @transmission.log 'sendToMergingNodeTarget', line, nodeTarget
 
-    cachedForMerge = @transmission.getCachedMessagesForMergeAt(nodeTarget)
+    # TODO: More consistent creation method
+    cachedForMerge = @transmission
+      .getOrCreateCachedMessage(nodeTarget, SelectedMessage.create, {@precedence})
 
-    if not cachedForMerge.mergeQuery?
-      existingQuery = @transmission.getCommunicationFor(nodeTarget)
-      if existingQuery? \
-        and existingQuery instanceof @transmission.Query \
-        and existingQuery.precedence.direction == @precedence.direction
-          cachedForMerge.mergeQuery = existingQuery
-      else
-        cachedForMerge.mergeQuery = @transmission.Query.createForMerge(this)
-      cachedForMerge.mergeQuery.sendToNodeTarget(nodeTarget)
+    cachedForMerge.receiveMessageFrom(this, line)
 
-    cachedForMerge.set(line, this)
-
-
-    cachedForMerge.getPrecedence ?= => @precedence
-
-    cachedForMerge.sendToNodeTarget ?= (transmission, nodeTarget) ->
-      transmission.log 'sendToNodeTarget', nodeTarget, @values()...
-      channelNodes = nodeTarget.getChannelNodes?()
-      unless channelNodes? and _channelNodesUpdated(this, transmission, channelNodes)
-        return this
-
-      transmission.log 'passedLines', @mergeQuery.getPassedLines().toArray()...
-    # TODO: Compare contents
-      if @length == @mergeQuery.getPassedLines().length
-        message = Message.chooseForNodeTarget(@values())
-        message.sendToNodeTarget(nodeTarget)
-
-    cachedForMerge.sendToNodeTarget(@transmission, nodeTarget)
+    cachedForMerge.sendToNodeTarget(nodeTarget)
 
     return this
-
-
-  _channelNodesUpdated = (msg, transmission, channelNodes) ->
-    for node in channelNodes
-      return false unless transmission.channelNodeUpdated(msg, node)
-    return true

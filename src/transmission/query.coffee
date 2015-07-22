@@ -49,11 +49,24 @@ module.exports = class Query
     })
 
 
-  @createForMerge = (prevMessage) ->
-    new this(prevMessage.transmission, {
-      precedence: prevMessage.precedence.getPrevious()
-      nesting: prevMessage.nesting
+  @createForMerge = (mergedMessage) ->
+    new this(mergedMessage.transmission, {
+      precedence: mergedMessage.precedence.getPrevious()
+      nesting: mergedMessage.nesting
     })
+
+
+  @createForSelect = (selectedMessage) ->
+    new this(selectedMessage.transmission, {
+      precedence: selectedMessage.precedence.getPrevious()
+      nesting: selectedMessage.nesting
+    })
+
+
+  @isForSelect = (query, selectedMessage) ->
+    query? \
+      and query instanceof this \
+      and query.precedence.direction == selectedMessage.precedence.direction
 
 
   @createForResponseMessage = (queuedMessage) ->

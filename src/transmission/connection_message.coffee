@@ -48,12 +48,11 @@ module.exports = class ConnectionMessage
   updatePoints: ->
     @points.forEach (point) =>
       @log point
-      if comm = @transmission.getCommunicationFor(point)
+      if (comm = @transmission.getCommunicationFor(point))?
         comm.resendFromNodePoint(point, @channelNode)
 
-      if point?
-        cachedForMerge = @transmission.getCachedMessagesForMergeAt(point)
-        cachedForMerge.sendToNodeTarget?(@transmission, point)
+      if (cachedForMerge = @transmission.getCachedMessage(point))?
+        cachedForMerge.resendToNodePoint(point)
 
     return this
 

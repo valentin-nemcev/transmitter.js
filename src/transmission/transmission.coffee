@@ -3,8 +3,6 @@
 
 assert = require 'assert'
 WeakMap = require 'collections/weak-map'
-FastMap = require 'collections/fast-map'
-MultiMap = require 'collections/multi-map'
 SortedArray = require 'collections/sorted-array'
 
 {inspect} = require 'util'
@@ -43,7 +41,7 @@ module.exports = class Transmission
   constructor: ->
     @pointsToComms = new WeakMap()
     @nodesToPayloads = new WeakMap()
-    @cachedMessagesForMerge = new MultiMap([], -> new FastMap())
+    @cachedMessages = new WeakMap()
     @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
     @lastCommSeqNum = 0
 
@@ -105,8 +103,16 @@ module.exports = class Transmission
 
 
 
-  getCachedMessagesForMergeAt: (point) ->
-    @cachedMessagesForMerge.get(point)
+  getCachedMessage: (point) ->
+    @cachedMessages.get(point)
+
+
+  getOrCreateCachedMessage: (point, createMessage, opts) ->
+    message = @cachedMessages.get(point)
+    return message if message?
+    message = createMessage(this, opts)
+    @cachedMessages.set(point, message)
+    return message
 
 
 
