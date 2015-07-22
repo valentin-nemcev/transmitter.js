@@ -28,7 +28,7 @@ module.exports = class NodeTarget
 
 
   receiveMessage: (message) ->
-    message.sendMergedToNode(this, @sources.getChannelNodes(), @node)
+    message.sendToNode(@node)
     return this
 
 
@@ -43,3 +43,6 @@ module.exports = class NodeTarget
   receiveQuery: (query) ->
     @sources.sendCommunication(query)
     return this
+
+
+  getChannelNodes: -> @sources.getChannelNodes()

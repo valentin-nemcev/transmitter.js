@@ -2,6 +2,7 @@
 
 
 Precedence = require './precedence'
+FastSet = require 'collections/fast-set'
 
 
 class NullQuery
@@ -15,8 +16,7 @@ module.exports = class Query
     [
       'Q',
       @precedence.inspect()
-      @node?.inspect() ? ''
-      @wasDelivered and 'D' or ''
+      @wasDelivered() and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
 
 
@@ -70,6 +70,7 @@ module.exports = class Query
 
   constructor: (@transmission, opts = {}) ->
     {@precedence, @nesting} = opts
+    @linesPassed = new FastSet()
 
 
   createNextQuery: ->
@@ -91,6 +92,10 @@ module.exports = class Query
     [@precedence.level, @communicationTypeOrder]
 
 
+  wasDelivered: ->
+    @linesPassed.length > 0
+
+
   tryQueryChannelNode: (channelNode) ->
     @transmission.tryQueryChannelNode(this, channelNode)
 
@@ -101,11 +106,18 @@ module.exports = class Query
     return this
 
 
+  getPassedLines: -> @linesPassed
+
+
+  addPassedLine: (line) ->
+    @linesPassed.add(line)
+    return this
+
+
   _sendToNodePoint: (point) ->
     if @transmission.tryAddCommunicationFor(this, point)
       point.receiveQuery(this)
     else
-      @markAsDelivered()
     return this
 
 
@@ -127,9 +139,13 @@ module.exports = class Query
 
   sendToNode: (node) ->
     @log node
-    @markAsDelivered()
     node.routeQuery(this)
     return this
+
+
+  sendToNodeTarget: (nodeTarget) ->
+    @log nodeTarget
+    @_sendToNodePoint(nodeTarget)
 
 
   sendFromNodeToNodeTarget: (node, nodeTarget) ->
@@ -148,12 +164,6 @@ module.exports = class Query
 
 
   respond: ->
-    unless @wasDelivered
+    unless @wasDelivered()
       @node.respondToQuery(this, @transmission.getPayloadFor(@node))
-    return this
-
-
-
-  markAsDelivered: ->
-    @wasDelivered = yes
     return this

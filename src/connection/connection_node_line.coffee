@@ -17,17 +17,18 @@ module.exports = class ConnectionNodeLine
     return this
 
 
-  disconnect: ->
+  disconnect: (message) ->
     @target?.disconnectSource(message, this)
     return this
 
 
   receiveQuery: (query) ->
     if query.directionMatches(@direction)
+      query.addPassedLine(this)
       @source.receiveQuery(query)
     return this
 
 
   receiveMessage: (message) ->
-    message.sendToNodeTarget(@target) if @target?
+    message.sendToMergingNodeTarget(this, @target) if @target?
     return this

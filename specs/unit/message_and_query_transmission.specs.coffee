@@ -22,6 +22,7 @@ class PrecedenceStub
   constructor: (@direction) ->
   directionMatches: (direction) -> direction == @direction
   getFinal: -> null
+  getPrevious: -> this
 
 class NodeSourceStub extends SourceNode
   createResponsePayload: -> new StubPayload()

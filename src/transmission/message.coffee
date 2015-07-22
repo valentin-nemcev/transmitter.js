@@ -68,6 +68,14 @@ module.exports = class Message
     })
 
 
+  @chooseForNodeTarget = (messages) ->
+    # TODO: refactor
+    messages = messages.sorted (a, b) ->
+      -1 * Object.compare(a.precedence.level, b.precedence.level)
+    messages[0].transmission.log 'choose', messages...
+    return messages[0]
+
+
 
   constructor: (@transmission, @payload, opts = {}) ->
     {@precedence, @nesting} = opts
@@ -199,12 +207,51 @@ module.exports = class Message
 
     cachedForMerge.set(this.getSourceNode(), this)
 
+    # TODO: Compare contents
     if cachedForMerge.length == sourceKeys.length
       target.receiveMessage(Message.createMerged(cachedForMerge))
 
     return this
 
 
-  sendMergedToNode: (nodeTarget, channelNodes, node) ->
-    @sendToNode(node)
+  sendToMergingNodeTarget: (line, nodeTarget) ->
+    @transmission.log 'sendToMergingNodeTarget', line, nodeTarget
+
+    cachedForMerge = @transmission.getCachedMessagesForMergeAt(nodeTarget)
+
+    if not cachedForMerge.mergeQuery?
+      existingQuery = @transmission.getCommunicationFor(nodeTarget)
+      if existingQuery? \
+        and existingQuery instanceof @transmission.Query \
+        and existingQuery.precedence.direction == @precedence.direction
+          cachedForMerge.mergeQuery = existingQuery
+      else
+        cachedForMerge.mergeQuery = @transmission.Query.createForMerge(this)
+      cachedForMerge.mergeQuery.sendToNodeTarget(nodeTarget)
+
+    cachedForMerge.set(line, this)
+
+
+    cachedForMerge.getPrecedence ?= => @precedence
+
+    cachedForMerge.sendToNodeTarget ?= (transmission, nodeTarget) ->
+      transmission.log 'sendToNodeTarget', nodeTarget, @values()...
+      channelNodes = nodeTarget.getChannelNodes?()
+      unless channelNodes? and _channelNodesUpdated(this, transmission, channelNodes)
+        return this
+
+      transmission.log 'passedLines', @mergeQuery.getPassedLines().toArray()...
+    # TODO: Compare contents
+      if @length == @mergeQuery.getPassedLines().length
+        message = Message.chooseForNodeTarget(@values())
+        message.sendToNodeTarget(nodeTarget)
+
+    cachedForMerge.sendToNodeTarget(@transmission, nodeTarget)
+
     return this
+
+
+  _channelNodesUpdated = (msg, transmission, channelNodes) ->
+    for node in channelNodes
+      return false unless transmission.channelNodeUpdated(msg, node)
+    return true

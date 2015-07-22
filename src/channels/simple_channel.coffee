@@ -92,7 +92,7 @@ module.exports = class SimpleChannel
 
 
   disconnect: (message) ->
-    @getConnection().connect(message)
+    @getConnection().disconnect(message)
     return this
 
 

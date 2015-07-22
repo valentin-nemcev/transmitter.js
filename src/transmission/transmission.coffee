@@ -69,6 +69,10 @@ module.exports = class Transmission
       true
 
 
+  channelNodeUpdated: (comm, channelNode) ->
+    not channelNode? or not @communicationSucceedsExistingFor(comm, channelNode)
+
+
   tryAddCommunicationFor: (comm, point) ->
     if @communicationSucceedsExistingFor(comm, point)
       @addCommunicationFor(comm, point)

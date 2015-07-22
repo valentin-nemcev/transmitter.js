@@ -17,7 +17,7 @@ module.exports = class NodeConnectionLine
     return this
 
 
-  disconnect: ->
+  disconnect: (message) ->
     @source?.disconnectTarget(message, this)
     return this
 
