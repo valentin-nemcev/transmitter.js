@@ -11,6 +11,9 @@ module.exports = class MergingConnectionTarget
     '[' + @sources.keys().map( (s) -> s.inspect()).join(', ') + ']:'
 
 
+  getSourceNodes: -> @sources.keys()
+
+
   setTarget: (@target) -> return this
 
 
@@ -25,7 +28,12 @@ module.exports = class MergingConnectionTarget
 
 
   receiveMessage: (message) ->
-    message.sendMergedTo(this, @sources.keys(), @target)
+    message.sendMergedTo(this, @target)
+    return this
+
+
+  sendMessage: (message) ->
+    @target.receiveMessage(message)
     return this
 
 

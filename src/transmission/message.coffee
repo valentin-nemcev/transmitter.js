@@ -6,6 +6,7 @@ Pass = require './pass'
 Precedence = require './precedence'
 
 SelectedMessage = require './selected_message'
+MergedMessage = require './merged_message'
 
 
 module.exports = class Message
@@ -14,7 +15,6 @@ module.exports = class Message
     [
       'M'
       @pass.inspect()
-      # @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
 
@@ -47,34 +47,18 @@ module.exports = class Message
     new this(prevMessage.transmission, payload, {
       pass:     prevMessage.pass
       nesting:        prevMessage.nesting
-      sourceMessages: [prevMessage]
     })
 
 
-  @createMerged = (prevNodesToMessages) ->
-    prevMessages = prevNodesToMessages.values()
-    pass = Pass.merge(
-      prevMessages.map((message) -> message.pass)
-    )
-    return null unless pass?
-
-    payloads = new Map(
-      prevNodesToMessages.map (message, node) -> [node, message.payload]
-    )
-    nesting = Math.max.apply(null,
-      prevMessages.map((message) -> message.nesting)
-    )
-    prevMessage = prevMessages[0]
-    new this(prevMessage.transmission, payloads, {
-      pass
+  @createMerged = (merged, payloads, {nesting}) ->
+    new this(merged.transmission, payloads, {
+      pass: merged.pass
       nesting
-      sourceMessages: prevMessages
     })
 
 
   constructor: (@transmission, @payload, opts = {}) ->
     {@pass, @nesting} = opts
-    @sourceMessages = opts.sourceMessages ? []
     throw new Error "Missing payload" unless @payload?
 
 
@@ -146,10 +130,10 @@ module.exports = class Message
     return this
 
 
-  sendFromNodeToNodeSource: (@node, nodeSource) ->
+  sendFromNodeToNodeSource: (@sourceNode, nodeSource) ->
     @log nodeSource
     @transmission.enqueueCommunication(this)
-    @transmission.addPayloadFor(@payload, @node)
+    @transmission.addPayloadFor(@payload, @sourceNode)
     @_sendToNodePoint(nodeSource)
 
 
@@ -159,24 +143,8 @@ module.exports = class Message
 
 
   respond: ->
-    @node.respondToMessage(this)
+    @sourceNode.respondToMessage(this)
     return this
-
-
-
-  getSourceNode: ->
-    switch @sourceMessages.length
-      when 0 then @node
-      when 1 then @sourceMessages[0].getSourceNode()
-      else
-        throw new Error('Expected single source node')
-
-
-  getSourceNodes: ->
-    if @sourceMessages.length
-      @sourceMessages.map((message) -> message.getSourceNodes()).flatten()
-    else
-      [@node]
 
 
 
@@ -189,47 +157,17 @@ module.exports = class Message
     return this
 
 
-  getMessagesToMerge = (tr, sourceKeys) ->
-    messages = []
-    for key in sourceKeys
-      comm = tr.getCommunicationFor(key.getNodeSource())
-      return unless comm? and comm instanceof Message
-      messages.push [key, comm]
-
-    return messages
-
-
-  # TODO: Refactor by using object instead of Map for cached messages, add
-  # better check for keys
-  sendMergedTo: (source, sourceKeys, target) ->
-    merged = @transmission.getCachedMessage(source)
-    unless merged?
-      merged = new Map()
-      @transmission.setCachedMessage(source, merged)
-
-    if merged.length is 0
-      source.receiveQuery(@transmission.Query.createForMerge(this))
-
-    merged.set(this.getSourceNode(), this)
-
-    # TODO: Compare contents
-    if merged.length == sourceKeys.length
-      merged = Message.createMerged(merged)
-      target.receiveMessage(merged) if merged?
+  sendMergedTo: (source, target) ->
+    MergedMessage
+      .getOrCreate(source, @transmission, @pass)
+      .receiveMessageFrom(this, @sourceNode)
 
     return this
 
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
-    # TODO: More consistent creation method
-    selected = @transmission.getCachedMessage(nodeTarget)
-    if not selected? \
-      or @getUpdatePrecedence().compare(selected.getUpdatePrecedence()) > 0
-        selected = SelectedMessage.create(@transmission, {@pass})
-        @transmission.setCachedMessage(nodeTarget, selected)
-
-    selected.receiveMessageFrom(this, line)
-
-    selected.sendToNodeTarget(nodeTarget)
+    SelectedMessage
+      .getOrCreate(nodeTarget, @transmission, @pass)
+      .receiveMessageFrom(this, line)
 
     return this

@@ -18,12 +18,16 @@ module.exports = class Transmission
     assert(not @instance, "Transmissions can't be nested")
     @instance = new Transmission()
     try
+      console.profile() if @profilingIsEnabled
       doWithTransmission(@instance)
       @instance.respond()
+      console.profileEnd() if @profilingIsEnabled
     finally
       @instance = null
     return this
 
+
+  @profilingIsEnabled = no
 
   loggingIsEnabled: no
 

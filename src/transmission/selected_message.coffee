@@ -16,10 +16,15 @@ module.exports = class SelectedMessage
     ].join(' ')
 
 
-  @create = (transmission, opts) => new this(transmission, opts)
+  @getOrCreate = (nodeTarget, transmission, pass) ->
+    selected = transmission.getCachedMessage(nodeTarget)
+    if not selected? or pass.compare(selected.pass) > 0
+      selected = new this(transmission, nodeTarget, {pass})
+      transmission.setCachedMessage(nodeTarget, selected)
+    return selected
 
 
-  constructor: (@transmission, opts = {}) ->
+  constructor: (@transmission, @nodeTarget, opts = {}) ->
     {@pass} = opts
     @linesToMessages = new FastMap()
 
@@ -33,47 +38,47 @@ module.exports = class SelectedMessage
 
   receiveMessageFrom: (message, line) ->
     @linesToMessages.set(line, message)
+    @trySendToNodeTarget()
     return this
 
 
-  _tryQueryForSelect: (nodeTarget) ->
+  _tryQueryForSelect: ->
     return @selectQuery if @selectQuery?
 
-    existingQuery = @transmission.getCommunicationFor(nodeTarget)
+    existingQuery = @transmission.getCommunicationFor(@nodeTarget)
 
     if @transmission.Query.isForSelect(existingQuery, this)
       @selectQuery = existingQuery
     else
       @selectQuery = @transmission.Query.createForSelect(this)
-      @selectQuery.sendToNodeTarget(nodeTarget)
+      @selectQuery.sendToNodeTarget(@nodeTarget)
 
     return @selectQuery
 
 
-  resendToNodePoint: (nodePoint) -> @sendToNodeTarget(nodePoint)
+  resend: -> @trySendToNodeTarget()
 
 
-  sendToNodeTarget: (nodeTarget) ->
-    selectQuery = @_tryQueryForSelect(nodeTarget)
+  trySendToNodeTarget: ->
+    selectQuery = @_tryQueryForSelect()
 
-    unless @_channelNodesUpdated(nodeTarget.getChannelNodes())
+    unless @_channelNodesUpdated()
       return this
 
     # TODO: Compare contents
     if @linesToMessages.length == selectQuery.getPassedLines().length
-      message = @_selectForNodeTarget(nodeTarget)
-      message.sendToNodeTarget(nodeTarget)
+      @_selectForNodeTarget().sendToNodeTarget(@nodeTarget)
 
 
-  _channelNodesUpdated: (channelNodes) ->
-    for node in channelNodes
+  _channelNodesUpdated: ->
+    for node in @nodeTarget.getChannelNodes()
       return false unless @transmission.channelNodeUpdated(this, node)
     return true
 
 
-  _selectForNodeTarget: (nodeTarget) ->
+  _selectForNodeTarget: ->
     # TODO: refactor
     messages = @linesToMessages.values().sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
-    @transmission.log nodeTarget, messages...
+    @transmission.log @nodeTarget, messages...
     return messages[0]

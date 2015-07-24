@@ -46,6 +46,6 @@ module.exports = class ConnectionMessage
         comm.resendFromNodePoint(point, @channelNode)
 
       if (cachedForMerge = @transmission.getCachedMessage(point))?
-        cachedForMerge.resendToNodePoint(point)
+        cachedForMerge.resend()
 
     return this

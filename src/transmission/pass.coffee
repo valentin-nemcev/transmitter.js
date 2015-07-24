@@ -34,13 +34,6 @@ module.exports = class Pass
     this.priority - other.priority
 
 
-  @merge = (passes) ->
-    if passes.every((pass) -> pass.equals(passes[0]))
-      passes[0]
-    else
-      null
-
-
   getForResponse: ->
     if @priority == 1
       null
