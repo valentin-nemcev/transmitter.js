@@ -51,7 +51,7 @@ module.exports = class SelectedMessage
 
     # TODO: Compare contents
     if @linesToMessages.length == selectQuery.getPassedLines().length
-      message = @_selectForNodeTarget()
+      message = @_selectForNodeTarget(nodeTarget)
       message.sendToNodeTarget(nodeTarget)
 
 
@@ -61,9 +61,9 @@ module.exports = class SelectedMessage
     return true
 
 
-  _selectForNodeTarget: ->
+  _selectForNodeTarget: (nodeTarget) ->
     # TODO: refactor
     messages = @linesToMessages.values().sorted (a, b) ->
-      -1 * Object.compare(a.precedence.level, b.precedence.level)
-    @transmission.log 'choose', messages...
+      -1 * Object.compare(a.getPayloadPriority(), b.getPayloadPriority())
+    @transmission.log nodeTarget, messages...
     return messages[0]

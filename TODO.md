@@ -27,8 +27,9 @@
   * Payloads should represent change operations on nodes
 
 * Implement
-  * Implement connection message precence with correct merging with regular
+  * Implement connection message precedence with correct merging with regular
     messages and queries
+  * Optimize querying for merge or select
   * Implement nested node querying after nested connection changes
   * Improve or remove query routing specs
   * Enforcing consistency for merging connections to channel nodes when
@@ -37,41 +38,3 @@
 
 * Later
   * Remove use strict (needs custom compiler for mocha, browserify and npm)
-
-
-
-
-Merging at node target
-  -1 value
-   0 value<
-
-  change<
-  no change
-
-Queries
-  To ensure one transmission per merge
-    Fails because of lack of merging at node target (1)
-  -1
-  1
-
-Queries affect whole network (2)
-
-(1) automatically merge at node target using partial merge
-(2) dont query at node target, just wait
-
-
-Write spec
-Merge at node target
-  Change -1 priorities
-    Remove rational priorities
-    -1 needed for selecting message for merge (move to payload?)
-    -1 needed for queue priority?
-    -1 not needed for node sources and targets (node sources? queries at node
-sources and targets?)
-  Decide when no more messages will be received
-    Query existing lines
-    Ensure no more lines will be added (can't do this)
-    When more lines are added, merge their messages and check that result doesn't change (otherwise raise an error)
-  Automatically merge messages, selecting only one
-    Assign priority to payloads, chose one with top priority, assert that it is
-the only one

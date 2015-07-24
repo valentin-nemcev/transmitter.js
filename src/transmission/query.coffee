@@ -106,7 +106,7 @@ module.exports = class Query
 
 
   wasDelivered: ->
-    @linesPassed.length > 0
+    @delivered or @linesPassed.length > 0
 
 
   tryQueryChannelNode: (channelNode) ->
@@ -131,6 +131,7 @@ module.exports = class Query
     if @transmission.tryAddCommunicationFor(this, point)
       point.receiveQuery(this)
     else
+      @delivered = yes
     return this
 
 

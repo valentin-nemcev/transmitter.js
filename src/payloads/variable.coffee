@@ -10,6 +10,8 @@ class SetConstPayload
 
   constructor: (@value) ->
 
+  getPriority: -> 1
+
   inspect: -> "setConst(#{inspect @value})"
 
   map: (map) ->
@@ -34,6 +36,8 @@ class UpdateMatchingPayload
 
 
   inspect: -> "valueUpdate(#{inspect @source})"
+
+  getPriority: -> @priority ? @source.getPriority()
 
 
   deliverToVariable: (target) ->
@@ -62,6 +66,11 @@ class SetPayload
 
 
   inspect: -> "value(#{inspect @get()})"
+
+
+  setPriority: (@priority) -> this
+
+  getPriority: -> @priority ? @source.getPriority()
 
 
   get: ->

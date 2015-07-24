@@ -3,7 +3,7 @@
 
 module.exports = class ConnectionNodeLine
 
-  inspect: -> '-' + (@target?.inspect() ? null)
+  inspect: -> @direction.inspect() + (@target?.inspect() ? null)
 
 
   constructor: (@target, @direction) ->

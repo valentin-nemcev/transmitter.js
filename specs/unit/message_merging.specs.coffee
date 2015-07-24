@@ -4,6 +4,7 @@ SourceNode = require 'transmitter/nodes/source_node'
 SimpleChannel = require 'transmitter/channels/simple_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
+Precedence = require 'transmitter/transmission/precedence'
 
 Transmitter = require 'transmitter'
 
@@ -11,12 +12,6 @@ class DirectionStub
   inspect: -> '.'
   matches: (other) -> this == other
   reverse: -> new DirectionStub()
-
-class PrecedenceStub
-  constructor: (@direction) ->
-  directionMatches: (direction) -> direction == @direction
-  getPrevious: -> this
-  getFinal: -> null
 
 class StubPayload
   inspect: -> 'stub()'
@@ -35,8 +30,7 @@ describe 'Message merging', ->
     sinon.spy(@target, 'receiveMessage')
 
     @transmission = new Transmission()
-    @direction = new DirectionStub()
-    @precedence = new PrecedenceStub(@direction)
+    @precedence = Precedence.createMessageDefault()
 
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
@@ -45,7 +39,7 @@ describe 'Message merging', ->
       .returns(@passivePayload)
 
     @compositeSource = new SimpleChannel()
-      .inDirection @direction
+      .inDirection @precedence.direction
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)

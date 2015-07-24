@@ -10,7 +10,7 @@ module.exports = class ConnectionMessage
     [
       'CM'
       # 'P:' + @precedence
-      @channelNode.inspect()
+      @channelNode?.inspect()
     ].join(' ')
 
 

@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 directions = require '../directions'
 
 
@@ -20,21 +22,19 @@ module.exports = class Precedence
   directionMatches: (direction) -> @direction.matches(direction)
 
 
-  @merge = (precedences) ->
-    direction = precedences[0].direction
-    level = 0
-    level += p.level for p in precedences
-    level /= precedences.length
+  equals: (other) ->
+    this.direction == other.direction and this.level == other.level
 
-    new Precedence(direction, level)
+
+  @merge = (precedences) ->
+    if precedences.every((precedence) -> precedence.equals(precedences[0]))
+      precedences[0]
+    else
+      null
 
 
   getPrevious: ->
-    intLevel = Math.ceil(@level)
-    if intLevel == 0
-      new Precedence(@direction, -1)
-    else
-      this
+    this
 
 
   getFinal: ->

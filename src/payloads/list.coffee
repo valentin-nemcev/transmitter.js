@@ -10,8 +10,9 @@ class SetConstPayload
 
   constructor: (@value) ->
 
+  getPriority: -> 1
+
   inspect: -> "setConst(#{inspect @value})"
-  inspect: -> "setConst()"
 
   updateMatching: (map, match) ->
     new UpdateMatchingPayload(this, {map, match})
@@ -41,6 +42,8 @@ class RemovePayload
 
   constructor: (@source) ->
 
+  getPriority: -> 1
+
   inspect: -> "listRemove(#{inspect @source})"
 
   deliverToList: (target) ->
@@ -56,6 +59,8 @@ class AddAtPayload
 
   constructor: (@source) ->
 
+  getPriority: -> 1
+
   inspect: -> "listAddAt(#{inspect @source.get()})"
 
   deliverToList: (target) ->
@@ -70,6 +75,8 @@ class UpdateMatchingPayload
     @matchFn = opts.match
 
   inspect: -> "listUpdate(#{inspect @source})"
+
+  getPriority: -> @priority ? @source.getPriority()
 
 
   deliverToList: (target) ->
@@ -125,6 +132,11 @@ class SetPayload
 
 
   inspect: -> "list(#{inspect @get()})"
+
+
+  setPriority: (@priority) -> this
+
+  getPriority: -> @priority ? @source.getPriority()
 
 
   get: ->

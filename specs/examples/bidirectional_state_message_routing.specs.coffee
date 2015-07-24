@@ -62,7 +62,7 @@ describe 'Bidirectional state message routing', ->
     expect(@tagInput.get()).to.equal('tagA, tagB')
 
 
-  specify 'when dervied node is updated, \
+  specify 'when derivied node is updated, \
     change is transmitted to origin and other derived nodes', ->
     Transmitter.startTransmission (tr) =>
       @tagInput.init(tr, 'tagA, tagB')

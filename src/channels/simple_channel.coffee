@@ -18,6 +18,9 @@ module.exports = class SimpleChannel
   returnArg = (arg) -> arg
 
 
+  inspect: -> '[' + @constructor.name + ']'
+
+
   constructor: ->
     @sources = []
     @targets = []

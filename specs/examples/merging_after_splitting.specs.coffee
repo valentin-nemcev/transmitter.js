@@ -43,7 +43,7 @@ describe 'Merging after splitting', ->
     expect(@stateVar.get()).to.equal(on)
 
 
-  specify.skip '...independent of order', ->
+  specify '...independent of order', ->
     Transmitter.startTransmission (tr) =>
       @keypressVar.originate(tr, 'esc')
 

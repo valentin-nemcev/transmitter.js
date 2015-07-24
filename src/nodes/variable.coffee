@@ -10,12 +10,12 @@ module.exports = class Variable extends RelayNode
   payload: VariablePayload
 
 
-  createResponsePayload: ->
-    @payload.set(this)
+  createResponsePayload: (prevPayload) ->
+    @payload.set(this).setPriority(prevPayload?.getPriority() ? 0)
 
 
   createOriginPayload: ->
-    @payload.set(this)
+    @payload.set(this).setPriority(1)
 
 
   createUpdatePayload: (value) ->

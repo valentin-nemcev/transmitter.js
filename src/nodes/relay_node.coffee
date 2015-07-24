@@ -59,7 +59,7 @@ module.exports = class RelayNode
   acceptPayload: -> this
 
 
-  createResponsePayload: (payload) -> payload
+  createResponsePayload: (payload) -> payload ? noop()
 
 
   createOriginPayload: ->

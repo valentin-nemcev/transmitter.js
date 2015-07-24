@@ -6,11 +6,12 @@ Transmitter = require 'transmitter'
 VariableNode = Transmitter.Nodes.Variable
 
 reduceMergedPayload = (payloads) ->
-  Transmitter.Payloads.Variable.setLazy ->
+  Transmitter.Payloads.Variable.setLazy(->
     payloads.reduce((result, value, node) ->
       result[node.inspect()] = value.get()
       result
     , {})
+  ).setPriority(1)
 
 
 describe 'Multilevel merging 1', ->

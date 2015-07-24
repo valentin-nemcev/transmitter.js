@@ -51,12 +51,14 @@ module.exports = class Message
 
 
   @createMerged = (prevNodesToMessages) ->
-    payloads = new Map(
-      prevNodesToMessages.map (message, node) -> [node, message.payload]
-    )
     prevMessages = prevNodesToMessages.values()
     precedence = Precedence.merge(
       prevMessages.map((message) -> message.precedence)
+    )
+    return null unless precedence?
+
+    payloads = new Map(
+      prevNodesToMessages.map (message, node) -> [node, message.payload]
     )
     nesting = Math.max.apply(null,
       prevMessages.map((message) -> message.nesting)
@@ -72,6 +74,7 @@ module.exports = class Message
   constructor: (@transmission, @payload, opts = {}) ->
     {@precedence, @nesting} = opts
     @sourceMessages = opts.sourceMessages ? []
+    throw new Error "Missing payload" unless @payload?
 
 
   createNextMessage: (payload) ->
@@ -95,6 +98,9 @@ module.exports = class Message
 
   getPrecedence: ->
     [@precedence.level, @communicationTypeOrder]
+
+
+  getPayloadPriority: -> @payload.getPriority()
 
 
   tryQueryChannelNode: (channelNode) ->
@@ -192,8 +198,10 @@ module.exports = class Message
   # TODO: Refactor by using object instead of Map for cached messages, add
   # better check for keys
   sendMergedTo: (source, sourceKeys, target) ->
-    cachedForMerge =
-      @transmission.getOrCreateCachedMessage(source, -> new Map())
+    cachedForMerge = @transmission.getCachedMessage(source)
+    unless cachedForMerge?
+      cachedForMerge = new Map()
+      @transmission.setCachedMessage(source, cachedForMerge)
 
     if cachedForMerge.length is 0
       source.receiveQuery(@transmission.Query.createForMerge(this))
@@ -202,17 +210,19 @@ module.exports = class Message
 
     # TODO: Compare contents
     if cachedForMerge.length == sourceKeys.length
-      target.receiveMessage(Message.createMerged(cachedForMerge))
+      merged = Message.createMerged(cachedForMerge)
+      target.receiveMessage(merged) if merged?
 
     return this
 
 
   sendToMergingNodeTarget: (line, nodeTarget) ->
-    @transmission.log 'sendToMergingNodeTarget', line, nodeTarget
-
     # TODO: More consistent creation method
-    cachedForMerge = @transmission
-      .getOrCreateCachedMessage(nodeTarget, SelectedMessage.create, {@precedence})
+    cachedForMerge = @transmission.getCachedMessage(nodeTarget)
+    if not cachedForMerge? or @precedence.level > cachedForMerge.precedence.level
+      cachedForMerge = SelectedMessage.create(@transmission, {@precedence})
+      @transmission.setCachedMessage(nodeTarget, cachedForMerge)
+
 
     cachedForMerge.receiveMessageFrom(this, line)
 

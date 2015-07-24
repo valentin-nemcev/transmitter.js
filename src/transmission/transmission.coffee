@@ -107,13 +107,9 @@ module.exports = class Transmission
     @cachedMessages.get(point)
 
 
-  getOrCreateCachedMessage: (point, createMessage, opts) ->
-    message = @cachedMessages.get(point)
-    return message if message?
-    message = createMessage(this, opts)
+  setCachedMessage: (point, message) ->
     @cachedMessages.set(point, message)
-    return message
-
+    return this
 
 
   addPayloadFor: (payload, node) ->
