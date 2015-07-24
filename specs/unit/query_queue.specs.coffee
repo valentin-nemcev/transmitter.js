@@ -5,8 +5,13 @@ Transmission = require 'transmitter/transmission/transmission'
 
 
 class QueryStub
+  constructor: (@priority) ->
   respond: -> this
-  getQueueOrder: ->
+  getQueuePrecedence: ->
+    {
+      priority: @priority
+      compare: (other) -> this.priority - other.priority
+    }
 
 
 describe 'Query queue', ->
@@ -26,13 +31,10 @@ describe 'Query queue', ->
 
 
   it 'responds to queries with lower order first', ->
-    @query1 = new QueryStub()
-    @query2 = new QueryStub()
-    @query3 = new QueryStub()
+    @query1 = new QueryStub(1)
+    @query2 = new QueryStub(2)
+    @query3 = new QueryStub(3)
     callOrder = []
-    sinon.stub(@query1, 'getQueueOrder').returns([-1  , 0])
-    sinon.stub(@query2, 'getQueueOrder').returns([-0.5, 0])
-    sinon.stub(@query3, 'getQueueOrder').returns([-0.5, 1])
     sinon.stub(@query1, 'respond', -> callOrder.push 1)
     sinon.stub(@query2, 'respond', -> callOrder.push 2)
     sinon.stub(@query3, 'respond', -> callOrder.push 3)
@@ -46,11 +48,9 @@ describe 'Query queue', ->
 
 
   it 'behaves like LIFO for queries with the same order', ->
-    @query1 = new QueryStub()
-    @query2 = new QueryStub()
+    @query1 = new QueryStub(0)
+    @query2 = new QueryStub(0)
     callOrder = []
-    sinon.stub(@query1, 'getQueueOrder').returns([0, 0])
-    sinon.stub(@query2, 'getQueueOrder').returns([0, 0])
     sinon.stub(@query1, 'respond', -> callOrder.push 1)
     sinon.stub(@query2, 'respond', -> callOrder.push 2)
 
@@ -62,11 +62,9 @@ describe 'Query queue', ->
 
 
   it 'has option to reverse queries with the same order for testing', ->
-    @query1 = new QueryStub()
-    @query2 = new QueryStub()
+    @query1 = new QueryStub(0)
+    @query2 = new QueryStub(0)
     callOrder = []
-    sinon.stub(@query1, 'getQueueOrder').returns([0, 0])
-    sinon.stub(@query2, 'getQueueOrder').returns([0, 0])
     sinon.stub(@query1, 'respond', -> callOrder.push 1)
     sinon.stub(@query2, 'respond', -> callOrder.push 2)
 

@@ -2,23 +2,33 @@
 
 
 FastMap = require 'collections/fast-map'
+Precedence = require './precedence'
 
 
 module.exports = class SelectedMessage
+
+  inspect: ->
+    [
+      'SM'
+      'P:' + @pass.inspect()
+      @selectQuery?.inspect()
+      @linesToMessages.values().map( (m) -> m.inspect() ).join(', ')
+    ].join(' ')
+
 
   @create = (transmission, opts) => new this(transmission, opts)
 
 
   constructor: (@transmission, opts = {}) ->
-    {@precedence} = opts
+    {@pass} = opts
     @linesToMessages = new FastMap()
 
 
-  communicationTypeOrder: 1
+  communicationTypePriority: 1
 
 
-  getPrecedence: ->
-    [@precedence.level, @communicationTypeOrder]
+  getUpdatePrecedence: ->
+    @precedence ?= Precedence.createUpdate(@pass, @communicationTypePriority)
 
 
   receiveMessageFrom: (message, line) ->
@@ -64,6 +74,6 @@ module.exports = class SelectedMessage
   _selectForNodeTarget: (nodeTarget) ->
     # TODO: refactor
     messages = @linesToMessages.values().sorted (a, b) ->
-      -1 * Object.compare(a.getPayloadPriority(), b.getPayloadPriority())
+      -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
     @transmission.log nodeTarget, messages...
     return messages[0]

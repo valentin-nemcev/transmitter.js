@@ -2,6 +2,7 @@
 
 
 Map = require 'collections/map'
+Pass = require './pass'
 Precedence = require './precedence'
 
 SelectedMessage = require './selected_message'
@@ -12,7 +13,7 @@ module.exports = class Message
   inspect: ->
     [
       'M'
-      @precedence.inspect()
+      @pass.inspect()
       # @getSourceNodes().map((n) -> n?.inspect() ? '-').join(', ')
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
@@ -25,26 +26,26 @@ module.exports = class Message
 
   @createInitial = (transmission, payload) ->
     new this(transmission, payload,
-      precedence: Precedence.createMessageDefault(), nesting: 0)
+      pass: Pass.createMessageDefault(), nesting: 0)
 
 
   @createNext = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
-      precedence: prevMessage.precedence
+      pass: prevMessage.pass
       nesting:    prevMessage.nesting
     })
 
 
   @createQueryResponse = (queuedQuery, payload) ->
     new this(queuedQuery.transmission, payload, {
-      precedence: queuedQuery.precedence
+      pass: queuedQuery.pass
       nesting:    queuedQuery.nesting
     })
 
 
   @createTransformed = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
-      precedence:     prevMessage.precedence
+      pass:     prevMessage.pass
       nesting:        prevMessage.nesting
       sourceMessages: [prevMessage]
     })
@@ -52,10 +53,10 @@ module.exports = class Message
 
   @createMerged = (prevNodesToMessages) ->
     prevMessages = prevNodesToMessages.values()
-    precedence = Precedence.merge(
-      prevMessages.map((message) -> message.precedence)
+    pass = Pass.merge(
+      prevMessages.map((message) -> message.pass)
     )
-    return null unless precedence?
+    return null unless pass?
 
     payloads = new Map(
       prevNodesToMessages.map (message, node) -> [node, message.payload]
@@ -65,14 +66,14 @@ module.exports = class Message
     )
     prevMessage = prevMessages[0]
     new this(prevMessage.transmission, payloads, {
-      precedence
+      pass
       nesting
       sourceMessages: prevMessages
     })
 
 
   constructor: (@transmission, @payload, opts = {}) ->
-    {@precedence, @nesting} = opts
+    {@pass, @nesting} = opts
     @sourceMessages = opts.sourceMessages ? []
     throw new Error "Missing payload" unless @payload?
 
@@ -90,17 +91,19 @@ module.exports = class Message
 
 
 
-  directionMatches: (direction) -> @precedence.directionMatches(direction)
+  directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
-  communicationTypeOrder: 1
+  communicationTypePriority: 1
 
 
-  getPrecedence: ->
-    [@precedence.level, @communicationTypeOrder]
+  getUpdatePrecedence: ->
+    @updatePrecedence ?=
+      Precedence.createUpdate(@pass, @communicationTypePriority)
 
 
-  getPayloadPriority: -> @payload.getPriority()
+  getSelectPrecedence: ->
+    @selectPrecedence ?= Precedence.createSelect(@payload.getPriority())
 
 
   tryQueryChannelNode: (channelNode) ->
@@ -150,8 +153,9 @@ module.exports = class Message
     @_sendToNodePoint(nodeSource)
 
 
-  getQueueOrder: ->
-    [@precedence.level, @communicationTypeOrder, @nesting]
+  getQueuePrecedence: ->
+    @queuePrecedence ?=
+      Precedence.createQueue(@pass, @communicationTypePriority, @nesting)
 
 
   respond: ->
@@ -198,34 +202,34 @@ module.exports = class Message
   # TODO: Refactor by using object instead of Map for cached messages, add
   # better check for keys
   sendMergedTo: (source, sourceKeys, target) ->
-    cachedForMerge = @transmission.getCachedMessage(source)
-    unless cachedForMerge?
-      cachedForMerge = new Map()
-      @transmission.setCachedMessage(source, cachedForMerge)
+    merged = @transmission.getCachedMessage(source)
+    unless merged?
+      merged = new Map()
+      @transmission.setCachedMessage(source, merged)
 
-    if cachedForMerge.length is 0
+    if merged.length is 0
       source.receiveQuery(@transmission.Query.createForMerge(this))
 
-    cachedForMerge.set(this.getSourceNode(), this)
+    merged.set(this.getSourceNode(), this)
 
     # TODO: Compare contents
-    if cachedForMerge.length == sourceKeys.length
-      merged = Message.createMerged(cachedForMerge)
+    if merged.length == sourceKeys.length
+      merged = Message.createMerged(merged)
       target.receiveMessage(merged) if merged?
 
     return this
 
 
-  sendToMergingNodeTarget: (line, nodeTarget) ->
+  sendToSelectingNodeTarget: (line, nodeTarget) ->
     # TODO: More consistent creation method
-    cachedForMerge = @transmission.getCachedMessage(nodeTarget)
-    if not cachedForMerge? or @precedence.level > cachedForMerge.precedence.level
-      cachedForMerge = SelectedMessage.create(@transmission, {@precedence})
-      @transmission.setCachedMessage(nodeTarget, cachedForMerge)
+    selected = @transmission.getCachedMessage(nodeTarget)
+    if not selected? \
+      or @getUpdatePrecedence().compare(selected.getUpdatePrecedence()) > 0
+        selected = SelectedMessage.create(@transmission, {@pass})
+        @transmission.setCachedMessage(nodeTarget, selected)
 
+    selected.receiveMessageFrom(this, line)
 
-    cachedForMerge.receiveMessageFrom(this, line)
-
-    cachedForMerge.sendToNodeTarget(nodeTarget)
+    selected.sendToNodeTarget(nodeTarget)
 
     return this

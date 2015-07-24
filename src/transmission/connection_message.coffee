@@ -2,6 +2,7 @@
 
 
 FastSet = require 'collections/fast-set'
+Precedence = require './precedence'
 
 
 module.exports = class ConnectionMessage
@@ -9,7 +10,6 @@ module.exports = class ConnectionMessage
   inspect: ->
     [
       'CM'
-      # 'P:' + @precedence
       @channelNode?.inspect()
     ].join(' ')
 
@@ -20,20 +20,14 @@ module.exports = class ConnectionMessage
 
 
   @createInitial = (transmission) ->
-    new this(transmission, null, {
-      # precedence: 0
-    })
+    new this(transmission, null)
 
 
   @createNext = (prevMessage, channelNode) ->
-    new this(prevMessage.transmission, channelNode, {
-      # precedence: prevMessage.precedence
-    })
+    new this(prevMessage.transmission, channelNode)
 
 
   constructor: (@transmission, @channelNode, opts = {}) ->
-    # TODO
-    {@precedence} = opts
     @points = new FastSet()
 
 
@@ -55,10 +49,3 @@ module.exports = class ConnectionMessage
         cachedForMerge.resendToNodePoint(point)
 
     return this
-
-
-  communicationTypeOrder: 2
-
-
-  getPrecedence: ->
-    [@precedence, @communicationTypeOrder]

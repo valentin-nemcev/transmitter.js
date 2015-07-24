@@ -95,7 +95,8 @@ module.exports = class Transmission
   communicationSucceedsExistingFor: (succComm, point) ->
     exisitingComm = @getCommunicationFor(point)
     return true if not exisitingComm?
-    compareArrays(succComm.getPrecedence(), exisitingComm.getPrecedence()) == 1
+    succComm.getUpdatePrecedence()
+      .compare(exisitingComm.getUpdatePrecedence()) > 0
 
 
   getCommunicationFor: (point) ->
@@ -129,10 +130,8 @@ module.exports = class Transmission
 
   compareComms: ([commASeqNum, commA], [commBSeqNum, commB]) ->
     r = if @reverseOrder then 1 else -1
-    compareArrays(
-      [commA.getQueueOrder()..., r * commASeqNum],
-      [commB.getQueueOrder()..., r * commBSeqNum]
-    )
+    commA.getQueuePrecedence().compare(commB.getQueuePrecedence()) \
+      or r * (commASeqNum - commBSeqNum)
 
 
   respond: ->

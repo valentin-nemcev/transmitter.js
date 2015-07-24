@@ -4,6 +4,7 @@ SourceNode = require 'transmitter/nodes/source_node'
 TargetNode = require 'transmitter/nodes/target_node'
 SimpleChannel = require 'transmitter/channels/simple_channel'
 
+Pass = require 'transmitter/transmission/pass'
 Message = require 'transmitter/transmission/message'
 Query = require 'transmitter/transmission/query'
 Transmission = require 'transmitter/transmission/transmission'
@@ -19,13 +20,6 @@ class StubPayload
   inspect: -> 'stub()'
   deliver: ->
 
-class PrecedenceStub
-  inspect: -> 'P:s'
-  constructor: (@direction) ->
-  directionMatches: (direction) -> direction == @direction
-  getFinal: -> null
-  getPrevious: -> this
-
 class NodeSourceStub extends SourceNode
   createResponsePayload: -> new StubPayload()
 
@@ -40,8 +34,8 @@ describe 'Message and query transmission', ->
   beforeEach ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
-    @direction = new DirectionStub()
-    @precedence = new PrecedenceStub(@direction)
+    @pass = Pass.createMessageDefault()
+    @direction = @pass.direction
 
     Transmitter.startTransmission (tr) =>
       new SimpleChannel()
@@ -56,7 +50,7 @@ describe 'Message and query transmission', ->
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload, {@precedence})
+    @message = new Message(@transmission, @payload, {@pass})
 
     @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
 
@@ -68,7 +62,7 @@ describe 'Message and query transmission', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
-    @query = new Query(@transmission, {@precedence})
+    @query = new Query(@transmission, {@pass})
 
     @query.sendFromNodeToNodeTarget(@target, @target.getNodeTarget())
     @transmission.respond()

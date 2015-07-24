@@ -30,5 +30,5 @@ module.exports = class ConnectionNodeLine
 
 
   receiveMessage: (message) ->
-    message.sendToMergingNodeTarget(this, @target) if @target?
+    message.sendToSelectingNodeTarget(this, @target) if @target?
     return this

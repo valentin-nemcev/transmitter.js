@@ -1,8 +1,9 @@
 'use strict'
 
 
-Precedence = require './precedence'
 FastSet = require 'collections/fast-set'
+Pass = require './pass'
+Precedence = require './precedence'
 
 
 class NullQuery
@@ -15,7 +16,7 @@ module.exports = class Query
   inspect: ->
     [
       'Q',
-      @precedence.inspect()
+      @pass.inspect()
       @wasDelivered() and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
 
@@ -32,33 +33,33 @@ module.exports = class Query
 
   @createInitial = (transmission) ->
     new this(transmission,
-      precedence: Precedence.createQueryDefault(), nesting: 0)
+      pass: Pass.createQueryDefault(), nesting: 0)
 
 
   @createNext = (prevQuery) ->
     new this(prevQuery.transmission, {
-      precedence: prevQuery.precedence
+      pass: prevQuery.pass
       nesting:    prevQuery.nesting
     })
 
 
   @createNextConnection = (prevMessageOrQuery) ->
     new this(prevMessageOrQuery.transmission, {
-      precedence: prevMessageOrQuery.precedence.getPrevious()
+      pass: prevMessageOrQuery.pass
       nesting:    prevMessageOrQuery.nesting - 1
     })
 
 
   @createForMerge = (mergedMessage) ->
     new this(mergedMessage.transmission, {
-      precedence: mergedMessage.precedence.getPrevious()
+      pass: mergedMessage.pass
       nesting: mergedMessage.nesting
     })
 
 
   @createForSelect = (selectedMessage) ->
     new this(selectedMessage.transmission, {
-      precedence: selectedMessage.precedence.getPrevious()
+      pass: selectedMessage.pass
       nesting: selectedMessage.nesting
     })
 
@@ -66,14 +67,14 @@ module.exports = class Query
   @isForSelect = (query, selectedMessage) ->
     query? \
       and query instanceof this \
-      and query.precedence.direction == selectedMessage.precedence.direction
+      and query.pass.direction == selectedMessage.pass.direction
 
 
   @createForResponseMessage = (queuedMessage) ->
-    precedence = queuedMessage.precedence.getFinal()
-    if precedence?
+    pass = queuedMessage.pass.getForResponse()
+    if pass?
       new this(queuedMessage.transmission, {
-        precedence
+        pass
         nesting: queuedMessage.nesting
       })
     else
@@ -82,7 +83,7 @@ module.exports = class Query
 
 
   constructor: (@transmission, opts = {}) ->
-    {@precedence, @nesting} = opts
+    {@pass, @nesting} = opts
     @linesPassed = new FastSet()
 
 
@@ -95,14 +96,15 @@ module.exports = class Query
 
 
 
-  directionMatches: (direction) -> @precedence.directionMatches(direction)
+  directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
-  communicationTypeOrder: 0
+  communicationTypePriority: 0
 
 
-  getPrecedence: ->
-    [@precedence.level, @communicationTypeOrder]
+  getUpdatePrecedence: ->
+    @updatePrecedence ?=
+      Precedence.createUpdate(@pass, @communicationTypePriority)
 
 
   wasDelivered: ->
@@ -173,8 +175,9 @@ module.exports = class Query
     return this
 
 
-  getQueueOrder: ->
-    [@precedence.level, @communicationTypeOrder, @nesting]
+  getQueuePrecedence: ->
+    @queuePrecedence ?=
+      Precedence.createQueue(@pass, @communicationTypePriority, @nesting)
 
 
   respond: ->

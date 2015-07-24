@@ -4,7 +4,7 @@ SourceNode = require 'transmitter/nodes/source_node'
 SimpleChannel = require 'transmitter/channels/simple_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
-Precedence = require 'transmitter/transmission/precedence'
+Pass = require 'transmitter/transmission/pass'
 
 Transmitter = require 'transmitter'
 
@@ -30,7 +30,7 @@ describe 'Message merging', ->
     sinon.spy(@target, 'receiveMessage')
 
     @transmission = new Transmission()
-    @precedence = Precedence.createMessageDefault()
+    @pass = Pass.createMessageDefault()
 
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
@@ -39,7 +39,7 @@ describe 'Message merging', ->
       .returns(@passivePayload)
 
     @compositeSource = new SimpleChannel()
-      .inDirection @precedence.direction
+      .inDirection @pass.direction
       .createMergingSource([@activeSource, @passiveSource])
 
     @compositeSource.setTarget(@target)
@@ -50,7 +50,7 @@ describe 'Message merging', ->
 
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
-    @message1 = new Message(@transmission, @activePayload, {@precedence})
+    @message1 = new Message(@transmission, @activePayload, {@pass})
 
     @message1.sendFromNodeToNodeSource(@activeSource,
       @activeSource.getNodeSource())

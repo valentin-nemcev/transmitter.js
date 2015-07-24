@@ -1,45 +1,38 @@
 'use strict'
 
 
-{inspect} = require 'util'
+class UpdatePrecedence
 
-directions = require '../directions'
+  constructor: (@pass, @commTypePriority) ->
 
-
-module.exports = class Precedence
-
-  inspect: -> 'P:' + @level + ' ' + @direction.inspect()
-
-
-  @createQueryDefault = -> new Precedence(directions.forward, 1)
-
-  @createMessageDefault = -> new Precedence(directions.backward, 0)
+  compare: (other) ->
+    this.pass.compare(other.pass) \
+      or this.commTypePriority - other.commTypePriority
 
 
-  constructor: (@direction, @level) ->
+class QueuePrecedence
+
+  constructor: (@pass, @commTypePriority, @nestingPriority) ->
+
+  compare: (other) ->
+    this.pass.compare(other.pass) \
+      or this.commTypePriority - other.commTypePriority \
+      or this.nestingPriority - other.nestingPriority
 
 
-  directionMatches: (direction) -> @direction.matches(direction)
+class SelectPrecedence
+
+  constructor: (@payloadPriority) ->
+
+  compare: (other) ->
+    this.payloadPriority - other.payloadPriority
 
 
-  equals: (other) ->
-    this.direction == other.direction and this.level == other.level
 
-
-  @merge = (precedences) ->
-    if precedences.every((precedence) -> precedence.equals(precedences[0]))
-      precedences[0]
-    else
-      null
-
-
-  getPrevious: ->
-    this
-
-
-  getFinal: ->
-    intLevel = Math.ceil(@level)
-    if intLevel == 1
-      null
-    else
-      new Precedence(@direction.reverse(), 1)
+module.exports =
+  createUpdate: (pass, commTypePriority) ->
+    new UpdatePrecedence(pass, commTypePriority)
+  createQueue: (pass, commTypePriority, nestingPriority) ->
+    new QueuePrecedence(pass, commTypePriority, nestingPriority)
+  createSelect: (payloadPriority) ->
+    new SelectPrecedence(payloadPriority)
