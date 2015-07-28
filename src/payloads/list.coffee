@@ -14,6 +14,9 @@ class SetConstPayload
 
   inspect: -> "setConst(#{inspect @value})"
 
+  map: (map) ->
+    new SetPayload(this, {map})
+
   updateMatching: (map, match) ->
     new UpdateMatchingPayload(this, {map, match})
 
@@ -23,6 +26,41 @@ class SetConstPayload
     @value[pos]
 
   getSize: -> @value.length
+
+
+  deliverToVariable: (variable) ->
+    variable.set(@get())
+    return this
+
+
+  deliverToList: (list) ->
+    list.set(@get())
+    return this
+
+
+
+class SetLazyPayload
+
+  @create = (getValue) => new this(getValue)
+
+  constructor: (@getValue) ->
+
+  getPriority: -> 1
+
+  inspect: -> "setLazy(#{inspect @getValue()})"
+
+  map: (map) ->
+    new SetPayload(this, {map})
+
+  updateMatching: (map, match) ->
+    new UpdateMatchingPayload(this, {map, match})
+
+  get: -> @value ?= @getValue()
+
+  getAt: (pos) ->
+    @get()[pos]
+
+  getSize: -> @get().length
 
 
   deliverToVariable: (variable) ->
@@ -177,7 +215,7 @@ class SetPayload
 
 module.exports = {
   set: SetPayload.create
-  setLazy: (getValue) -> SetPayload.create(get: getValue)
+  setLazy: (getValue) -> SetLazyPayload.create(getValue)
   setConst: SetConstPayload.create
   append: (elementSource) ->
     AddAtPayload.create(elementSource.map (el) -> [el, null])

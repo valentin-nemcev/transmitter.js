@@ -15,8 +15,6 @@ module.exports = class ChannelList extends ChannelNode
     return this
 
 
-  get: -> @channels.slice()
-
   set: (newChannels) ->
     oldChannels = @channels
 
@@ -26,3 +24,37 @@ module.exports = class ChannelList extends ChannelNode
     @channels.push newChannels...
     newChannel.connect(@message) for newChannel in newChannels
     this
+
+
+  addAt: (el, pos) ->
+    pos ?= @channels.length
+    if pos == @channels.length
+      @channels.push el
+    else
+      @channels.splice(pos, 0, el)
+
+    el.connect(@message)
+    return this
+
+
+  removeAt: (pos) ->
+    el = @channels.splice(pos, 1)[0]
+    el.disconnect(@message)
+    return this
+
+
+  move: (fromPos, toPos) ->
+    @channels.splice(toPos, 0, @channels.splice(fromPos, 1)[0])
+    return this
+
+
+  get: ->
+    @channels.slice()
+
+
+  getAt: (pos) ->
+    @channels[pos]
+
+
+  getSize: ->
+    @channels.length

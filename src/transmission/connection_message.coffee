@@ -10,7 +10,7 @@ module.exports = class ConnectionMessage
   inspect: ->
     [
       'CM'
-      @channelNode?.inspect()
+      @sourceChannelNode?.inspect()
     ].join(' ')
 
 
@@ -23,29 +23,37 @@ module.exports = class ConnectionMessage
     new this(transmission, null)
 
 
-  @createNext = (prevMessage, channelNode) ->
-    new this(prevMessage.transmission, channelNode)
+  @createNext = (prevMessage, sourceChannelNode) ->
+    new this(prevMessage.transmission, sourceChannelNode)
 
 
-  constructor: (@transmission, @channelNode, opts = {}) ->
-    @points = new FastSet()
+  constructor: (@transmission, @sourceChannelNode, opts = {}) ->
+    @targetPointsToUpdate =
+      new FastSet().addEach(@sourceChannelNode?.getTargetPoints())
 
 
-  getChannelNode: -> @channelNode
+  getSourceChannelNode: -> @sourceChannelNode
 
 
-  addPoint: (point) ->
-    @points.add(point)
+  addTargetPoint: (targetPoint) ->
+    @targetPointsToUpdate.add(targetPoint)
+    @sourceChannelNode?.addTargetPoint(targetPoint)
     return this
 
 
-  updatePoints: ->
-    @points.forEach (point) =>
-      @log point
-      if (comm = @transmission.getCommunicationFor(point))?
-        comm.resendFromNodePoint(point, @channelNode)
+  removeTargetPoint: (targetPoint) ->
+    @targetPointsToUpdate.add(targetPoint)
+    @sourceChannelNode?.removeTargetPoint(targetPoint)
+    return this
 
-      if (cachedForMerge = @transmission.getCachedMessage(point))?
+
+  updateTargetPoints: ->
+    @targetPointsToUpdate.forEach (targetPoint) =>
+      @log targetPoint
+      if (comm = @transmission.getCommunicationFor(targetPoint))?
+        comm.resendFromNodePoint(targetPoint, @sourceChannelNode)
+
+      if (cachedForMerge = @transmission.getCachedMessage(targetPoint))?
         cachedForMerge.resend()
 
     return this

@@ -102,5 +102,5 @@ module.exports = class SimpleChannel
   init: (tr) ->
     message = tr.createInitialConnectionMessage()
     @connect(message)
-    message.updatePoints()
+    message.updateTargetPoints()
     return this

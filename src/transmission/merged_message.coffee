@@ -9,7 +9,7 @@ module.exports = class MergedMessage
   inspect: ->
     [
       'MM'
-      'P:' + @pass.inspect()
+      @pass.inspect()
       @nodesToMessages.values().map( (m) -> m.inspect() ).join(', ')
     ].join(' ')
 
@@ -44,4 +44,5 @@ module.exports = class MergedMessage
       @nodesToMessages.map (message, node) -> [node, message.payload]
     )
     nesting = Math.max(@nodesToMessages.map((message) -> message.nesting)...)
+    @transmission.log this
     @transmission.Message.createMerged(this, payloads, {nesting})

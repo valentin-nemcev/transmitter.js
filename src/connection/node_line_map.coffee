@@ -16,15 +16,15 @@ module.exports = class NodeLineMap
 
 
   connect: (message, line) ->
-    channelNode = message.getChannelNode()
-    message.addPoint(@nodePoint)
+    channelNode = message.getSourceChannelNode()
+    message.addTargetPoint(@nodePoint)
     @channelNodeToLines.get(channelNode).add(line)
     return this
 
 
   disconnect: (message, line) ->
-    channelNode = message.getChannelNode()
-    message.addPoint(@nodePoint)
+    channelNode = message.getSourceChannelNode()
+    message.removeTargetPoint(@nodePoint)
     lines = @channelNodeToLines.get(channelNode)
     lines.delete(line)
     @channelNodeToLines.delete(channelNode) if lines.length is 0
