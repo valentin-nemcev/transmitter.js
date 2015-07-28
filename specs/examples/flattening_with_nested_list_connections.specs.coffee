@@ -38,9 +38,6 @@ describe 'Flattening with nested list connections', ->
       .withMatchOriginDerived (model, view) ->
         model == view.model
       .withOriginDerivedChannel (model, view) ->
-        # TODO: Enforce consistency
-        unless model? and view?
-          return Transmitter.Channels.getNullChannel()
         new Transmitter.Channels.VariableChannel()
           .withOrigin model.valueVar
           .withDerived view.valueVar
