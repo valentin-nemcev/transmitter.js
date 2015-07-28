@@ -18,7 +18,7 @@ module.exports = class SelectedMessage
 
   @getOrCreate = (nodeTarget, transmission, pass) ->
     selected = transmission.getCachedMessage(nodeTarget)
-    if not selected? or pass.compare(selected.pass) > 0
+    unless (selected? and pass.equals(selected.pass))
       selected = new this(transmission, nodeTarget, {pass})
       transmission.setCachedMessage(nodeTarget, selected)
     return selected

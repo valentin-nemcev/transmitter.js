@@ -12,7 +12,7 @@ class SetConstPayload
 
   getPriority: -> 1
 
-  inspect: -> "setConst(#{inspect @value})"
+  inspect: -> "#{@getPriority()}:setConst(#{inspect @value})"
 
   map: (map) ->
     new SetPayload(this, {map})
@@ -47,7 +47,7 @@ class SetLazyPayload
 
   getPriority: -> 1
 
-  inspect: -> "setLazy(#{inspect @getValue()})"
+  inspect: -> "#{@getPriority()}:setLazy(#{inspect @getValue()})"
 
   map: (map) ->
     new SetPayload(this, {map})
@@ -82,7 +82,7 @@ class RemovePayload
 
   getPriority: -> 1
 
-  inspect: -> "listRemove(#{inspect @source})"
+  inspect: -> "#{@getPriority()}:listRemove(#{inspect @source})"
 
   deliverToList: (target) ->
     element = @source.get()
@@ -99,7 +99,7 @@ class AddAtPayload
 
   getPriority: -> 1
 
-  inspect: -> "listAddAt(#{inspect @source.get()})"
+  inspect: -> "#{@getPriority()}:listAddAt(#{inspect @source.get()})"
 
   deliverToList: (target) ->
     target.addAt(@source.get()...)
@@ -112,7 +112,7 @@ class UpdateMatchingPayload
     @mapFn = opts.map
     @matchFn = opts.match
 
-  inspect: -> "listUpdate(#{inspect @source})"
+  inspect: -> "#{@getPriority()}:listUpdate(#{inspect @source})"
 
   getPriority: -> @priority ? @source.getPriority()
 
@@ -169,7 +169,7 @@ class SetPayload
     @mapFn = opts.map ? id
 
 
-  inspect: -> "list(#{inspect @get()})"
+  inspect: -> "#{@getPriority()}:list(#{inspect @get()})"
 
 
   setPriority: (@priority) -> this

@@ -16,7 +16,7 @@ module.exports = class MergedMessage
 
   @getOrCreate = (source, transmission, pass) ->
     merged = transmission.getCachedMessage(source)
-    if not merged? or pass.compare(merged.pass) > 0
+    unless (merged? and pass.equals(merged.pass))
       merged = new this(transmission, source, {pass})
       transmission.setCachedMessage(source, merged)
     return merged

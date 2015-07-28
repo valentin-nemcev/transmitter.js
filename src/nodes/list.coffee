@@ -10,7 +10,7 @@ module.exports = class List extends RelayNode
   payload: ListPayload
 
 
-  createResponsePayload: ->
+  createResponsePayload: (prevPayload) ->
     @payload.set(this).setPriority(prevPayload?.getPriority() ? 0)
 
 
