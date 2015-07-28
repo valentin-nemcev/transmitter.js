@@ -1,6 +1,9 @@
 'use strict'
 
 
+directions = require '../directions'
+
+getNullChannel = require './null_channel'
 SimpleChannel = require './simple_channel'
 CompositeChannel = require './composite_channel'
 
@@ -8,6 +11,18 @@ CompositeChannel = require './composite_channel'
 module.exports = class BidirectionalChannel extends CompositeChannel
 
   inspect: -> '[' + @constructor.name + ']'
+
+
+  inForwardDirection: -> @inDirection(directions.forward)
+  inBackwardDirection: -> @inDirection(directions.backward)
+
+
+  inDirection: (@direction) ->
+    return this
+
+
+  getDirection: ->
+    @direction ? directions.omni
 
 
   withOrigin:  (@origin)  -> this
@@ -62,10 +77,16 @@ module.exports = class BidirectionalChannel extends CompositeChannel
 
 
   @defineChannel ->
-    createSimple(@origin, @derived, @getTransformOrigin())
-      .inForwardDirection()
+    if @getDirection().matches(directions.forward)
+      createSimple(@origin, @derived, @getTransformOrigin())
+        .inForwardDirection()
+    else
+      getNullChannel()
 
 
   @defineChannel ->
-    createSimple(@derived, @origin, @getTransformDerived())
-      .inBackwardDirection()
+    if @getDirection().matches(directions.backward)
+      createSimple(@derived, @origin, @getTransformDerived())
+        .inBackwardDirection()
+    else
+      getNullChannel()

@@ -50,6 +50,12 @@ module.exports = class RelayNode
     return this
 
 
+  receivePayload: (tr, payload) ->
+    tr.createInitialMessage(payload)
+      .sendToNodeTarget(@getNodeTarget())
+    return this
+
+
   queryState: (tr) ->
     tr.createInitialQuery()
       .sendFromNodeToNodeTarget(this, @getNodeTarget())
