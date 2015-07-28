@@ -14,8 +14,8 @@ module.exports = class ConnectionMessage
     ].join(' ')
 
 
-  log: ->
-    @transmission.log this, arguments...
+  log: (arg) ->
+    @transmission.log this, arg
     return this
 
 

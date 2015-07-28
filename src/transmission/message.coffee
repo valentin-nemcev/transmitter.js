@@ -19,8 +19,8 @@ module.exports = class Message
     ].filter( (s) -> s.length).join(' ')
 
 
-  log: ->
-    @transmission.log this, arguments...
+  log: (arg) ->
+    @transmission.log this, arg
     return this
 
 
