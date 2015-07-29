@@ -84,7 +84,7 @@ module.exports = class Query
 
   constructor: (@transmission, opts = {}) ->
     {@pass, @nesting} = opts
-    @linesPassed = new FastSet()
+    @passedLines = new FastSet()
 
 
   createNextQuery: ->
@@ -108,7 +108,7 @@ module.exports = class Query
 
 
   wasDelivered: ->
-    @delivered or @linesPassed.length > 0
+    @delivered or @passedLines.length > 0
 
 
   tryQueryChannelNode: (channelNode) ->
@@ -121,11 +121,11 @@ module.exports = class Query
     return this
 
 
-  getPassedLines: -> @linesPassed
+  getPassedLines: -> @passedLines
 
 
   addPassedLine: (line) ->
-    @linesPassed.add(line)
+    @passedLines.add(line)
     return this
 
 

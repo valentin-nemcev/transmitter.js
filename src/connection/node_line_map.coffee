@@ -2,17 +2,25 @@
 
 
 MultiMap = require 'collections/multi-map'
-FastSet = require 'collections/fast-set'
+Set = require 'collections/set'
+
+
+class LineSet extends Set
+
+  acceptsCommunication: (comm) ->
+    @some (line) -> line.acceptsCommunication(comm)
+
 
 
 module.exports = class NodeLineMap
 
   constructor: (@nodePoint) ->
-    @channelNodeToLines = new MultiMap(null, -> new FastSet())
+    @channelNodeToLines = new MultiMap(null, -> new LineSet())
 
 
-  getChannelNodes: ->
-    @channelNodeToLines.keys()
+  getChannelNodesFor: (comm) ->
+    channelNode for [channelNode, lines] in @channelNodeToLines.entries() \
+      when lines.acceptsCommunication(comm)
 
 
   connect: (message, line) ->
@@ -39,6 +47,7 @@ module.exports = class NodeLineMap
 
   sendCommunication: (comm) ->
     @channelNodeToLines.forEach (lines, channelNode) ->
-      if comm.tryQueryChannelNode(channelNode)
-        lines.forEach (line) -> comm.sendToLine(line)
+      if lines.acceptsCommunication(comm) \
+        and comm.tryQueryChannelNode(channelNode)
+          lines.forEach (line) -> comm.sendToLine(line, channelNode)
     return this

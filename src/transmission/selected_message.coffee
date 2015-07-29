@@ -53,25 +53,25 @@ module.exports = class SelectedMessage
       @selectQuery = @transmission.Query.createForSelect(this)
       @selectQuery.sendToNodeTarget(@nodeTarget)
 
-    return @selectQuery
+    return this
 
 
   resend: -> @trySendToNodeTarget()
 
 
   trySendToNodeTarget: ->
-    selectQuery = @_tryQueryForSelect()
+    @_tryQueryForSelect()
 
     unless @_channelNodesUpdated()
       return this
 
     # TODO: Compare contents
-    if @linesToMessages.length == selectQuery.getPassedLines().length
+    if @linesToMessages.length == @selectQuery.getPassedLines().length
       @_selectForNodeTarget().sendToNodeTarget(@nodeTarget)
 
 
   _channelNodesUpdated: ->
-    for node in @nodeTarget.getChannelNodes()
+    for node in @nodeTarget.getChannelNodesFor(@selectQuery)
       return false unless @transmission.channelNodeUpdated(this, node)
     return true
 

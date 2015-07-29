@@ -22,12 +22,16 @@ module.exports = class NodeConnectionLine
     return this
 
 
-  receiveQuery: (query) ->
-    query.sendToNodeSource(@source) if @source?
-    return this
+  acceptsCommunication: (message) ->
+    message.directionMatches(@direction)
 
 
   receiveMessage: (message) ->
-    if message.directionMatches(@direction)
+    if @acceptsCommunication(message)
       @target.receiveMessage(message)
+    return this
+
+
+  receiveQuery: (query) ->
+    query.sendToNodeSource(@source) if @source?
     return this

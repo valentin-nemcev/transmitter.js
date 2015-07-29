@@ -63,3 +63,26 @@ describe 'Flattening with nested connections', ->
 
   specify 'and it propagates back to derived node', ->
     expect(@derivedVar.get()).to.be.null
+
+
+  describe 'with loop', ->
+
+    before ->
+      @define 'supOriginVar', new Transmitter.Nodes.Variable()
+
+      supOriginChannel = new Transmitter.Channels.VariableChannel()
+        .withOrigin @supOriginVar
+        .withDerived @originVar
+
+      Transmitter.startTransmission (tr) =>
+        supOriginChannel.init(tr)
+
+
+    specify 'when super origin is updated', ->
+      Transmitter.startTransmission (tr) =>
+        @model = new Model()
+        @originVar.init(tr, @model)
+
+
+    specify 'then it propagates to derived node', ->
+      expect(@derivedVar.get().model).to.equal(@model)

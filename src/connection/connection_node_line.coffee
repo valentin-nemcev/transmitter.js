@@ -22,8 +22,12 @@ module.exports = class ConnectionNodeLine
     return this
 
 
+  acceptsCommunication: (query) ->
+    query.directionMatches(@direction)
+
+
   receiveQuery: (query) ->
-    if query.directionMatches(@direction)
+    if @acceptsCommunication(query)
       query.addPassedLine(this)
       @source.receiveQuery(query)
     return this

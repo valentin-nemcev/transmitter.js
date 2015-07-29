@@ -45,4 +45,4 @@ module.exports = class NodeTarget
     return this
 
 
-  getChannelNodes: -> @sources.getChannelNodes()
+  getChannelNodesFor: (comm) -> @sources.getChannelNodesFor(comm)
