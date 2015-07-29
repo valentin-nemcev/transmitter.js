@@ -1,7 +1,13 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
+
 class UpdatePrecedence
+
+  inspect: ->
+    'UP[' + [@pass, @commTypePriority].map(inspect).join(', ') + ']'
 
   constructor: (@pass, @commTypePriority) ->
 
@@ -12,6 +18,9 @@ class UpdatePrecedence
 
 class QueuePrecedence
 
+  inspect: ->
+    'QP[' + [@pass, @commTypePriority, @nestingPriority].map(inspect).join(', ') + ']'
+
   constructor: (@pass, @commTypePriority, @nestingPriority) ->
 
   compare: (other) ->
@@ -21,6 +30,9 @@ class QueuePrecedence
 
 
 class SelectPrecedence
+
+  inspect: ->
+    'SP[' + [@payloadPriority].map(inspect).join(', ') + ']'
 
   constructor: (@payloadPriority) ->
 

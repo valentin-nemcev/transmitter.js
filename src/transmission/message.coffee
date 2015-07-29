@@ -95,7 +95,7 @@ module.exports = class Message
 
 
   sendToLine: (line) ->
-    @log line
+    # @log line
     line.receiveMessage(this)
     return this
 

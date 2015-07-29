@@ -2,9 +2,13 @@
 
 
 SimpleChannel = require './simple_channel'
+Record = require '../nodes/record'
 
 
 module.exports = class CompositeChannel
+
+  @defineLazy = Record.defineLazy
+
 
   @defineChannel = (createChannel) ->
     (@::classChannelCreateFunctions ?= []).push createChannel

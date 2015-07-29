@@ -14,13 +14,14 @@ module.exports = class ListChannel extends BidirectionalChannel
     return this
 
 
+  @defineLazy 'nestedChannelList', -> new ChannelList()
+
   withOriginDerivedChannel: (createOriginDerivedChannel) ->
-    @nestedListChannelNode = new ChannelList()
     @defineChannel ->
       new SimpleChannel()
         .fromSource @origin
         .fromSource @derived
-        .toConnectionTarget @nestedListChannelNode
+        .toConnectionTarget @nestedChannelList
         .withTransform (lists) =>
           origin = lists.get(@origin)
           derived = lists.get(@derived)

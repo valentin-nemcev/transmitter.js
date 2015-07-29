@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 directions = require '../directions'
 
 getNullChannel = require './null_channel'
@@ -10,7 +12,8 @@ CompositeChannel = require './composite_channel'
 
 module.exports = class BidirectionalChannel extends CompositeChannel
 
-  inspect: -> '[' + @constructor.name + ']'
+  inspect: ->
+    '(' + [@origin, @getDirection(), @derived].map(inspect).join('') + ')'
 
 
   inForwardDirection: -> @inDirection(directions.forward)

@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 FastSet = require 'collections/fast-set'
 Precedence = require './precedence'
 
@@ -10,7 +12,7 @@ module.exports = class ConnectionMessage
   inspect: ->
     [
       'CM'
-      @sourceChannelNode?.inspect()
+      inspect @sourceChannelNode
     ].join(' ')
 
 

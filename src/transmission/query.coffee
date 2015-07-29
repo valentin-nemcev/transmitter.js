@@ -116,7 +116,7 @@ module.exports = class Query
 
 
   sendToLine: (line) ->
-    @log line
+    # @log line
     line.receiveQuery(this)
     return this
 
