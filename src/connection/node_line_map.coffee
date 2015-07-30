@@ -49,5 +49,5 @@ module.exports = class NodeLineMap
     @channelNodeToLines.forEach (lines, channelNode) ->
       if lines.acceptsCommunication(comm) \
         and comm.tryQueryChannelNode(channelNode)
-          lines.forEach (line) -> comm.sendToLine(line, channelNode)
+          lines.forEach (line) -> comm.sendToLine(line)
     return this

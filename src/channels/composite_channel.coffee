@@ -7,6 +7,9 @@ Record = require '../nodes/record'
 
 module.exports = class CompositeChannel
 
+  inspect: -> '[' + @constructor.name + ']'
+
+
   @defineLazy = Record.defineLazy
 
 

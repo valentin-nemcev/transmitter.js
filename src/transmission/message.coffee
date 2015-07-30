@@ -2,9 +2,9 @@
 
 
 Map = require 'collections/map'
+
 Pass = require './pass'
 Precedence = require './precedence'
-
 SelectedMessage = require './selected_message'
 MergedMessage = require './merged_message'
 

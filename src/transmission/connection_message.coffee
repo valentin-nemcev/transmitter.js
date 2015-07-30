@@ -4,7 +4,8 @@
 {inspect} = require 'util'
 
 FastSet = require 'collections/fast-set'
-Precedence = require './precedence'
+
+Pass = require './pass'
 
 
 module.exports = class ConnectionMessage
@@ -22,14 +23,18 @@ module.exports = class ConnectionMessage
 
 
   @createInitial = (transmission) ->
-    new this(transmission, null)
+    new this(transmission, null, pass: Pass.createQueryDefault(), nesting: 0)
 
 
   @createNext = (prevMessage, sourceChannelNode) ->
-    new this(prevMessage.transmission, sourceChannelNode)
+    new this(prevMessage.transmission, sourceChannelNode, {
+      pass: prevMessage.pass
+      nesting: prevMessage.nesting + 1
+    })
 
 
   constructor: (@transmission, @sourceChannelNode, opts = {}) ->
+    {@pass, @nesting} = opts
     @targetPointsToUpdate =
       new FastSet().addEach(@sourceChannelNode?.getTargetPoints())
 
@@ -57,5 +62,8 @@ module.exports = class ConnectionMessage
 
       if (cachedForMerge = @transmission.getCachedMessage(targetPoint))?
         cachedForMerge.resend()
+
+      # if targetPoint.sources?
+      #   @transmission.Query.createNext(this).sendToNodeTarget(targetPoint)
 
     return this

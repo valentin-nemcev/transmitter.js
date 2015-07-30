@@ -64,11 +64,22 @@ describe 'Flattening connection', ->
     expect(nestedObject.valueVar.get()).to.equal('value1')
 
 
-  specify 'updating flat target after outer source update', ->
+  specify 'updating flat target after outer and inner source update', ->
     nestedObject = new NestedObject('objectA')
 
     Transmitter.startTransmission (tr) =>
       nestedObject.valueVar.init(tr, 'value1')
+      @nestedVar.init(tr, nestedObject)
+
+    expect(@serializedVar.get())
+      .to.deep.equal({name: 'objectA', value: 'value1'})
+
+
+  specify 'updating flat target after outer only source update', ->
+    nestedObject = new NestedObject('objectA')
+    nestedObject.valueVar.set('value1')
+
+    Transmitter.startTransmission (tr) =>
       @nestedVar.init(tr, nestedObject)
 
     expect(@serializedVar.get())
