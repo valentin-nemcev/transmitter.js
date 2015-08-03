@@ -29,11 +29,8 @@ module.exports = class SelectedMessage
     @linesToMessages = new FastMap()
 
 
-  communicationTypePriority: 1
-
-
   getUpdatePrecedence: ->
-    @precedence ?= Precedence.createUpdate(@pass, @communicationTypePriority)
+    @precedence ?= Precedence.createUpdate(@pass)
 
 
   receiveMessageFrom: (message, line) ->
@@ -43,15 +40,11 @@ module.exports = class SelectedMessage
 
 
   _tryQueryForSelect: ->
-    return @selectQuery if @selectQuery?
+    @selectQuery ?=
+      @transmission.getCommunicationFor('query', @pass, @nodeTarget)
 
-    existingQuery = @transmission.getCommunicationFor(@nodeTarget)
-
-    if @transmission.Query.isForSelect(existingQuery, this)
-      @selectQuery = existingQuery
-    else
-      @selectQuery = @transmission.Query.createForSelect(this)
-      @selectQuery.sendToNodeTarget(@nodeTarget)
+    @selectQuery ?= @transmission.Query.createForSelect(this)
+      .sendFromNodeToNodeTarget(@nodeTarget.node, @nodeTarget)
 
     return this
 
@@ -65,6 +58,8 @@ module.exports = class SelectedMessage
     unless @_channelNodesUpdated()
       return this
 
+    @transmission.log @nodeTarget, @linesToMessages.entries()...
+    @transmission.log @nodeTarget, @selectQuery, @selectQuery.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @selectQuery.getPassedLines().length
       @_selectForNodeTarget().sendToNodeTarget(@nodeTarget)

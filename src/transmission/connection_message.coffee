@@ -57,13 +57,15 @@ module.exports = class ConnectionMessage
   updateTargetPoints: ->
     @targetPointsToUpdate.forEach (targetPoint) =>
       @log targetPoint
-      if (comm = @transmission.getCommunicationFor(targetPoint))?
-        comm.resendFromNodePoint(targetPoint, @sourceChannelNode)
+      comm = @transmission.getCommunicationFor(
+        targetPoint.communicationType, @pass, targetPoint)
+      comm?.resendFromNodePoint(targetPoint, @sourceChannelNode)
 
       if (cachedForMerge = @transmission.getCachedMessage(targetPoint))?
         cachedForMerge.resend()
 
-      # if targetPoint.sources?
-      #   @transmission.Query.createNext(this).sendToNodeTarget(targetPoint)
+      if targetPoint.communicationType is 'query'
+        @transmission.Query.createNext(this)
+          .sendFromNodeToNodeTarget(targetPoint.node, targetPoint)
 
     return this

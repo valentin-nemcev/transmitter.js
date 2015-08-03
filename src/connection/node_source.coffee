@@ -32,7 +32,7 @@ module.exports = class NodeSource
     return this
 
 
-  resendQuery: -> this
+  communicationType: 'message'
 
 
   resendMessage: (message, channelNode) ->

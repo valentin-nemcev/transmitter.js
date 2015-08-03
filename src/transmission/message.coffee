@@ -78,12 +78,14 @@ module.exports = class Message
   directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
+  type: 'message'
+
   communicationTypePriority: 1
 
 
   getUpdatePrecedence: ->
     @updatePrecedence ?=
-      Precedence.createUpdate(@pass, @communicationTypePriority)
+      Precedence.createUpdate(@pass)
 
 
   getSelectPrecedence: ->
@@ -95,7 +97,7 @@ module.exports = class Message
 
 
   sendToLine: (line) ->
-    # @log line
+    @log line
     line.receiveMessage(this)
     return this
 

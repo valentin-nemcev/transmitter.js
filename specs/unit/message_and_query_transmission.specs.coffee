@@ -25,7 +25,7 @@ class NodeSourceStub extends SourceNode
 
 class NodeTargetStub extends TargetNode
   acceptPayload: (payload) ->
-    payload.deliver(this)
+    payload.deliver?(this)
     return this
 
 

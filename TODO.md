@@ -26,8 +26,8 @@
   * Don't use context in isolated tests, use context in scenarios.
 
 * Implement
+  * Improve query and update priority logic
   * Optimize querying for merge or select
-  * Implement nested node querying after nested connection changes
   * Improve or remove query routing specs
 
 * Later

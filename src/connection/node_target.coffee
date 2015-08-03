@@ -32,7 +32,7 @@ module.exports = class NodeTarget
     return this
 
 
-  resendMessage: -> this
+  communicationType: 'query'
 
 
   resendQuery: (query, channelNode) ->

@@ -64,12 +64,6 @@ module.exports = class Query
     })
 
 
-  @isForSelect = (query, selectedMessage) ->
-    query? \
-      and query instanceof this \
-      and query.pass.direction == selectedMessage.pass.direction
-
-
   @createForResponseMessage = (queuedMessage) ->
     pass = queuedMessage.pass.getForResponse()
     if pass?
@@ -99,12 +93,14 @@ module.exports = class Query
   directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
+  type: 'query'
+
   communicationTypePriority: 0
 
 
   getUpdatePrecedence: ->
     @updatePrecedence ?=
-      Precedence.createUpdate(@pass, @communicationTypePriority)
+      Precedence.createUpdate(@pass)
 
 
   wasDelivered: ->
@@ -116,7 +112,6 @@ module.exports = class Query
 
 
   sendToLine: (line) ->
-    # @log line
     line.receiveQuery(this)
     return this
 
@@ -159,13 +154,7 @@ module.exports = class Query
     return this
 
 
-  sendToNodeTarget: (nodeTarget) ->
-    @log nodeTarget
-    @_sendToNodePoint(nodeTarget)
-
-
   sendFromNodeToNodeTarget: (node, nodeTarget) ->
-    @log nodeTarget
     @enqueueForSourceNode(node)
     @_sendToNodePoint(nodeTarget)
 

@@ -44,6 +44,12 @@ module.exports = class SimpleChannel
     return this
 
 
+  fromSources: (sources) ->
+    @sources.push sources...
+    @forceMerging = yes
+    return this
+
+
   toTarget: (target) ->
     @targets.push target if target?
     return this
@@ -58,7 +64,7 @@ module.exports = class SimpleChannel
 
 
   getSource: ->
-    @source ?= if @sources.length > 1
+    @source ?= if @forceMerging or @sources.length > 1
       @createMergingSource(@sources)
     else @createSingleSource(@sources[0])
 

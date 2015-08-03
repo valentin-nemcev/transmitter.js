@@ -35,13 +35,13 @@ module.exports = class MergedMessage
 
     # TODO: Compare contents
     if @nodesToMessages.length == @source.getSourceNodes().length
-      @source.sendMessage(@_mergeMessages())
+      @source.sendMessage(@_mergeMessages(@source.getSourceNodes()))
     return this
 
 
-  _mergeMessages: ->
+  _mergeMessages: (sourceNodes) ->
     payloads = new Map(
-      @nodesToMessages.map (message, node) -> [node, message.payload]
+      sourceNodes.map (node) => [node, @nodesToMessages.get(node)?.payload]
     )
     nesting = Math.max(@nodesToMessages.map((message) -> message.nesting)...)
     @transmission.log this

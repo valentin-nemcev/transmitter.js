@@ -3,7 +3,7 @@
 
 NodeTarget = require '../connection/node_target'
 
-# ValuePayload = require '../payloads/value'
+noop = require '../payloads/noop'
 
 
 module.exports = class TargetNode
@@ -18,11 +18,10 @@ module.exports = class TargetNode
     return this
 
 
-  respondToQuery: (tr) ->
-    tr.createNextMessage(@createResponsePayload())
+  respondToQuery: (tr, prevPayload) ->
+    tr.createQueryResponseMessage(@createResponsePayload(prevPayload))
       .sendToNodeTarget(@getNodeTarget())
     return this
 
 
-  createResponsePayload: ->
-    # ValuePayload.create(null)
+  createResponsePayload: (payload) -> payload ? noop()

@@ -15,14 +15,15 @@ module.exports = class Transmission
   ConnectionMessage : require './connection_message'
 
   @start = (doWithTransmission) ->
-    assert(not @instance, "Transmissions can't be nested")
+    # assert(not @instance, "Transmissions can't be nested")
     @instance = new Transmission()
-    try
+    do
+    # try
       console.profile() if @profilingIsEnabled
       doWithTransmission(@instance)
       @instance.respond()
       console.profileEnd() if @profilingIsEnabled
-    finally
+    # finally
       @instance = null
     return this
 
@@ -43,7 +44,9 @@ module.exports = class Transmission
   reverseOrder: no
 
   constructor: ->
-    @pointsToComms = new WeakMap()
+    @pointsToQueries = new WeakMap()
+    @pointsToMessages = new WeakMap()
+
     @nodesToPayloads = new WeakMap()
     @cachedMessages = new WeakMap()
     @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
@@ -64,7 +67,7 @@ module.exports = class Transmission
 
   # Common code for communications (queries and messages)
   tryQueryChannelNode: (comm, channelNode) ->
-    if channelNode? and @communicationSucceedsExistingFor(comm, channelNode)
+    if not @channelNodeUpdated(comm, channelNode)
       @Query.createNextConnection(comm).sendToChannelNode(channelNode)
       false
     else
@@ -72,39 +75,39 @@ module.exports = class Transmission
 
 
   channelNodeUpdated: (comm, channelNode) ->
-    not channelNode? or not @communicationSucceedsExistingFor(comm, channelNode)
+    not (@_commSucceedsExistingFor(comm, channelNode, 'message'))
 
 
   tryAddCommunicationFor: (comm, point) ->
-    if @communicationSucceedsExistingFor(comm, point)
+    if @_commSucceedsExistingFor(comm, point)
       @addCommunicationFor(comm, point)
       true
     else
       false
 
 
+  _commSucceedsExistingFor: (succComm, point, type) ->
+    return false unless point?
+    not @getCommunicationFor(type ? succComm.type, succComm.pass, point)
+
+
   addCommunicationFor: (comm, point) ->
-    @pointsToComms.set(point, comm)
+    comms = @_getCommsByType(comm.type)
+    byPass = comms.get(point) ? []
+    byPass[comm.pass.priority] = comm
+    comms.set(point, byPass)
     return this
 
 
-  compareArrays = (a, b) ->
-    for i in [0...Math.max(a.length, b.length)]
-      [elA, elB] = [a[i], b[i]]
-      if elA > elB then return  1
-      if elA < elB then return -1
-    return 0
+  getCommunicationFor: (type, pass, point) ->
+    (@_getCommsByType(type).get(point) ? [])[pass.priority]
 
 
-  communicationSucceedsExistingFor: (succComm, point) ->
-    exisitingComm = @getCommunicationFor(point)
-    return true if not exisitingComm?
-    succComm.getUpdatePrecedence()
-      .compare(exisitingComm.getUpdatePrecedence()) > 0
-
-
-  getCommunicationFor: (point) ->
-    @pointsToComms.get(point)
+  _getCommsByType: (type) ->
+    switch type
+      when 'query'   then @pointsToQueries
+      when 'message' then @pointsToMessages
+      else throw new Error "Unknown communication type: #{type}"
 
 
 
