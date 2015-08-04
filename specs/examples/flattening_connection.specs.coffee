@@ -46,11 +46,19 @@ describe 'Flattening connection', ->
               new Transmitter.Channels.ConstChannel()
                 .toTarget @serializedVar
                 .inForwardDirection()
-                .withValue -> null
+                .withPayload ->
+                  Transmitter.Payloads.Variable.setConst(
+                    {name: null, value: null}
+                  )
         .init(tr)
 
       # TODO
       @nestedVar.init(tr, null)
+
+
+  specify 'has default const value after initialization', ->
+    expect(@serializedVar.get())
+      .to.deep.equal({name: null, value: null})
 
 
   specify 'creation of nested target after flat source update', ->
