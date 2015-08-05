@@ -104,3 +104,31 @@ describe 'Flattening connection', ->
 
     expect(@serializedVar.get())
       .to.deep.equal({name: 'objectA', value: 'value1'})
+
+
+
+  describe 'nesting order', ->
+
+    beforeEach ->
+      @define 'serializedDerivedVar', new Transmitter.Nodes.Variable()
+      Transmitter.startTransmission (tr) =>
+        new Transmitter.Channels.VariableChannel()
+          .withOrigin @serializedVar
+          .withDerived @serializedDerivedVar
+          .init(tr)
+
+
+    ['straight', 'reverse'].forEach (order) ->
+      specify "querying source and target \
+          results in correct response order (#{order})", ->
+        nestedObject = new NestedObject('objectA')
+        nestedObject.valueVar.set('value1')
+        @nestedVar.set(nestedObject)
+
+        Transmitter.startTransmission (tr) =>
+          tr.reverseOrder = order is 'reverse'
+          @nestedVar.queryState(tr)
+          @serializedVar.queryState(tr)
+
+        expect(@serializedDerivedVar.get())
+          .to.deep.equal({name: 'objectA', value: 'value1'})
