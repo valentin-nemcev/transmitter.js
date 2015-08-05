@@ -19,14 +19,14 @@ class UpdatePrecedence
 class QueuePrecedence
 
   inspect: ->
-    'QP[' + [@pass, @commTypePriority, @nestingPriority].map(inspect).join(', ') + ']'
+    'QP[' + [@pass, @commTypePriority, @nesting].map(inspect).join(', ') + ']'
 
-  constructor: (@pass, @commTypePriority, @nestingPriority) ->
+  constructor: (@pass, @commTypePriority, @nesting) ->
 
   compare: (other) ->
     this.pass.compare(other.pass) \
       or this.commTypePriority - other.commTypePriority \
-      or this.nestingPriority - other.nestingPriority
+      or this.nesting.compare(other.nesting)
 
 
 class SelectPrecedence
@@ -44,7 +44,7 @@ class SelectPrecedence
 module.exports =
   createUpdate: (pass, commTypePriority) ->
     new UpdatePrecedence(pass, commTypePriority)
-  createQueue: (pass, commTypePriority, nestingPriority) ->
-    new QueuePrecedence(pass, commTypePriority, nestingPriority)
+  createQueue: (pass, commTypePriority, nesting) ->
+    new QueuePrecedence(pass, commTypePriority, nesting)
   createSelect: (payloadPriority) ->
     new SelectPrecedence(payloadPriority)

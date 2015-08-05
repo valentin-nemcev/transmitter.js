@@ -6,6 +6,7 @@
 FastSet = require 'collections/fast-set'
 
 Pass = require './pass'
+Nesting = require './nesting'
 
 
 module.exports = class ConnectionMessage
@@ -25,13 +26,16 @@ module.exports = class ConnectionMessage
 
 
   @createInitial = (transmission) ->
-    new this(transmission, null, pass: Pass.createQueryDefault(), nesting: 0)
+    new this(transmission, null,
+      pass: Pass.createQueryDefault(),
+      nesting: Nesting.createInitial()
+    )
 
 
   @createNext = (prevMessage, sourceChannelNode) ->
     new this(prevMessage.transmission, sourceChannelNode, {
       pass: prevMessage.pass
-      nesting: prevMessage.nesting + 1
+      nesting: prevMessage.nesting.increase()
     })
 
 

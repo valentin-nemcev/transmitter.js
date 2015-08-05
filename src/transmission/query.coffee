@@ -5,6 +5,7 @@
 
 FastSet = require 'collections/fast-set'
 Pass = require './pass'
+Nesting = require './nesting'
 Precedence = require './precedence'
 
 
@@ -36,20 +37,22 @@ module.exports = class Query
 
   @createInitial = (transmission) ->
     new this(transmission,
-      pass: Pass.createQueryDefault(), nesting: 0)
+      pass: Pass.createQueryDefault(),
+      nesting: Nesting.createInitial()
+    )
 
 
   @createNext = (prevQuery) ->
     new this(prevQuery.transmission, {
       pass: prevQuery.pass
-      nesting:    prevQuery.nesting
+      nesting: prevQuery.nesting
     })
 
 
   @createNextConnection = (prevMessageOrQuery) ->
     new this(prevMessageOrQuery.transmission, {
       pass: prevMessageOrQuery.pass
-      nesting:    prevMessageOrQuery.nesting - 1
+      nesting: prevMessageOrQuery.nesting.decrease()
     })
 
 

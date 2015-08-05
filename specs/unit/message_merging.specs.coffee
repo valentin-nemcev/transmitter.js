@@ -5,6 +5,7 @@ SimpleChannel = require 'transmitter/channels/simple_channel'
 Transmission = require 'transmitter/transmission/transmission'
 Message = require 'transmitter/transmission/message'
 Pass = require 'transmitter/transmission/pass'
+Nesting = require 'transmitter/transmission/nesting'
 
 Transmitter = require 'transmitter'
 
@@ -31,6 +32,7 @@ describe 'Message merging', ->
 
     @transmission = new Transmission()
     @pass = Pass.createMessageDefault()
+    @nesting = Nesting.createInitial()
 
     @passivePayload = new StubPayload()
     @activeSource = new NodeStub()
@@ -50,7 +52,7 @@ describe 'Message merging', ->
 
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
-    @message1 = new Message(@transmission, @activePayload, {@pass, nesting: 0})
+    @message1 = new Message(@transmission, @activePayload, {@pass, @nesting})
 
     @message1.sendFromNodeToNodeSource(@activeSource,
       @activeSource.getNodeSource())

@@ -6,6 +6,7 @@
 Map = require 'collections/map'
 
 Pass = require './pass'
+Nesting = require './nesting'
 Precedence = require './precedence'
 SelectedMessage = require './selected_message'
 MergedMessage = require './merged_message'
@@ -29,27 +30,29 @@ module.exports = class Message
 
   @createInitial = (transmission, payload) ->
     new this(transmission, payload,
-      pass: Pass.createMessageDefault(), nesting: 0)
+      pass: Pass.createMessageDefault(),
+      nesting: Nesting.createInitial()
+    )
 
 
   @createNext = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
       pass: prevMessage.pass
-      nesting:    prevMessage.nesting
+      nesting: prevMessage.nesting
     })
 
 
   @createQueryResponse = (queuedQuery, payload) ->
     new this(queuedQuery.transmission, payload, {
       pass: queuedQuery.pass
-      nesting:    queuedQuery.nesting
+      nesting: queuedQuery.nesting
     })
 
 
   @createTransformed = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
-      pass:     prevMessage.pass
-      nesting:        prevMessage.nesting
+      pass: prevMessage.pass
+      nesting: prevMessage.nesting
     })
 
 

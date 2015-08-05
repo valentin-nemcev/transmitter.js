@@ -3,6 +3,8 @@
 
 Map = require 'collections/map'
 
+Nesting = require './nesting'
+
 
 module.exports = class MergedMessage
 
@@ -44,6 +46,6 @@ module.exports = class MergedMessage
     payloads = new Map(
       sourceNodes.map (node) => [node, @nodesToMessages.get(node)?.payload]
     )
-    nesting = Math.max(@nodesToMessages.map((message) -> message.nesting)...)
+    nesting = Nesting.merge @nodesToMessages.map((message) -> message.nesting)
     @transmission.log this
     @transmission.Message.createMerged(this, payloads, {nesting})

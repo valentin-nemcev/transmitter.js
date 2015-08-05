@@ -5,6 +5,7 @@ TargetNode = require 'transmitter/nodes/target_node'
 SimpleChannel = require 'transmitter/channels/simple_channel'
 
 Pass = require 'transmitter/transmission/pass'
+Nesting = require 'transmitter/transmission/nesting'
 Message = require 'transmitter/transmission/message'
 Query = require 'transmitter/transmission/query'
 Transmission = require 'transmitter/transmission/transmission'
@@ -35,6 +36,7 @@ describe 'Message and query transmission', ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
     @pass = Pass.createMessageDefault()
+    @nesting = Nesting.createInitial()
     @direction = @pass.direction
 
     Transmitter.startTransmission (tr) =>
@@ -50,7 +52,7 @@ describe 'Message and query transmission', ->
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload, {@pass, nesting: 0})
+    @message = new Message(@transmission, @payload, {@pass, @nesting})
 
     @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
 
@@ -62,7 +64,7 @@ describe 'Message and query transmission', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
-    @query = new Query(@transmission, {@pass, nesting: 0})
+    @query = new Query(@transmission, {@pass, @nesting})
 
     @query.sendFromNodeToNodeTarget(@target, @target.getNodeTarget())
     @transmission.respond()
