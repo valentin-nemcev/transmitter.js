@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 Map = require 'collections/map'
 
 Pass = require './pass'
@@ -14,7 +16,8 @@ module.exports = class Message
   inspect: ->
     [
       'M'
-      @pass.inspect()
+      inspect @nesting
+      inspect @pass
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
 
@@ -60,6 +63,7 @@ module.exports = class Message
   constructor: (@transmission, @payload, opts = {}) ->
     {@pass, @nesting} = opts
     throw new Error "Missing payload" unless @payload?
+    throw new Error "Missing nesting" unless @nesting?
 
 
   createNextMessage: (payload) ->
@@ -103,6 +107,7 @@ module.exports = class Message
 
 
   _sendToNodePoint: (point) ->
+    @log point
     if @transmission.tryAddCommunicationFor(this, point)
       point.receiveMessage(this)
     return this
@@ -114,7 +119,6 @@ module.exports = class Message
 
 
   sendToNodeTarget: (nodeTarget) ->
-    @log nodeTarget
     @_sendToNodePoint(nodeTarget)
 
 
@@ -133,7 +137,6 @@ module.exports = class Message
 
 
   sendFromNodeToNodeSource: (@sourceNode, nodeSource) ->
-    @log nodeSource
     @transmission.enqueueCommunication(this)
     @transmission.addPayloadFor(@payload, @sourceNode)
     @_sendToNodePoint(nodeSource)
@@ -161,7 +164,7 @@ module.exports = class Message
 
   sendMergedTo: (source, target) ->
     MergedMessage
-      .getOrCreate(source, @transmission, @pass)
+      .getOrCreate(source, @transmission, @pass, @nesting)
       .receiveMessageFrom(this, @sourceNode)
 
     return this
@@ -169,7 +172,7 @@ module.exports = class Message
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
     SelectedMessage
-      .getOrCreate(nodeTarget, @transmission, @pass)
+      .getOrCreate(nodeTarget, @transmission, @pass, @nesting)
       .receiveMessageFrom(this, line)
 
     return this

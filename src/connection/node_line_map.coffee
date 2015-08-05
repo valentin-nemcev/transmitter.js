@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 MultiMap = require 'collections/multi-map'
 Set = require 'collections/set'
 
@@ -46,7 +48,7 @@ module.exports = class NodeLineMap
 
 
   sendCommunication: (comm) ->
-    @channelNodeToLines.forEach (lines, channelNode) ->
+    @channelNodeToLines.forEach (lines, channelNode) =>
       if lines.acceptsCommunication(comm) \
         and comm.tryQueryChannelNode(channelNode)
           lines.forEach (line) -> comm.sendToLine(line)

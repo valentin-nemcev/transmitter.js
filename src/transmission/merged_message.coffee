@@ -9,21 +9,22 @@ module.exports = class MergedMessage
   inspect: ->
     [
       'MM'
-      @pass.inspect()
-      @nodesToMessages.values().map( (m) -> m.inspect() ).join(', ')
+      inspect @nesting
+      inspect @pass
+      @nodesToMessages.values().map(inspect).join(', ')
     ].join(' ')
 
 
-  @getOrCreate = (source, transmission, pass) ->
+  @getOrCreate = (source, transmission, pass, nesting) ->
     merged = transmission.getCachedMessage(source)
     unless (merged? and pass.equals(merged.pass))
-      merged = new this(transmission, source, {pass})
+      merged = new this(transmission, source, {pass, nesting})
       transmission.setCachedMessage(source, merged)
     return merged
 
 
   constructor: (@transmission, @source, opts = {}) ->
-    {@pass} = opts
+    {@pass, @nesting} = opts
     @nodesToMessages = new Map()
 
 

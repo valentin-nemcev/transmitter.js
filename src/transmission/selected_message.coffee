@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 FastMap = require 'collections/fast-map'
 Precedence = require './precedence'
 
@@ -10,22 +12,24 @@ module.exports = class SelectedMessage
   inspect: ->
     [
       'SM'
-      'P:' + @pass.inspect()
+      inspect @nesting
+      inspect @pass
       @selectQuery?.inspect()
-      @linesToMessages.values().map( (m) -> m.inspect() ).join(', ')
+      @linesToMessages.values().map(inspect).join(', ')
     ].join(' ')
 
 
-  @getOrCreate = (nodeTarget, transmission, pass) ->
+  # TODO: refactor params
+  @getOrCreate = (nodeTarget, transmission, pass, nesting) ->
     selected = transmission.getCachedMessage(nodeTarget)
     unless (selected? and pass.equals(selected.pass))
-      selected = new this(transmission, nodeTarget, {pass})
+      selected = new this(transmission, nodeTarget, {pass, nesting})
       transmission.setCachedMessage(nodeTarget, selected)
     return selected
 
 
   constructor: (@transmission, @nodeTarget, opts = {}) ->
-    {@pass} = opts
+    {@pass, @nesting} = opts
     @linesToMessages = new FastMap()
 
 

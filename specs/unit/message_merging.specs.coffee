@@ -50,7 +50,7 @@ describe 'Message merging', ->
 
   specify 'when one active source have sent message', ->
     @activePayload = new StubPayload()
-    @message1 = new Message(@transmission, @activePayload, {@pass})
+    @message1 = new Message(@transmission, @activePayload, {@pass, nesting: 0})
 
     @message1.sendFromNodeToNodeSource(@activeSource,
       @activeSource.getNodeSource())

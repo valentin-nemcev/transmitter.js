@@ -50,7 +50,7 @@ describe 'Message and query transmission', ->
   it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload, {@pass})
+    @message = new Message(@transmission, @payload, {@pass, nesting: 0})
 
     @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
 
@@ -62,7 +62,7 @@ describe 'Message and query transmission', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
-    @query = new Query(@transmission, {@pass})
+    @query = new Query(@transmission, {@pass, nesting: 0})
 
     @query.sendFromNodeToNodeTarget(@target, @target.getNodeTarget())
     @transmission.respond()

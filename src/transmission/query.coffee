@@ -1,6 +1,8 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
 FastSet = require 'collections/fast-set'
 Pass = require './pass'
 Precedence = require './precedence'
@@ -16,7 +18,8 @@ module.exports = class Query
   inspect: ->
     [
       'Q',
-      @pass.inspect()
+      inspect @nesting
+      inspect @pass
       @wasDelivered() and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
 
@@ -78,6 +81,7 @@ module.exports = class Query
 
   constructor: (@transmission, opts = {}) ->
     {@pass, @nesting} = opts
+    throw new Error "Missing nesting" unless @nesting?
     @passedLines = new FastSet()
 
 
@@ -125,6 +129,7 @@ module.exports = class Query
 
 
   _sendToNodePoint: (point) ->
+    @log point
     if @transmission.tryAddCommunicationFor(this, point)
       point.receiveQuery(this)
     else
@@ -138,7 +143,6 @@ module.exports = class Query
 
 
   sendToNodeSource: (nodeSource) ->
-    @log nodeSource
     @_sendToNodePoint(nodeSource)
 
 
