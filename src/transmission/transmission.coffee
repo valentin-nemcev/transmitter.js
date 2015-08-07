@@ -49,7 +49,8 @@ module.exports = class Transmission
 
     @nodesToPayloads = new WeakMap()
     @cachedMessages = new WeakMap()
-    @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
+    # @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
+    @commQueue = new Array()
     @lastCommSeqNum = 0
 
 
@@ -75,20 +76,7 @@ module.exports = class Transmission
 
 
   channelNodeUpdated: (comm, channelNode) ->
-    not (@_commSucceedsExistingFor(comm, channelNode, 'message'))
-
-
-  tryAddCommunicationFor: (comm, point) ->
-    if @_commSucceedsExistingFor(comm, point)
-      @addCommunicationFor(comm, point)
-      true
-    else
-      false
-
-
-  _commSucceedsExistingFor: (succComm, point, type) ->
-    return false unless point?
-    not @getCommunicationFor(type ? succComm.type, succComm.pass, point)
+    channelNode is null or @getCommunicationFor('message', comm.pass, channelNode)
 
 
   addCommunicationFor: (comm, point) ->
@@ -100,6 +88,7 @@ module.exports = class Transmission
 
 
   getCommunicationFor: (type, pass, point) ->
+    return null if pass is null
     (@_getCommsByType(type).get(point) ? [])[pass.priority]
 
 
@@ -135,14 +124,22 @@ module.exports = class Transmission
     return this
 
 
-  compareComms: ([commASeqNum, commA], [commBSeqNum, commB]) ->
+  compareComms: ([commASeqNum, commA], [commBSeqNum, commB]) =>
     r = if @reverseOrder then 1 else -1
     commA.getQueuePrecedence().compare(commB.getQueuePrecedence()) \
       or r * (commASeqNum - commBSeqNum)
 
 
+  logQueue: ->
+    @log @commQueue.map(([commSeqNum, comm]) ->
+      [comm, commSeqNum, comm.sourceNode]
+    ).toArray()...
+
+
   respond: ->
     while @commQueue.length
+      @commQueue.sort(@compareComms)
+      @logQueue()
       [commSeqNum, comm] = @commQueue.shift()
       comm.respond()
     return this

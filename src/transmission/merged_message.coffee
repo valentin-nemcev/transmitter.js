@@ -1,5 +1,6 @@
 'use strict'
 
+{inspect} = require 'util'
 
 Map = require 'collections/map'
 
@@ -43,9 +44,9 @@ module.exports = class MergedMessage
 
 
   _mergeMessages: (sourceNodes) ->
-    payloads = new Map(
-      sourceNodes.map (node) => [node, @nodesToMessages.get(node)?.payload]
-    )
-    nesting = Nesting.merge @nodesToMessages.map((message) -> message.nesting)
     @transmission.log this
+    payloads = new Map \
+      sourceNodes.map((node) => [node, @nodesToMessages.get(node)?.payload])
+    nesting = Nesting.merge \
+      @nodesToMessages.map((message) -> message.nesting)
     @transmission.Message.createMerged(this, payloads, {nesting})

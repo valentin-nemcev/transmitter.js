@@ -34,8 +34,11 @@ module.exports = class Pass
     this.priority - other.priority
 
 
-  getForResponse: ->
+  getNext: ->
     if @priority == 1
       null
     else
       @constructor.getForward()
+
+
+  getForResponse: -> @getNext()

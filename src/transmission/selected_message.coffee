@@ -5,6 +5,7 @@
 
 FastMap = require 'collections/fast-map'
 Precedence = require './precedence'
+Nesting = require './nesting'
 
 
 module.exports = class SelectedMessage
@@ -15,6 +16,7 @@ module.exports = class SelectedMessage
       inspect @nesting
       inspect @pass
       @selectQuery?.inspect()
+      ','
       @linesToMessages.values().map(inspect).join(', ')
     ].join(' ')
 
@@ -66,7 +68,8 @@ module.exports = class SelectedMessage
     @transmission.log @nodeTarget, @selectQuery, @selectQuery.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @selectQuery.getPassedLines().length
-      @_selectForNodeTarget().sendToNodeTarget(@nodeTarget)
+      @_trySendSelected()
+    return this
 
 
   _channelNodesUpdated: ->
@@ -75,9 +78,15 @@ module.exports = class SelectedMessage
     return true
 
 
-  _selectForNodeTarget: ->
+  _trySendSelected: ->
+    return this if @selectedMessage?
     # TODO: refactor
-    messages = @linesToMessages.values().sorted (a, b) ->
+    messages = @linesToMessages.values()
+    Nesting.equalize messages.map((m) -> m.nesting)
+    sorted = messages.sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
-    @transmission.log @nodeTarget, messages...
-    return messages[0]
+    @transmission.log this, @nodeTarget
+    # @selectedMessage should be set before it is sent to prevent loops
+    @selectedMessage = sorted[0]
+    @selectedMessage.sendToNodeTarget(@nodeTarget)
+    return this

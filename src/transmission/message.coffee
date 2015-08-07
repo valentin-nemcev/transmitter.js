@@ -23,8 +23,10 @@ module.exports = class Message
     ].filter( (s) -> s.length).join(' ')
 
 
-  log: (arg) ->
-    @transmission.log this, arg
+  log: ->
+    args = [this]
+    args.push arg for arg in arguments
+    @transmission.log args...
     return this
 
 
@@ -90,6 +92,12 @@ module.exports = class Message
   communicationTypePriority: 1
 
 
+  join: (comm) ->
+    if this.pass.equals(comm.pass)
+      Nesting.equalize [this.nesting, comm.nesting]
+    return this
+
+
   getUpdatePrecedence: ->
     @updatePrecedence ?=
       Precedence.createUpdate(@pass)
@@ -111,12 +119,18 @@ module.exports = class Message
 
   _sendToNodePoint: (point) ->
     @log point
-    if @transmission.tryAddCommunicationFor(this, point)
+    existing = @transmission.getCommunicationFor('message', @pass, point)
+    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), point)
+    if existing?
+      throw new Error("Can't send message to same point twice #{point.inspect()}")
+    else
+      @transmission.addCommunicationFor(this, point)
       point.receiveMessage(this)
     return this
 
 
-  resendFromNodePoint: (point, channelNode) ->
+  resendFromNodePoint: (point, channelNode, connectionMessage) ->
+    @nesting = connectionMessage.nesting
     point.resendMessage(this, channelNode)
     return this
 
@@ -127,9 +141,13 @@ module.exports = class Message
 
   sendToChannelNode: (node) ->
     @log node
-    @transmission.tryAddCommunicationFor(this, node) \
-      or throw new Error("Can't send message to same channel node twice")
-    node.routeMessage(this, @payload)
+    existing = @transmission.getCommunicationFor('message', @pass, node)
+    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), node)
+    if existing?
+      throw new Error("Can't send message to same channel node twice")
+    else
+      @transmission.addCommunicationFor(this, node)
+      node.routeMessage(this, @payload)
     return this
 
 
@@ -151,6 +169,7 @@ module.exports = class Message
 
 
   respond: ->
+    @log 'respond', @sourceNode
     @sourceNode.respondToMessage(this)
     return this
 

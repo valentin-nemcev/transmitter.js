@@ -25,8 +25,10 @@ module.exports = class Query
     ].filter( (s) -> s.length).join(' ')
 
 
-  log: (arg) ->
-    @transmission.log this, arg
+  log: ->
+    args = [this]
+    args.push arg for arg in arguments
+    @transmission.log args...
     return this
 
 
@@ -105,6 +107,12 @@ module.exports = class Query
   communicationTypePriority: 0
 
 
+  join: (comm) ->
+    if this.pass.equals(comm.pass)
+      Nesting.equalize [this.nesting, comm.nesting]
+    return this
+
+
   getUpdatePrecedence: ->
     @updatePrecedence ?=
       Precedence.createUpdate(@pass)
@@ -119,6 +127,7 @@ module.exports = class Query
 
 
   sendToLine: (line) ->
+    @log line
     line.receiveQuery(this)
     return this
 
@@ -133,14 +142,20 @@ module.exports = class Query
 
   _sendToNodePoint: (point) ->
     @log point
-    if @transmission.tryAddCommunicationFor(this, point)
-      point.receiveQuery(this)
-    else
+    existing = @transmission.getCommunicationFor('query', @pass, point)
+    existing ?= @transmission.getCommunicationFor('message', @pass, point)
+    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), point)
+    if existing?
+      existing.join(this)
       @delivered = yes
+    else
+      @transmission.addCommunicationFor(this, point)
+      point.receiveQuery(this)
     return this
 
 
-  resendFromNodePoint: (point, channelNode) ->
+  resendFromNodePoint: (point, channelNode, connectionMessage) ->
+    @nesting = connectionMessage.nesting
     point.resendQuery(this, channelNode)
     return this
 
@@ -166,7 +181,7 @@ module.exports = class Query
     @_sendToNodePoint(nodeTarget)
 
 
-  enqueueForSourceNode: (@node) ->
+  enqueueForSourceNode: (@sourceNode) ->
     @transmission.enqueueCommunication(this)
     return this
 
@@ -178,5 +193,7 @@ module.exports = class Query
 
   respond: ->
     unless @wasDelivered()
-      @node.respondToQuery(this, @transmission.getPayloadFor(@node))
+      @log 'respond', @sourceNode
+      @sourceNode.respondToQuery(this,
+        @transmission.getPayloadFor(@sourceNode))
     return this

@@ -65,7 +65,7 @@ module.exports = class ConnectionMessage
       @log targetPoint
       comm = @transmission.getCommunicationFor(
         targetPoint.communicationType, @pass, targetPoint)
-      comm?.resendFromNodePoint(targetPoint, @sourceChannelNode)
+      comm?.resendFromNodePoint(targetPoint, @sourceChannelNode, this)
 
       if (cachedForMerge = @transmission.getCachedMessage(targetPoint))?
         cachedForMerge.resend()
