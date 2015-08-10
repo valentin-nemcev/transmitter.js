@@ -139,7 +139,6 @@ module.exports = class Transmission
   respond: ->
     while @commQueue.length
       @commQueue.sort(@compareComms)
-      @logQueue()
       [commSeqNum, comm] = @commQueue.shift()
       comm.respond()
     return this

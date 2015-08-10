@@ -2,25 +2,29 @@
 
 
 NodeSource = require '../connection/node_source'
+BlindNodeTarget = require '../connection/blind_node_target'
 VariablePayload = require '../payloads/variable'
 noop = require '../payloads/noop'
 
 
 module.exports = class SourceNode
 
-  NodeSource.extend this
-
   inspect: -> '[' + @constructor.name + ']'
 
 
+  getNodeSource: -> @nodeSource ?= new NodeSource(this)
+  getNodeTarget: -> @nodeTarget ?= new BlindNodeTarget(this)
+
+
   routeQuery: (tr) ->
-    tr.createNextQuery().enqueueForSourceNode(this)
+    tr.createNextQuery()
+      .sendFromNodeToNodeTarget(this, @getNodeTarget())
     return this
 
 
   respondToMessage: (tr) ->
     tr.createQueryForResponseMessage()
-      .enqueueForSourceNode(this)
+      .sendFromNodeToNodeTarget(this, @getNodeTarget())
     return this
 
 

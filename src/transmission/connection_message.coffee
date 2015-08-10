@@ -70,6 +70,7 @@ module.exports = class ConnectionMessage
       if (cachedForMerge = @transmission.getCachedMessage(targetPoint))?
         cachedForMerge.resend()
 
+      # TODO: Refactor
       if targetPoint.communicationType is 'query'
         @transmission.Query.createNext(this)
           .sendFromNodeToNodeTarget(targetPoint.node, targetPoint)

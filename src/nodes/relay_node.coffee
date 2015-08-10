@@ -7,9 +7,6 @@ noop = require '../payloads/noop'
 
 module.exports = class RelayNode
 
-  NodeSource.extend this
-  NodeTarget.extend this
-
   inspect: -> '[' + @constructor.name + ']'
 
 
@@ -18,6 +15,10 @@ module.exports = class RelayNode
     tr.createNextMessage(@createResponsePayload(payload))
       .sendFromNodeToNodeSource(this, @getNodeSource())
     return this
+
+
+  getNodeSource: -> @nodeSource ?= new NodeSource(this)
+  getNodeTarget: -> @nodeTarget ?= new NodeTarget(this)
 
 
   routeQuery: (tr) ->

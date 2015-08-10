@@ -6,10 +6,6 @@ NodeLineMap = require './node_line_map'
 
 module.exports = class NodeSource
 
-  @extend = (nodeClass) ->
-    nodeClass::getNodeSource = -> @nodeSource ?= new NodeSource(this)
-
-
   inspect: -> @node.inspect() + '<'
 
 

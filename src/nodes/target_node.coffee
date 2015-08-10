@@ -8,9 +8,10 @@ noop = require '../payloads/noop'
 
 module.exports = class TargetNode
 
-  NodeTarget.extend this
-
   inspect: -> '[' + @constructor.name + ']'
+
+
+  getNodeTarget: -> @nodeTarget ?= new NodeTarget(this)
 
 
   routeMessage: (tr, payload) ->
