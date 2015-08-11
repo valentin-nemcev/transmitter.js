@@ -1,15 +1,12 @@
 'use strict'
 
 
-{inspect} = require 'util'
-
-Set = require 'collections/set'
+Map = require 'collections/map'
 
 
 module.exports = class Nesting
 
   inspect: -> @level
-    # "#{@level} -> [#{@nested.map(inspect).join(', ')}]"
 
   @createInitial = -> new Nesting(0)
 
@@ -17,31 +14,39 @@ module.exports = class Nesting
     new Nesting(Math.max((nestings.map (n) -> n.level)...))
 
 
-  getIndependent = (nestings) ->
-    independent = []
-    nestings.forEach (nesting) ->
-      unless nestings.some((n) -> n.contains(nesting))
-        independent.push nesting
-    return independent
+  @getIndependent = (nestings) ->
+    independent = new Map()
+    for nesting in nestings
+      independent.set(nesting.root, nesting)
+    return independent.values()
+
 
   @equalize = (nestings) ->
-    nestings = getIndependent(nestings)
+    nestings = @getIndependent(nestings)
     maxLevel = Math.max (level for {level} in nestings)...
     nesting.shiftTo(maxLevel) for nesting in nestings
+    for i in [1...nestings.length]
+      nestings[0].merge(nestings[i])
     return null
 
 
   constructor: (@level) ->
-    @nested = new Set()
+    @root = this
+    @connected = [this]
 
 
-  addNested: (other) ->
-    @nested.add other
+  _getConnected: -> @root.connected
+
+
+  merge: (other) ->
+    @add(nesting) for nesting in other._getConnected()
     return this
 
 
-  contains: (other) ->
-    @nested.has(other)
+  add: (other) ->
+    other.root = this.root
+    @_getConnected().push(other)
+    return this
 
 
   compare: (other) ->
@@ -49,20 +54,28 @@ module.exports = class Nesting
 
 
   shiftTo: (level) ->
-    @shiftBy(level - @level)
+    @_shiftBy(level - @level)
 
 
-  shiftBy: (levelDiff) ->
-    @level += levelDiff
-    @nested.forEach (nesting) -> nesting.shiftBy(levelDiff)
+  _shiftBy: (levelDiff) ->
+    @_getConnected().forEach (nesting) ->
+      nesting.level += levelDiff
     return this
 
 
-  increase: ->
-    nested = new @constructor(@level + 1)
-    @addNested(nested)
-    return nested
+  findByLevel = (nestings, level) ->
+    return nested for nested in nestings when nestings.level == level
+    return null
 
 
-  decrease: ->
-    new @constructor(@level - 1).addNested(this)
+  _change: (levelDiff) ->
+    nesting = findByLevel(@_getConnected(), @level + levelDiff)
+    unless nesting?
+      nesting = new @constructor(@level + levelDiff)
+      @add(nesting)
+    return nesting
+
+
+  increase: -> @_change(+1)
+
+  decrease: -> @_change(-1)

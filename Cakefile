@@ -3,7 +3,7 @@ require 'shelljs/global'
 bin = './node_modules/.bin'
 
 mochaCmd = (args...) ->
-  "#{bin}/mocha --bail --no-debug
+  "#{bin}/mocha --no-bail --no-debug
     --colors --opts specs/mocha.opts #{args.join(' ')}"
 
 unitSpecs = 'specs/unit.specs.coffee'
