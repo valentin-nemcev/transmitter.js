@@ -119,10 +119,12 @@ module.exports = class Message
 
   _sendToNodePoint: (point) ->
     @log point
+    existingQuery = @transmission.getCommunicationFor('query', @pass, point)
+    existingQuery?.join(this)
     existing = @transmission.getCommunicationFor('message', @pass, point)
     existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), point)
     if existing?
-      throw new Error("Can't send message to same point twice #{point.inspect()}")
+      existing.join(this)
     else
       @transmission.addCommunicationFor(this, point)
       point.receiveMessage(this)
@@ -141,10 +143,12 @@ module.exports = class Message
 
   sendToChannelNode: (node) ->
     @log node
+    existingQuery = @transmission.getCommunicationFor('query', @pass, node)
+    existingQuery?.join(this)
     existing = @transmission.getCommunicationFor('message', @pass, node)
     existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), node)
     if existing?
-      throw new Error("Can't send message to same channel node twice")
+      existing.join(this)
     else
       @transmission.addCommunicationFor(this, node)
       node.routeMessage(this, @payload)

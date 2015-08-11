@@ -31,6 +31,8 @@ describe 'Flattening connection', ->
               null
         .init(tr)
 
+    # Separate transmissions to test channel init querying
+    Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.SimpleChannel()
         .fromSource @nestedVar
         .toConnectionTarget @nestedChannelVar
@@ -51,9 +53,6 @@ describe 'Flattening connection', ->
                     {name: null, value: null}
                   )
         .init(tr)
-
-      # TODO
-      @nestedVar.init(tr, null)
 
 
   specify 'has default const value after initialization', ->

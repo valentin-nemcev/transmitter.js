@@ -27,10 +27,15 @@ module.exports = class ChannelNode
 
 
   connect: (message) ->
+    message.addTargetPoint(this)
     return this
 
 
+  communicationType: 'query'
+
+
   receiveQuery: (query) ->
+    query.addPassedLine(this)
     @source.receiveQuery(query)
     return this
 
