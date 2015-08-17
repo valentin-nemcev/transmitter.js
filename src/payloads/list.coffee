@@ -17,6 +17,9 @@ class SetConstPayload
   map: (map) ->
     new SetPayload(this, {map})
 
+  filter: (filter) ->
+    new SetPayload(this, {filter})
+
   updateMatching: (map, match) ->
     new UpdateMatchingPayload(this, {map, match})
 
@@ -51,6 +54,9 @@ class SetLazyPayload
 
   map: (map) ->
     new SetPayload(this, {map})
+
+  filter: (filter) ->
+    new SetPayload(this, {filter})
 
   updateMatching: (map, match) ->
     new UpdateMatchingPayload(this, {map, match})
@@ -164,9 +170,11 @@ class SetPayload
 
 
   id = (a) -> a
+  getTrue = -> true
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
+    @filterFn = opts.filter ? getTrue
 
 
   inspect: -> "#{@getPriority()}:list(#{inspect @get()})"
@@ -178,19 +186,24 @@ class SetPayload
 
 
   get: ->
-    @mapFn.call(null, el) for el in @source.get()
+    @result ?= for el in @source.get() when @filterFn.call(null, el)
+        @mapFn.call(null, el)
 
 
   getAt: (pos) ->
-    @mapFn.call(null, @source.getAt(pos))
+    @get()[pos]
 
 
   getSize: ->
-    @source.getSize()
+    @get().length
 
 
   map: (map) ->
     new SetPayload(this, {map})
+
+
+  filter: (filter) ->
+    new SetPayload(this, {filter})
 
 
   updateMatching: (map, match) ->

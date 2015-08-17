@@ -9,6 +9,8 @@ directions = require '../directions'
 NodeConnectionLine = require '../connection/node_connection_line'
 ConnectionNodeLine = require '../connection/connection_node_line'
 MergingConnectionTarget = require '../connection/merging_connection_target'
+SeparatingConnectionSource =
+  require '../connection/separating_connection_source'
 Connection = require '../connection/connection'
 
 
@@ -55,6 +57,12 @@ module.exports = class SimpleChannel
     return this
 
 
+  toTargets: (targets) ->
+    @targets.push targets...
+    @forceSeparating = yes
+    return this
+
+
   toConnectionTarget: (@connectionTarget) ->
     return this
 
@@ -81,11 +89,23 @@ module.exports = class SimpleChannel
 
 
   getTarget: ->
-    @target ?= @connectionTarget ? @createSingleTarget(@targets[0])
+    @target ?= if @connectionTarget?
+      @connectionTarget
+    else if @forceSeparating or @targets.length > 1
+      @createSeparatingTarget(@targets)
+    else
+      @createSingleTarget(@targets[0])
 
 
   createSingleTarget: (target) ->
     new ConnectionNodeLine(target?.getNodeTarget(), @getDirection())
+
+
+  createSeparatingTarget: (targets) ->
+    parts = for target in targets
+      line = new ConnectionNodeLine(target.getNodeTarget(), @getDirection())
+      [target, line]
+    new SeparatingConnectionSource(new Map(parts))
 
 
   getTransform: -> @transform ? returnArg

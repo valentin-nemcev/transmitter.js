@@ -1,14 +1,17 @@
 'use strict'
 
 
+{inspect} = require 'util'
+
+
 module.exports = class MergingConnectionTarget
+
+  inspect: ->
+    '[' + @sources.keys().map(inspect).join(', ') + ']:'
+
 
   constructor: (@sources) ->
     @sources.forEach (source, node) => source.setTarget(this)
-
-
-  inspect: ->
-    '[' + @sources.keys().map( (s) -> s.inspect()).join(', ') + ']:'
 
 
   getSourceNodes: -> @sources.keys()

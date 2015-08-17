@@ -181,10 +181,22 @@ module.exports = class Message
 
   sendTransformedTo: (transform, target) ->
     copy = if transform?
-      Message.createTransformed(this, transform(@payload, @transmission))
+      payload = if (targetPayload = target.getPayload())?
+        transform(@payload, targetPayload, @transmission)
+        targetPayload
+      else
+        transform(@payload, @transmission)
+      Message.createTransformed(this, payload)
     else
       this
     target.receiveMessage(copy)
+    return this
+
+
+  sendSeparatedTo: (targets) ->
+    targets.forEach (target, node) =>
+      msg = Message.createTransformed(this, @payload.get(node))
+      target.receiveMessage(msg)
     return this
 
 

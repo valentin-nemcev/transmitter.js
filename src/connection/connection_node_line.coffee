@@ -33,6 +33,9 @@ module.exports = class ConnectionNodeLine
     return this
 
 
+  getPayload: -> null
+
+
   receiveMessage: (message) ->
     message.sendToSelectingNodeTarget(this, @target) if @target?
     return this

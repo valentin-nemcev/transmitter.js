@@ -34,7 +34,7 @@ module.exports = class Transmission
 
   loggingFilter: -> true
 
-  log: (args...) ->
+  log: ->
     return this unless @loggingIsEnabled
     msg = (inspect arg for arg in arguments).join(', ')
     console.log msg if @loggingFilter(msg)

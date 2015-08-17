@@ -102,6 +102,6 @@ class SetPayload
 
 module.exports = {
   set: SetPayload.create
-  setLazy: (getValue) -> SetPayload.create(get: getValue)
+  setLazy: (getValue) -> SetPayload.create(get: getValue, getPriority: -> 1)
   setConst: SetConstPayload.create
 }

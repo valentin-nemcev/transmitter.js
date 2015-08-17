@@ -40,6 +40,9 @@ module.exports = class ChannelNode
     return this
 
 
+  getPayload: -> null
+
+
   receiveMessage: (message) ->
     message.sendToChannelNode(this)
     return this
