@@ -41,6 +41,27 @@ module.exports = class Transmission
     return this
 
 
+  logQueue: ->
+    return this unless @loggingIsEnabled
+    nextComm = @commQueue[0][1]
+    return this unless @loggingFilter(inspect nextComm.sourceNode)
+    message = []
+    filteredCounter = 0
+    for [commSeqNum, comm] in @commQueue
+      msg = [comm, comm.sourceNode]
+        .map(inspect).join(' for ').replace(/\s+/gi, ' ')
+      if @loggingFilter(msg)
+        filteredCounter = 0
+        message.push msg
+      else
+        if filteredCounter
+          message.pop()
+        filteredCounter++
+        message.push "(#{filteredCounter} skipped)"
+    console.log message.join('\n  ')
+    return this
+
+
   reverseOrder: no
 
   constructor: ->
@@ -130,15 +151,10 @@ module.exports = class Transmission
       or r * (commASeqNum - commBSeqNum)
 
 
-  logQueue: ->
-    @log @commQueue.map(([commSeqNum, comm]) ->
-      [comm, commSeqNum, comm.sourceNode]
-    ).toArray()...
-
-
   respond: ->
     while @commQueue.length
       @commQueue.sort(@compareComms)
+      @logQueue()
       [commSeqNum, comm] = @commQueue.shift()
       comm.respond()
     return this
