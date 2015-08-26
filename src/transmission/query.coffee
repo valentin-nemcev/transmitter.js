@@ -19,7 +19,7 @@ module.exports = class Query
   inspect: ->
     [
       'Q',
-      inspect @nesting
+      # inspect @nesting
       inspect @pass
       @wasDelivered() and 'D' or ''
     ].filter( (s) -> s.length).join(' ')

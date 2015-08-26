@@ -13,7 +13,7 @@ module.exports = class SelectedMessage
   inspect: ->
     [
       'SM'
-      inspect @nesting
+      # inspect @nesting
       inspect @pass
       @selectQuery?.inspect()
       ','

@@ -19,14 +19,14 @@ class UpdatePrecedence
 class QueuePrecedence
 
   inspect: ->
-    'QP[' + [@pass, @commTypePriority, @nesting].map(inspect).join(', ') + ']'
+    'QP[' + [@pass, @commTypePriority].map(inspect).join(', ') + ']'
 
   constructor: (@pass, @commTypePriority, @nesting) ->
 
   compare: (other) ->
     this.pass.compare(other.pass) \
-      or this.commTypePriority - other.commTypePriority \
-      or this.nesting.compare(other.nesting)
+      or this.commTypePriority - other.commTypePriority
+      # or this.nesting.compare(other.nesting)
 
 
 class SelectPrecedence

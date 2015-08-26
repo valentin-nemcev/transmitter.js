@@ -12,7 +12,7 @@ module.exports = class MergedMessage
   inspect: ->
     [
       'MM'
-      inspect @nesting
+      # inspect @nesting
       inspect @pass
       @nodesToMessages.values().map(inspect).join(', ')
     ].join(' ')

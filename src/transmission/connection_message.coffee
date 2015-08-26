@@ -14,7 +14,7 @@ module.exports = class ConnectionMessage
   inspect: ->
     [
       'CM'
-      inspect @nesting
+      # inspect @nesting
       inspect @pass
       inspect @sourceChannelNode
     ].join(' ')

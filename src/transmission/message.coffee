@@ -17,7 +17,7 @@ module.exports = class Message
   inspect: ->
     [
       'M'
-      inspect @nesting
+      # inspect @nesting
       inspect @pass
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
