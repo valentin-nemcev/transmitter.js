@@ -5,7 +5,6 @@
 
 FastMap = require 'collections/fast-map'
 Precedence = require './precedence'
-Nesting = require './nesting'
 
 
 module.exports = class SelectedMessage
@@ -13,7 +12,6 @@ module.exports = class SelectedMessage
   inspect: ->
     [
       'SM'
-      # inspect @nesting
       inspect @pass
       @selectQuery?.inspect()
       ','
@@ -22,16 +20,16 @@ module.exports = class SelectedMessage
 
 
   # TODO: refactor params
-  @getOrCreate = (nodeTarget, transmission, pass, nesting) ->
+  @getOrCreate = (nodeTarget, transmission, pass) ->
     selected = transmission.getCachedMessage(nodeTarget)
     unless (selected? and pass.equals(selected.pass))
-      selected = new this(transmission, nodeTarget, {pass, nesting})
+      selected = new this(transmission, nodeTarget, {pass})
       transmission.setCachedMessage(nodeTarget, selected)
     return selected
 
 
   constructor: (@transmission, @nodeTarget, opts = {}) ->
-    {@pass, @nesting} = opts
+    {@pass} = opts
     @linesToMessages = new FastMap()
 
 
@@ -82,7 +80,6 @@ module.exports = class SelectedMessage
     return this if @selectedMessage?
     # TODO: refactor
     messages = @linesToMessages.values()
-    Nesting.equalize messages.map((m) -> m.nesting)
     sorted = messages.sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
     @transmission.log this, @nodeTarget

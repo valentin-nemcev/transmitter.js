@@ -6,7 +6,6 @@
 Map = require 'collections/map'
 
 Pass = require './pass'
-Nesting = require './nesting'
 Precedence = require './precedence'
 SelectedMessage = require './selected_message'
 MergedMessage = require './merged_message'
@@ -17,7 +16,6 @@ module.exports = class Message
   inspect: ->
     [
       'M'
-      # inspect @nesting
       inspect @pass
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
@@ -33,42 +31,36 @@ module.exports = class Message
   @createInitial = (transmission, payload) ->
     new this(transmission, payload,
       pass: Pass.createMessageDefault(),
-      nesting: Nesting.createInitial()
     )
 
 
   @createNext = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
       pass: prevMessage.pass
-      nesting: prevMessage.nesting
     })
 
 
   @createQueryResponse = (queuedQuery, payload) ->
     new this(queuedQuery.transmission, payload, {
       pass: queuedQuery.pass
-      nesting: queuedQuery.nesting
     })
 
 
   @createTransformed = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
       pass: prevMessage.pass
-      nesting: prevMessage.nesting
     })
 
 
-  @createMerged = (merged, payloads, {nesting}) ->
+  @createMerged = (merged, payloads) ->
     new this(merged.transmission, payloads, {
       pass: merged.pass
-      nesting
     })
 
 
   constructor: (@transmission, @payload, opts = {}) ->
-    {@pass, @nesting} = opts
+    {@pass} = opts
     throw new Error "Missing payload" unless @payload?
-    throw new Error "Missing nesting" unless @nesting?
 
 
   createNextMessage: (payload) ->
@@ -93,8 +85,6 @@ module.exports = class Message
 
 
   join: (comm) ->
-    if this.pass.equals(comm.pass)
-      Nesting.equalize [this.nesting, comm.nesting]
     return this
 
 
@@ -136,7 +126,6 @@ module.exports = class Message
 
 
   resendFromNodePoint: (point, channelNode, connectionMessage) ->
-    @nesting = connectionMessage.nesting
     point.resendMessage(this, channelNode)
     return this
 
@@ -173,7 +162,7 @@ module.exports = class Message
 
   getQueuePrecedence: ->
     @queuePrecedence ?=
-      Precedence.createQueue(@pass, @communicationTypePriority, @nesting)
+      Precedence.createQueue(@pass, @communicationTypePriority)
 
 
   readyToRespond: -> yes
@@ -209,7 +198,7 @@ module.exports = class Message
 
   sendMergedTo: (source, target) ->
     MergedMessage
-      .getOrCreate(source, @transmission, @pass, @nesting)
+      .getOrCreate(source, @transmission, @pass)
       .receiveMessageFrom(this, @sourceNode)
 
     return this
@@ -217,7 +206,7 @@ module.exports = class Message
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
     SelectedMessage
-      .getOrCreate(nodeTarget, @transmission, @pass, @nesting)
+      .getOrCreate(nodeTarget, @transmission, @pass)
       .receiveMessageFrom(this, line)
 
     return this

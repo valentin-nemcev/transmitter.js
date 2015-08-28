@@ -5,7 +5,6 @@
 
 FastSet = require 'collections/fast-set'
 Pass = require './pass'
-Nesting = require './nesting'
 Precedence = require './precedence'
 
 
@@ -19,7 +18,6 @@ module.exports = class Query
   inspect: ->
     [
       'Q',
-      # inspect @nesting
       inspect @pass
       @wasDelivered() and 'D' or ''
     ].filter( (s) -> s.length).join(' ')
@@ -40,35 +38,30 @@ module.exports = class Query
   @createInitial = (transmission) ->
     new this(transmission,
       pass: Pass.createQueryDefault(),
-      nesting: Nesting.createInitial()
     )
 
 
   @createNext = (prevQuery) ->
     new this(prevQuery.transmission, {
       pass: prevQuery.pass
-      nesting: prevQuery.nesting
     })
 
 
   @createNextConnection = (prevMessageOrQuery) ->
     new this(prevMessageOrQuery.transmission, {
       pass: prevMessageOrQuery.pass
-      nesting: prevMessageOrQuery.nesting.decrease()
     })
 
 
   @createForMerge = (mergedMessage) ->
     new this(mergedMessage.transmission, {
       pass: mergedMessage.pass
-      nesting: mergedMessage.nesting
     })
 
 
   @createForSelect = (selectedMessage) ->
     new this(selectedMessage.transmission, {
       pass: selectedMessage.pass
-      nesting: selectedMessage.nesting
     })
 
 
@@ -77,7 +70,6 @@ module.exports = class Query
     if pass?
       new this(queuedMessage.transmission, {
         pass
-        nesting: queuedMessage.nesting
       })
     else
       @getNullQuery()
@@ -85,8 +77,7 @@ module.exports = class Query
 
 
   constructor: (@transmission, opts = {}) ->
-    {@pass, @nesting} = opts
-    throw new Error "Missing nesting" unless @nesting?
+    {@pass} = opts
     @passedLines = new FastSet()
     @queriedChannelNodes = new FastSet()
 
@@ -108,9 +99,8 @@ module.exports = class Query
   communicationTypePriority: 0
 
 
+  # TODO
   join: (comm) ->
-    if this.pass.equals(comm.pass)
-      Nesting.equalize [this.nesting, comm.nesting]
     return this
 
 
@@ -162,7 +152,6 @@ module.exports = class Query
 
 
   resendFromNodePoint: (point, channelNode, connectionMessage) ->
-    @nesting = connectionMessage.nesting
     point.resendQuery(this, channelNode)
     return this
 
@@ -207,7 +196,7 @@ module.exports = class Query
 
   getQueuePrecedence: ->
     @queuePrecedence ?=
-      Precedence.createQueue(@pass, @communicationTypePriority, @nesting)
+      Precedence.createQueue(@pass, @communicationTypePriority)
 
 
   _channelNodesUpdated: ->

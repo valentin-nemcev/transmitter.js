@@ -4,30 +4,27 @@
 
 Map = require 'collections/map'
 
-Nesting = require './nesting'
-
 
 module.exports = class MergedMessage
 
   inspect: ->
     [
       'MM'
-      # inspect @nesting
       inspect @pass
       @nodesToMessages.values().map(inspect).join(', ')
     ].join(' ')
 
 
-  @getOrCreate = (source, transmission, pass, nesting) ->
+  @getOrCreate = (source, transmission, pass) ->
     merged = transmission.getCachedMessage(source)
     unless (merged? and pass.equals(merged.pass))
-      merged = new this(transmission, source, {pass, nesting})
+      merged = new this(transmission, source, {pass})
       transmission.setCachedMessage(source, merged)
     return merged
 
 
   constructor: (@transmission, @source, opts = {}) ->
-    {@pass, @nesting} = opts
+    {@pass} = opts
     @nodesToMessages = new Map()
 
 
@@ -47,6 +44,4 @@ module.exports = class MergedMessage
     @transmission.log this
     payloads = new Map \
       sourceNodes.map((node) => [node, @nodesToMessages.get(node)?.payload])
-    nesting = Nesting.merge \
-      @nodesToMessages.map((message) -> message.nesting)
-    @transmission.Message.createMerged(this, payloads, {nesting})
+    @transmission.Message.createMerged(this, payloads)
