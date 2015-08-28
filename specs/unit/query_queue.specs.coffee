@@ -6,6 +6,7 @@ Transmission = require 'transmitter/transmission/transmission'
 
 class QueryStub
   constructor: (@priority) ->
+  readyToRespond: -> yes
   respond: -> this
   getQueuePrecedence: ->
     {

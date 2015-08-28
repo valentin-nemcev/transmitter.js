@@ -22,6 +22,10 @@ module.exports = class Connection
     return this
 
 
+  getPlaceholderPayload: ->
+    @transform.call(null)
+
+
   receiveMessage: (message) ->
     message.sendTransformedTo(@transform, @target)
     return this

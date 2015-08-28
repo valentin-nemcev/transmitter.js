@@ -45,6 +45,10 @@ module.exports = class ConnectionMessage
       new FastSet().addEach(@sourceChannelNode?.getTargetPoints())
 
 
+  createPlaceholderConnectionMessage: (sourceChannelNode) ->
+    ConnectionMessage.createNext(this, sourceChannelNode)
+
+
   getSourceChannelNode: -> @sourceChannelNode
 
 

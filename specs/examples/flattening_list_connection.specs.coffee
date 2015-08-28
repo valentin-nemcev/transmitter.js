@@ -61,6 +61,11 @@ describe 'Flattening list connection', ->
         .fromSource @nestedList
         .toConnectionTarget @nestedChannelVar
         .withTransform (nestedList) =>
+          unless nestedList?
+            return new Transmitter.Payloads.Variable.setLazy =>
+              return new Transmitter.Channels.PlaceholderChannel()
+                .toTarget @serializedVar
+                .inForwardDirection()
           Transmitter.Payloads.Variable.setLazy =>
             if nestedList.getSize()
               new NestedChannel(nestedList.get(), @serializedVar)

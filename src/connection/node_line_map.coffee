@@ -42,8 +42,9 @@ module.exports = class NodeLineMap
 
 
   resendCommunication: (comm, channelNode) ->
-    @channelNodeToLines.get(channelNode).forEach (line) ->
-      comm.sendToLine(line)
+    lines = @channelNodeToLines.get(channelNode)
+    lines.forEach (line) -> comm.sendToLine(line)
+    comm.addPassedChannelNode(channelNode)
     return this
 
 
@@ -52,4 +53,5 @@ module.exports = class NodeLineMap
       if lines.acceptsCommunication(comm) \
         and comm.tryQueryChannelNode(channelNode)
           lines.forEach (line) -> comm.sendToLine(line)
+          comm.addPassedChannelNode(channelNode)
     return this

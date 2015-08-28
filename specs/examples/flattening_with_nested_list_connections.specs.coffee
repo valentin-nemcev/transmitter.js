@@ -51,7 +51,7 @@ describe 'Flattening with nested list connections', ->
       .fromSource @derivedList
       .toConnectionTarget @flatteningChannelList
       .withTransform (viewList) =>
-        viewList.map (view) =>
+        viewList?.map (view) =>
           new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
             .fromSource view.removeEvt

@@ -23,6 +23,7 @@ module.exports = class ListChannel extends BidirectionalChannel
         .fromSource @derived
         .toConnectionTarget @nestedChannelList
         .withTransform (lists) =>
+          return null unless lists?
           origin = lists.get(@origin)
           derived = lists.get(@derived)
 

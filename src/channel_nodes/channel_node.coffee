@@ -28,6 +28,11 @@ module.exports = class ChannelNode
 
   connect: (message) ->
     message.addTargetPoint(this)
+
+    if (payload = @source.getPlaceholderPayload())?
+      @message = message.createPlaceholderConnectionMessage(this)
+      @acceptPayload(payload)
+      @message = null
     return this
 
 
@@ -40,6 +45,7 @@ module.exports = class ChannelNode
     return this
 
 
+  # TODO: Refactor
   getPayload: -> null
 
 

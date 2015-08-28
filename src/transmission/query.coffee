@@ -88,6 +88,7 @@ module.exports = class Query
     {@pass, @nesting} = opts
     throw new Error "Missing nesting" unless @nesting?
     @passedLines = new FastSet()
+    @queriedChannelNodes = new FastSet()
 
 
   createNextQuery: ->
@@ -118,12 +119,15 @@ module.exports = class Query
       Precedence.createUpdate(@pass)
 
 
-  wasDelivered: ->
-    @delivered or @passedLines.length > 0
-
-
   tryQueryChannelNode: (channelNode) ->
+    @queriedChannelNodes.add(channelNode)
     @transmission.tryQueryChannelNode(this, channelNode)
+
+
+  addPassedChannelNode: (channelNode) ->
+    @queriedChannelNodes.remove(channelNode)
+    @tryEnqueue()
+    return this
 
 
   sendToLine: (line) ->
@@ -140,7 +144,7 @@ module.exports = class Query
     return this
 
 
-  _sendToNodePoint: (point) ->
+  _sendToNodePoint: (point, node) ->
     @log point
     existing = @transmission.getCommunicationFor('query', @pass, point)
     existing ?= @transmission.getCommunicationFor('message', @pass, point)
@@ -151,6 +155,9 @@ module.exports = class Query
     else
       @transmission.addCommunicationFor(this, point)
       point.receiveQuery(this)
+      if node
+        @sentToNodeTarget = yes
+        @tryEnqueue()
     return this
 
 
@@ -176,9 +183,8 @@ module.exports = class Query
     return this
 
 
-  sendFromNodeToNodeTarget: (node, nodeTarget) ->
-    @enqueueForSourceNode(node)
-    @_sendToNodePoint(nodeTarget)
+  sendFromNodeToNodeTarget: (@sourceNode, @nodeTarget) ->
+    @_sendToNodePoint(@nodeTarget, @sourceNode)
 
 
   enqueueForSourceNode: (@sourceNode) ->
@@ -186,9 +192,31 @@ module.exports = class Query
     return this
 
 
+  tryEnqueue: ->
+    if @sentToNodeTarget \
+      and @queriedChannelNodes.length is 0 \
+      and @passedLines.length is 0
+        @log 'enqueue', @sourceNode
+        @transmission.enqueueCommunication(this)
+    return this
+
+
+  wasDelivered: ->
+    @delivered or @passedLines.length > 0
+
+
   getQueuePrecedence: ->
     @queuePrecedence ?=
       Precedence.createQueue(@pass, @communicationTypePriority, @nesting)
+
+
+  _channelNodesUpdated: ->
+
+
+  readyToRespond: ->
+    for node in @nodeTarget?.getChannelNodesFor(this) ? []
+      return false unless @transmission.channelNodeUpdated(this, node)
+    return true
 
 
   respond: ->

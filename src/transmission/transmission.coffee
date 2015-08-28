@@ -155,6 +155,10 @@ module.exports = class Transmission
     while @commQueue.length
       @commQueue.sort(@compareComms)
       @logQueue()
-      [commSeqNum, comm] = @commQueue.shift()
-      comm.respond()
+      for i in [0...@commQueue.length]
+        [commSeqNum, comm] = @commQueue[i]
+        if comm.readyToRespond()
+          @commQueue.splice(i, 1)
+          comm.respond()
+          break
     return this

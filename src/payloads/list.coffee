@@ -187,7 +187,7 @@ class SetPayload
 
   get: ->
     @result ?= for el in @source.get() when @filterFn.call(null, el)
-        @mapFn.call(null, el)
+      @mapFn.call(null, el)
 
 
   getAt: (pos) ->

@@ -111,6 +111,10 @@ module.exports = class Message
     @transmission.tryQueryChannelNode(this, channelNode)
 
 
+  addPassedChannelNode: (channelNode) ->
+    return this
+
+
   sendToLine: (line) ->
     @log line
     line.receiveMessage(this)
@@ -170,6 +174,9 @@ module.exports = class Message
   getQueuePrecedence: ->
     @queuePrecedence ?=
       Precedence.createQueue(@pass, @communicationTypePriority, @nesting)
+
+
+  readyToRespond: -> yes
 
 
   respond: ->
