@@ -48,7 +48,10 @@ class SetLazyPayload
 
   constructor: (@getValue) ->
 
-  getPriority: -> 1
+  setPriority: (@priority) -> this
+
+  getPriority: -> @priority ? @source.getPriority()
+
 
   inspect: -> "#{@getPriority()}:setLazy(#{inspect @getValue()})"
 
@@ -228,7 +231,7 @@ class SetPayload
 
 module.exports = {
   set: SetPayload.create
-  setLazy: (getValue) -> SetLazyPayload.create(getValue)
+  setLazy: (getValue) -> SetLazyPayload.create(getValue).setPriority(1)
   setConst: SetConstPayload.create
   append: (elementSource) ->
     AddAtPayload.create(elementSource.map (el) -> [el, null])

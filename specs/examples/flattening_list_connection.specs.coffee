@@ -50,9 +50,10 @@ describe 'Flattening list connection', ->
         .fromSource @serializedVar
         .toTarget @nestedList
         .withTransform (payload) ->
-          Transmitter.Payloads.List.setLazy ->
+          Transmitter.Payloads.List.setLazy(->
             payload.get().map (serialized) ->
               return new NestedObject(serialized.name)
+          ).setPriority(payload.getPriority())
         .init(tr)
 
     # Separate transmissions to test channel init querying
@@ -107,6 +108,7 @@ describe 'Flattening list connection', ->
     Transmitter.startTransmission (tr) =>
       nestedObjectA.valueVar.init(tr, 'value1')
       nestedObjectB.valueVar.init(tr, 'value2')
+      console.log '@nestedList.init(tr, [nestedObjectA, nestedObjectB])'
       @nestedList.init(tr, [nestedObjectA, nestedObjectB])
 
     expect(@serializedVar.get())

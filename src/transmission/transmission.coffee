@@ -154,7 +154,7 @@ module.exports = class Transmission
   respond: ->
     while @commQueue.length
       @commQueue.sort(@compareComms)
-      @logQueue()
+      # @logQueue()
       for i in [0...@commQueue.length]
         [commSeqNum, comm] = @commQueue[i]
         if comm.readyToRespond()

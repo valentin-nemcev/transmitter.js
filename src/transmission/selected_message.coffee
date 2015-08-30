@@ -43,6 +43,13 @@ module.exports = class SelectedMessage
     return this
 
 
+  receiveInitialMessage: (message) ->
+    throw new Error "Can send only one initial message" if @initialMessage?
+    @initialMessage = message
+    @trySendToNodeTarget()
+    return this
+
+
   _tryQueryForSelect: ->
     @selectQuery ?=
       @transmission.getCommunicationFor('query', @pass, @nodeTarget)
@@ -53,7 +60,7 @@ module.exports = class SelectedMessage
     return this
 
 
-  resend: -> @trySendToNodeTarget()
+  resendFromNodePoint: -> @trySendToNodeTarget()
 
 
   trySendToNodeTarget: ->
@@ -62,7 +69,7 @@ module.exports = class SelectedMessage
     unless @_channelNodesUpdated()
       return this
 
-    @transmission.log @nodeTarget, @linesToMessages.entries()...
+    @transmission.log @nodeTarget, @linesToMessages.entries()..., @initialMessage
     @transmission.log @nodeTarget, @selectQuery, @selectQuery.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @selectQuery.getPassedLines().length
@@ -80,10 +87,11 @@ module.exports = class SelectedMessage
     return this if @selectedMessage?
     # TODO: refactor
     messages = @linesToMessages.values()
+    messages.push @initialMessage if @initialMessage?
     sorted = messages.sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
     @transmission.log this, @nodeTarget
     # @selectedMessage should be set before it is sent to prevent loops
     @selectedMessage = sorted[0]
-    @selectedMessage.sendToNodeTarget(@nodeTarget)
+    @nodeTarget.receiveMessage(@selectedMessage)
     return this

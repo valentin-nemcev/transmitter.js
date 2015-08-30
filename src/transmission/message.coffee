@@ -131,7 +131,17 @@ module.exports = class Message
 
 
   sendToNodeTarget: (nodeTarget) ->
-    @_sendToNodePoint(nodeTarget)
+    SelectedMessage
+      .getOrCreate(this, nodeTarget)
+      .receiveInitialMessage(this)
+    return this
+
+
+  sendToSelectingNodeTarget: (line, nodeTarget) ->
+    SelectedMessage
+      .getOrCreate(this, nodeTarget)
+      .receiveMessageFrom(this, line)
+    return this
 
 
   sendToChannelNode: (node) ->
@@ -200,13 +210,5 @@ module.exports = class Message
     MergedMessage
       .getOrCreate(this, source)
       .receiveMessageFrom(this, @sourceNode)
-
-    return this
-
-
-  sendToSelectingNodeTarget: (line, nodeTarget) ->
-    SelectedMessage
-      .getOrCreate(this, nodeTarget)
-      .receiveMessageFrom(this, line)
 
     return this
