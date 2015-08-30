@@ -19,8 +19,8 @@ module.exports = class SelectedMessage
     ].join(' ')
 
 
-  # TODO: refactor params
-  @getOrCreate = (nodeTarget, transmission, pass) ->
+  @getOrCreate = (message, nodeTarget) ->
+    {transmission, pass} = message
     selected = transmission.getCachedMessage(nodeTarget)
     unless (selected? and pass.equals(selected.pass))
       selected = new this(transmission, nodeTarget, {pass})

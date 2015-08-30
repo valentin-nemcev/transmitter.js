@@ -198,7 +198,7 @@ module.exports = class Message
 
   sendMergedTo: (source, target) ->
     MergedMessage
-      .getOrCreate(source, @transmission, @pass)
+      .getOrCreate(this, source)
       .receiveMessageFrom(this, @sourceNode)
 
     return this
@@ -206,7 +206,7 @@ module.exports = class Message
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
     SelectedMessage
-      .getOrCreate(nodeTarget, @transmission, @pass)
+      .getOrCreate(this, nodeTarget)
       .receiveMessageFrom(this, line)
 
     return this

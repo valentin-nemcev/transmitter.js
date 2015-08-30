@@ -4,18 +4,6 @@
 {inspect} = require 'util'
 
 
-class UpdatePrecedence
-
-  inspect: ->
-    'UP[' + [@pass, @commTypePriority].map(inspect).join(', ') + ']'
-
-  constructor: (@pass, @commTypePriority) ->
-
-  compare: (other) ->
-    this.pass.compare(other.pass) \
-      or this.commTypePriority - other.commTypePriority
-
-
 class QueuePrecedence
 
   inspect: ->
@@ -41,8 +29,6 @@ class SelectPrecedence
 
 
 module.exports =
-  createUpdate: (pass, commTypePriority) ->
-    new UpdatePrecedence(pass, commTypePriority)
   createQueue: (pass, commTypePriority) ->
     new QueuePrecedence(pass, commTypePriority)
   createSelect: (payloadPriority) ->
