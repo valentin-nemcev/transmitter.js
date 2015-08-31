@@ -38,12 +38,11 @@ module.exports = class ChannelNode
 
   receiveConnectionMessage: (connectionMessage) ->
     connectionMessage.createNextQuery()
-      .sendFromNodeToNodeTarget(null, this)
+      .sendToChannelNode(this)
     return this
 
 
   receiveQuery: (query) ->
-    query.addPassedLine(this)
     @source.receiveQuery(query)
     return this
 

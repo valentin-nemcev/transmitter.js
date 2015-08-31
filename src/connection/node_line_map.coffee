@@ -12,6 +12,10 @@ class LineSet extends Set
   acceptsCommunication: (comm) ->
     @some (line) -> line.acceptsCommunication(comm)
 
+  receiveCommunication: (comm) ->
+    @forEach (line) ->
+      comm.sendToLine(line) if line.acceptsCommunication(comm)
+
 
 
 module.exports = class NodeLineMap
@@ -43,7 +47,7 @@ module.exports = class NodeLineMap
 
   resendCommunication: (comm, channelNode) ->
     lines = @channelNodeToLines.get(channelNode)
-    lines.forEach (line) -> comm.sendToLine(line)
+    lines.receiveCommunication(comm)
     comm.addPassedChannelNode(channelNode)
     return this
 
@@ -52,6 +56,6 @@ module.exports = class NodeLineMap
     @channelNodeToLines.forEach (lines, channelNode) =>
       if lines.acceptsCommunication(comm) \
         and comm.tryQueryChannelNode(channelNode)
-          lines.forEach (line) -> comm.sendToLine(line)
+          lines.receiveCommunication(comm)
           comm.addPassedChannelNode(channelNode)
     return this

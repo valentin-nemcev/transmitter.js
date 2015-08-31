@@ -27,9 +27,7 @@ module.exports = class ConnectionNodeLine
 
 
   receiveQuery: (query) ->
-    if @acceptsCommunication(query)
-      query.addPassedLine(this)
-      @source.receiveQuery(query)
+    @source.receiveQuery(query)
     return this
 
 

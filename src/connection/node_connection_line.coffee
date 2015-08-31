@@ -27,8 +27,7 @@ module.exports = class NodeConnectionLine
 
 
   receiveMessage: (message) ->
-    if @acceptsCommunication(message)
-      @target.receiveMessage(message)
+    @target.receiveMessage(message)
     return this
 
 

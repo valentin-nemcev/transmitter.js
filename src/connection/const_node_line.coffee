@@ -28,9 +28,7 @@ module.exports = class ConstNodeLine
 
 
   receiveQuery: (query) ->
-    if @acceptsCommunication(query)
-      query.addPassedLine(this)
-      query.createNextQuery().enqueueForSourceNode(this)
+    query.createNextQuery().enqueueForSourceNode(this)
     return this
 
 

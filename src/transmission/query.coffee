@@ -122,16 +122,12 @@ module.exports = class Query
 
   sendToLine: (line) ->
     @log line
+    @passedLines.add(line)
     line.receiveQuery(this)
     return this
 
 
   getPassedLines: -> @passedLines
-
-
-  addPassedLine: (line) ->
-    @passedLines.add(line)
-    return this
 
 
   _sendToNodePoint: (point, node) ->

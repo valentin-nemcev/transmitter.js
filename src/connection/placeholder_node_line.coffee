@@ -24,7 +24,4 @@ module.exports = class PlaceholderNodeLine
 
 
   receiveQuery: (query) ->
-    # if @acceptsCommunication(query)
-    #   query.addPassedLine(this)
-    #   query.createNextQuery().enqueueForSourceNode(this)
     return this
