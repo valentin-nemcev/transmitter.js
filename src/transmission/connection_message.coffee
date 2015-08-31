@@ -45,6 +45,10 @@ module.exports = class ConnectionMessage
     ConnectionMessage.createNext(this, sourceChannelNode)
 
 
+  createNextQuery: ->
+    @transmission.Query.createNext(this)
+
+
   getSourceChannelNode: -> @sourceChannelNode
 
 
@@ -60,19 +64,12 @@ module.exports = class ConnectionMessage
     return this
 
 
-  updateTargetPoints: ->
+  getCommunicationFor: (type, nodePoint) ->
+    @transmission.getCommunicationFor(type, @pass, nodePoint)
+
+
+  sendToTargetPoints: ->
     @targetPointsToUpdate.forEach (targetPoint) =>
       @log targetPoint
-      comm = @transmission.getCommunicationFor(
-        targetPoint.communicationType, @pass, targetPoint)
-      comm?.resendFromNodePoint(targetPoint, @sourceChannelNode, this)
-
-      # TODO: Refactor
-      if targetPoint.communicationType is 'query'
-        comm = @transmission.getCommunicationFor(
-          'message', @pass, targetPoint)
-        comm?.resendFromNodePoint()
-        @transmission.Query.createNext(this)
-          .sendFromNodeToNodeTarget(targetPoint.node, targetPoint)
-
+      targetPoint.receiveConnectionMessage(this, @sourceChannelNode)
     return this

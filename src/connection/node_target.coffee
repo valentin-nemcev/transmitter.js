@@ -28,11 +28,17 @@ module.exports = class NodeTarget
     return this
 
 
-  communicationType: 'query'
+  receiveConnectionMessage: (connectionMessage, channelNode) ->
+    query = connectionMessage.getCommunicationFor('query', this)
+    if query?
+      @sources.resendCommunication(query, channelNode)
+    else
+      connectionMessage.createNextQuery()
+        .sendFromNodeToNodeTarget(@node, this)
 
+    message = connectionMessage.getCommunicationFor('message', this)
+    message?.channelNodeDidUpdate(channelNode)
 
-  resendQuery: (query, channelNode) ->
-    @sources.resendCommunication(query, channelNode)
     return this
 
 

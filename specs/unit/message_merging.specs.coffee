@@ -45,7 +45,7 @@ describe 'Message merging', ->
     @compositeSource.setTarget(@target)
     message = @transmission.createInitialConnectionMessage()
     @compositeSource.connect(message)
-    message.updateTargetPoints()
+    message.sendToTargetPoints()
 
 
   specify 'when one active source have sent message', ->

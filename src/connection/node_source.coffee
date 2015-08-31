@@ -28,11 +28,9 @@ module.exports = class NodeSource
     return this
 
 
-  communicationType: 'message'
-
-
-  resendMessage: (message, channelNode) ->
-    @targets.resendCommunication(message, channelNode)
+  receiveConnectionMessage: (connectionMessage, channelNode) ->
+    message = connectionMessage.getCommunicationFor('message', this)
+    @targets.resendCommunication(message, channelNode) if message?
     return this
 
 

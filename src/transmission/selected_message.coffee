@@ -67,13 +67,13 @@ module.exports = class SelectedMessage
     return this
 
 
-  resendFromNodePoint: -> @trySendToNodeTarget()
+  channelNodeDidUpdate: (channelNode) -> @trySendToNodeTarget()
 
 
   trySendToNodeTarget: ->
     @_tryQueryForSelect()
 
-    unless @_channelNodesUpdated()
+    unless @_areAllChannelNodesUpdated()
       return this
 
     @transmission.log @nodeTarget, @linesToMessages.entries()..., @initialMessage
@@ -84,7 +84,7 @@ module.exports = class SelectedMessage
     return this
 
 
-  _channelNodesUpdated: ->
+  _areAllChannelNodesUpdated: ->
     for node in @nodeTarget.getChannelNodesFor(@selectQuery)
       return false unless @transmission.channelNodeUpdated(this, node)
     return true

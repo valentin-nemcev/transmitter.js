@@ -125,11 +125,6 @@ module.exports = class Message
     return this
 
 
-  resendFromNodePoint: (point, channelNode, connectionMessage) ->
-    point.resendMessage(this, channelNode)
-    return this
-
-
   sendToNodeTarget: (nodeTarget) ->
     SelectedMessage
       .getOrCreate(this, nodeTarget)

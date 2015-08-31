@@ -108,7 +108,6 @@ describe 'Flattening list connection', ->
     Transmitter.startTransmission (tr) =>
       nestedObjectA.valueVar.init(tr, 'value1')
       nestedObjectB.valueVar.init(tr, 'value2')
-      console.log '@nestedList.init(tr, [nestedObjectA, nestedObjectB])'
       @nestedList.init(tr, [nestedObjectA, nestedObjectB])
 
     expect(@serializedVar.get())

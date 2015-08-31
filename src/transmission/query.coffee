@@ -151,11 +151,6 @@ module.exports = class Query
     return this
 
 
-  resendFromNodePoint: (point, channelNode, connectionMessage) ->
-    point.resendQuery(this, channelNode)
-    return this
-
-
   sendToNodeSource: (nodeSource) ->
     @_sendToNodePoint(nodeSource)
 
