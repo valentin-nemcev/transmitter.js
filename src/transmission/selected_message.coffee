@@ -21,10 +21,12 @@ module.exports = class SelectedMessage
 
   @getOrCreate = (message, nodeTarget) ->
     {transmission, pass} = message
-    selected = transmission.getCachedMessage(nodeTarget)
-    unless (selected? and pass.equals(selected.pass))
+    existing = transmission.getCommunicationFor('message', pass.getNext(), nodeTarget)
+    return null if existing?
+    selected = transmission.getCommunicationFor('message', pass, nodeTarget)
+    unless selected?
       selected = new this(transmission, nodeTarget, {pass})
-      transmission.setCachedMessage(nodeTarget, selected)
+      transmission.addCommunicationFor(selected, nodeTarget)
     return selected
 
 
@@ -33,8 +35,11 @@ module.exports = class SelectedMessage
     @linesToMessages = new FastMap()
 
 
-  getUpdatePrecedence: ->
-    @precedence ?= Precedence.createUpdate(@pass)
+  type: 'message'
+
+
+  join: (comm) ->
+    return this
 
 
   receiveMessageFrom: (message, line) ->
@@ -51,11 +56,13 @@ module.exports = class SelectedMessage
 
 
   _tryQueryForSelect: ->
-    @selectQuery ?=
-      @transmission.getCommunicationFor('query', @pass, @nodeTarget)
-
-    @selectQuery ?= @transmission.Query.createForSelect(this)
-      .sendFromNodeToNodeTarget(@nodeTarget.node, @nodeTarget)
+    @selectQuery ?= do =>
+      query = @transmission.getCommunicationFor('query', @pass, @nodeTarget)
+      unless query?
+        query = @transmission.Query.createForSelect(this)
+        @transmission.addCommunicationFor(query, @nodeTarget)
+        @nodeTarget.receiveQuery(query)
+      query.join(this)
 
     return this
 

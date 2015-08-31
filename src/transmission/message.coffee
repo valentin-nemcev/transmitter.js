@@ -133,14 +133,14 @@ module.exports = class Message
   sendToNodeTarget: (nodeTarget) ->
     SelectedMessage
       .getOrCreate(this, nodeTarget)
-      .receiveInitialMessage(this)
+      ?.receiveInitialMessage(this)
     return this
 
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
     SelectedMessage
       .getOrCreate(this, nodeTarget)
-      .receiveMessageFrom(this, line)
+      ?.receiveMessageFrom(this, line)
     return this
 
 
