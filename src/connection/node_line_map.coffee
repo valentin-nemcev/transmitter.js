@@ -48,7 +48,6 @@ module.exports = class NodeLineMap
   resendCommunication: (comm, channelNode) ->
     lines = @channelNodeToLines.get(channelNode)
     lines.receiveCommunication(comm)
-    comm.addPassedChannelNode(channelNode)
     return this
 
 
@@ -57,5 +56,4 @@ module.exports = class NodeLineMap
       if lines.acceptsCommunication(comm) \
         and comm.tryQueryChannelNode(channelNode)
           lines.receiveCommunication(comm)
-          comm.addPassedChannelNode(channelNode)
     return this

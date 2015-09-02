@@ -70,23 +70,25 @@ module.exports = class SelectedMessage
     @trySendToNodeTarget()
 
 
-  _tryQuery: ->
-    @query ?= do =>
-      query = @transmission.getCommunicationFor('query', @pass, @nodeTarget)
-      unless query?
-        query = @transmission.Query.createNext(this)
-          .sendToNodeTarget(@nodeTarget)
-      query.join(this)
+  _doQuery: ->
+    query = @transmission.Query.createNext(this)
 
-    return this
+    @nodeTarget.getChannelNodesFor(query).forEach (channelNode) =>
+      if query.tryQueryChannelNode(channelNode)
+        @nodeTarget.receiveQueryForChannelNode(query, channelNode)
+
+    query.tryEnqueue(@nodeTarget)
 
 
   joinConnectionMessage: (channelNode) ->
-    @trySendToNodeTarget()
+    @trySendToNodeTarget(channelNode)
 
 
-  trySendToNodeTarget: ->
-    @_tryQuery()
+  trySendToNodeTarget: (channelNode) ->
+    @query ?= @_doQuery()
+
+    if channelNode?
+      @nodeTarget.receiveQueryForChannelNode(@query, channelNode)
 
     unless @query.areAllChannelNodesUpdated()
       return this

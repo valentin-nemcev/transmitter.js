@@ -29,18 +29,13 @@ module.exports = class NodeTarget
 
 
   receiveConnectionMessage: (connectionMessage, channelNode) ->
-    query = connectionMessage.getCommunicationFor('query', this)
-    if query?
-      @sources.resendCommunication(query, channelNode)
-
-    message = connectionMessage.getSelectedMessage(this)
-    message.joinConnectionMessage(channelNode)
-
+    connectionMessage.getSelectedMessage(this)
+      .joinConnectionMessage(channelNode)
     return this
 
 
-  receiveQuery: (query) ->
-    @sources.sendCommunication(query)
+  receiveQueryForChannelNode: (query, channelNode) ->
+    @sources.resendCommunication(query, channelNode)
     return this
 
 

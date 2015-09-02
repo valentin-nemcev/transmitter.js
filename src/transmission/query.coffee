@@ -88,14 +88,7 @@ module.exports = class Query
 
 
   tryQueryChannelNode: (channelNode) ->
-    @queriedChannelNodes.add(channelNode)
     @transmission.tryQueryChannelNode(this, channelNode)
-
-
-  addPassedChannelNode: (channelNode) ->
-    @queriedChannelNodes.remove(channelNode)
-    @tryEnqueue()
-    return this
 
 
   sendToLine: (line) ->
@@ -108,23 +101,15 @@ module.exports = class Query
   getPassedLines: -> @passedLines
 
 
-  _sendToNodePoint: (point, isTarget) ->
-    @log point
-    existing = @transmission.getCommunicationFor('query', @pass, point)
+  sendToNodeSource: (nodeSource) ->
+    @log nodeSource
+    existing = @transmission.getCommunicationFor('query', @pass, nodeSource)
     if existing?
       existing.join(this)
-      @delivered = yes
     else
-      @transmission.addCommunicationFor(this, point)
-      point.receiveQuery(this)
-      if isTarget
-        @sentToNodeTarget = yes
-        @tryEnqueue()
+      @transmission.addCommunicationFor(this, nodeSource)
+      nodeSource.receiveQuery(this)
     return this
-
-
-  sendToNodeSource: (nodeSource) ->
-    @_sendToNodePoint(nodeSource)
 
 
   sendToChannelNode: (node) ->
@@ -140,10 +125,6 @@ module.exports = class Query
     return this
 
 
-  sendToNodeTarget: (@nodeTarget) ->
-    @_sendToNodePoint(@nodeTarget, yes)
-
-
   enqueueForSourceNode: (@sourceNode) ->
     @transmission.enqueueCommunication(this)
     return this
@@ -152,17 +133,15 @@ module.exports = class Query
   getSourceNode: -> @sourceNode ? @nodeTarget.node
 
 
-  tryEnqueue: ->
-    if @sentToNodeTarget \
-      and @queriedChannelNodes.length is 0 \
-      and @passedLines.length is 0
-        @log 'enqueue', @getSourceNode()
-        @transmission.enqueueCommunication(this)
+  tryEnqueue: (@nodeTarget) ->
+    unless @wasDelivered()
+      @log 'enqueue', @getSourceNode()
+      @transmission.enqueueCommunication(this)
     return this
 
 
   wasDelivered: ->
-    @delivered or @passedLines.length > 0
+    @passedLines.length > 0
 
 
   getQueuePrecedence: ->

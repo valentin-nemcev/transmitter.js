@@ -106,20 +106,6 @@ module.exports = class Message
     return this
 
 
-  _sendToNodePoint: (point) ->
-    @log point
-    existingQuery = @transmission.getCommunicationFor('query', @pass, point)
-    existingQuery?.join(this)
-    existing = @transmission.getCommunicationFor('message', @pass, point)
-    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), point)
-    if existing?
-      existing.join(this)
-    else
-      @transmission.addCommunicationFor(this, point)
-      point.receiveMessage(this)
-    return this
-
-
   sendToNodeTarget: (nodeTarget) ->
     @transmission.SelectedMessage
       .getOrCreate(this, nodeTarget)
@@ -155,9 +141,21 @@ module.exports = class Message
 
 
   sendFromNodeToNodeSource: (@sourceNode, nodeSource) ->
+    @log nodeSource
+
     @transmission.enqueueCommunication(this)
     @transmission.addPayloadFor(@payload, @sourceNode)
-    @_sendToNodePoint(nodeSource)
+
+    existingQuery = @transmission.getCommunicationFor('query', @pass, nodeSource)
+    existingQuery?.join(this)
+    existing = @transmission.getCommunicationFor('message', @pass, nodeSource)
+    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), nodeSource)
+    if existing?
+      existing.join(this)
+    else
+      @transmission.addCommunicationFor(this, nodeSource)
+      nodeSource.receiveMessage(this)
+    return this
 
 
   getQueuePrecedence: ->
