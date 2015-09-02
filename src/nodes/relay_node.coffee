@@ -21,18 +21,6 @@ module.exports = class RelayNode
   getNodeTarget: -> @nodeTarget ?= new NodeTarget(this)
 
 
-  routeQuery: (tr) ->
-    tr.createNextQuery()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
-  respondToMessage: (tr) ->
-    tr.createQueryForResponseMessage()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
   respondToQuery: (tr, prevPayload) ->
     tr.createQueryResponseMessage(@createResponsePayload(prevPayload))
       .sendFromNodeToNodeSource(this, @getNodeSource())
@@ -59,7 +47,7 @@ module.exports = class RelayNode
 
   queryState: (tr) ->
     tr.createInitialQuery()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
+      .sendToNode(this)
     return this
 
 

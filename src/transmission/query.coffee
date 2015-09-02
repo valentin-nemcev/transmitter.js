@@ -8,11 +8,6 @@ Pass = require './pass'
 Precedence = require './precedence'
 
 
-class NullQuery
-  sendFromNodeToNodeTarget: -> this
-  enqueueForSourceNode: -> this
-
-
 module.exports = class Query
 
   inspect: ->
@@ -57,17 +52,6 @@ module.exports = class Query
     new this(mergedMessage.transmission, {
       pass: mergedMessage.pass
     })
-
-
-  @createForResponseMessage = (queuedMessage) ->
-    pass = queuedMessage.pass.getForResponse()
-    if pass?
-      new this(queuedMessage.transmission, {
-        pass
-      })
-    else
-      @getNullQuery()
-
 
 
   constructor: (@transmission, opts = {}) ->
@@ -151,11 +135,12 @@ module.exports = class Query
 
   sendToNode: (node) ->
     @log node
-    node.routeQuery(this)
+    @transmission.SelectedMessage.getOrCreate(this, node.getNodeTarget())
+      .joinQuery(this)
     return this
 
 
-  sendFromNodeToNodeTarget: (sourceNode, @nodeTarget) ->
+  sendToNodeTarget: (@nodeTarget) ->
     @_sendToNodePoint(@nodeTarget, yes)
 
 

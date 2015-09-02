@@ -13,6 +13,7 @@ module.exports = class Transmission
   Query             : require './query'
   Message           : require './message'
   ConnectionMessage : require './connection_message'
+  SelectedMessage   : require './selected_message'
 
   @start = (doWithTransmission) ->
     # assert(not @instance, "Transmissions can't be nested")

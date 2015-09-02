@@ -16,18 +16,6 @@ module.exports = class SourceNode
   getNodeTarget: -> @nodeTarget ?= new BlindNodeTarget(this)
 
 
-  routeQuery: (tr) ->
-    tr.createNextQuery()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
-  respondToMessage: (tr) ->
-    tr.createQueryForResponseMessage()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
   respondToQuery: (tr, prevPayload) ->
     tr.createQueryResponseMessage(prevPayload ? @createResponsePayload())
       .sendFromNodeToNodeSource(this, @getNodeSource())

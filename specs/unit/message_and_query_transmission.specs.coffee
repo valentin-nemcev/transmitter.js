@@ -64,7 +64,7 @@ describe 'Message and query transmission', ->
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
     @query = new Query(@transmission, {@pass})
 
-    @query.sendFromNodeToNodeTarget(@target, @target.getNodeTarget())
+    @query.sendToNode(@target)
     @transmission.respond()
 
     expect(@payload.deliver).to.have.been

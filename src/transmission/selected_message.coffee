@@ -19,8 +19,17 @@ module.exports = class SelectedMessage
     ].join(' ')
 
 
-  @getOrCreate = (message, nodeTarget) ->
+  @joinMessageForResponse = (message, nodeTarget) ->
     {transmission, pass} = message
+    responsePass = pass.getForResponse()
+    if responsePass?
+      @getOrCreate({transmission, pass: responsePass}, nodeTarget)
+        .joinMessageForResponse(message)
+    return this
+
+
+  @getOrCreate = (comm, nodeTarget) ->
+    {transmission, pass} = comm
     selected = transmission.getCommunicationFor('message', pass, nodeTarget)
     unless selected?
       selected = new this(transmission, nodeTarget, {pass})
@@ -53,18 +62,27 @@ module.exports = class SelectedMessage
     return this
 
 
+  joinQuery: (query) ->
+    @trySendToNodeTarget()
+
+
+  joinMessageForResponse: (message) ->
+    @trySendToNodeTarget()
+
+
   _tryQuery: ->
     @query ?= do =>
       query = @transmission.getCommunicationFor('query', @pass, @nodeTarget)
       unless query?
         query = @transmission.Query.createNext(this)
-          .sendFromNodeToNodeTarget(@nodeTarget.node, @nodeTarget)
+          .sendToNodeTarget(@nodeTarget)
       query.join(this)
 
     return this
 
 
-  joinConnectionMessage: (channelNode) -> @trySendToNodeTarget()
+  joinConnectionMessage: (channelNode) ->
+    @trySendToNodeTarget()
 
 
   trySendToNodeTarget: ->
@@ -91,5 +109,6 @@ module.exports = class SelectedMessage
     @transmission.log this, @nodeTarget
     # @selectedMessage should be set before it is sent to prevent loops
     @selectedMessage = sorted[0]
-    @nodeTarget.receiveMessage(@selectedMessage)
+    if @selectedMessage?
+      @nodeTarget.receiveMessage(@selectedMessage)
     return this

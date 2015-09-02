@@ -7,7 +7,6 @@ Map = require 'collections/map'
 
 Pass = require './pass'
 Precedence = require './precedence'
-SelectedMessage = require './selected_message'
 MergedMessage = require './merged_message'
 
 
@@ -67,10 +66,6 @@ module.exports = class Message
     Message.createNext(this, payload)
 
 
-  createQueryForResponseMessage: ->
-    @transmission.Query.createForResponseMessage(this)
-
-
   createNextConnectionMessage: (channelNode) ->
     @transmission.ConnectionMessage.createNext(this, channelNode)
 
@@ -126,14 +121,14 @@ module.exports = class Message
 
 
   sendToNodeTarget: (nodeTarget) ->
-    SelectedMessage
+    @transmission.SelectedMessage
       .getOrCreate(this, nodeTarget)
       .joinInitialMessage(this)
     return this
 
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
-    SelectedMessage
+    @transmission.SelectedMessage
       .getOrCreate(this, nodeTarget)
       .joinMessageFrom(this, line)
     return this
@@ -175,7 +170,8 @@ module.exports = class Message
 
   respond: ->
     @log 'respond', @sourceNode
-    @sourceNode.respondToMessage(this)
+    @transmission.SelectedMessage
+      .joinMessageForResponse(this, @sourceNode.getNodeTarget())
     return this
 
 
