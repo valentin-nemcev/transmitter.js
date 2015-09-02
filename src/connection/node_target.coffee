@@ -37,7 +37,7 @@ module.exports = class NodeTarget
         .sendFromNodeToNodeTarget(@node, this)
 
     message = connectionMessage.getCommunicationFor('message', this)
-    message?.channelNodeDidUpdate(channelNode)
+    message?.joinConnectionMessage(channelNode)
 
     return this
 

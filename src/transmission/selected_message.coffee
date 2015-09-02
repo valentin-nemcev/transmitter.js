@@ -13,7 +13,7 @@ module.exports = class SelectedMessage
     [
       'SM'
       inspect @pass
-      @selectQuery?.inspect()
+      @query?.inspect()
       ','
       @linesToMessages.values().map(inspect).join(', ')
     ].join(' ')
@@ -21,8 +21,6 @@ module.exports = class SelectedMessage
 
   @getOrCreate = (message, nodeTarget) ->
     {transmission, pass} = message
-    existing = transmission.getCommunicationFor('message', pass.getNext(), nodeTarget)
-    return null if existing?
     selected = transmission.getCommunicationFor('message', pass, nodeTarget)
     unless selected?
       selected = new this(transmission, nodeTarget, {pass})
@@ -42,52 +40,45 @@ module.exports = class SelectedMessage
     return this
 
 
-  receiveMessageFrom: (message, line) ->
+  joinMessageFrom: (message, line) ->
     @linesToMessages.set(line, message)
     @trySendToNodeTarget()
     return this
 
 
-  receiveInitialMessage: (message) ->
+  joinInitialMessage: (message) ->
     throw new Error "Can send only one initial message" if @initialMessage?
     @initialMessage = message
     @trySendToNodeTarget()
     return this
 
 
-  _tryQueryForSelect: ->
-    @selectQuery ?= do =>
+  _tryQuery: ->
+    @query ?= do =>
       query = @transmission.getCommunicationFor('query', @pass, @nodeTarget)
       unless query?
-        query = @transmission.Query.createForSelect(this)
-        @transmission.addCommunicationFor(query, @nodeTarget)
-        @nodeTarget.receiveQuery(query)
+        query = @transmission.Query.createNext(this)
+          .sendFromNodeToNodeTarget(@nodeTarget.node, @nodeTarget)
       query.join(this)
 
     return this
 
 
-  channelNodeDidUpdate: (channelNode) -> @trySendToNodeTarget()
+  joinConnectionMessage: (channelNode) -> @trySendToNodeTarget()
 
 
   trySendToNodeTarget: ->
-    @_tryQueryForSelect()
+    @_tryQuery()
 
-    unless @_areAllChannelNodesUpdated()
+    unless @query.areAllChannelNodesUpdated()
       return this
 
     @transmission.log @nodeTarget, @linesToMessages.entries()..., @initialMessage
-    @transmission.log @nodeTarget, @selectQuery, @selectQuery.getPassedLines().toArray()...
+    @transmission.log @nodeTarget, @query, @query.getPassedLines().toArray()...
     # TODO: Compare contents
-    if @linesToMessages.length == @selectQuery.getPassedLines().length
+    if @linesToMessages.length == @query.getPassedLines().length
       @_trySendSelected()
     return this
-
-
-  _areAllChannelNodesUpdated: ->
-    for node in @nodeTarget.getChannelNodesFor(@selectQuery)
-      return false unless @transmission.channelNodeUpdated(this, node)
-    return true
 
 
   _trySendSelected: ->

@@ -59,12 +59,6 @@ module.exports = class Query
     })
 
 
-  @createForSelect = (selectedMessage) ->
-    new this(selectedMessage.transmission, {
-      pass: selectedMessage.pass
-    })
-
-
   @createForResponseMessage = (queuedMessage) ->
     pass = queuedMessage.pass.getForResponse()
     if pass?
@@ -130,18 +124,16 @@ module.exports = class Query
   getPassedLines: -> @passedLines
 
 
-  _sendToNodePoint: (point, node) ->
+  _sendToNodePoint: (point, isTarget) ->
     @log point
     existing = @transmission.getCommunicationFor('query', @pass, point)
-    existing ?= @transmission.getCommunicationFor('message', @pass, point)
-    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), point)
     if existing?
       existing.join(this)
       @delivered = yes
     else
       @transmission.addCommunicationFor(this, point)
       point.receiveQuery(this)
-      if node
+      if isTarget
         @sentToNodeTarget = yes
         @tryEnqueue()
     return this
@@ -163,8 +155,8 @@ module.exports = class Query
     return this
 
 
-  sendFromNodeToNodeTarget: (@sourceNode, @nodeTarget) ->
-    @_sendToNodePoint(@nodeTarget, @sourceNode)
+  sendFromNodeToNodeTarget: (sourceNode, @nodeTarget) ->
+    @_sendToNodePoint(@nodeTarget, yes)
 
 
   enqueueForSourceNode: (@sourceNode) ->
@@ -172,11 +164,14 @@ module.exports = class Query
     return this
 
 
+  getSourceNode: -> @sourceNode ? @nodeTarget.node
+
+
   tryEnqueue: ->
     if @sentToNodeTarget \
       and @queriedChannelNodes.length is 0 \
       and @passedLines.length is 0
-        @log 'enqueue', @sourceNode
+        @log 'enqueue', @getSourceNode()
         @transmission.enqueueCommunication(this)
     return this
 
@@ -190,10 +185,11 @@ module.exports = class Query
       Precedence.createQueue(@pass, @communicationTypePriority)
 
 
-  _channelNodesUpdated: ->
+
+  readyToRespond: -> @areAllChannelNodesUpdated()
 
 
-  readyToRespond: ->
+  areAllChannelNodesUpdated: ->
     for node in @nodeTarget?.getChannelNodesFor(this) ? []
       return false unless @transmission.channelNodeUpdated(this, node)
     return true
@@ -201,7 +197,7 @@ module.exports = class Query
 
   respond: ->
     unless @wasDelivered()
-      @log 'respond', @sourceNode
-      @sourceNode.respondToQuery(this,
-        @transmission.getPayloadFor(@sourceNode))
+      @log 'respond', @getSourceNode()
+      @getSourceNode().respondToQuery(this,
+        @transmission.getPayloadFor(@getSourceNode()))
     return this
