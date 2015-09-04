@@ -68,8 +68,8 @@ module.exports = class ConnectionMessage
     @transmission.getCommunicationFor(type, @pass, nodePoint)
 
 
-  getSelectedMessage: (nodePoint) ->
-    @transmission.SelectedMessage.getOrCreate(this, nodePoint)
+  getSelectedMessage: (node) ->
+    @transmission.SelectedMessage.getOrCreate(this, {node})
 
 
   sendToTargetPoints: ->

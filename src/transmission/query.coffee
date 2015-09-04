@@ -120,7 +120,7 @@ module.exports = class Query
 
   sendToNode: (node) ->
     @log node
-    @transmission.SelectedMessage.getOrCreate(this, node.getNodeTarget())
+    @transmission.SelectedMessage.getOrCreate(this, {node})
       .joinQuery(this)
     return this
 
@@ -130,10 +130,10 @@ module.exports = class Query
     return this
 
 
-  getSourceNode: -> @sourceNode ? @nodeTarget.node
+  getSourceNode: -> @sourceNode
 
 
-  tryEnqueue: (@nodeTarget) ->
+  tryEnqueue: (@sourceNode) ->
     unless @wasDelivered()
       @log 'enqueue', @getSourceNode()
       @transmission.enqueueCommunication(this)
@@ -154,7 +154,8 @@ module.exports = class Query
 
 
   areAllChannelNodesUpdated: ->
-    for node in @nodeTarget?.getChannelNodesFor(this) ? []
+    # TODO
+    for node in @sourceNode?.getNodeTarget?()?.getChannelNodesFor(this) ? []
       return false unless @transmission.channelNodeUpdated(this, node)
     return true
 

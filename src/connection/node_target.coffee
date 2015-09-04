@@ -29,7 +29,7 @@ module.exports = class NodeTarget
 
 
   receiveConnectionMessage: (connectionMessage, channelNode) ->
-    connectionMessage.getSelectedMessage(this)
+    connectionMessage.getSelectedMessage(@node)
       .joinConnectionMessage(channelNode)
     return this
 

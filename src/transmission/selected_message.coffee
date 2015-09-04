@@ -19,25 +19,29 @@ module.exports = class SelectedMessage
     ].join(' ')
 
 
-  @joinMessageForResponse = (message, nodeTarget) ->
+  @joinMessageForResponse = (message, {node, nodeTarget}) ->
     {transmission, pass} = message
+    nodeTarget ?= node.getNodeTarget()
+    node ?= nodeTarget.node
     responsePass = pass.getForResponse()
     if responsePass?
-      @getOrCreate({transmission, pass: responsePass}, nodeTarget)
+      @getOrCreate({transmission, pass: responsePass}, node)
         .joinMessageForResponse(message)
     return this
 
 
-  @getOrCreate = (comm, nodeTarget) ->
+  @getOrCreate = (comm, {node, nodeTarget}) ->
     {transmission, pass} = comm
-    selected = transmission.getCommunicationFor('message', pass, nodeTarget)
+    nodeTarget ?= node.getNodeTarget()
+    node ?= nodeTarget.node
+    selected = transmission.getCommunicationFor('message', pass, node)
     unless selected?
-      selected = new this(transmission, nodeTarget, {pass})
-      transmission.addCommunicationFor(selected, nodeTarget)
+      selected = new this(transmission, node, {pass})
+      transmission.addCommunicationFor(selected, node)
     return selected
 
 
-  constructor: (@transmission, @nodeTarget, opts = {}) ->
+  constructor: (@transmission, @node, opts = {}) ->
     {@pass} = opts
     @linesToMessages = new FastMap()
 
@@ -84,15 +88,16 @@ module.exports = class SelectedMessage
   _sendQuery: ->
     query = @transmission.Query.createNext(this)
 
-    @nodeTarget.getChannelNodesFor(query).forEach (channelNode) =>
+    nodeTarget = @node.getNodeTarget()
+    nodeTarget.getChannelNodesFor(query).forEach (channelNode) =>
       if query.tryQueryChannelNode(channelNode)
-        @nodeTarget.receiveQueryForChannelNode(query, channelNode)
+        nodeTarget.receiveQueryForChannelNode(query, channelNode)
 
-    query.tryEnqueue(@nodeTarget)
+    query.tryEnqueue(@node)
 
 
   _sendQueryToForChannelNode: (channelNode) ->
-    @nodeTarget.receiveQueryForChannelNode(@query, channelNode)
+    @node.getNodeTarget().receiveQueryForChannelNode(@query, channelNode)
     return this
 
 
@@ -100,8 +105,8 @@ module.exports = class SelectedMessage
     unless @query.areAllChannelNodesUpdated()
       return this
 
-    @transmission.log @nodeTarget, @linesToMessages.entries()..., @initialMessage
-    @transmission.log @nodeTarget, @query, @query.getPassedLines().toArray()...
+    @transmission.log @node, @linesToMessages.entries()..., @initialMessage
+    @transmission.log @node, @query, @query.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @query.getPassedLines().length
       @_trySendSelected()
@@ -115,9 +120,9 @@ module.exports = class SelectedMessage
     messages.push @initialMessage if @initialMessage?
     sorted = messages.sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
-    @transmission.log this, @nodeTarget
+    @transmission.log this, @node
     # @selectedMessage should be set before it is sent to prevent loops
     @selectedMessage = sorted[0]
     if @selectedMessage?
-      @nodeTarget.receiveMessage(@selectedMessage)
+      @selectedMessage.sendToNode(@node)
     return this

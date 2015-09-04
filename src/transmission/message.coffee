@@ -108,14 +108,14 @@ module.exports = class Message
 
   sendToNodeTarget: (nodeTarget) ->
     @transmission.SelectedMessage
-      .getOrCreate(this, nodeTarget)
+      .getOrCreate(this, {nodeTarget})
       .joinInitialMessage(this)
     return this
 
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
     @transmission.SelectedMessage
-      .getOrCreate(this, nodeTarget)
+      .getOrCreate(this, {nodeTarget})
       .joinMessageFrom(this, line)
     return this
 
@@ -169,7 +169,7 @@ module.exports = class Message
   respond: ->
     @log 'respond', @sourceNode
     @transmission.SelectedMessage
-      .joinMessageForResponse(this, @sourceNode.getNodeTarget())
+      .joinMessageForResponse(this, {node: @sourceNode})
     return this
 
 
