@@ -51,26 +51,37 @@ module.exports = class SelectedMessage
 
   joinMessageFrom: (message, line) ->
     @linesToMessages.set(line, message)
-    @trySendToNodeTarget()
-    return this
+    @_ensureQuerySent()
+    @_sendMessage()
 
 
   joinInitialMessage: (message) ->
     throw new Error "Can send only one initial message" if @initialMessage?
     @initialMessage = message
-    @trySendToNodeTarget()
-    return this
+    @_ensureQuerySent()
+    @_sendMessage()
 
 
   joinQuery: (query) ->
-    @trySendToNodeTarget()
+    @_ensureQuerySent()
 
 
   joinMessageForResponse: (message) ->
-    @trySendToNodeTarget()
+    @_ensureQuerySent()
 
 
-  _doQuery: ->
+  joinConnectionMessage: (channelNode) ->
+    @_ensureQuerySent()
+    @_sendQueryToForChannelNode(channelNode)
+    @_sendMessage()
+
+
+  _ensureQuerySent: ->
+    @query ?= @_sendQuery()
+    return this
+
+
+  _sendQuery: ->
     query = @transmission.Query.createNext(this)
 
     @nodeTarget.getChannelNodesFor(query).forEach (channelNode) =>
@@ -80,16 +91,12 @@ module.exports = class SelectedMessage
     query.tryEnqueue(@nodeTarget)
 
 
-  joinConnectionMessage: (channelNode) ->
-    @trySendToNodeTarget(channelNode)
+  _sendQueryToForChannelNode: (channelNode) ->
+    @nodeTarget.receiveQueryForChannelNode(@query, channelNode)
+    return this
 
 
-  trySendToNodeTarget: (channelNode) ->
-    @query ?= @_doQuery()
-
-    if channelNode?
-      @nodeTarget.receiveQueryForChannelNode(@query, channelNode)
-
+  _sendMessage: ->
     unless @query.areAllChannelNodesUpdated()
       return this
 
