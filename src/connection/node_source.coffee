@@ -30,10 +30,13 @@ module.exports = class NodeSource
 
   receiveConnectionMessage: (connectionMessage, channelNode) ->
     message = connectionMessage.getCommunicationFor('message', this)
-    @targets.resendCommunication(message, channelNode) if message?
+    message?.joinConnectionMessage(channelNode)
     return this
 
 
-  receiveMessage: (message) ->
-    @targets.sendCommunication(message)
+  receiveMessageForChannelNode: (message, channelNode) ->
+    @targets.resendCommunication(message, channelNode)
     return this
+
+
+  getChannelNodesFor: (comm) -> @targets.getChannelNodesFor(comm)

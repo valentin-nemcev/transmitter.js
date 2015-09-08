@@ -19,7 +19,9 @@ module.exports = class ConnectionMessage
 
 
   log: (arg) ->
-    @transmission.log this, arg
+    args = [this]
+    args.push arg for arg in arguments
+    @transmission.log args...
     return this
 
 
@@ -76,4 +78,5 @@ module.exports = class ConnectionMessage
     @targetPointsToUpdate.forEach (targetPoint) =>
       @log targetPoint
       targetPoint.receiveConnectionMessage(this, @sourceChannelNode)
+      @log targetPoint, 'complete'
     return this

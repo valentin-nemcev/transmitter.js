@@ -10,9 +10,11 @@ class SetConstPayload
 
   constructor: (@value) ->
 
-  getPriority: -> 1
+  setPriority: (@priority) -> this
 
-  inspect: -> "setConst(#{inspect @value})"
+  getPriority: -> @priority ? 1
+
+  inspect: -> "#{@getPriority()}:setConst(#{inspect @value})"
 
   map: (map) ->
     new SetPayload(this, {map})
@@ -35,7 +37,7 @@ class UpdateMatchingPayload
     @matchFn = opts.match
 
 
-  inspect: -> "valueUpdate(#{inspect @source})"
+  inspect: -> "#{@getPriority()}:valueUpdate(#{inspect @source})"
 
   getPriority: -> @priority ? @source.getPriority()
 
@@ -65,7 +67,7 @@ class SetPayload
     @mapFn = opts.map ? id
 
 
-  inspect: -> "value(#{inspect @get()})"
+  inspect: -> "#{@getPriority()}:value(#{inspect @get()})"
 
 
   setPriority: (@priority) -> this
@@ -103,5 +105,5 @@ class SetPayload
 module.exports = {
   set: SetPayload.create
   setLazy: (getValue) -> SetPayload.create(get: getValue).setPriority(1)
-  setConst: SetConstPayload.create
+  setConst: (value) -> SetConstPayload.create(value).setPriority(1)
 }

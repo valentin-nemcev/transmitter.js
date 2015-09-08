@@ -50,7 +50,7 @@ class SetLazyPayload
 
   setPriority: (@priority) -> this
 
-  getPriority: -> @priority ? @source.getPriority()
+  getPriority: -> @priority ? 1
 
 
   inspect: -> "#{@getPriority()}:setLazy(#{inspect @getValue()})"

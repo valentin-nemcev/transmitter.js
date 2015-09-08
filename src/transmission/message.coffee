@@ -154,8 +154,31 @@ module.exports = class Message
       existing.join(this)
     else
       @transmission.addCommunicationFor(this, nodeSource)
-      nodeSource.receiveMessage(this)
+      @_send(nodeSource)
+    @log nodeSource, 'complete'
     return this
+
+
+  _send: (nodeSource) ->
+    @updatedChannelNodes = new Set()
+
+    nodeSource = @sourceNode.getNodeSource()
+    nodeSource.getChannelNodesFor(this).forEach (channelNode) =>
+      if this.tryQueryChannelNode(channelNode)
+        @updatedChannelNodes.add(channelNode)
+        nodeSource.receiveMessageForChannelNode(this, channelNode)
+    return this
+
+
+  _sendForChannelNode: (channelNode) ->
+    unless @updatedChannelNodes.has(channelNode)
+      @updatedChannelNodes.add(channelNode)
+      @sourceNode.getNodeSource().receiveMessageForChannelNode(this, channelNode)
+    return this
+
+
+  joinConnectionMessage: (channelNode) ->
+    @_sendForChannelNode(channelNode)
 
 
   getQueuePrecedence: ->

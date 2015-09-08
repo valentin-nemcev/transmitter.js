@@ -36,7 +36,9 @@ describe 'Flattening list connection', ->
         .withTransform (serialized, values) =>
           for valueVar, i in values.keys()
             value = serialized.get()[i]?.value
-            values.set(valueVar, Transmitter.Payloads.Variable.setConst(value))
+            values.set valueVar,
+              Transmitter.Payloads.Variable.setConst(value)
+                .setPriority(serialized.getPriority())
 
 
   beforeEach ->

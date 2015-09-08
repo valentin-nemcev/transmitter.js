@@ -101,17 +101,6 @@ module.exports = class Query
   getPassedLines: -> @passedLines
 
 
-  sendToNodeSource: (nodeSource) ->
-    @log nodeSource
-    existing = @transmission.getCommunicationFor('query', @pass, nodeSource)
-    if existing?
-      existing.join(this)
-    else
-      @transmission.addCommunicationFor(this, nodeSource)
-      nodeSource.receiveQuery(this)
-    return this
-
-
   sendToChannelNode: (node) ->
     @log node
     node.receiveQuery(this)

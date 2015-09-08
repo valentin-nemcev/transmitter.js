@@ -4,6 +4,7 @@
 {inspect} = require 'util'
 
 FastMap = require 'collections/fast-map'
+Set = require 'collections/set'
 Precedence = require './precedence'
 
 
@@ -54,6 +55,9 @@ module.exports = class SelectedMessage
 
 
   joinMessageFrom: (message, line) ->
+    @transmission.log line, message
+    if (prev = @linesToMessages.get(line))?
+      throw new Error "Already received message from #{inspect line}"
     @linesToMessages.set(line, message)
     @_ensureQuerySent()
     @_sendMessage()
@@ -76,8 +80,11 @@ module.exports = class SelectedMessage
 
   joinConnectionMessage: (channelNode) ->
     @_ensureQuerySent()
-    @_sendQueryToForChannelNode(channelNode)
+    @_sendQueryForChannelNode(channelNode)
     @_sendMessage()
+
+
+  _queryWasSent: -> @query?
 
 
   _ensureQuerySent: ->
@@ -87,17 +94,21 @@ module.exports = class SelectedMessage
 
   _sendQuery: ->
     query = @transmission.Query.createNext(this)
+    @updatedChannelNodes = new Set()
 
     nodeTarget = @node.getNodeTarget()
     nodeTarget.getChannelNodesFor(query).forEach (channelNode) =>
       if query.tryQueryChannelNode(channelNode)
+        @updatedChannelNodes.add(channelNode)
         nodeTarget.receiveQueryForChannelNode(query, channelNode)
 
     query.tryEnqueue(@node)
 
 
-  _sendQueryToForChannelNode: (channelNode) ->
-    @node.getNodeTarget().receiveQueryForChannelNode(@query, channelNode)
+  _sendQueryForChannelNode: (channelNode) ->
+    unless @updatedChannelNodes.has(channelNode)
+      @updatedChannelNodes.add(channelNode)
+      @node.getNodeTarget().receiveQueryForChannelNode(@query, channelNode)
     return this
 
 
@@ -109,20 +120,29 @@ module.exports = class SelectedMessage
     @transmission.log @node, @query, @query.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @query.getPassedLines().length
-      @_trySendSelected()
+      @_trySendOutgoing()
     return this
 
 
-  _trySendSelected: ->
-    return this if @selectedMessage?
+  _trySendOutgoing: ->
+    # return this if @outgoingMessage?
+    @transmission.log this, @node
+    newOutgoingMessage = @_selectMessage()
+    if @outgoingMessage? and @outgoingMessage != newOutgoingMessage
+      throw new Error "Outgoing message already sent at #{inspect @node}. " \
+        + "Previous: #{inspect @outgoingMessage}, " \
+        + "current: #{inspect newOutgoingMessage}"
+    # @outgoingMessage should be set before it is sent to prevent loops
+    if not @outgoingMessage? and newOutgoingMessage?
+      @outgoingMessage = newOutgoingMessage
+      @outgoingMessage.sendToNode(@node)
+    return this
+
+
+  _selectMessage: ->
     # TODO: refactor
     messages = @linesToMessages.values()
     messages.push @initialMessage if @initialMessage?
     sorted = messages.sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
-    @transmission.log this, @node
-    # @selectedMessage should be set before it is sent to prevent loops
-    @selectedMessage = sorted[0]
-    if @selectedMessage?
-      @selectedMessage.sendToNode(@node)
-    return this
+    return sorted[0]
