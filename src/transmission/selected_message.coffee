@@ -20,22 +20,12 @@ module.exports = class SelectedMessage
     ].join(' ')
 
 
-  @joinMessageForResponse = (message, {node, nodeTarget}) ->
-    {transmission, pass} = message
-    nodeTarget ?= node.getNodeTarget()
-    node ?= nodeTarget.node
-    responsePass = pass.getForResponse()
-    if responsePass?
-      @getOrCreate({transmission, pass: responsePass}, node)
-        .joinMessageForResponse(message)
-    return this
-
-
   @getOrCreate = (comm, {node, nodeTarget}) ->
     {transmission, pass} = comm
     nodeTarget ?= node.getNodeTarget()
     node ?= nodeTarget.node
-    selected = transmission.getCommunicationFor('message', pass, node)
+
+    selected = transmission.getCommunicationFor(pass, node)
     unless selected?
       selected = new this(transmission, node, {pass})
       transmission.addCommunicationFor(selected, node)
@@ -45,9 +35,6 @@ module.exports = class SelectedMessage
   constructor: (@transmission, @node, opts = {}) ->
     {@pass} = opts
     @linesToMessages = new FastMap()
-
-
-  type: 'message'
 
 
   join: (comm) ->
@@ -60,49 +47,70 @@ module.exports = class SelectedMessage
       throw new Error "Already received message from #{inspect line}"
     @linesToMessages.set(line, message)
     @_ensureQuerySent()
-    @_sendMessage()
-
-
-  joinInitialMessage: (message) ->
-    throw new Error "Can send only one initial message" if @initialMessage?
-    @initialMessage = message
-    @_ensureQuerySent()
-    @_sendMessage()
+    @_selectAndSendOutgoingIfReady()
 
 
   joinQuery: (query) ->
     @_ensureQuerySent()
+    return this
 
 
-  joinMessageForResponse: (message) ->
+  joinMessageForResponse: (@prevMessage) ->
     @_ensureQuerySent()
 
 
-  joinConnectionMessage: (channelNode) ->
+  joinTargetConnectionMessage: (channelNode) ->
     @_ensureQuerySent()
     @_sendQueryForChannelNode(channelNode)
-    @_sendMessage()
+    @_selectAndSendOutgoingIfReady()
+
+
+  joinSourceConnectionMessage: (channelNode) ->
+    @outgoingMessage?.sendForChannelNode(channelNode)
+    return this
 
 
   _queryWasSent: -> @query?
 
 
   _ensureQuerySent: ->
-    @query ?= @_sendQuery()
-    return this
+    return this if @query?
+    @query = @transmission.Query.createNext(this)
 
-
-  _sendQuery: ->
-    query = @transmission.Query.createNext(this)
     @updatedChannelNodes = new Set()
 
     nodeTarget = @node.getNodeTarget()
-    nodeTarget.getChannelNodesFor(query).forEach (channelNode) =>
-      if query.tryQueryChannelNode(channelNode)
+    nodeTarget.getChannelNodesFor(@query).forEach (channelNode) =>
+      if @query.tryQueryChannelNode(channelNode)
         @updatedChannelNodes.add(channelNode)
-        nodeTarget.receiveQueryForChannelNode(query, channelNode)
+        nodeTarget.receiveQueryForChannelNode(@query, channelNode)
 
-    query.tryEnqueue(@node)
+    @transmission.log @query, 'enqueue', @node
+    @transmission.enqueueCommunication(this)
+    return this
+
+
+  respond: ->
+    unless @query.wasDelivered() or @outgoingMessage?
+      @transmission.log @query, 'respond', @node
+      prevPayload = @prevMessage?.payload
+      payload = @node.createResponsePayload(prevPayload)
+      @_sendOutgoing(
+        @transmission.Message.createQueryResponse(this, payload))
+    return this
+
+
+  getQueuePrecedence: ->
+    @queuePrecedence ?= Precedence.createQueue(@pass)
+
+
+  readyToRespond: -> @areAllChannelNodesUpdated()
+
+
+  areAllChannelNodesUpdated: ->
+    for node in @node.getNodeTarget().getChannelNodesFor(@query)
+      return false unless @transmission.channelNodeUpdated(@query, node)
+    return true
 
 
   _sendQueryForChannelNode: (channelNode) ->
@@ -112,37 +120,67 @@ module.exports = class SelectedMessage
     return this
 
 
-  _sendMessage: ->
-    unless @query.areAllChannelNodesUpdated()
+  _selectAndSendOutgoingIfReady: ->
+    unless @areAllChannelNodesUpdated()
       return this
 
-    @transmission.log @node, @linesToMessages.entries()..., @initialMessage
+    @transmission.log @node, @linesToMessages.entries()...
     @transmission.log @node, @query, @query.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @query.getPassedLines().length
-      @_trySendOutgoing()
+      newSelectedMessage = @_selectMessage()
+      if @selectedMessage? and @selectedMessage != newSelectedMessage
+        throw new Error "Message already selected at #{inspect @node}. " \
+          + "Previous: #{inspect @selectedMessage}, " \
+          + "current: #{inspect newSelectedMessage}"
+      if newSelectedMessage? and @selectedMessage != newSelectedMessage
+        @selectedMessage = newSelectedMessage
+        if @outgoingMessage?
+          if @outgoingMessage != newSelectedMessage \
+            and newSelectedMessage.getSelectPrecedence()
+              .compare(@outgoingMessage.getSelectPrecedence()) >= 0
+                throw new Error "Message already sent at #{inspect @node}. " \
+                  + "Previous: #{inspect @outgoingMessage}, " \
+                  + "current: #{inspect newSelectedMessage}"
+        else
+          @_sendOutgoing(@_relayMessage(newSelectedMessage))
     return this
 
 
-  _trySendOutgoing: ->
-    # return this if @outgoingMessage?
+  _relayMessage: (prevMessage) ->
+    @transmission.log prevMessage, @node
+    payload = @node.processPayload(prevMessage.payload)
+    @transmission.Message.createNext(this, payload)
+
+
+  _sendOutgoing: (newOutgoingMessage) ->
     @transmission.log this, @node
-    newOutgoingMessage = @_selectMessage()
-    if @outgoingMessage? and @outgoingMessage != newOutgoingMessage
-      throw new Error "Outgoing message already sent at #{inspect @node}. " \
-        + "Previous: #{inspect @outgoingMessage}, " \
-        + "current: #{inspect newOutgoingMessage}"
-    # @outgoingMessage should be set before it is sent to prevent loops
-    if not @outgoingMessage? and newOutgoingMessage?
-      @outgoingMessage = newOutgoingMessage
-      @outgoingMessage.sendToNode(@node)
+    # This method is reentrant, so assign @outgoingMessage before sending
+    @outgoingMessage = newOutgoingMessage
+    @transmission.log @outgoingMessage, @node.getNodeSource()
+
+    @outgoingMessage.sourceNode = @node
+    responsePass = @pass.getForResponse()
+    if responsePass?
+      SelectedMessage.getOrCreate({@transmission, pass: responsePass}, {@node})
+        .joinMessageForResponse(@outgoingMessage)
+
+    @outgoingMessage.send(@node.getNodeSource())
+    return this
+
+
+  originateMessage: (payload) ->
+    if @outgoingMessage?
+        throw new Error "Message already originated at #{inspect @node}. " \
+          + "Previous: #{inspect @outgoingMessage}"
+    payload = @node.processPayload(payload)
+    @_sendOutgoing(@transmission.Message.createNext(this, payload))
     return this
 
 
   _selectMessage: ->
     # TODO: refactor
     messages = @linesToMessages.values()
-    messages.push @initialMessage if @initialMessage?
     sorted = messages.sorted (a, b) ->
       -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
     return sorted[0]

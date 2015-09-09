@@ -74,20 +74,6 @@ module.exports = class Message
   directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
-  type: 'message'
-
-  communicationTypePriority: 1
-
-
-  join: (comm) ->
-    return this
-
-
-  getUpdatePrecedence: ->
-    @updatePrecedence ?=
-      Precedence.createUpdate(@pass)
-
-
   getSelectPrecedence: ->
     @selectPrecedence ?= Precedence.createSelect(@payload.getPriority())
 
@@ -106,13 +92,6 @@ module.exports = class Message
     return this
 
 
-  sendToNodeTarget: (nodeTarget) ->
-    @transmission.SelectedMessage
-      .getOrCreate(this, {nodeTarget})
-      .joinInitialMessage(this)
-    return this
-
-
   sendToSelectingNodeTarget: (line, nodeTarget) ->
     @transmission.SelectedMessage
       .getOrCreate(this, {nodeTarget})
@@ -122,47 +101,21 @@ module.exports = class Message
 
   sendToChannelNode: (node) ->
     @log node
-    existingQuery = @transmission.getCommunicationFor('query', @pass, node)
-    existingQuery?.join(this)
-    existing = @transmission.getCommunicationFor('message', @pass, node)
-    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), node)
+    existing = @transmission.getCommunicationFor(@pass, node)
+    existing ?= @transmission.getCommunicationFor(@pass.getNext(), node)
     if existing?
-      existing.join(this)
-    else
-      @transmission.addCommunicationFor(this, node)
-      node.routeMessage(this, @payload)
-    return this
-
-
-  sendToNode: (node) ->
-    @log node
+      throw new Error "Message already sent to #{inspect node}. " \
+        + "Previous: #{inspect existing}, " \
+        + "current: #{inspect this}"
+    @transmission.addCommunicationFor(this, node)
     node.routeMessage(this, @payload)
     return this
 
 
-  sendFromNodeToNodeSource: (@sourceNode, nodeSource) ->
-    @log nodeSource
 
-    @transmission.enqueueCommunication(this)
-    @transmission.addPayloadFor(@payload, @sourceNode)
-
-    existingQuery = @transmission.getCommunicationFor('query', @pass, nodeSource)
-    existingQuery?.join(this)
-    existing = @transmission.getCommunicationFor('message', @pass, nodeSource)
-    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), nodeSource)
-    if existing?
-      existing.join(this)
-    else
-      @transmission.addCommunicationFor(this, nodeSource)
-      @_send(nodeSource)
-    @log nodeSource, 'complete'
-    return this
-
-
-  _send: (nodeSource) ->
+  send: (nodeSource) ->
     @updatedChannelNodes = new Set()
 
-    nodeSource = @sourceNode.getNodeSource()
     nodeSource.getChannelNodesFor(this).forEach (channelNode) =>
       if this.tryQueryChannelNode(channelNode)
         @updatedChannelNodes.add(channelNode)
@@ -170,29 +123,10 @@ module.exports = class Message
     return this
 
 
-  _sendForChannelNode: (channelNode) ->
+  sendForChannelNode: (channelNode) ->
     unless @updatedChannelNodes.has(channelNode)
       @updatedChannelNodes.add(channelNode)
       @sourceNode.getNodeSource().receiveMessageForChannelNode(this, channelNode)
-    return this
-
-
-  joinConnectionMessage: (channelNode) ->
-    @_sendForChannelNode(channelNode)
-
-
-  getQueuePrecedence: ->
-    @queuePrecedence ?=
-      Precedence.createQueue(@pass, @communicationTypePriority)
-
-
-  readyToRespond: -> yes
-
-
-  respond: ->
-    @log 'respond', @sourceNode
-    @transmission.SelectedMessage
-      .joinMessageForResponse(this, {node: @sourceNode})
     return this
 
 

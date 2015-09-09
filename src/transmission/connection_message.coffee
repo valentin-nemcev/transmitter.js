@@ -66,10 +66,6 @@ module.exports = class ConnectionMessage
     return this
 
 
-  getCommunicationFor: (type, nodePoint) ->
-    @transmission.getCommunicationFor(type, @pass, nodePoint)
-
-
   getSelectedMessage: (node) ->
     @transmission.SelectedMessage.getOrCreate(this, {node})
 
@@ -78,5 +74,5 @@ module.exports = class ConnectionMessage
     @targetPointsToUpdate.forEach (targetPoint) =>
       @log targetPoint
       targetPoint.receiveConnectionMessage(this, @sourceChannelNode)
-      @log targetPoint, 'complete'
+      # @log targetPoint, 'complete'
     return this

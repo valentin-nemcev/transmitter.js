@@ -17,6 +17,7 @@ class DirectionStub
   reverse: -> new DirectionStub()
 
 class StubPayload
+  getPriority: -> 1
   inspect: -> 'stub()'
   deliver: ->
 
@@ -52,7 +53,7 @@ describe 'Message and query transmission', ->
     sinon.spy(@payload, 'deliver')
     @message = new Message(@transmission, @payload, {@pass})
 
-    @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
+    @message.send(@source.getNodeSource())
 
     expect(@payload.deliver).to.have.been
       .calledWith(sinon.match.same(@target))

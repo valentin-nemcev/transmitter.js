@@ -7,6 +7,8 @@ SortedArray = require 'collections/sorted-array'
 
 {inspect} = require 'util'
 
+Pass = require './pass'
+
 
 module.exports = class Transmission
 
@@ -66,10 +68,8 @@ module.exports = class Transmission
   reverseOrder: no
 
   constructor: ->
-    @pointsToQueries = new WeakMap()
-    @pointsToMessages = new WeakMap()
+    @pointsToComms = new WeakMap()
 
-    @nodesToPayloads = new WeakMap()
     @cachedMessages = new WeakMap()
     # @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
     @commQueue = new Array()
@@ -87,6 +87,13 @@ module.exports = class Transmission
     @ConnectionMessage.createInitial(this)
 
 
+  originateMessage: (node, payload) ->
+    @SelectedMessage.getOrCreate(
+      {transmission: this, pass: Pass.createMessageDefault()},
+      {node: node}
+    ).originateMessage(payload)
+
+
 
   # Common code for communications (queries and messages)
   tryQueryChannelNode: (comm, channelNode) ->
@@ -98,28 +105,19 @@ module.exports = class Transmission
 
 
   channelNodeUpdated: (comm, channelNode) ->
-    channelNode is null or @getCommunicationFor('message', comm.pass, channelNode)
+    channelNode is null or @getCommunicationFor(comm.pass, channelNode)
 
 
   addCommunicationFor: (comm, point) ->
-    comms = @_getCommsByType(comm.type)
-    byPass = comms.get(point) ? []
+    byPass = @pointsToComms.get(point) ? []
     byPass[comm.pass.priority] = comm
-    comms.set(point, byPass)
+    @pointsToComms.set(point, byPass)
     return this
 
 
-  getCommunicationFor: (type, pass, point) ->
+  getCommunicationFor: (pass, point) ->
     return null if pass is null
-    (@_getCommsByType(type).get(point) ? [])[pass.priority]
-
-
-  _getCommsByType: (type) ->
-    switch type
-      when 'query'   then @pointsToQueries
-      when 'message' then @pointsToMessages
-      else throw new Error "Unknown communication type: #{type}"
-
+    (@pointsToComms.get(point) ? [])[pass.priority]
 
 
   getCachedMessage: (point) ->
@@ -129,15 +127,6 @@ module.exports = class Transmission
   setCachedMessage: (point, message) ->
     @cachedMessages.set(point, message)
     return this
-
-
-  addPayloadFor: (payload, node) ->
-    @nodesToPayloads.set(node, payload)
-    return this
-
-
-  getPayloadFor: (node) ->
-    @nodesToPayloads.get(node)
 
 
 

@@ -72,21 +72,6 @@ module.exports = class Query
   directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
-  type: 'query'
-
-  communicationTypePriority: 0
-
-
-  # TODO
-  join: (comm) ->
-    return this
-
-
-  getUpdatePrecedence: ->
-    @updatePrecedence ?=
-      Precedence.createUpdate(@pass)
-
-
   tryQueryChannelNode: (channelNode) ->
     @transmission.tryQueryChannelNode(this, channelNode)
 
@@ -114,44 +99,5 @@ module.exports = class Query
     return this
 
 
-  enqueueForSourceNode: (@sourceNode) ->
-    @transmission.enqueueCommunication(this)
-    return this
-
-
-  getSourceNode: -> @sourceNode
-
-
-  tryEnqueue: (@sourceNode) ->
-    unless @wasDelivered()
-      @log 'enqueue', @getSourceNode()
-      @transmission.enqueueCommunication(this)
-    return this
-
-
   wasDelivered: ->
     @passedLines.length > 0
-
-
-  getQueuePrecedence: ->
-    @queuePrecedence ?=
-      Precedence.createQueue(@pass, @communicationTypePriority)
-
-
-
-  readyToRespond: -> @areAllChannelNodesUpdated()
-
-
-  areAllChannelNodesUpdated: ->
-    # TODO
-    for node in @sourceNode?.getNodeTarget?()?.getChannelNodesFor(this) ? []
-      return false unless @transmission.channelNodeUpdated(this, node)
-    return true
-
-
-  respond: ->
-    unless @wasDelivered()
-      @log 'respond', @getSourceNode()
-      @getSourceNode().respondToQuery(this,
-        @transmission.getPayloadFor(@getSourceNode()))
-    return this

@@ -28,11 +28,6 @@ module.exports = class ConstNodeLine
 
 
   receiveQuery: (query) ->
-    query.createNextQuery().enqueueForSourceNode(this)
-    return this
-
-
-  respondToQuery: (tr) ->
-    tr.createQueryResponseMessage(@createPayload())
+    query.createQueryResponseMessage(@createPayload())
       .sendToSelectingNodeTarget(this, @target)
     return this

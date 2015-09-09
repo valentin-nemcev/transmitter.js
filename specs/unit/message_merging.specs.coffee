@@ -16,7 +16,7 @@ class DirectionStub
 class StubPayload
   inspect: -> 'stub()'
 
-class NodeStub extends SourceNode
+class SourceStub extends SourceNode
   createResponsePayload: -> new StubPayload()
 
 class TargetStub
@@ -32,9 +32,12 @@ describe 'Message merging', ->
     @transmission = new Transmission()
     @pass = Pass.createMessageDefault()
 
+    @activePayload = new StubPayload()
     @passivePayload = new StubPayload()
-    @activeSource = new NodeStub()
-    @passiveSource = new NodeStub()
+    @activeSource = new SourceStub()
+    @passiveSource = new SourceStub()
+    sinon.stub(@activeSource, 'createResponsePayload')
+      .returns(@activePayload)
     sinon.stub(@passiveSource, 'createResponsePayload')
       .returns(@passivePayload)
 
@@ -49,11 +52,7 @@ describe 'Message merging', ->
 
 
   specify 'when one active source have sent message', ->
-    @activePayload = new StubPayload()
-    @message1 = new Message(@transmission, @activePayload, {@pass})
-
-    @message1.sendFromNodeToNodeSource(@activeSource,
-      @activeSource.getNodeSource())
+    @transmission.originateMessage(@activeSource, new StubPayload())
 
 
   specify 'then nothing is sent', ->
@@ -65,7 +64,6 @@ describe 'Message merging', ->
 
 
   specify 'then merged message is sent', ->
-    Message = @message1.constructor
     expect(@target.receiveMessage)
       .to.have.been.calledWith(sinon.match.instanceOf(Message))
 
