@@ -67,14 +67,10 @@ module.exports = class Transmission
 
   reverseOrder: no
 
-  constructor: ->
-    @pointsToComms = new WeakMap()
-    @comms = for priority in [0..Pass.maxPriority]
-      {map: new WeakMap(), array: []}
 
-    @cachedMessages = new WeakMap()
-    @commQueue = new Array()
-    @lastCommSeqNum = 0
+  constructor: ->
+    @comms = for priority in [0..Pass.maxPriority]
+      {map: new WeakMap(), queue: []}
 
 
 
@@ -97,13 +93,18 @@ module.exports = class Transmission
 
 
 
-  addCommunicationFor: (comm, point) ->
-    {map, array} = @comms[comm.pass.priority]
+  addCommunicationForAndEnqueue: (comm, point) ->
+    @addCommunicationFor(comm, point, yes)
+
+
+  addCommunicationFor: (comm, point, enqueue = no) ->
+    {map, queue} = @comms[comm.pass.priority]
     map.set(point, comm)
-    if @reverseOrder
-      array.unshift(comm)
-    else
-      array.push(comm)
+    if enqueue
+      if @reverseOrder
+        queue.unshift(comm)
+      else
+        queue.push(comm)
     return this
 
 
@@ -112,24 +113,15 @@ module.exports = class Transmission
     @comms[pass.priority].map.get(point)
 
 
-  getCachedMessage: (point) ->
-    @cachedMessages.get(point)
-
-
-  setCachedMessage: (point, message) ->
-    @cachedMessages.set(point, message)
-    return this
-
-
 
   respond: ->
-    for {array} in @comms
+    for {queue} in @comms
       loop
         didRespond = no
-        # Use while loop to handle comms pushed to array in single iteration
+        # Use while loop to handle comms pushed to queue in single iteration
         i = 0
-        while i < array.length
-          comm = array[i++]
+        while i < queue.length
+          comm = queue[i++]
           if comm.readyToRespond()
             didRespond = yes
             comm.respond()

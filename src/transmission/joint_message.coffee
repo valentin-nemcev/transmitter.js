@@ -28,7 +28,7 @@ module.exports = class JointMessage
     selected = transmission.getCommunicationFor(pass, node)
     unless selected?
       selected = new this(transmission, node, {pass})
-      transmission.addCommunicationFor(selected, node)
+      transmission.addCommunicationForAndEnqueue(selected, node)
     return selected
 
 

@@ -17,10 +17,10 @@ module.exports = class MergedMessage
 
   @getOrCreate = (message, source) ->
     {transmission, pass} = message
-    merged = transmission.getCachedMessage(source)
+    merged = transmission.getCommunicationFor(pass, source)
     unless (merged? and pass.equals(merged.pass))
       merged = new this(transmission, source, {pass})
-      transmission.setCachedMessage(source, merged)
+      transmission.addCommunicationFor(merged, source)
     return merged
 
 
