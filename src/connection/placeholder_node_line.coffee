@@ -10,12 +10,12 @@ module.exports = class PlaceholderNodeLine
 
 
   connect: (message) ->
-    @target.connectSource(message, this)
+    @target.connectLine(message, this)
     return this
 
 
   disconnect: (message) ->
-    @target.disconnectSource(message, this)
+    @target.disconnectLine(message, this)
     return this
 
 
@@ -24,7 +24,4 @@ module.exports = class PlaceholderNodeLine
 
 
   receiveQuery: (query) ->
-    # if @acceptsCommunication(query)
-    #   query.addPassedLine(this)
-    #   query.createNextQuery().enqueueForSourceNode(this)
     return this

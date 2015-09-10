@@ -17,11 +17,12 @@ class DirectionStub
   reverse: -> new DirectionStub()
 
 class StubPayload
+  getPriority: -> 1
   inspect: -> 'stub()'
   deliver: ->
 
 class NodeSourceStub extends SourceNode
-  createResponsePayload: -> new StubPayload()
+  createResponsePayload: (payload) -> payload
 
 class NodeTargetStub extends TargetNode
   acceptPayload: (payload) ->
@@ -34,25 +35,21 @@ describe 'Message and query transmission', ->
   beforeEach ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
-    @pass = Pass.createMessageDefault()
-    @direction = @pass.direction
 
+
+  it 'transmits message from source to target', ->
     Transmitter.startTransmission (tr) =>
       new SimpleChannel()
-        .inDirection @direction
+        .inBackwardDirection()
         .fromSource @source
         .toTarget @target
         .init(tr)
 
     @transmission = new Transmission()
 
-
-  it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload, {@pass})
-
-    @message.sendFromNodeToNodeSource(@source, @source.getNodeSource())
+    @transmission.originateMessage(@source, @payload)
 
     expect(@payload.deliver).to.have.been
       .calledWith(sinon.match.same(@target))
@@ -62,9 +59,17 @@ describe 'Message and query transmission', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
-    @query = new Query(@transmission, {@pass})
 
-    @query.sendFromNodeToNodeTarget(@target, @target.getNodeTarget())
+    Transmitter.startTransmission (tr) =>
+      new SimpleChannel()
+        .inForwardDirection()
+        .fromSource @source
+        .toTarget @target
+        .init(tr)
+
+    @transmission = new Transmission()
+
+    @transmission.originateQuery(@target)
     @transmission.respond()
 
     expect(@payload.deliver).to.have.been

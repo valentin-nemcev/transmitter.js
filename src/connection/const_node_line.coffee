@@ -14,12 +14,12 @@ module.exports = class ConstNodeLine
 
 
   connect: (message) ->
-    @target.connectSource(message, this)
+    @target.connectLine(message, this)
     return this
 
 
   disconnect: (message) ->
-    @target.disconnectSource(message, this)
+    @target.disconnectLine(message, this)
     return this
 
 
@@ -28,13 +28,6 @@ module.exports = class ConstNodeLine
 
 
   receiveQuery: (query) ->
-    if @acceptsCommunication(query)
-      query.addPassedLine(this)
-      query.createNextQuery().enqueueForSourceNode(this)
-    return this
-
-
-  respondToQuery: (tr) ->
-    tr.createQueryResponseMessage(@createPayload())
-      .sendToSelectingNodeTarget(this, @target)
+    query.createQueryResponseMessage(@createPayload())
+      .sendToNodeTarget(this, @target)
     return this

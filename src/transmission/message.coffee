@@ -7,7 +7,6 @@ Map = require 'collections/map'
 
 Pass = require './pass'
 Precedence = require './precedence'
-SelectedMessage = require './selected_message'
 MergedMessage = require './merged_message'
 
 
@@ -26,12 +25,6 @@ module.exports = class Message
     args.push arg for arg in arguments
     @transmission.log args...
     return this
-
-
-  @createInitial = (transmission, payload) ->
-    new this(transmission, payload,
-      pass: Pass.createMessageDefault(),
-    )
 
 
   @createNext = (prevMessage, payload) ->
@@ -67,10 +60,6 @@ module.exports = class Message
     Message.createNext(this, payload)
 
 
-  createQueryForResponseMessage: ->
-    @transmission.Query.createForResponseMessage(this)
-
-
   createNextConnectionMessage: (channelNode) ->
     @transmission.ConnectionMessage.createNext(this, channelNode)
 
@@ -79,30 +68,8 @@ module.exports = class Message
   directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
-  type: 'message'
-
-  communicationTypePriority: 1
-
-
-  join: (comm) ->
-    return this
-
-
-  getUpdatePrecedence: ->
-    @updatePrecedence ?=
-      Precedence.createUpdate(@pass)
-
-
   getSelectPrecedence: ->
     @selectPrecedence ?= Precedence.createSelect(@payload.getPriority())
-
-
-  tryQueryChannelNode: (channelNode) ->
-    @transmission.tryQueryChannelNode(this, channelNode)
-
-
-  addPassedChannelNode: (channelNode) ->
-    return this
 
 
   sendToLine: (line) ->
@@ -111,68 +78,24 @@ module.exports = class Message
     return this
 
 
-  _sendToNodePoint: (point) ->
-    @log point
-    existingQuery = @transmission.getCommunicationFor('query', @pass, point)
-    existingQuery?.join(this)
-    existing = @transmission.getCommunicationFor('message', @pass, point)
-    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), point)
-    if existing?
-      existing.join(this)
-    else
-      @transmission.addCommunicationFor(this, point)
-      point.receiveMessage(this)
+  sendToNodeTarget: (line, nodeTarget) ->
+    @transmission.JointMessage
+      .getOrCreate(this, {nodeTarget})
+      .joinMessageFrom(this, line)
     return this
-
-
-  resendFromNodePoint: (point, channelNode, connectionMessage) ->
-    point.resendMessage(this, channelNode)
-    return this
-
-
-  sendToNodeTarget: (nodeTarget) ->
-    @_sendToNodePoint(nodeTarget)
 
 
   sendToChannelNode: (node) ->
     @log node
-    existingQuery = @transmission.getCommunicationFor('query', @pass, node)
-    existingQuery?.join(this)
-    existing = @transmission.getCommunicationFor('message', @pass, node)
-    existing ?= @transmission.getCommunicationFor('message', @pass.getNext(), node)
+    existing = @transmission.getCommunicationFor(@pass, node)
+    existing ?= @transmission.getCommunicationFor(@pass.getNext(), node)
     if existing?
-      existing.join(this)
-    else
-      @transmission.addCommunicationFor(this, node)
-      node.routeMessage(this, @payload)
-    return this
-
-
-  sendToNode: (node) ->
-    @log node
+      throw new Error "Message already sent to #{inspect node}. " \
+        + "Previous: #{inspect existing}, " \
+        + "current: #{inspect this}"
+    @transmission.addCommunicationFor(this, node)
     node.routeMessage(this, @payload)
     return this
-
-
-  sendFromNodeToNodeSource: (@sourceNode, nodeSource) ->
-    @transmission.enqueueCommunication(this)
-    @transmission.addPayloadFor(@payload, @sourceNode)
-    @_sendToNodePoint(nodeSource)
-
-
-  getQueuePrecedence: ->
-    @queuePrecedence ?=
-      Precedence.createQueue(@pass, @communicationTypePriority)
-
-
-  readyToRespond: -> yes
-
-
-  respond: ->
-    @log 'respond', @sourceNode
-    @sourceNode.respondToMessage(this)
-    return this
-
 
 
   sendTransformedTo: (transform, target) ->
@@ -200,13 +123,5 @@ module.exports = class Message
     MergedMessage
       .getOrCreate(this, source)
       .receiveMessageFrom(this, @sourceNode)
-
-    return this
-
-
-  sendToSelectingNodeTarget: (line, nodeTarget) ->
-    SelectedMessage
-      .getOrCreate(this, nodeTarget)
-      .receiveMessageFrom(this, line)
 
     return this

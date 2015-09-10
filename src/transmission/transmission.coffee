@@ -7,12 +7,15 @@ SortedArray = require 'collections/sorted-array'
 
 {inspect} = require 'util'
 
+Pass = require './pass'
+
 
 module.exports = class Transmission
 
   Query             : require './query'
   Message           : require './message'
   ConnectionMessage : require './connection_message'
+  JointMessage      : require './joint_message'
 
   @start = (doWithTransmission) ->
     # assert(not @instance, "Transmissions can't be nested")
@@ -64,101 +67,63 @@ module.exports = class Transmission
 
   reverseOrder: no
 
+
   constructor: ->
-    @pointsToQueries = new WeakMap()
-    @pointsToMessages = new WeakMap()
-
-    @nodesToPayloads = new WeakMap()
-    @cachedMessages = new WeakMap()
-    # @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
-    @commQueue = new Array()
-    @lastCommSeqNum = 0
+    @comms = for priority in [0..Pass.maxPriority]
+      {map: new WeakMap(), queue: []}
 
 
-
-  createInitialQuery: ->
-    @Query.createInitial(this)
-
-  createInitialMessage: (payload) ->
-    @Message.createInitial(this, payload)
 
   createInitialConnectionMessage: ->
     @ConnectionMessage.createInitial(this)
 
 
-
-  # Common code for communications (queries and messages)
-  tryQueryChannelNode: (comm, channelNode) ->
-    if not @channelNodeUpdated(comm, channelNode)
-      @Query.createNextConnection(comm).sendToChannelNode(channelNode)
-      false
-    else
-      true
+  originateQuery: (node) ->
+    @JointMessage.getOrCreate(
+      {transmission: this, pass: Pass.createQueryDefault()},
+      {node: node}
+    ).originateQuery()
 
 
-  channelNodeUpdated: (comm, channelNode) ->
-    channelNode is null or @getCommunicationFor('message', comm.pass, channelNode)
+  originateMessage: (node, payload) ->
+    @JointMessage.getOrCreate(
+      {transmission: this, pass: Pass.createMessageDefault()},
+      {node: node}
+    ).originateMessage(payload)
 
 
-  addCommunicationFor: (comm, point) ->
-    comms = @_getCommsByType(comm.type)
-    byPass = comms.get(point) ? []
-    byPass[comm.pass.priority] = comm
-    comms.set(point, byPass)
+
+  addCommunicationForAndEnqueue: (comm, point) ->
+    @addCommunicationFor(comm, point, yes)
+
+
+  addCommunicationFor: (comm, point, enqueue = no) ->
+    {map, queue} = @comms[comm.pass.priority]
+    map.set(point, comm)
+    if enqueue
+      if @reverseOrder
+        queue.unshift(comm)
+      else
+        queue.push(comm)
     return this
 
 
-  getCommunicationFor: (type, pass, point) ->
+  getCommunicationFor: (pass, point) ->
     return null if pass is null
-    (@_getCommsByType(type).get(point) ? [])[pass.priority]
+    @comms[pass.priority].map.get(point)
 
-
-  _getCommsByType: (type) ->
-    switch type
-      when 'query'   then @pointsToQueries
-      when 'message' then @pointsToMessages
-      else throw new Error "Unknown communication type: #{type}"
-
-
-
-  getCachedMessage: (point) ->
-    @cachedMessages.get(point)
-
-
-  setCachedMessage: (point, message) ->
-    @cachedMessages.set(point, message)
-    return this
-
-
-  addPayloadFor: (payload, node) ->
-    @nodesToPayloads.set(node, payload)
-    return this
-
-
-  getPayloadFor: (node) ->
-    @nodesToPayloads.get(node)
-
-
-
-  enqueueCommunication: (comm) ->
-    @commQueue.add([@lastCommSeqNum++, comm])
-    return this
-
-
-  compareComms: ([commASeqNum, commA], [commBSeqNum, commB]) =>
-    r = if @reverseOrder then 1 else -1
-    commA.getQueuePrecedence().compare(commB.getQueuePrecedence()) \
-      or r * (commASeqNum - commBSeqNum)
 
 
   respond: ->
-    while @commQueue.length
-      @commQueue.sort(@compareComms)
-      @logQueue()
-      for i in [0...@commQueue.length]
-        [commSeqNum, comm] = @commQueue[i]
-        if comm.readyToRespond()
-          @commQueue.splice(i, 1)
-          comm.respond()
-          break
+    for {queue} in @comms
+      loop
+        didRespond = no
+        # Use while loop to handle comms pushed to queue in single iteration
+        i = 0
+        while i < queue.length
+          comm = queue[i++]
+          if comm.readyToRespond()
+            didRespond = yes
+            comm.respond()
+        break unless didRespond
     return this

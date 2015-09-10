@@ -19,7 +19,9 @@ module.exports = class ConnectionMessage
 
 
   log: (arg) ->
-    @transmission.log this, arg
+    args = [this]
+    args.push arg for arg in arguments
+    @transmission.log args...
     return this
 
 
@@ -45,6 +47,10 @@ module.exports = class ConnectionMessage
     ConnectionMessage.createNext(this, sourceChannelNode)
 
 
+  createNextQuery: ->
+    @transmission.Query.createNext(this)
+
+
   getSourceChannelNode: -> @sourceChannelNode
 
 
@@ -60,19 +66,13 @@ module.exports = class ConnectionMessage
     return this
 
 
-  updateTargetPoints: ->
+  getJointMessage: (node) ->
+    @transmission.JointMessage.getOrCreate(this, {node})
+
+
+  sendToTargetPoints: ->
     @targetPointsToUpdate.forEach (targetPoint) =>
       @log targetPoint
-      comm = @transmission.getCommunicationFor(
-        targetPoint.communicationType, @pass, targetPoint)
-      comm?.resendFromNodePoint(targetPoint, @sourceChannelNode, this)
-
-      if (cachedForMerge = @transmission.getCachedMessage(targetPoint))?
-        cachedForMerge.resend()
-
-      # TODO: Refactor
-      if targetPoint.communicationType is 'query'
-        @transmission.Query.createNext(this)
-          .sendFromNodeToNodeTarget(targetPoint.node, targetPoint)
-
+      targetPoint.receiveConnectionMessage(this, @sourceChannelNode)
+      # @log targetPoint, 'complete'
     return this

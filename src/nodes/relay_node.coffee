@@ -10,56 +10,31 @@ module.exports = class RelayNode
   inspect: -> '[' + @constructor.name + ']'
 
 
-  routeMessage: (tr, payload) ->
+  processPayload: (payload) ->
     @acceptPayload(payload)
-    tr.createNextMessage(@createResponsePayload(payload))
-      .sendFromNodeToNodeSource(this, @getNodeSource())
-    return this
+    return @createResponsePayload(payload)
 
 
   getNodeSource: -> @nodeSource ?= new NodeSource(this)
   getNodeTarget: -> @nodeTarget ?= new NodeTarget(this)
 
 
-  routeQuery: (tr) ->
-    tr.createNextQuery()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
-  respondToMessage: (tr) ->
-    tr.createQueryForResponseMessage()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
-  respondToQuery: (tr, prevPayload) ->
-    tr.createQueryResponseMessage(@createResponsePayload(prevPayload))
-      .sendFromNodeToNodeSource(this, @getNodeSource())
-    return this
-
-
   originate: (tr) ->
-    tr.createInitialMessage(@createOriginPayload())
-      .sendFromNodeToNodeSource(this, @getNodeSource())
+    tr.originateMessage(this, @createOriginPayload())
     return this
 
 
   init: (tr, value) ->
-    tr.createInitialMessage(@createUpdatePayload(value))
-      .sendToNodeTarget(@getNodeTarget())
-    return this
+    @receivePayload(tr, @createUpdatePayload(value))
 
 
   receivePayload: (tr, payload) ->
-    tr.createInitialMessage(payload)
-      .sendToNodeTarget(@getNodeTarget())
+    tr.originateMessage(this, payload)
     return this
 
 
   queryState: (tr) ->
-    tr.createInitialQuery()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
+    tr.originateQuery(this)
     return this
 
 

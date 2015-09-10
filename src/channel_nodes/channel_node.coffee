@@ -36,11 +36,13 @@ module.exports = class ChannelNode
     return this
 
 
-  communicationType: 'query'
+  receiveConnectionMessage: (connectionMessage) ->
+    connectionMessage.createNextQuery()
+      .sendToChannelNode(this)
+    return this
 
 
   receiveQuery: (query) ->
-    query.addPassedLine(this)
     @source.receiveQuery(query)
     return this
 
@@ -57,6 +59,6 @@ module.exports = class ChannelNode
   routeMessage: (tr, payload) ->
     @message = tr.createNextConnectionMessage(this)
     @acceptPayload(payload)
-    @message.updateTargetPoints()
+    @message.sendToTargetPoints()
     @message = null
     return this

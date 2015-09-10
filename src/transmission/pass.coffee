@@ -8,6 +8,8 @@ directions = require '../directions'
 
 module.exports = class Pass
 
+  @maxPriority = 1
+
   inspect: -> 'P:' + @priority + ' ' + @direction.inspect()
 
 

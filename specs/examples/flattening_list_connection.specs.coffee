@@ -36,7 +36,9 @@ describe 'Flattening list connection', ->
         .withTransform (serialized, values) =>
           for valueVar, i in values.keys()
             value = serialized.get()[i]?.value
-            values.set(valueVar, Transmitter.Payloads.Variable.setConst(value))
+            values.set valueVar,
+              Transmitter.Payloads.Variable.setConst(value)
+                .setPriority(serialized.getPriority())
 
 
   beforeEach ->
@@ -50,9 +52,10 @@ describe 'Flattening list connection', ->
         .fromSource @serializedVar
         .toTarget @nestedList
         .withTransform (payload) ->
-          Transmitter.Payloads.List.setLazy ->
+          Transmitter.Payloads.List.setLazy(->
             payload.get().map (serialized) ->
               return new NestedObject(serialized.name)
+          ).setPriority(payload.getPriority())
         .init(tr)
 
     # Separate transmissions to test channel init querying

@@ -13,12 +13,12 @@ module.exports = class ConnectionNodeLine
 
 
   connect: (message) ->
-    @target?.connectSource(message, this)
+    @target?.connectLine(message, this)
     return this
 
 
   disconnect: (message) ->
-    @target?.disconnectSource(message, this)
+    @target?.disconnectLine(message, this)
     return this
 
 
@@ -27,9 +27,7 @@ module.exports = class ConnectionNodeLine
 
 
   receiveQuery: (query) ->
-    if @acceptsCommunication(query)
-      query.addPassedLine(this)
-      @source.receiveQuery(query)
+    @source.receiveQuery(query)
     return this
 
 
@@ -37,5 +35,5 @@ module.exports = class ConnectionNodeLine
 
 
   receiveMessage: (message) ->
-    message.sendToSelectingNodeTarget(this, @target) if @target?
+    message.sendToNodeTarget(this, @target) if @target?
     return this

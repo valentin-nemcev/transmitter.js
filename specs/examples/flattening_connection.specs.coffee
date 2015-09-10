@@ -147,7 +147,6 @@ describe 'Flattening connection', ->
 
         Transmitter.startTransmission (tr) =>
           tr.reverseOrder = order is 'reverse'
-          # tr.loggingIsEnabled = yes
           @createBackwardChannel().init(tr)
           @createNestedChannel().init(tr)
           @createDerivedChannel().init(tr)

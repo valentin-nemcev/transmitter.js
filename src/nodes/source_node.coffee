@@ -12,36 +12,20 @@ module.exports = class SourceNode
   inspect: -> '[' + @constructor.name + ']'
 
 
+  processPayload: (payload) ->
+    return @createResponsePayload(payload)
+
+
   getNodeSource: -> @nodeSource ?= new NodeSource(this)
   getNodeTarget: -> @nodeTarget ?= new BlindNodeTarget(this)
 
 
-  routeQuery: (tr) ->
-    tr.createNextQuery()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
-  respondToMessage: (tr) ->
-    tr.createQueryForResponseMessage()
-      .sendFromNodeToNodeTarget(this, @getNodeTarget())
-    return this
-
-
-  respondToQuery: (tr, prevPayload) ->
-    tr.createQueryResponseMessage(prevPayload ? @createResponsePayload())
-      .sendFromNodeToNodeSource(this, @getNodeSource())
-    return this
-
-
   originate: (tr, value) ->
-    tr.createInitialMessage(@createOriginPayload(value))
-      .sendFromNodeToNodeSource(this, @getNodeSource())
+    tr.originateMessage(this, @createOriginPayload(value))
     return this
 
 
-  createResponsePayload: ->
-    noop()
+  createResponsePayload: (payload) -> payload ? noop()
 
 
   createOriginPayload: (value) ->

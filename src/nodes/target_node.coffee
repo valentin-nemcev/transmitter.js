@@ -1,6 +1,7 @@
 'use strict'
 
 
+BlindNodeSource = require '../connection/blind_node_source'
 NodeTarget = require '../connection/node_target'
 
 noop = require '../payloads/noop'
@@ -11,18 +12,13 @@ module.exports = class TargetNode
   inspect: -> '[' + @constructor.name + ']'
 
 
+  getNodeSource: -> @nodeSource ?= new BlindNodeSource(this)
   getNodeTarget: -> @nodeTarget ?= new NodeTarget(this)
 
 
-  routeMessage: (tr, payload) ->
+  processPayload: (payload) ->
     @acceptPayload(payload)
-    return this
-
-
-  respondToQuery: (tr, prevPayload) ->
-    tr.createQueryResponseMessage(@createResponsePayload(prevPayload))
-      .sendToNodeTarget(@getNodeTarget())
-    return this
+    return @createResponsePayload(payload)
 
 
   createResponsePayload: (payload) -> payload ? noop()

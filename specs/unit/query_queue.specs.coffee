@@ -2,17 +2,16 @@
 
 
 Transmission = require 'transmitter/transmission/transmission'
+Pass = require 'transmitter/transmission/pass'
 
 
 class QueryStub
-  constructor: (@priority) ->
-  readyToRespond: -> yes
-  respond: -> this
-  getQueuePrecedence: ->
-    {
-      priority: @priority
-      compare: (other) -> this.priority - other.priority
-    }
+  constructor: (@pass) ->
+  respond: -> @_didRespond = yes; this
+  readyToRespond: -> not @_didRespond
+
+
+class PointStub
 
 
 describe 'Query queue', ->
@@ -22,70 +21,68 @@ describe 'Query queue', ->
 
 
   it 'responds to queries from nodes', ->
-    @query = new QueryStub()
+    @query = new QueryStub(Pass.getBackward())
     sinon.spy(@query, 'respond')
 
-    @transmission.enqueueCommunication(@query)
+    @transmission.addCommunicationForAndEnqueue(@query, new PointStub())
     @transmission.respond()
 
     expect(@query.respond).to.have.been.calledOnce
 
 
-  it 'responds to queries with lower order first', ->
-    @query1 = new QueryStub(1)
-    @query2 = new QueryStub(2)
-    @query3 = new QueryStub(3)
+  it 'responds to queries with lower pass priority first', ->
+    @query1 = new QueryStub(Pass.getBackward())
+    @query2 = new QueryStub(Pass.getForward())
     callOrder = []
-    sinon.stub(@query1, 'respond', -> callOrder.push 1)
-    sinon.stub(@query2, 'respond', -> callOrder.push 2)
-    sinon.stub(@query3, 'respond', -> callOrder.push 3)
+    sinon.stub(@query1, 'respond', -> callOrder.push 1; @_didRespond = yes)
+    sinon.stub(@query2, 'respond', -> callOrder.push 2; @_didRespond = yes)
 
-    @transmission.enqueueCommunication(@query2)
-    @transmission.enqueueCommunication(@query3)
-    @transmission.enqueueCommunication(@query1)
+    @transmission.addCommunicationForAndEnqueue(@query2, new PointStub())
+    @transmission.addCommunicationForAndEnqueue(@query1, new PointStub())
     @transmission.respond()
 
-    expect(callOrder).to.deep.equal([1, 2, 3])
+    expect(callOrder).to.deep.equal([1, 2])
 
 
-  it 'behaves like LIFO for queries with the same order', ->
-    @query1 = new QueryStub(0)
-    @query2 = new QueryStub(0)
+  it 'behaves like FIFO for queries with the same order', ->
+    @query1 = new QueryStub(Pass.getBackward())
+    @query2 = new QueryStub(Pass.getBackward())
     callOrder = []
-    sinon.stub(@query1, 'respond', -> callOrder.push 1)
-    sinon.stub(@query2, 'respond', -> callOrder.push 2)
+    sinon.stub(@query1, 'respond', -> callOrder.push 1; @_didRespond = yes)
+    sinon.stub(@query2, 'respond', -> callOrder.push 2; @_didRespond = yes)
 
-    @transmission.enqueueCommunication(@query2)
-    @transmission.enqueueCommunication(@query1)
+    @transmission.addCommunicationForAndEnqueue(@query1, new PointStub())
+    @transmission.addCommunicationForAndEnqueue(@query2, new PointStub())
     @transmission.respond()
 
     expect(callOrder).to.deep.equal([1, 2])
 
 
   it 'has option to reverse queries with the same order for testing', ->
-    @query1 = new QueryStub(0)
-    @query2 = new QueryStub(0)
+    @query1 = new QueryStub(Pass.getBackward())
+    @query2 = new QueryStub(Pass.getBackward())
     callOrder = []
-    sinon.stub(@query1, 'respond', -> callOrder.push 1)
-    sinon.stub(@query2, 'respond', -> callOrder.push 2)
+    sinon.stub(@query1, 'respond', -> callOrder.push 1; @_didRespond = yes)
+    sinon.stub(@query2, 'respond', -> callOrder.push 2; @_didRespond = yes)
 
     @transmission.reverseOrder = yes
-    @transmission.enqueueCommunication(@query2)
-    @transmission.enqueueCommunication(@query1)
+    @transmission.addCommunicationForAndEnqueue(@query1, new PointStub())
+    @transmission.addCommunicationForAndEnqueue(@query2, new PointStub())
     @transmission.respond()
 
     expect(callOrder).to.deep.equal([2, 1])
 
 
   it 'responds to queries created as a result of previous response', ->
-    @query1 = new QueryStub()
-    @query2 = new QueryStub()
+    @query1 = new QueryStub(Pass.getBackward())
+    @query2 = new QueryStub(Pass.getBackward())
     sinon.stub(@query1, 'respond', =>
-      @transmission.enqueueCommunication(@query2)
+      @transmission.addCommunicationForAndEnqueue(@query2, new PointStub())
+      @query1._didRespond = yes
     )
     sinon.spy(@query2, 'respond')
 
-    @transmission.enqueueCommunication(@query1)
+    @transmission.addCommunicationForAndEnqueue(@query1, new PointStub())
     @transmission.respond()
 
     expect(@query2.respond).to.have.been.calledOnce
