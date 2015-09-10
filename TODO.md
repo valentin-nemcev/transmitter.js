@@ -22,13 +22,10 @@
 ## Development tasks
 
 * Refactor
-  * Better names for node and connection source/target
   * Don't use context in isolated tests, use context in scenarios.
 
 * Implement
-  * Improve query and update priority logic
-  * Optimize querying for merge or select
-  * Improve or remove query routing specs
+  * Better checks for message pass ordering in joint message
 
 * Later
   * Remove use strict (needs custom compiler for mocha, browserify and npm)
