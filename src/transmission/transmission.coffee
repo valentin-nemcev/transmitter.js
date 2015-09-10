@@ -69,9 +69,10 @@ module.exports = class Transmission
 
   constructor: ->
     @pointsToComms = new WeakMap()
+    @comms = for priority in [0..Pass.maxPriority]
+      {map: new WeakMap(), array: []}
 
     @cachedMessages = new WeakMap()
-    # @commQueue = SortedArray([], Object.equals, => @compareComms(arguments...))
     @commQueue = new Array()
     @lastCommSeqNum = 0
 
@@ -109,15 +110,18 @@ module.exports = class Transmission
 
 
   addCommunicationFor: (comm, point) ->
-    byPass = @pointsToComms.get(point) ? []
-    byPass[comm.pass.priority] = comm
-    @pointsToComms.set(point, byPass)
+    {map, array} = @comms[comm.pass.priority]
+    map.set(point, comm)
+    if @reverseOrder
+      array.unshift(comm)
+    else
+      array.push(comm)
     return this
 
 
   getCommunicationFor: (pass, point) ->
     return null if pass is null
-    (@pointsToComms.get(point) ? [])[pass.priority]
+    @comms[pass.priority].map.get(point)
 
 
   getCachedMessage: (point) ->
@@ -130,25 +134,16 @@ module.exports = class Transmission
 
 
 
-  enqueueCommunication: (comm) ->
-    @commQueue.add([@lastCommSeqNum++, comm])
-    return this
-
-
-  compareComms: ([commASeqNum, commA], [commBSeqNum, commB]) =>
-    r = if @reverseOrder then 1 else -1
-    commA.getQueuePrecedence().compare(commB.getQueuePrecedence()) \
-      or r * (commASeqNum - commBSeqNum)
-
-
   respond: ->
-    while @commQueue.length
-      @commQueue.sort(@compareComms)
-      # @logQueue()
-      for i in [0...@commQueue.length]
-        [commSeqNum, comm] = @commQueue[i]
-        if comm.readyToRespond()
-          @commQueue.splice(i, 1)
-          comm.respond()
-          break
+    for {array} in @comms
+      loop
+        didRespond = no
+        # Use while loop to handle comms pushed to array in single iteration
+        i = 0
+        while i < array.length 
+          comm = array[i++]
+          if comm.readyToRespond()
+            didRespond = yes
+            comm.respond()
+        break unless didRespond
     return this

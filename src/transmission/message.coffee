@@ -130,6 +130,8 @@ module.exports = class Message
     return this
 
 
+  readyToRespond: -> false
+
 
   sendTransformedTo: (transform, target) ->
     copy = if transform?

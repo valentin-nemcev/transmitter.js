@@ -85,26 +85,22 @@ module.exports = class SelectedMessage
         @updatedChannelNodes.add(channelNode)
         nodeTarget.receiveQueryForChannelNode(@query, channelNode)
 
-    @transmission.log @query, 'enqueue', @node
-    @transmission.enqueueCommunication(this)
     return this
 
 
-  respond: ->
-    unless @query.wasDelivered() or @outgoingMessage?
-      @transmission.log @query, 'respond', @node
-      prevPayload = @prevMessage?.payload
-      payload = @node.createResponsePayload(prevPayload)
-      @_sendOutgoing(
-        @transmission.Message.createQueryResponse(this, payload))
-    return this
+  originateResponseMessage: ->
+    @transmission.log @query, 'respond', @node
+    prevPayload = @prevMessage?.payload
+    payload = @node.createResponsePayload(prevPayload)
+    @_sendOutgoing(
+      @transmission.Message.createQueryResponse(this, payload))
+
+  readyToRespond: ->
+    @query? and not @outgoingMessage? and not @query.wasDelivered() \
+      and @areAllChannelNodesUpdated()
 
 
-  getQueuePrecedence: ->
-    @queuePrecedence ?= Precedence.createQueue(@pass)
-
-
-  readyToRespond: -> @areAllChannelNodesUpdated()
+  respond: -> @originateResponseMessage()
 
 
   areAllChannelNodesUpdated: ->
