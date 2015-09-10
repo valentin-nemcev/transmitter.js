@@ -8,7 +8,7 @@ Set = require 'collections/set'
 Precedence = require './precedence'
 
 
-module.exports = class SelectedMessage
+module.exports = class JointMessage
 
   inspect: ->
     [
@@ -124,22 +124,22 @@ module.exports = class SelectedMessage
     @transmission.log @node, @query, @query.getPassedLines().toArray()...
     # TODO: Compare contents
     if @linesToMessages.length == @query.getPassedLines().length
-      newSelectedMessage = @_selectMessage()
-      if @selectedMessage? and @selectedMessage != newSelectedMessage
+      newJointMessage = @_selectMessage()
+      if @selectedMessage? and @selectedMessage != newJointMessage
         throw new Error "Message already selected at #{inspect @node}. " \
           + "Previous: #{inspect @selectedMessage}, " \
-          + "current: #{inspect newSelectedMessage}"
-      if newSelectedMessage? and @selectedMessage != newSelectedMessage
-        @selectedMessage = newSelectedMessage
+          + "current: #{inspect newJointMessage}"
+      if newJointMessage? and @selectedMessage != newJointMessage
+        @selectedMessage = newJointMessage
         if @outgoingMessage?
-          if @outgoingMessage != newSelectedMessage \
-            and newSelectedMessage.getSelectPrecedence()
+          if @outgoingMessage != newJointMessage \
+            and newJointMessage.getSelectPrecedence()
               .compare(@outgoingMessage.getSelectPrecedence()) >= 0
                 throw new Error "Message already sent at #{inspect @node}. " \
                   + "Previous: #{inspect @outgoingMessage}, " \
-                  + "current: #{inspect newSelectedMessage}"
+                  + "current: #{inspect newJointMessage}"
         else
-          @_sendOutgoing(@_relayMessage(newSelectedMessage))
+          @_sendOutgoing(@_relayMessage(newJointMessage))
     return this
 
 
@@ -158,7 +158,7 @@ module.exports = class SelectedMessage
     @outgoingMessage.sourceNode = @node
     responsePass = @pass.getForResponse()
     if responsePass?
-      SelectedMessage.getOrCreate({@transmission, pass: responsePass}, {@node})
+      JointMessage.getOrCreate({@transmission, pass: responsePass}, {@node})
         .joinMessageForResponse(@outgoingMessage)
 
     @outgoingMessage.send(@node.getNodeSource())

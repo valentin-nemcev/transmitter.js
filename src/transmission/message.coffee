@@ -93,7 +93,7 @@ module.exports = class Message
 
 
   sendToSelectingNodeTarget: (line, nodeTarget) ->
-    @transmission.SelectedMessage
+    @transmission.JointMessage
       .getOrCreate(this, {nodeTarget})
       .joinMessageFrom(this, line)
     return this

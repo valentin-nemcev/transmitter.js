@@ -15,7 +15,7 @@ module.exports = class Transmission
   Query             : require './query'
   Message           : require './message'
   ConnectionMessage : require './connection_message'
-  SelectedMessage   : require './selected_message'
+  JointMessage      : require './joint_message'
 
   @start = (doWithTransmission) ->
     # assert(not @instance, "Transmissions can't be nested")
@@ -89,7 +89,7 @@ module.exports = class Transmission
 
 
   originateMessage: (node, payload) ->
-    @SelectedMessage.getOrCreate(
+    @JointMessage.getOrCreate(
       {transmission: this, pass: Pass.createMessageDefault()},
       {node: node}
     ).originateMessage(payload)
@@ -140,7 +140,7 @@ module.exports = class Transmission
         didRespond = no
         # Use while loop to handle comms pushed to array in single iteration
         i = 0
-        while i < array.length 
+        while i < array.length
           comm = array[i++]
           if comm.readyToRespond()
             didRespond = yes

@@ -29,7 +29,7 @@ module.exports = class NodeSource
 
 
   receiveConnectionMessage: (connectionMessage, channelNode) ->
-    connectionMessage.getSelectedMessage(@node)
+    connectionMessage.getJointMessage(@node)
       .joinSourceConnectionMessage(channelNode)
     return this
 

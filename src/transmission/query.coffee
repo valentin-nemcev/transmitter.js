@@ -94,7 +94,7 @@ module.exports = class Query
 
   sendToNode: (node) ->
     @log node
-    @transmission.SelectedMessage.getOrCreate(this, {node})
+    @transmission.JointMessage.getOrCreate(this, {node})
       .joinQuery(this)
     return this
 

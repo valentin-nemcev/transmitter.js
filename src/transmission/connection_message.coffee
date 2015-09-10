@@ -66,8 +66,8 @@ module.exports = class ConnectionMessage
     return this
 
 
-  getSelectedMessage: (node) ->
-    @transmission.SelectedMessage.getOrCreate(this, {node})
+  getJointMessage: (node) ->
+    @transmission.JointMessage.getOrCreate(this, {node})
 
 
   sendToTargetPoints: ->
