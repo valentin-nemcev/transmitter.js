@@ -27,12 +27,6 @@ module.exports = class Message
     return this
 
 
-  @createInitial = (transmission, payload) ->
-    new this(transmission, payload,
-      pass: Pass.createMessageDefault(),
-    )
-
-
   @createNext = (prevMessage, payload) ->
     new this(prevMessage.transmission, payload, {
       pass: prevMessage.pass

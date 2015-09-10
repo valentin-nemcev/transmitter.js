@@ -1,37 +1,15 @@
 'use strict'
 
 
-NodeLineMap = require './node_line_map'
+NodePoint = require './node_point'
 
 
-module.exports = class NodeTarget
+module.exports = class NodeTarget extends NodePoint
 
   inspect: -> '>' + @node.inspect()
-
-
-  constructor: (@node) ->
-    @sources = new NodeLineMap(this)
-
-
-  connectSource: (message, source) -> 
-    @sources.connect(message, source)
-    return this
-
-
-  disconnectSource: (message, source) ->
-    @sources.disconnect(message, source)
-    return this
 
 
   receiveConnectionMessage: (connectionMessage, channelNode) ->
     connectionMessage.getJointMessage(@node)
       .joinTargetConnectionMessage(channelNode)
     return this
-
-
-  receiveCommForChannelNode: (query, channelNode) ->
-    @sources.resendCommunication(query, channelNode)
-    return this
-
-
-  getChannelNodesFor: (comm) -> @sources.getChannelNodesFor(comm)

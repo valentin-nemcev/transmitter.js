@@ -78,14 +78,15 @@ module.exports = class Transmission
 
 
 
-  createInitialQuery: ->
-    @Query.createInitial(this)
-
-  createInitialMessage: (payload) ->
-    @Message.createInitial(this, payload)
-
   createInitialConnectionMessage: ->
     @ConnectionMessage.createInitial(this)
+
+
+  originateQuery: (node) ->
+    @JointMessage.getOrCreate(
+      {transmission: this, pass: Pass.createQueryDefault()},
+      {node: node}
+    ).originateQuery()
 
 
   originateMessage: (node, payload) ->

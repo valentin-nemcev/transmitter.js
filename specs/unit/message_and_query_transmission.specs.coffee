@@ -35,24 +35,20 @@ describe 'Message and query transmission', ->
   beforeEach ->
     @source = new NodeSourceStub()
     @target = new NodeTargetStub()
-    @pass = Pass.createMessageDefault()
-    @direction = @pass.direction
 
+
+  it 'transmits message from source to target', ->
     Transmitter.startTransmission (tr) =>
       new SimpleChannel()
-        .inDirection @direction
+        .inBackwardDirection()
         .fromSource @source
         .toTarget @target
         .init(tr)
 
     @transmission = new Transmission()
 
-
-  it 'transmits message from source to target', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
-    @message = new Message(@transmission, @payload, {@pass})
-
     @transmission.originateMessage(@source, @payload)
 
     expect(@payload.deliver).to.have.been
@@ -63,9 +59,17 @@ describe 'Message and query transmission', ->
     @payload = new StubPayload()
     sinon.spy(@payload, 'deliver')
     sinon.stub(@source, 'createResponsePayload').returns(@payload)
-    @query = new Query(@transmission, {@pass})
 
-    @query.sendToNode(@target)
+    Transmitter.startTransmission (tr) =>
+      new SimpleChannel()
+        .inForwardDirection()
+        .fromSource @source
+        .toTarget @target
+        .init(tr)
+
+    @transmission = new Transmission()
+
+    @transmission.originateQuery(@target)
     @transmission.respond()
 
     expect(@payload.deliver).to.have.been

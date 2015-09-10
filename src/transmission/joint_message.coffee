@@ -21,10 +21,9 @@ module.exports = class JointMessage
     ].join(' ')
 
 
-  @getOrCreate = (comm, {node, nodeTarget}) ->
+  @getOrCreate = (comm, {node, nodeTarget, nodeSource}) ->
     {transmission, pass} = comm
-    nodeTarget ?= node.getNodeTarget()
-    node ?= nodeTarget.node
+    node ?= nodeTarget?.node ? nodeSource?.node
 
     selected = transmission.getCommunicationFor(pass, node)
     unless selected?
@@ -47,7 +46,11 @@ module.exports = class JointMessage
     @_selectAndSendMessageIfReady()
 
 
-  joinQuery: (query) ->
+  joinQueryFrom: (query, line) ->
+    @_ensureQuerySent()
+
+
+  originateQuery: ->
     @_ensureQuerySent()
 
 

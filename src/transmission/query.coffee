@@ -25,12 +25,6 @@ module.exports = class Query
     return this
 
 
-  @createInitial = (transmission) ->
-    new this(transmission,
-      pass: Pass.createQueryDefault(),
-    )
-
-
   @createNext = (prevQuery) ->
     new this(prevQuery.transmission, {
       pass: prevQuery.pass
@@ -63,6 +57,9 @@ module.exports = class Query
   directionMatches: (direction) -> @pass.directionMatches(direction)
 
 
+  getPassedLines: -> @passedLines
+
+
   sendToLine: (line) ->
     @log line
     @passedLines.add(line)
@@ -70,19 +67,16 @@ module.exports = class Query
     return this
 
 
-  getPassedLines: -> @passedLines
+  sendToNodeSource: (line, nodeSource) ->
+    @transmission.JointMessage
+      .getOrCreate(this, {nodeSource})
+      .joinQueryFrom(this, line)
+    return this
 
 
   sendToChannelNode: (node) ->
     @log node
     node.receiveQuery(this)
-    return this
-
-
-  sendToNode: (node) ->
-    @log node
-    @transmission.JointMessage.getOrCreate(this, {node})
-      .joinQuery(this)
     return this
 
 

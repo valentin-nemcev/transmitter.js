@@ -34,8 +34,7 @@ module.exports = class RelayNode
 
 
   queryState: (tr) ->
-    tr.createInitialQuery()
-      .sendToNode(this)
+    tr.originateQuery(this)
     return this
 
 

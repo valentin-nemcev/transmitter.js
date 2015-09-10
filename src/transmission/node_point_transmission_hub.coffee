@@ -12,7 +12,7 @@ module.exports = class NodePointTransmissionHub
     @nodePoint.getChannelNodesFor(@comm).forEach (channelNode) =>
       if @_tryQueryChannelNode(channelNode)
         @updatedChannelNodes.add(channelNode)
-        @nodePoint.receiveCommForChannelNode(@comm, channelNode)
+        @nodePoint.receiveCommunicationForChannelNode(@comm, channelNode)
 
     return this
 
@@ -20,7 +20,7 @@ module.exports = class NodePointTransmissionHub
   sendForChannelNode: (channelNode) ->
     unless @updatedChannelNodes.has(channelNode)
       @updatedChannelNodes.add(channelNode)
-      @nodePoint.receiveCommForChannelNode(@comm, channelNode)
+      @nodePoint.receiveCommunicationForChannelNode(@comm, channelNode)
     return this
 
 

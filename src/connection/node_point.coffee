@@ -20,7 +20,7 @@ class LineSet extends Set
 
 module.exports = class NodeLineMap
 
-  constructor: (@nodePoint) ->
+  constructor: (@node) ->
     @channelNodeToLines = new MultiMap(null, -> new LineSet())
 
 
@@ -29,31 +29,23 @@ module.exports = class NodeLineMap
       when lines.acceptsCommunication(comm)
 
 
-  connect: (message, line) ->
+  connectLine: (message, line) ->
     channelNode = message.getSourceChannelNode()
-    message.addTargetPoint(@nodePoint)
+    message.addTargetPoint(this)
     @channelNodeToLines.get(channelNode).add(line)
     return this
 
 
-  disconnect: (message, line) ->
+  disconnectLine: (message, line) ->
     channelNode = message.getSourceChannelNode()
-    message.removeTargetPoint(@nodePoint)
+    message.removeTargetPoint(this)
     lines = @channelNodeToLines.get(channelNode)
     lines.delete(line)
     @channelNodeToLines.delete(channelNode) if lines.length is 0
     return this
 
 
-  resendCommunication: (comm, channelNode) ->
+  receiveCommunicationForChannelNode: (comm, channelNode) ->
     lines = @channelNodeToLines.get(channelNode)
     lines.receiveCommunication(comm)
-    return this
-
-
-  sendCommunication: (comm) ->
-    @channelNodeToLines.forEach (lines, channelNode) =>
-      if lines.acceptsCommunication(comm) \
-        and comm.tryQueryChannelNode(channelNode)
-          lines.receiveCommunication(comm)
     return this
