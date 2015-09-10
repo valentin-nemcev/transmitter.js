@@ -6,6 +6,7 @@
 FastMap = require 'collections/fast-map'
 Set = require 'collections/set'
 Precedence = require './precedence'
+NodePointTransmissionHub = require './node_point_transmission_hub'
 
 
 module.exports = class JointMessage
@@ -37,146 +38,145 @@ module.exports = class JointMessage
     @linesToMessages = new FastMap()
 
 
-  join: (comm) ->
-    return this
-
-
   joinMessageFrom: (message, line) ->
     @transmission.log line, message
     if (prev = @linesToMessages.get(line))?
       throw new Error "Already received message from #{inspect line}"
     @linesToMessages.set(line, message)
     @_ensureQuerySent()
-    @_selectAndSendOutgoingIfReady()
+    @_selectAndSendMessageIfReady()
 
 
   joinQuery: (query) ->
-    @_ensureQuerySent()
-    return this
-
-
-  joinMessageForResponse: (@prevMessage) ->
     @_ensureQuerySent()
 
 
   joinTargetConnectionMessage: (channelNode) ->
     @_ensureQuerySent()
     @_sendQueryForChannelNode(channelNode)
-    @_selectAndSendOutgoingIfReady()
+    @_selectAndSendMessageIfReady()
 
 
   joinSourceConnectionMessage: (channelNode) ->
-    @outgoingMessage?.sendForChannelNode(channelNode)
+    @messageHub?.sendForChannelNode(channelNode)
     return this
 
 
-  _queryWasSent: -> @query?
+  joinPrecedingMessage: (@precedingMessage) ->
+    @_ensureQuerySent()
+
+
+  originateMessage: (payload) ->
+    if @message?
+        throw new Error "Message already originated at #{inspect @node}. " \
+          + "Previous: #{inspect @message}"
+    payload = @node.processPayload(payload)
+    @_sendMessage(@transmission.Message.createNext(this, payload))
+    return this
 
 
   _ensureQuerySent: ->
     return this if @query?
+    # This method is reentrant, so assign @query before sending
     @query = @transmission.Query.createNext(this)
-
-    @updatedChannelNodes = new Set()
-
-    nodeTarget = @node.getNodeTarget()
-    nodeTarget.getChannelNodesFor(@query).forEach (channelNode) =>
-      if @query.tryQueryChannelNode(channelNode)
-        @updatedChannelNodes.add(channelNode)
-        nodeTarget.receiveQueryForChannelNode(@query, channelNode)
+    @queryHub = new NodePointTransmissionHub(@query, @node.getNodeTarget())
+    @queryHub.sendForAll()
 
     return this
-
-
-  originateResponseMessage: ->
-    @transmission.log @query, 'respond', @node
-    prevPayload = @prevMessage?.payload
-    payload = @node.createResponsePayload(prevPayload)
-    @_sendOutgoing(
-      @transmission.Message.createQueryResponse(this, payload))
-
-  readyToRespond: ->
-    @query? and not @outgoingMessage? and not @query.wasDelivered() \
-      and @areAllChannelNodesUpdated()
-
-
-  respond: -> @originateResponseMessage()
-
-
-  areAllChannelNodesUpdated: ->
-    for node in @node.getNodeTarget().getChannelNodesFor(@query)
-      return false unless @transmission.channelNodeUpdated(@query, node)
-    return true
 
 
   _sendQueryForChannelNode: (channelNode) ->
-    unless @updatedChannelNodes.has(channelNode)
-      @updatedChannelNodes.add(channelNode)
-      @node.getNodeTarget().receiveQueryForChannelNode(@query, channelNode)
+    @queryHub.sendForChannelNode(channelNode)
     return this
 
 
-  _selectAndSendOutgoingIfReady: ->
-    unless @areAllChannelNodesUpdated()
+  _selectAndSendMessageIfReady: ->
+    unless @queryHub.areAllChannelNodesUpdated()
       return this
 
     @transmission.log @node, @linesToMessages.entries()...
     @transmission.log @node, @query, @query.getPassedLines().toArray()...
     # TODO: Compare contents
-    if @linesToMessages.length == @query.getPassedLines().length
-      newJointMessage = @_selectMessage()
-      if @selectedMessage? and @selectedMessage != newJointMessage
-        throw new Error "Message already selected at #{inspect @node}. " \
-          + "Previous: #{inspect @selectedMessage}, " \
-          + "current: #{inspect newJointMessage}"
-      if newJointMessage? and @selectedMessage != newJointMessage
-        @selectedMessage = newJointMessage
-        if @outgoingMessage?
-          if @outgoingMessage != newJointMessage \
-            and newJointMessage.getSelectPrecedence()
-              .compare(@outgoingMessage.getSelectPrecedence()) >= 0
-                throw new Error "Message already sent at #{inspect @node}. " \
-                  + "Previous: #{inspect @outgoingMessage}, " \
-                  + "current: #{inspect newJointMessage}"
-        else
-          @_sendOutgoing(@_relayMessage(newJointMessage))
+    unless @linesToMessages.length == @query.getPassedLines().length
+      return this
+
+    newSelectedMessage = @_selectMessage()
+    if @selectedMessage?
+      @_assertSelectedMessage(newSelectedMessage)
+      return this
+
+    return this unless newSelectedMessage?
+
+    @selectedMessage = newSelectedMessage
+    if @message?
+      @_assertMessage(newSelectedMessage)
+      return this
+
+    @_sendMessage(@_processMessage(newSelectedMessage))
     return this
 
 
-  _relayMessage: (prevMessage) ->
+  _assertSelectedMessage: (newSelectedMessage) ->
+    if @selectedMessage != newSelectedMessage
+      throw new Error "Message already selected at #{inspect @node}. " \
+        + "Previous: #{inspect @selectedMessage}, " \
+        + "current: #{inspect newSelectedMessage}"
+    return this
+
+
+  _assertMessage: (message) ->
+    if @message != message \
+      and message.getSelectPrecedence()
+        .compare(@message.getSelectPrecedence()) >= 0
+          throw new Error "Message already sent at #{inspect @node}. " \
+            + "Previous: #{inspect @message}, " \
+            + "current: #{inspect message}"
+    return this
+
+
+  _selectMessage: ->
+    # TODO: Add checks for more than one message with precedence of 1
+    messages = @linesToMessages.values()
+    sorted = messages.sorted (a, b) ->
+      -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
+    return sorted[0]
+
+
+  _processMessage: (prevMessage) ->
     @transmission.log prevMessage, @node
     payload = @node.processPayload(prevMessage.payload)
     @transmission.Message.createNext(this, payload)
 
 
-  _sendOutgoing: (newOutgoingMessage) ->
-    @transmission.log this, @node
-    # This method is reentrant, so assign @outgoingMessage before sending
-    @outgoingMessage = newOutgoingMessage
-    @transmission.log @outgoingMessage, @node.getNodeSource()
 
-    @outgoingMessage.sourceNode = @node
+  readyToRespond: ->
+    @query? and not @message? and not @query.wasDelivered() \
+      and @queryHub.areAllChannelNodesUpdated()
+
+
+  respond: ->
+    @transmission.log @query, 'respond', @node
+    payload = @node.createResponsePayload(@precedingMessage?.payload)
+    @_sendMessage(@transmission.Message.createQueryResponse(this, payload))
+
+
+  _sendMessage: (message) ->
+    @transmission.log this, @node
+    throw new Error "Can't send message twice" if @message?
+    # This method is reentrant, so assign @message before sending
+    @message = message
+    @transmission.log @message, @node.getNodeSource()
+
+    @message.sourceNode = @node
+    @_joinMessageToSucceeding()
+    @messageHub = new NodePointTransmissionHub(@message, @node.getNodeSource())
+    @messageHub.sendForAll()
+    return this
+
+
+  _joinMessageToSucceeding: ->
     responsePass = @pass.getForResponse()
     if responsePass?
       JointMessage.getOrCreate({@transmission, pass: responsePass}, {@node})
-        .joinMessageForResponse(@outgoingMessage)
+        .joinPrecedingMessage(@message)
 
-    @outgoingMessage.send(@node.getNodeSource())
-    return this
-
-
-  originateMessage: (payload) ->
-    if @outgoingMessage?
-        throw new Error "Message already originated at #{inspect @node}. " \
-          + "Previous: #{inspect @outgoingMessage}"
-    payload = @node.processPayload(payload)
-    @_sendOutgoing(@transmission.Message.createNext(this, payload))
-    return this
-
-
-  _selectMessage: ->
-    # TODO: refactor
-    messages = @linesToMessages.values()
-    sorted = messages.sorted (a, b) ->
-      -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
-    return sorted[0]

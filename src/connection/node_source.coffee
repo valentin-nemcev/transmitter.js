@@ -34,7 +34,7 @@ module.exports = class NodeSource
     return this
 
 
-  receiveMessageForChannelNode: (message, channelNode) ->
+  receiveCommForChannelNode: (message, channelNode) ->
     @targets.resendCommunication(message, channelNode)
     return this
 

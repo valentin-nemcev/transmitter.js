@@ -25,11 +25,6 @@ module.exports = class Query
     return this
 
 
-  @getNullQuery = -> @nullQuery ?= new NullQuery()
-
-  getNullQuery: -> Query.getNullQuery()
-
-
   @createInitial = (transmission) ->
     new this(transmission,
       pass: Pass.createQueryDefault(),
@@ -60,20 +55,12 @@ module.exports = class Query
     @queriedChannelNodes = new FastSet()
 
 
-  createNextQuery: ->
-    Query.createNext(this)
-
-
   createQueryResponseMessage: (payload) ->
     @transmission.Message.createQueryResponse(this, payload)
 
 
 
   directionMatches: (direction) -> @pass.directionMatches(direction)
-
-
-  tryQueryChannelNode: (channelNode) ->
-    @transmission.tryQueryChannelNode(this, channelNode)
 
 
   sendToLine: (line) ->

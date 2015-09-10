@@ -29,5 +29,5 @@ module.exports = class ConstNodeLine
 
   receiveQuery: (query) ->
     query.createQueryResponseMessage(@createPayload())
-      .sendToSelectingNodeTarget(this, @target)
+      .sendToNodeTarget(this, @target)
     return this

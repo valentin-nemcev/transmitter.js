@@ -96,19 +96,6 @@ module.exports = class Transmission
 
 
 
-  # Common code for communications (queries and messages)
-  tryQueryChannelNode: (comm, channelNode) ->
-    if not @channelNodeUpdated(comm, channelNode)
-      @Query.createNextConnection(comm).sendToChannelNode(channelNode)
-      false
-    else
-      true
-
-
-  channelNodeUpdated: (comm, channelNode) ->
-    channelNode is null or @getCommunicationFor(comm.pass, channelNode)
-
-
   addCommunicationFor: (comm, point) ->
     {map, array} = @comms[comm.pass.priority]
     map.set(point, comm)

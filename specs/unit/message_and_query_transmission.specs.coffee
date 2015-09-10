@@ -22,7 +22,7 @@ class StubPayload
   deliver: ->
 
 class NodeSourceStub extends SourceNode
-  createResponsePayload: -> new StubPayload()
+  createResponsePayload: (payload) -> payload
 
 class NodeTargetStub extends TargetNode
   acceptPayload: (payload) ->
@@ -53,7 +53,7 @@ describe 'Message and query transmission', ->
     sinon.spy(@payload, 'deliver')
     @message = new Message(@transmission, @payload, {@pass})
 
-    @message.send(@source.getNodeSource())
+    @transmission.originateMessage(@source, @payload)
 
     expect(@payload.deliver).to.have.been
       .calledWith(sinon.match.same(@target))

@@ -29,7 +29,7 @@ module.exports = class NodeTarget
     return this
 
 
-  receiveQueryForChannelNode: (query, channelNode) ->
+  receiveCommForChannelNode: (query, channelNode) ->
     @sources.resendCommunication(query, channelNode)
     return this
 

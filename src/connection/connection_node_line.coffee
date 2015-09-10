@@ -35,5 +35,5 @@ module.exports = class ConnectionNodeLine
 
 
   receiveMessage: (message) ->
-    message.sendToSelectingNodeTarget(this, @target) if @target?
+    message.sendToNodeTarget(this, @target) if @target?
     return this

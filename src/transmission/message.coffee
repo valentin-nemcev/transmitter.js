@@ -78,21 +78,13 @@ module.exports = class Message
     @selectPrecedence ?= Precedence.createSelect(@payload.getPriority())
 
 
-  tryQueryChannelNode: (channelNode) ->
-    @transmission.tryQueryChannelNode(this, channelNode)
-
-
-  addPassedChannelNode: (channelNode) ->
-    return this
-
-
   sendToLine: (line) ->
     @log line
     line.receiveMessage(this)
     return this
 
 
-  sendToSelectingNodeTarget: (line, nodeTarget) ->
+  sendToNodeTarget: (line, nodeTarget) ->
     @transmission.JointMessage
       .getOrCreate(this, {nodeTarget})
       .joinMessageFrom(this, line)
@@ -109,24 +101,6 @@ module.exports = class Message
         + "current: #{inspect this}"
     @transmission.addCommunicationFor(this, node)
     node.routeMessage(this, @payload)
-    return this
-
-
-
-  send: (nodeSource) ->
-    @updatedChannelNodes = new Set()
-
-    nodeSource.getChannelNodesFor(this).forEach (channelNode) =>
-      if this.tryQueryChannelNode(channelNode)
-        @updatedChannelNodes.add(channelNode)
-        nodeSource.receiveMessageForChannelNode(this, channelNode)
-    return this
-
-
-  sendForChannelNode: (channelNode) ->
-    unless @updatedChannelNodes.has(channelNode)
-      @updatedChannelNodes.add(channelNode)
-      @sourceNode.getNodeSource().receiveMessageForChannelNode(this, channelNode)
     return this
 
 
