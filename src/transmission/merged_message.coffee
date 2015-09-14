@@ -3,6 +3,7 @@
 {inspect} = require 'util'
 
 Map = require 'collections/map'
+noop = require '../payloads/noop'
 
 
 module.exports = class MergedMessage
@@ -37,12 +38,30 @@ module.exports = class MergedMessage
 
     # TODO: Compare contents
     if @nodesToMessages.length == @source.getSourceNodes().length
-      @source.sendMessage(@_mergeMessages(@source.getSourceNodes()))
+      if @source.prioritiesShouldMatch and not @_prioritiesMatch()
+        payload = noop()
+        priority = null
+      else
+        payload = @_getMergedPayload(@source.getSourceNodes())
+        priority = payload.getPriority()
+      message = @transmission.Message.createMerged(this, payload)
+      message.setPriority(priority)
+      @source.sendMessage(message)
     return this
 
 
-  _mergeMessages: (sourceNodes) ->
+  _prioritiesMatch: ->
+    priorities = @nodesToMessages.map (msg) -> msg.getPriority()
+    priorities.every (p) -> p == priorities[0]
+
+
+  _getMergedPayload: (sourceNodes) ->
     @transmission.log this
-    payloads = new Map \
-      sourceNodes.map((node) => [node, @nodesToMessages.get(node)?.payload])
-    @transmission.Message.createMerged(this, payloads)
+    payload = new Map()
+    priority = null
+    sourceNodes.forEach (node) =>
+      message = @nodesToMessages.get(node)
+      payload.set(node, message?.payload)
+      priority = Math.max(message?.getPriority(), priority)
+    payload.getPriority = -> priority
+    return payload

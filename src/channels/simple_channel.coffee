@@ -52,6 +52,11 @@ module.exports = class SimpleChannel
     return this
 
 
+  requireMatchingSourcePriorities: ->
+    @sourcePrioritiesShouldMatch = yes
+    return this
+
+
   toTarget: (target) ->
     @targets.push target if target?
     return this
@@ -73,7 +78,8 @@ module.exports = class SimpleChannel
 
   getSource: ->
     @source ?= if @forceMerging or @sources.length > 1
-      @createMergingSource(@sources)
+      @createMergingSource(@sources,
+        prioritiesShouldMatch: @sourcePrioritiesShouldMatch)
     else @createSingleSource(@sources[0])
 
 
@@ -81,11 +87,11 @@ module.exports = class SimpleChannel
     new NodeConnectionLine(source?.getNodeSource(), @getDirection())
 
 
-  createMergingSource: (sources) ->
+  createMergingSource: (sources, opts) ->
     parts = for source in sources
       line = new NodeConnectionLine(source.getNodeSource(), @getDirection())
       [source, line]
-    new MergingConnectionTarget(new Map(parts))
+    new MergingConnectionTarget(new Map(parts), opts)
 
 
   getTarget: ->

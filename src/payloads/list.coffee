@@ -89,7 +89,9 @@ class RemovePayload
 
   constructor: (@source) ->
 
-  getPriority: -> 1
+  setPriority: (@priority) -> this
+
+  getPriority: -> @priority ? @source.getPriority()
 
   inspect: -> "#{@getPriority()}:listRemove(#{inspect @source})"
 
@@ -106,7 +108,9 @@ class AddAtPayload
 
   constructor: (@source) ->
 
-  getPriority: -> 1
+  setPriority: (@priority) -> this
+
+  getPriority: -> @priority ? @source.getPriority()
 
   inspect: -> "#{@getPriority()}:listAddAt(#{inspect @source.get()})"
 
@@ -122,6 +126,8 @@ class UpdateMatchingPayload
     @matchFn = opts.match
 
   inspect: -> "#{@getPriority()}:listUpdate(#{inspect @source})"
+
+  setPriority: (@priority) -> this
 
   getPriority: -> @priority ? @source.getPriority()
 

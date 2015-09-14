@@ -10,7 +10,8 @@ module.exports = class MergingConnectionTarget
     '[' + @sources.keys().map(inspect).join(', ') + ']:'
 
 
-  constructor: (@sources) ->
+  constructor: (@sources, opts = {}) ->
+    {@prioritiesShouldMatch} = opts
     @sources.forEach (source, node) => source.setTarget(this)
 
 

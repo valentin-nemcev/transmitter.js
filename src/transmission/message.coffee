@@ -69,7 +69,16 @@ module.exports = class Message
 
 
   getSelectPrecedence: ->
-    @selectPrecedence ?= Precedence.createSelect(@payload.getPriority())
+    @selectPrecedence ?= Precedence.createSelect(@getPriority())
+
+
+  getPriority: ->
+    @payload.fixedPriority ? @priority
+
+
+  setPriority: (@priority) ->
+    @payload.setPriority?(@priority)
+    this
 
 
   sendToLine: (line) ->
@@ -99,7 +108,7 @@ module.exports = class Message
 
 
   sendTransformedTo: (transform, target) ->
-    copy = if transform?
+    transformed = if transform?
       payload = if (targetPayload = target.getPayload())?
         transform(@payload, targetPayload, @transmission)
         targetPayload
@@ -108,13 +117,15 @@ module.exports = class Message
       Message.createTransformed(this, payload)
     else
       this
-    target.receiveMessage(copy)
+    transformed.setPriority(this.getPriority())
+    target.receiveMessage(transformed)
     return this
 
 
   sendSeparatedTo: (targets) ->
     targets.forEach (target, node) =>
       msg = Message.createTransformed(this, @payload.get(node))
+      msg.setPriority(@getPriority())
       target.receiveMessage(msg)
     return this
 

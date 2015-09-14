@@ -29,7 +29,10 @@ module.exports = class SeparatingConnectionSource
 
 
   getPayload: -> 
-    new Map(@targets.map (target, node) -> [node, null])
+    payload = new Map(@targets.map (target, node) -> [node, null])
+    payload.setPriority = (@priority) -> this
+    payload.getPriority = -> @priority
+    return payload
 
 
   receiveMessage: (message) ->

@@ -39,6 +39,8 @@ class UpdateMatchingPayload
 
   inspect: -> "#{@getPriority()}:valueUpdate(#{inspect @source})"
 
+  setPriority: (@priority) -> this
+
   getPriority: -> @priority ? @source.getPriority()
 
 

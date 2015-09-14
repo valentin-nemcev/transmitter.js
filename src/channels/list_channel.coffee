@@ -21,14 +21,13 @@ module.exports = class ListChannel extends BidirectionalChannel
       new SimpleChannel()
         .fromSource @origin
         .fromSource @derived
+        .requireMatchingSourcePriorities()
         .toConnectionTarget @nestedChannelList
         .withTransform (lists) =>
           return null unless lists?
+          return lists unless lists.get?
           origin = lists.get(@origin)
           derived = lists.get(@derived)
-
-          unless origin.getPriority() == derived.getPriority()
-            return noop()
 
           zipped = ListPayload.setLazy( -> origin.get().zip(derived.get()))
 
