@@ -76,9 +76,7 @@ module.exports = class Message
     @payload.fixedPriority ? @priority
 
 
-  setPriority: (@priority) ->
-    @payload.setPriority?(@priority)
-    this
+  setPriority: (@priority) -> this
 
 
   sendToLine: (line) ->

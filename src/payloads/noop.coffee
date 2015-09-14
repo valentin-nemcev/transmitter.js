@@ -9,10 +9,6 @@ class NoopPayload
 
   fixedPriority: 0
 
-  setPriority: -> this
-
-  getPriority: -> 0
-
   deliverToVariable: (variable) ->
     return this
 

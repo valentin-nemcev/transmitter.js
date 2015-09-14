@@ -11,7 +11,7 @@ reduceMergedPayload = (payloads) ->
       result[node.inspect()] = value.get()
       result
     , {})
-  ).setPriority(1)
+  )
 
 
 describe 'Multilevel merging 1', ->

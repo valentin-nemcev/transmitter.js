@@ -14,8 +14,6 @@ class DirectionStub
   reverse: -> new DirectionStub()
 
 class StubPayload
-  setPriority: (@priority) -> this
-  getPriority: -> @priority
   inspect: -> 'stub()'
 
 class SourceStub extends SourceNode

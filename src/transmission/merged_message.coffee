@@ -42,8 +42,7 @@ module.exports = class MergedMessage
         payload = noop()
         priority = null
       else
-        payload = @_getMergedPayload(@source.getSourceNodes())
-        priority = payload.getPriority()
+        [payload, priority] = @_getMergedPayload(@source.getSourceNodes())
       message = @transmission.Message.createMerged(this, payload)
       message.setPriority(priority)
       @source.sendMessage(message)
@@ -63,5 +62,4 @@ module.exports = class MergedMessage
       message = @nodesToMessages.get(node)
       payload.set(node, message?.payload)
       priority = Math.max(message?.getPriority(), priority)
-    payload.getPriority = -> priority
-    return payload
+    return [payload, priority]

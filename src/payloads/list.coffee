@@ -10,9 +10,7 @@ class SetConstPayload
 
   constructor: (@value) ->
 
-  getPriority: -> 1
-
-  inspect: -> "#{@getPriority()}:setConst(#{inspect @value})"
+  inspect: -> "setConst(#{inspect @value})"
 
   map: (map) ->
     new SetPayload(this, {map})
@@ -48,12 +46,7 @@ class SetLazyPayload
 
   constructor: (@getValue) ->
 
-  setPriority: (@priority) -> this
-
-  getPriority: -> @priority ? 1
-
-
-  inspect: -> "#{@getPriority()}:setLazy(#{inspect @getValue()})"
+  inspect: -> "setLazy(#{inspect @getValue()})"
 
   map: (map) ->
     new SetPayload(this, {map})
@@ -89,11 +82,7 @@ class RemovePayload
 
   constructor: (@source) ->
 
-  setPriority: (@priority) -> this
-
-  getPriority: -> @priority ? @source.getPriority()
-
-  inspect: -> "#{@getPriority()}:listRemove(#{inspect @source})"
+  inspect: -> "listRemove(#{inspect @source})"
 
   deliverToList: (target) ->
     element = @source.get()
@@ -108,11 +97,7 @@ class AddAtPayload
 
   constructor: (@source) ->
 
-  setPriority: (@priority) -> this
-
-  getPriority: -> @priority ? @source.getPriority()
-
-  inspect: -> "#{@getPriority()}:listAddAt(#{inspect @source.get()})"
+  inspect: -> "listAddAt(#{inspect @source.get()})"
 
   deliverToList: (target) ->
     target.addAt(@source.get()...)
@@ -125,11 +110,7 @@ class UpdateMatchingPayload
     @mapFn = opts.map
     @matchFn = opts.match
 
-  inspect: -> "#{@getPriority()}:listUpdate(#{inspect @source})"
-
-  setPriority: (@priority) -> this
-
-  getPriority: -> @priority ? @source.getPriority()
+  inspect: -> "listUpdate(#{inspect @source})"
 
 
   deliverToList: (target) ->
@@ -186,12 +167,7 @@ class SetPayload
     @filterFn = opts.filter ? getTrue
 
 
-  inspect: -> "#{@getPriority()}:list(#{inspect @get()})"
-
-
-  setPriority: (@priority) -> this
-
-  getPriority: -> @priority ? @source.getPriority()
+  inspect: -> "list(#{inspect @get()})"
 
 
   get: ->
@@ -237,7 +213,7 @@ class SetPayload
 
 module.exports = {
   set: SetPayload.create
-  setLazy: (getValue) -> SetLazyPayload.create(getValue).setPriority(1)
+  setLazy: (getValue) -> SetLazyPayload.create(getValue)
   setConst: SetConstPayload.create
   append: (elementSource) ->
     AddAtPayload.create(elementSource.map (el) -> [el, null])
