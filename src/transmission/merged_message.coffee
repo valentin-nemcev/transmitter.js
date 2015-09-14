@@ -42,8 +42,7 @@ module.exports = class MergedMessage
         priority = null
       else
         [payload, priority] = @_getMergedPayload(@source.getSourceNodes())
-      message = @transmission.Message.createNext(this, payload)
-      message.setPriority(priority)
+      message = @transmission.Message.createNext(this, payload, priority)
       @source.sendMessage(message)
     return this
 

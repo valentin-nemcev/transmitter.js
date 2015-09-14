@@ -74,8 +74,7 @@ module.exports = class JointMessage
           + "Previous: #{inspect @message}"
     payload = @node.processPayload(payload)
     message = @transmission.Message
-      .createNext(this, payload)
-      .setPriority(1)
+      .createNext(this, payload, 1)
     @_sendMessage(message)
     return this
 
@@ -152,8 +151,7 @@ module.exports = class JointMessage
     prevPayload = prevMessage.payload
     nextPayload = @node.processPayload(prevPayload)
     @transmission.Message
-      .createNext(this, nextPayload)
-      .setPriority(prevMessage.getPriority())
+      .createNext(this, nextPayload, prevMessage.getPriority())
 
 
   readyToRespond: ->
@@ -166,8 +164,7 @@ module.exports = class JointMessage
     prevPayload = @precedingMessage?.payload
     nextPayload = @node.createResponsePayload(prevPayload)
     nextMessage = @transmission.Message
-      .createNext(this, nextPayload)
-      .setPriority(@precedingMessage?.getPriority() ? 0)
+      .createNext(this, nextPayload, @precedingMessage?.getPriority() ? 0)
     @_sendMessage(nextMessage)
 
 

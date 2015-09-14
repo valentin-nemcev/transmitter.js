@@ -27,11 +27,11 @@ module.exports = class Message
     return this
 
 
-  @createNext = (prevMessage, payload) ->
-    new this(prevMessage.transmission, prevMessage.pass, payload)
+  @createNext = (prevMessage, payload, priority) ->
+    new this(prevMessage.transmission, prevMessage.pass, payload, priority)
 
 
-  constructor: (@transmission, @pass, @payload) ->
+  constructor: (@transmission, @pass, @payload, @priority) ->
     throw new Error "Missing payload" unless @payload?
 
 
@@ -49,9 +49,6 @@ module.exports = class Message
 
   getPriority: ->
     @payload.fixedPriority ? @priority
-
-
-  setPriority: (@priority) -> this
 
 
   sendToLine: (line) ->
@@ -87,18 +84,16 @@ module.exports = class Message
         targetPayload
       else
         transform(@payload, @transmission)
-      Message.createNext(this, payload)
+      Message.createNext(this, payload, @getPriority())
     else
       this
-    transformed.setPriority(this.getPriority())
     target.receiveMessage(transformed)
     return this
 
 
   sendSeparatedTo: (targets) ->
     targets.forEach (target, node) =>
-      msg = Message.createNext(this, @payload.get(node))
-      msg.setPriority(@getPriority())
+      msg = Message.createNext(this, @payload.get(node), @getPriority())
       target.receiveMessage(msg)
     return this
 
