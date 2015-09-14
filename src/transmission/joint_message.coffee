@@ -27,13 +27,12 @@ module.exports = class JointMessage
 
     selected = transmission.getCommunicationFor(pass, node)
     unless selected?
-      selected = new this(transmission, node, {pass})
+      selected = new this(transmission, pass, node)
       transmission.addCommunicationForAndEnqueue(selected, node)
     return selected
 
 
-  constructor: (@transmission, @node, opts = {}) ->
-    {@pass} = opts
+  constructor: (@transmission, @pass, @node) ->
     @linesToMessages = new FastMap()
 
 
@@ -167,7 +166,7 @@ module.exports = class JointMessage
     prevPayload = @precedingMessage?.payload
     nextPayload = @node.createResponsePayload(prevPayload)
     nextMessage = @transmission.Message
-      .createQueryResponse(this, nextPayload)
+      .createNext(this, nextPayload)
       .setPriority(@precedingMessage?.getPriority() ? 0)
     @_sendMessage(nextMessage)
 

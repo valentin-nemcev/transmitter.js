@@ -28,36 +28,11 @@ module.exports = class Message
 
 
   @createNext = (prevMessage, payload) ->
-    new this(prevMessage.transmission, payload, {
-      pass: prevMessage.pass
-    })
+    new this(prevMessage.transmission, prevMessage.pass, payload)
 
 
-  @createQueryResponse = (queuedQuery, payload) ->
-    new this(queuedQuery.transmission, payload, {
-      pass: queuedQuery.pass
-    })
-
-
-  @createTransformed = (prevMessage, payload) ->
-    new this(prevMessage.transmission, payload, {
-      pass: prevMessage.pass
-    })
-
-
-  @createMerged = (merged, payloads) ->
-    new this(merged.transmission, payloads, {
-      pass: merged.pass
-    })
-
-
-  constructor: (@transmission, @payload, opts = {}) ->
-    {@pass} = opts
+  constructor: (@transmission, @pass, @payload) ->
     throw new Error "Missing payload" unless @payload?
-
-
-  createNextMessage: (payload) ->
-    Message.createNext(this, payload)
 
 
   createNextConnectionMessage: (channelNode) ->
@@ -112,7 +87,7 @@ module.exports = class Message
         targetPayload
       else
         transform(@payload, @transmission)
-      Message.createTransformed(this, payload)
+      Message.createNext(this, payload)
     else
       this
     transformed.setPriority(this.getPriority())
@@ -122,7 +97,7 @@ module.exports = class Message
 
   sendSeparatedTo: (targets) ->
     targets.forEach (target, node) =>
-      msg = Message.createTransformed(this, @payload.get(node))
+      msg = Message.createNext(this, @payload.get(node))
       msg.setPriority(@getPriority())
       target.receiveMessage(msg)
     return this

@@ -20,19 +20,18 @@ module.exports = class MergedMessage
     {transmission, pass} = message
     merged = transmission.getCommunicationFor(pass, source)
     unless (merged? and pass.equals(merged.pass))
-      merged = new this(transmission, source, {pass})
+      merged = new this(transmission, pass, source)
       transmission.addCommunicationFor(merged, source)
     return merged
 
 
-  constructor: (@transmission, @source, opts = {}) ->
-    {@pass} = opts
+  constructor: (@transmission, @pass, @source) ->
     @nodesToMessages = new Map()
 
 
   receiveMessageFrom: (message, node, target) ->
     if @nodesToMessages.length is 0
-      @source.receiveQuery(@transmission.Query.createForMerge(this))
+      @source.receiveQuery(@transmission.Query.createNext(this))
 
     @nodesToMessages.set(node, message)
 
@@ -43,7 +42,7 @@ module.exports = class MergedMessage
         priority = null
       else
         [payload, priority] = @_getMergedPayload(@source.getSourceNodes())
-      message = @transmission.Message.createMerged(this, payload)
+      message = @transmission.Message.createNext(this, payload)
       message.setPriority(priority)
       @source.sendMessage(message)
     return this

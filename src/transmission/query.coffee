@@ -26,31 +26,20 @@ module.exports = class Query
 
 
   @createNext = (prevQuery) ->
-    new this(prevQuery.transmission, {
-      pass: prevQuery.pass
-    })
+    new this(prevQuery.transmission, prevQuery.pass)
 
 
   @createNextConnection = (prevMessageOrQuery) ->
-    new this(prevMessageOrQuery.transmission, {
-      pass: prevMessageOrQuery.pass
-    })
+    new this(prevMessageOrQuery.transmission, prevMessageOrQuery.pass)
 
 
-  @createForMerge = (mergedMessage) ->
-    new this(mergedMessage.transmission, {
-      pass: mergedMessage.pass
-    })
-
-
-  constructor: (@transmission, opts = {}) ->
-    {@pass} = opts
+  constructor: (@transmission, @pass) ->
     @passedLines = new FastSet()
     @queriedChannelNodes = new FastSet()
 
 
   createQueryResponseMessage: (payload) ->
-    @transmission.Message.createQueryResponse(this, payload)
+    @transmission.Message.createNext(this, payload)
 
 
 

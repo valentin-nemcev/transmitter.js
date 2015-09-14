@@ -26,19 +26,14 @@ module.exports = class ConnectionMessage
 
 
   @createInitial = (transmission) ->
-    new this(transmission, null,
-      pass: Pass.createQueryDefault(),
-    )
+    new this(transmission, Pass.createQueryDefault(), null)
 
 
   @createNext = (prevMessage, sourceChannelNode) ->
-    new this(prevMessage.transmission, sourceChannelNode, {
-      pass: prevMessage.pass
-    })
+    new this(prevMessage.transmission, prevMessage.pass, sourceChannelNode)
 
 
-  constructor: (@transmission, @sourceChannelNode, opts = {}) ->
-    {@pass} = opts
+  constructor: (@transmission, @pass, @sourceChannelNode) ->
     @targetPointsToUpdate =
       new FastSet().addEach(@sourceChannelNode?.getTargetPoints())
 
