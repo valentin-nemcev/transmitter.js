@@ -23,6 +23,7 @@
 
 * Refactor
   * Don't use context in isolated tests, use context in scenarios.
+  * Refactor payload creation methods
 
 * Implement
   * Better checks for message pass ordering in joint message

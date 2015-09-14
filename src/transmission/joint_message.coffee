@@ -74,6 +74,7 @@ module.exports = class JointMessage
         throw new Error "Message already originated at #{inspect @node}. " \
           + "Previous: #{inspect @message}"
     payload = @node.processPayload(payload)
+    payload.setPriority(1)
     @_sendMessage(@transmission.Message.createNext(this, payload))
     return this
 
@@ -147,8 +148,10 @@ module.exports = class JointMessage
 
   _processMessage: (prevMessage) ->
     @transmission.log prevMessage, @node
-    payload = @node.processPayload(prevMessage.payload)
-    @transmission.Message.createNext(this, payload)
+    prevPayload = prevMessage.payload
+    nextPayload = @node.processPayload(prevPayload)
+    nextPayload.setPriority(prevPayload?.getPriority() ? 0)
+    @transmission.Message.createNext(this, nextPayload)
 
 
 
@@ -159,8 +162,10 @@ module.exports = class JointMessage
 
   respond: ->
     @transmission.log @query, 'respond', @node
-    payload = @node.createResponsePayload(@precedingMessage?.payload)
-    @_sendMessage(@transmission.Message.createQueryResponse(this, payload))
+    prevPayload = @precedingMessage?.payload
+    nextPayload = @node.createResponsePayload(prevPayload)
+    nextPayload.setPriority(prevPayload?.getPriority() ? 0)
+    @_sendMessage(@transmission.Message.createQueryResponse(this, nextPayload))
 
 
   _sendMessage: (message) ->

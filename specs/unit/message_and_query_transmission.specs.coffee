@@ -17,7 +17,8 @@ class DirectionStub
   reverse: -> new DirectionStub()
 
 class StubPayload
-  getPriority: -> 1
+  setPriority: (@priority) -> this
+  getPriority: -> @priority
   inspect: -> 'stub()'
   deliver: ->
 

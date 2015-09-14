@@ -7,6 +7,8 @@ class NoopPayload
 
   inspect: -> "noop()"
 
+  setPriority: -> this
+
   getPriority: -> 0
 
   deliverToVariable: (variable) ->

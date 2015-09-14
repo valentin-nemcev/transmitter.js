@@ -11,11 +11,11 @@ module.exports = class List extends RelayNode
 
 
   createResponsePayload: (prevPayload) ->
-    @payload.set(this).setPriority(prevPayload?.getPriority() ? 0)
+    @payload.set(this)
 
 
   createOriginPayload: ->
-    @payload.set(this).setPriority(1)
+    @payload.set(this)
 
 
   createUpdatePayload: (value) ->
