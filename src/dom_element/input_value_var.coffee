@@ -2,14 +2,14 @@
 
 
 Variable = require '../nodes/variable'
-Transmitter = require '../transmitter'
+Transmission = require '../transmission/transmission'
 
 
 module.exports = class InputValueVar extends Variable
 
   constructor: (@element) ->
     @element.addEventListener 'input', =>
-      Transmitter.startTransmission (tr) =>
+      Transmission.start (tr) =>
         @originate(tr)
 
   set: (value) -> @element.value = value; this

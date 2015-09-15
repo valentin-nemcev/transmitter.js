@@ -8,4 +8,6 @@ module.exports = {
   Record:   require './record'
   Variable: require './variable'
   List:     require './list'
+
+  PropertyVariable: require './property_variable'
 }

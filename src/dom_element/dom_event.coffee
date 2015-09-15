@@ -2,7 +2,7 @@
 
 
 SourceNode = require '../nodes/source_node'
-Transmitter = require '../transmitter'
+Transmission = require '../transmission/transmission'
 
 
 module.exports = class DOMEvent extends SourceNode
@@ -11,5 +11,5 @@ module.exports = class DOMEvent extends SourceNode
     @element.addEventListener @type, @triggerEvent
 
   triggerEvent: (ev) =>
-    Transmitter.startTransmission (tr) =>
+    Transmission.start (tr) =>
       @originate(tr, ev)

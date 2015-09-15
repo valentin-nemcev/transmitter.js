@@ -2,14 +2,14 @@
 
 
 Variable = require '../nodes/variable'
-Transmitter = require '../transmitter'
+Transmission = require '../transmission/transmission'
 
 
 module.exports = class CheckboxStateVar extends Variable
 
     constructor: (@element) ->
       @element.addEventListener 'click', =>
-        Transmitter.startTransmission (tr) =>
+        Transmission.start (tr) =>
           @originate(tr)
 
     set: (value) -> @element.checked = value; this

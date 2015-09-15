@@ -11,6 +11,7 @@ module.exports = new class Transmitter
   Channels:     require './channels'
   ChannelNodes: require './channel_nodes'
   DOMElement:   require './dom_element'
+  Browser:      require './browser'
   Transmission: Transmission
 
   constructor: (opts = {}) ->
