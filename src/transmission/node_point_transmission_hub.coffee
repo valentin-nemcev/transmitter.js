@@ -11,9 +11,7 @@ module.exports = class NodePointTransmissionHub
   sendForAll: ->
     @nodePoint.getChannelNodesFor(@comm).forEach (channelNode) =>
       if @_tryQueryChannelNode(channelNode)
-        @updatedChannelNodes.add(channelNode)
-        @nodePoint.receiveCommunicationForChannelNode(@comm, channelNode)
-
+        @sendForChannelNode(channelNode)
     return this
 
 

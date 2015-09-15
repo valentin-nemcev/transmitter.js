@@ -39,7 +39,10 @@ module.exports = class JointMessage
   joinMessageFrom: (message, line) ->
     @transmission.log line, message
     if (prev = @linesToMessages.get(line))?
-      throw new Error "Already received message from #{inspect line}"
+      throw new Error \
+      "Already received message from #{inspect line}. " \
+      + "Previous: #{inspect prev}, " \
+      + "current: #{inspect message}"
     @linesToMessages.set(line, message)
     @_ensureQuerySent()
     @_selectAndSendMessageIfReady()
