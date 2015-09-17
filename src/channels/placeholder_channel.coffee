@@ -8,6 +8,7 @@ class PlaceholderChannel
   inspect: -> '[' + @constructor.name + ']'
 
   [
+    'assertPresent'
     'inForwardDirection'
     'inBackwardDirection'
     'inDirection'
@@ -17,7 +18,9 @@ class PlaceholderChannel
   connect: -> this
   disconnect: -> this
 
-  toTarget: (@target) -> this
+  toTarget: (@target) ->
+    @assertPresent('Target', @target)
+    return this
 
   getConnection: ->
     @connection ?= new PlaceholderNodeLine(

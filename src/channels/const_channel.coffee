@@ -10,6 +10,7 @@ module.exports = class ConstChannel
   inspect: -> '[' + @constructor.name + ']'
 
   [
+    'assertPresent'
     'inForwardDirection'
     'inBackwardDirection'
     'inDirection'
@@ -20,7 +21,9 @@ module.exports = class ConstChannel
   ].forEach (method) => this::[method] = SimpleChannel::[method]
 
 
-  toTarget: (@target) -> this
+  toTarget: (@target) ->
+    @assertPresent('Target', @target)
+    return this
 
 
   withPayload: (@createPayload) -> this

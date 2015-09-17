@@ -1,7 +1,7 @@
 'use strict'
 
 
-assert = require 'assert'
+{inspect} = require 'util'
 Map = require 'collections/map'
 
 directions = require '../directions'
@@ -23,6 +23,12 @@ module.exports = class SimpleChannel
   inspect: -> '[' + @constructor.name + ']'
 
 
+  assertPresent: (name, value) ->
+    if not value or (value?.length? and value.length is 0)
+      throw new Error name + " must be present, #{inspect value} given"
+    return this
+
+
   constructor: ->
     @sources = []
     @targets = []
@@ -42,11 +48,13 @@ module.exports = class SimpleChannel
 
 
   fromSource: (source) ->
+    @assertPresent('Source', source)
     @sources.push source if source?
     return this
 
 
   fromSources: (sources) ->
+    @assertPresent('Sources', sources)
     @sources.push sources...
     @forceMerging = yes
     return this
@@ -58,17 +66,20 @@ module.exports = class SimpleChannel
 
 
   toTarget: (target) ->
+    @assertPresent('Target', target)
     @targets.push target if target?
     return this
 
 
   toTargets: (targets) ->
+    @assertPresent('Target', targets)
     @targets.push targets...
     @forceSeparating = yes
     return this
 
 
   toConnectionTarget: (@connectionTarget) ->
+    @assertPresent('Connection target', @connectionTarget)
     return this
 
 
