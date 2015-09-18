@@ -47,10 +47,6 @@ module.exports = class ChannelNode
     return this
 
 
-  # TODO: Refactor
-  getPayload: -> null
-
-
   receiveMessage: (message) ->
     message.sendToChannelNode(this)
     return this

@@ -17,8 +17,7 @@ describe 'Reversing messages in the middle of the chain', ->
         .fromSource(@textInput)
         .inBackwardDirection()
         .withTransform (payloads) =>
-          buttonWasClicked = payloads.get(@button)
-          textValue        = payloads.get(@textInput)
+          [buttonWasClicked, textValue] = payloads
           if buttonWasClicked.get?
             Transmitter.Payloads.List.append(textValue)
           else

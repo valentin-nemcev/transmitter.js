@@ -5,13 +5,13 @@ Transmitter = require 'transmitter'
 
 VariableNode = Transmitter.Nodes.Variable
 
-reduceMergedPayload = (payloads) ->
-  Transmitter.Payloads.Variable.setLazy(->
-    payloads.reduce((result, value, node) ->
-      result[node.inspect()] = value.get()
-      result
-    , {})
-  )
+reduceMergedPayload = (nodes...) ->
+  (payloads) ->
+    Transmitter.Payloads.Variable.setLazy ->
+      result = {}
+      payloads.forEach (payload, i) ->
+        result[nodes[i].inspect()] = payload.get()
+      return result
 
 
 describe 'Multilevel merging 1', ->
@@ -44,9 +44,8 @@ describe 'Multilevel merging 1', ->
     Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
-        .fromSource(@d1)
-        .fromSource(@d2)
-        .withTransform reduceMergedPayload
+        .fromSources @d1, @d2
+        .withTransform reduceMergedPayload(@d1, @d2)
         .toTarget @b1
         .init(tr)
 
@@ -58,9 +57,8 @@ describe 'Multilevel merging 1', ->
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
-        .fromSource(@b1)
-        .fromSource(@b2)
-        .withTransform reduceMergedPayload
+        .fromSources @b1, @b2
+        .withTransform reduceMergedPayload(@b1, @b2)
         .toTarget @a
         .init(tr)
 
@@ -98,9 +96,8 @@ describe 'Multilevel merging 2', ->
     @bind1 = (tr) =>
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
-        .fromSource(@b1)
-        .fromSource(@b2)
-        .withTransform reduceMergedPayload
+        .fromSources @b1, @b2
+        .withTransform reduceMergedPayload(@b1, @b2)
         .toTarget @a
         .init(tr)
 

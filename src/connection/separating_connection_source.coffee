@@ -28,11 +28,6 @@ module.exports = class SeparatingConnectionSource
     return this
 
 
-  getPayload: -> 
-    payload = new Map(@targets.map (target, node) -> [node, null])
-    return payload
-
-
   receiveMessage: (message) ->
     message.sendSeparatedTo(@targets)
     return this

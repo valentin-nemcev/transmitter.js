@@ -29,9 +29,7 @@ describe 'Connection with merge and query', ->
         .fromSource(@button)
         .fromSource(@textInput)
         .inBackwardDirection()
-        .withTransform (payloads) =>
-          buttonWasClicked = payloads.get(@button)
-          textValue        = payloads.get(@textInput)
+        .withTransform ([buttonWasClicked, textValue]) =>
           if buttonWasClicked.get?
             textValue
           else

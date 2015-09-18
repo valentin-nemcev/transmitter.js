@@ -47,15 +47,30 @@ module.exports = class SimpleChannel
       @direction ? directions.null
 
 
-  fromSource: (source) ->
-    @assertPresent('Source', source)
-    @sources.push source if source?
+  assertSource: (source) ->
+    unless source?.getNodeSource?
+      throw new Error "#{inspect source} is not a valid source node"
     return this
 
 
-  fromSources: (sources) ->
-    @assertPresent('Sources', sources)
-    @sources.push sources...
+  fromSource: (source) ->
+    @assertSource(source)
+    @sources.push source
+    return this
+
+
+  fromSources: (sources...) ->
+    for source in sources
+      @assertSource(source)
+      @sources.push source
+    @forceMerging = yes
+    return this
+
+
+  fromDynamicSources: (sources) ->
+    for source in sources
+      @assertSource(source)
+      @sources.push source
     @forceMerging = yes
     return this
 
@@ -65,17 +80,34 @@ module.exports = class SimpleChannel
     return this
 
 
-  toTarget: (target) ->
-    @assertPresent('Target', target)
-    @targets.push target if target?
+
+  assertTarget: (target) ->
+    unless target?.getNodeTarget?
+      throw new Error "#{inspect target} is not a valid target node"
     return this
 
 
-  toTargets: (targets) ->
-    @assertPresent('Target', targets)
-    @targets.push targets...
+  toTarget: (target) ->
+    @assertTarget(target)
+    @targets.push target
+    return this
+
+
+  toTargets: (targets...) ->
+    for target in targets
+      @assertTarget(target)
+      @targets.push target
     @forceSeparating = yes
     return this
+
+
+  toDynamicTargets: (targets) ->
+    for target in targets
+      @assertTarget(target)
+      @targets.push target
+    @forceSeparating = yes
+    return this
+
 
 
   toConnectionTarget: (@connectionTarget) ->

@@ -54,10 +54,10 @@ module.exports = class MergedMessage
 
   _getMergedPayload: (sourceNodes) ->
     @transmission.log this
-    payload = new Map()
+    payload = []
     priority = null
     sourceNodes.forEach (node) =>
       message = @nodesToMessages.get(node)
-      payload.set(node, message?.payload)
-      priority = Math.max(message?.getPriority(), priority)
+      priority = Math.max(priority, message.getPriority())
+      payload.push message.payload
     return [payload, priority]

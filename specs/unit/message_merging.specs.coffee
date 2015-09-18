@@ -72,5 +72,5 @@ describe 'Message merging', ->
     mergedMessage = @target.receiveMessage.firstCall.args[0]
     mergedPayload = mergedMessage.payload
 
-    expect(mergedPayload.get(@activeSource)).to.equal(@activePayload)
-    expect(mergedPayload.get(@passiveSource)).to.equal(@passivePayload)
+    expect(mergedPayload[0]).to.equal(@activePayload)
+    expect(mergedPayload[1]).to.equal(@passivePayload)

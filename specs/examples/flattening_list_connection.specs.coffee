@@ -20,11 +20,11 @@ describe 'Flattening list connection', ->
     @defineChannel ->
       new Transmitter.Channels.SimpleChannel()
         .inForwardDirection()
-        .fromSources @nestedObjects.map (o) -> o.valueVar
+        .fromDynamicSources @nestedObjects.map (o) -> o.valueVar
         .toTarget @serializedVar
         .withTransform (values) =>
           Transmitter.Payloads.Variable.setLazy =>
-            for value, i in values.values()
+            for value, i in values
               {name: @nestedObjects[i].name, value: value.get()}
 
 
@@ -32,12 +32,12 @@ describe 'Flattening list connection', ->
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSource @serializedVar
-        .toTargets @nestedObjects.map (o) -> o.valueVar
-        .withTransform (serialized, values) =>
-          for valueVar, i in values.keys()
-            value = serialized.get()[i]?.value
-            values.set valueVar,
-              Transmitter.Payloads.Variable.setConst(value)
+        .toDynamicTargets @nestedObjects.map (o) -> o.valueVar
+        .withTransform (serializedPayload) =>
+          serialized = serializedPayload.get() ? []
+          for {valueVar}, i  in @nestedObjects
+            value = serialized[i]?.value
+            Transmitter.Payloads.Variable.setConst(value)
 
 
   beforeEach ->

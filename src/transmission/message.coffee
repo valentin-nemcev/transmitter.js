@@ -79,11 +79,7 @@ module.exports = class Message
 
   sendTransformedTo: (transform, target) ->
     transformed = if transform?
-      payload = if (targetPayload = target.getPayload())?
-        transform(@payload, targetPayload, @transmission)
-        targetPayload
-      else
-        transform(@payload, @transmission)
+      payload = transform(@payload, @transmission)
       Message.createNext(this, payload, @getPriority())
     else
       this
@@ -91,10 +87,12 @@ module.exports = class Message
     return this
 
 
-  sendSeparatedTo: (targets) ->
-    targets.forEach (target, node) =>
-      msg = Message.createNext(this, @payload.get(node), @getPriority())
+  sendSeparatedTo: (targetNodes) ->
+    i = 0
+    targetNodes.forEach (target, node) =>
+      msg = Message.createNext(this, @payload[i], @getPriority())
       target.receiveMessage(msg)
+      i += 1
     return this
 
 
