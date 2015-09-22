@@ -48,3 +48,6 @@ module.exports = class RelayNode
 
 
   createUpdatePayload: (value) ->
+
+
+  createPlaceholderPayload: -> noop()

@@ -22,6 +22,10 @@ module.exports = class Variable extends RelayNode
     @payload.setConst(value)
 
 
+  createPlaceholderPayload: ->
+    @payload.setConst(null)
+
+
   acceptPayload: (payload) ->
     payload.deliverToVariable(this)
     return this

@@ -35,11 +35,6 @@ describe 'Flattening connection', ->
         .fromSource @nestedVar
         .toConnectionTarget @nestedChannelVar
         .withTransform (payload) =>
-          unless payload?
-            return new Transmitter.Payloads.Variable.setLazy =>
-              return new Transmitter.Channels.PlaceholderChannel()
-                .toTarget @serializedVar
-                .inForwardDirection()
           payload.map (nestedObject) =>
             if nestedObject?
               new Transmitter.Channels.VariableChannel()

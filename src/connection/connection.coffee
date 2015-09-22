@@ -23,7 +23,7 @@ module.exports = class Connection
 
 
   getPlaceholderPayload: ->
-    @transform.call(null)
+    @transform.call(null, @source.getPlaceholderPayload())
 
 
   receiveMessage: (message) ->

@@ -22,6 +22,10 @@ module.exports = class List extends RelayNode
     @payload.setConst(value)
 
 
+  createPlaceholderPayload: ->
+    @payload.setConst([])
+
+
   constructor: ->
     @list = []
 

@@ -24,7 +24,6 @@ module.exports = class ListChannel extends BidirectionalChannel
         .requireMatchingSourcePriorities()
         .toConnectionTarget @nestedChannelList
         .withTransform (payloads) =>
-          return null unless payloads?
           return payloads unless payloads.length?
           [origin, derived] = payloads
 

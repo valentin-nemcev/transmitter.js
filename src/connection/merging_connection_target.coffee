@@ -3,6 +3,8 @@
 
 {inspect} = require 'util'
 
+noop = require '../payloads/noop'
+
 
 module.exports = class MergingConnectionTarget
 
@@ -29,6 +31,9 @@ module.exports = class MergingConnectionTarget
   disconnect: (message) ->
     @sources.forEach (source) -> source.disconnect(message)
     return this
+
+
+  getPlaceholderPayload: -> noop()
 
 
   receiveMessage: (message) ->

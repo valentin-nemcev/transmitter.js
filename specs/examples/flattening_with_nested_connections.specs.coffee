@@ -35,11 +35,6 @@ describe 'Flattening with nested connections', ->
       .fromSource @derivedVar
       .toConnectionTarget @flatteningChannelVar
       .withTransform (viewVal) =>
-        unless viewVal?
-          return new Transmitter.Payloads.Variable.setLazy =>
-            return new Transmitter.Channels.PlaceholderChannel()
-              .toTarget @originVar
-              .inBackwardDirection()
         viewVal.map (view) =>
           if view?
             new Transmitter.Channels.SimpleChannel()

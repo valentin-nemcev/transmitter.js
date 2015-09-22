@@ -26,6 +26,10 @@ module.exports = class NodeConnectionLine
     message.directionMatches(@direction)
 
 
+  getPlaceholderPayload: ->
+    @source.getPlaceholderPayload()
+
+
   receiveMessage: (message) ->
     @target.receiveMessage(message)
     return this
