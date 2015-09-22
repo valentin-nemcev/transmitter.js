@@ -3,8 +3,25 @@
 
 {inspect} = require 'util'
 
+Payload = require './payload'
+noop = require './noop'
 
-class SetConstPayload
+
+class VariablePayload extends Payload
+
+  noopIf: (conditionCb) ->
+    if conditionCb(@get()) then noop() else this
+
+  merge: (otherPayload) ->
+    @map (value) => [value, otherPayload.get()]
+
+
+  separate: ->
+    @get().map (value) ->
+      SetConstPayload.create(value)
+
+
+class SetConstPayload extends VariablePayload
 
   @create = (value) => new this(value)
 
@@ -26,7 +43,7 @@ id = (a) -> a
 getNull = -> null
 
 
-class UpdateMatchingPayload
+class UpdateMatchingPayload extends VariablePayload
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map ? id
@@ -51,7 +68,7 @@ class UpdateMatchingPayload
 
 
 
-class SetPayload
+class SetPayload extends VariablePayload
 
   @create = (source) =>
     return new this(source)
@@ -90,6 +107,11 @@ class SetPayload
     return this
 
 
+
+NoopPayload = noop().constructor
+
+Payload::toSetVariable = -> SetPayload.create(this)
+NoopPayload::toSetVariable = -> this
 
 module.exports = {
   set: SetPayload.create

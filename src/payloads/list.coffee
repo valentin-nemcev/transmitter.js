@@ -3,8 +3,11 @@
 
 {inspect} = require 'util'
 
+noop = require './noop'
+Payload = require './payload'
 
-class SetConstPayload
+
+class SetConstPayload extends Payload
 
   @create = (value) => new this(value)
 
@@ -40,7 +43,7 @@ class SetConstPayload
 
 
 
-class SetLazyPayload
+class SetLazyPayload extends Payload
 
   @create = (getValue) => new this(getValue)
 
@@ -76,7 +79,7 @@ class SetLazyPayload
 
 
 
-class RemovePayload
+class RemovePayload extends Payload
 
   @create = (@source) => new this(@source)
 
@@ -91,7 +94,7 @@ class RemovePayload
     return this
 
 
-class AddAtPayload
+class AddAtPayload extends Payload
 
   @create = (@source) => new this(@source)
 
@@ -104,7 +107,7 @@ class AddAtPayload
     return this
 
 
-class UpdateMatchingPayload
+class UpdateMatchingPayload extends Payload
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map
@@ -153,7 +156,7 @@ class UpdateMatchingPayload
 
 
 
-class SetPayload
+class SetPayload extends Payload
 
   @create = (source) =>
     return new this(source)
@@ -210,6 +213,16 @@ class SetPayload
     return this
 
 
+NoopPayload = noop().constructor
+
+Payload::toSetList = -> SetPayload.create(this)
+NoopPayload::toSetList = -> this
+
+Payload::toAppendListElement = -> AddAtPayload.create(this.map (el) -> [el, null])
+NoopPayload::toAppendListElement = -> this
+
+Payload::toRemoveListElement = -> RemovePayload.create(this)
+NoopPayload::toRemoveListElement = -> this
 
 module.exports = {
   set: SetPayload.create
