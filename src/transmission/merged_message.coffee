@@ -4,6 +4,7 @@
 
 Map = require 'collections/map'
 noop = require '../payloads/noop'
+{merge} = require '../payloads/variable'
 
 
 module.exports = class MergedMessage
@@ -29,21 +30,30 @@ module.exports = class MergedMessage
     @nodesToMessages = new Map()
 
 
-  receiveMessageFrom: (message, node, target) ->
-    if @nodesToMessages.length is 0
-      @source.receiveQuery(@transmission.Query.createNext(this))
+  joinQuery: (query) ->
+    unless @query?
+      @query = query
+      if @source.getSourceNodes().length is 0
+        @_sendMessage(@_getEmptyPayload())
+      else
+        @source.sendQuery(@query)
+    return this
+
+
+  joinMessageFrom: (message, node) ->
+    unless @query?
+      @query = @transmission.Query.createNext(this)
+      @source.sendQuery(@query)
 
     @nodesToMessages.set(node, message)
 
     # TODO: Compare contents
     if @nodesToMessages.length == @source.getSourceNodes().length
-      if @source.prioritiesShouldMatch and not @_prioritiesMatch()
-        payload = noop()
-        priority = null
+      [payload, priority] = if @source.prioritiesShouldMatch and not @_prioritiesMatch()
+        @_getNoopPayload()
       else
-        [payload, priority] = @_getMergedPayload(@source.getSourceNodes())
-      message = @transmission.Message.createNext(this, payload, priority)
-      @source.sendMessage(message)
+        @_getMergedPayload(@source.getSourceNodes())
+      @_sendMessage([payload, priority])
     return this
 
 
@@ -52,13 +62,25 @@ module.exports = class MergedMessage
     priorities.every (p) -> p == priorities[0]
 
 
-  merge = ->
-    this[0].merge(this.slice(1)...)
+  _sendMessage: ([payload, priority]) ->
+    message = @transmission.Message.createNext(this, payload, priority)
+    @source.sendMessage(message)
+    return this
+
+
+  _getNoopPayload: -> [noop(), null]
+
+
+  _getEmptyPayload: ->
+    payload = []
+    payload.merge = -> merge(this)
+    [payload, 0]
+
 
   _getMergedPayload: (sourceNodes) ->
     @transmission.log this
     payload = []
-    payload.merge = merge
+    payload.merge = -> merge(this)
     priority = null
     sourceNodes.forEach (node) =>
       message = @nodesToMessages.get(node)

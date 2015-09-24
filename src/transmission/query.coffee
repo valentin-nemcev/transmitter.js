@@ -7,6 +7,8 @@ FastSet = require 'collections/fast-set'
 Pass = require './pass'
 Precedence = require './precedence'
 
+MergedMessage = require './merged_message'
+
 
 module.exports = class Query
 
@@ -54,6 +56,12 @@ module.exports = class Query
     @passedLines.add(line)
     line.receiveQuery(this)
     return this
+
+
+  joinMergedMessage: (source) ->
+    MergedMessage
+      .getOrCreate(this, source)
+      .joinQuery(this)
 
 
   sendToNodeSource: (line, nodeSource) ->

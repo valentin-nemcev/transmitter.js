@@ -123,7 +123,8 @@ module.exports = class SimpleChannel
     @source ?= if @forceMerging or @sources.length > 1
       @createMergingSource(@sources,
         prioritiesShouldMatch: @sourcePrioritiesShouldMatch)
-    else @createSingleSource(@sources[0])
+    else
+      @createSingleSource(@sources[0])
 
 
   createSingleSource: (source) ->
@@ -141,7 +142,10 @@ module.exports = class SimpleChannel
     @target ?= if @connectionTarget?
       @connectionTarget
     else if @forceSeparating or @targets.length > 1
-      @createSeparatingTarget(@targets)
+      if @targets.length
+        @createSeparatingTarget(@targets)
+      else
+        null
     else
       @createSingleTarget(@targets[0])
 
@@ -160,8 +164,16 @@ module.exports = class SimpleChannel
   getTransform: -> @transform ? returnArg
 
 
+  nullConnection =
+    connect: -> this
+    disconnect: -> this
+
   getConnection: ->
-    @connection ?= new Connection(@getSource(), @getTarget(), @getTransform())
+    @connection ?=
+      if not @getTarget()?
+        nullConnection
+      else
+        new Connection(@getSource(), @getTarget(), @getTransform())
 
 
   connect: (message) ->

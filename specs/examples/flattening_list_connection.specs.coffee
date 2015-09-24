@@ -62,14 +62,7 @@ describe 'Flattening list connection', ->
         .toConnectionTarget @nestedChannelVar
         .withTransform (nestedList) =>
           nestedList.toSetVariable().map (nested) =>
-            if nested.length
-              new NestedChannel(nested, @serializedVar)
-            else
-              new Transmitter.Channels.ConstChannel()
-                .toTarget @serializedVar
-                .inForwardDirection()
-                .withPayload ->
-                  Transmitter.Payloads.List.setConst([])
+            new NestedChannel(nested, @serializedVar)
         .init(tr)
 
 

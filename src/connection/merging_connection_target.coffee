@@ -37,7 +37,7 @@ module.exports = class MergingConnectionTarget
 
 
   receiveMessage: (message) ->
-    message.sendMergedTo(this, @target)
+    message.sendMergedTo(this)
     return this
 
 
@@ -46,6 +46,11 @@ module.exports = class MergingConnectionTarget
     return this
 
 
-  receiveQuery: (query) ->
+  sendQuery: (query) ->
     @sources.forEach (source, node) -> source.receiveQuery(query)
+    return this
+
+
+  receiveQuery: (query) ->
+    query.joinMergedMessage(this)
     return this

@@ -7,14 +7,16 @@ Payload = require './payload'
 noop = require './noop'
 
 
+merge = (payloads) ->
+  SetPayload.create get: ->
+    payloads.map (p) -> p.get()
+
 class VariablePayload extends Payload
 
   noopIf: (conditionCb) ->
     if conditionCb(@get()) then noop() else this
 
-  merge: (otherPayloads...) ->
-    @map (value) => [value, otherPayloads.map((p) -> p.get())...]
-
+  merge: (otherPayloads...) -> merge([this, otherPayloads...])
 
   separate: ->
     @get().map (value) ->
@@ -114,6 +116,7 @@ Payload::toSetVariable = -> SetPayload.create(this)
 NoopPayload::toSetVariable = -> this
 
 module.exports = {
+  merge
   set: SetPayload.create
   setLazy: (getValue) -> SetPayload.create(get: getValue)
   setConst: (value) -> SetConstPayload.create(value)

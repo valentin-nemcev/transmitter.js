@@ -96,9 +96,9 @@ module.exports = class Message
     return this
 
 
-  sendMergedTo: (source, target) ->
+  sendMergedTo: (source) ->
     MergedMessage
       .getOrCreate(this, source)
-      .receiveMessageFrom(this, @sourceNode)
+      .joinMessageFrom(this, @sourceNode)
 
     return this
