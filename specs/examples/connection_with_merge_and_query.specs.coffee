@@ -29,11 +29,8 @@ describe 'Connection with merge and query', ->
         .fromSource(@button)
         .fromSource(@textInput)
         .inBackwardDirection()
-        .withTransform ([buttonWasClicked, textValue]) =>
-          if buttonWasClicked.get?
-            textValue
-          else
-            Transmitter.Payloads.noop()
+        .withTransform ([buttonWasClickedPayload, textValuePayload]) =>
+          textValuePayload.replaceByNoop(buttonWasClickedPayload)
         .toTarget @alertEmitter
         .init(tr)
 

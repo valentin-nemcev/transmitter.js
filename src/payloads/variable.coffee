@@ -12,8 +12,8 @@ class VariablePayload extends Payload
   noopIf: (conditionCb) ->
     if conditionCb(@get()) then noop() else this
 
-  merge: (otherPayload) ->
-    @map (value) => [value, otherPayload.get()]
+  merge: (otherPayloads...) ->
+    @map (value) => [value, otherPayloads.map((p) -> p.get())...]
 
 
   separate: ->

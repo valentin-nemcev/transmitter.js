@@ -52,9 +52,13 @@ module.exports = class MergedMessage
     priorities.every (p) -> p == priorities[0]
 
 
+  merge = ->
+    this[0].merge(this.slice(1)...)
+
   _getMergedPayload: (sourceNodes) ->
     @transmission.log this
     payload = []
+    payload.merge = merge
     priority = null
     sourceNodes.forEach (node) =>
       message = @nodesToMessages.get(node)

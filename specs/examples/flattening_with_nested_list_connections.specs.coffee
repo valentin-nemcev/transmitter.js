@@ -57,10 +57,7 @@ describe 'Flattening with nested list connections', ->
             .fromSource view.removeEvt
             .toTarget @originList
             .withTransform (ev) ->
-              if ev.get?
-                Transmitter.Payloads.List.removeConst(view.model)
-              else
-                ev
+              ev.map( -> view.model ).toRemoveListElement()
 
     Transmitter.startTransmission (tr) =>
       originDerivedChannel.init(tr)

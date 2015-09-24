@@ -18,10 +18,7 @@ describe 'Merging after splitting', ->
         .fromSource @keypressVar
         .toTarget @stateVar
         .withTransform (keypress) ->
-          if keypress.get?() is 'enter'
-            Transmitter.Payloads.Variable.setConst(on)
-          else
-            Transmitter.Payloads.noop()
+          keypress.noopIf((key) -> key isnt 'enter').map( -> on)
         .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
@@ -29,10 +26,7 @@ describe 'Merging after splitting', ->
         .fromSource @keypressVar
         .toTarget @stateVar
         .withTransform (keypress) ->
-          if keypress.get?() is 'esc'
-            Transmitter.Payloads.Variable.setConst(off)
-          else
-            Transmitter.Payloads.noop()
+          keypress.noopIf((key) -> key isnt 'esc').map( -> off)
         .init(tr)
 
 

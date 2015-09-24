@@ -22,10 +22,10 @@ describe 'Flattening list connection', ->
         .inForwardDirection()
         .fromDynamicSources @nestedObjects.map (o) -> o.valueVar
         .toTarget @serializedVar
-        .withTransform (values) =>
-          Transmitter.Payloads.Variable.setLazy =>
+        .withTransform (valuePayloads) =>
+          valuePayloads.merge().map (values) =>
             for value, i in values
-              {name: @nestedObjects[i].name, value: value.get()}
+              {name: @nestedObjects[i].name, value}
 
 
     @defineChannel ->
@@ -34,10 +34,10 @@ describe 'Flattening list connection', ->
         .fromSource @serializedVar
         .toDynamicTargets @nestedObjects.map (o) -> o.valueVar
         .withTransform (serializedPayload) =>
-          serialized = serializedPayload.get() ? []
-          for {valueVar}, i  in @nestedObjects
-            value = serialized[i]?.value
-            Transmitter.Payloads.Variable.setConst(value)
+          serializedPayload
+            .map (serialized = []) =>
+              serialized[i]?.value for {valueVar}, i in @nestedObjects
+            .separate()
 
 
   beforeEach ->
@@ -51,10 +51,8 @@ describe 'Flattening list connection', ->
         .fromSource @serializedVar
         .toTarget @nestedList
         .withTransform (payload) ->
-          Transmitter.Payloads.List.setLazy(->
-            payload.get().map (serialized) ->
-              return new NestedObject(serialized.name)
-          )
+          payload.toSetList().map (serialized) ->
+            new NestedObject(serialized.name)
         .init(tr)
 
     # Separate transmissions to test channel init querying
@@ -63,9 +61,9 @@ describe 'Flattening list connection', ->
         .fromSource @nestedList
         .toConnectionTarget @nestedChannelVar
         .withTransform (nestedList) =>
-          Transmitter.Payloads.Variable.setLazy =>
-            if nestedList.getSize()
-              new NestedChannel(nestedList.get(), @serializedVar)
+          nestedList.toSetVariable().map (nested) =>
+            if nested.length
+              new NestedChannel(nested, @serializedVar)
             else
               new Transmitter.Channels.ConstChannel()
                 .toTarget @serializedVar

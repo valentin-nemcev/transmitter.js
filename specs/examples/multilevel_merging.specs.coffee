@@ -7,10 +7,9 @@ VariableNode = Transmitter.Nodes.Variable
 
 reduceMergedPayload = (nodes...) ->
   (payloads) ->
-    Transmitter.Payloads.Variable.setLazy ->
+    payloads.merge().map (values) ->
       result = {}
-      payloads.forEach (payload, i) ->
-        result[nodes[i].inspect()] = payload.get()
+      values.forEach (value, i) -> result[nodes[i].inspect()] = value
       return result
 
 

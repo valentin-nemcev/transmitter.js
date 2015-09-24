@@ -16,23 +16,18 @@ describe 'Reversing messages in the middle of the chain', ->
         .fromSource(@button)
         .fromSource(@textInput)
         .inBackwardDirection()
-        .withTransform (payloads) =>
-          [buttonWasClicked, textValue] = payloads
-          if buttonWasClicked.get?
-            Transmitter.Payloads.List.append(textValue)
-          else
-            Transmitter.Payloads.noop()
+        .withTransform ([buttonWasClickedPayload, textValuePayload]) =>
+          textValuePayload
+            .replaceByNoop(buttonWasClickedPayload)
+            .toAppendListElement()
         .toTarget @tagList
         .init(tr)
 
       new Transmitter.Channels.SimpleChannel()
         .fromSource(@button)
         .inForwardDirection()
-        .withTransform (buttonWasClicked) =>
-          if buttonWasClicked.get?
-            Transmitter.Payloads.Variable.setConst('')
-          else
-            Transmitter.Payloads.noop()
+        .withTransform (buttonWasClickedPayload) =>
+          buttonWasClickedPayload.map( -> '' )
         .toTarget @textInput
         .init(tr)
 
