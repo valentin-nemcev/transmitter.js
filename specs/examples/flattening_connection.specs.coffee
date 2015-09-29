@@ -13,61 +13,76 @@ class NestedObject extends Transmitter.Nodes.Record
 
 describe 'Flattening connection', ->
 
-  class NestedChannel extends Transmitter.Channels.CompositeChannel
-
-    constructor: (@nestedObject, @serializedVar) ->
-      @valueVarDynamic = [@nestedObject?.valueVar].filter (v) -> v?
-
-    @defineChannel ->
-      new Transmitter.Channels.SimpleChannel()
-        .inForwardDirection()
-        .fromDynamicSources @valueVarDynamic
-        .toTarget @serializedVar
-        .withTransform (valuePayloads) =>
-          valuePayloads.merge().map ([value]) =>
-            {name: @nestedObject?.name ? null, value: value ? null}
-
-
-    @defineChannel ->
-      new Transmitter.Channels.SimpleChannel()
-        .inBackwardDirection()
-        .fromSource @serializedVar
-        .toDynamicTargets @valueVarDynamic
-        .withTransform (serializedPayload) ->
-          [serializedPayload.map (serialized) -> serialized?.value]
-
-
   beforeEach ->
     @define 'serializedVar', new Transmitter.Nodes.Variable()
+    @define 'flatVar', new Transmitter.Nodes.Variable()
     @define 'nestedVar', new Transmitter.Nodes.Variable()
-    @define 'nestedChannelVar', new Transmitter.ChannelNodes.ChannelVariable()
+    @define 'nestedBackwardChannelVar',
+      new Transmitter.ChannelNodes.ChannelVariable()
+    @define 'nestedForwardChannelVar',
+      new Transmitter.ChannelNodes.ChannelVariable()
 
-    @createBackwardChannel = =>
-      new Transmitter.Channels.SimpleChannel()
-        .inBackwardDirection()
-        .fromSource @serializedVar
-        .toTarget @nestedVar
-        .withTransform (payload) ->
-          payload.map (serialized) ->
-            if serialized?
-              return new NestedObject(serialized.name)
-            else
-              null
+
+    @createFlatChannel = =>
+      new Transmitter.Channels.CompositeChannel()
+        .defineChannel =>
+          new Transmitter.Channels.SimpleChannel()
+            .inForwardDirection()
+            .fromSources @flatVar, @nestedVar
+            .toTarget @serializedVar
+            .withTransform ([flatPayload, nestedPayload]) ->
+              flatPayload.merge(nestedPayload).map ([value, nestedObject]) ->
+                {name: nestedObject?.name ? null, value: value ? null}
+
+        .defineChannel =>
+          new Transmitter.Channels.SimpleChannel()
+            .inBackwardDirection()
+            .fromSource @serializedVar
+            .toTarget @nestedVar
+            .withTransform (payload) ->
+              payload.map (serialized) ->
+                if serialized?
+                  return new NestedObject(serialized.name)
+                else
+                  null
+
 
     @createNestedChannel = =>
-      new Transmitter.Channels.SimpleChannel()
-        .fromSource @nestedVar
-        .toConnectionTarget @nestedChannelVar
-        .withTransform (payload) =>
-          payload.map (nestedObject) =>
-            new NestedChannel(nestedObject, @serializedVar)
+      new Transmitter.Channels.CompositeChannel()
+        .defineChannel =>
+          new Transmitter.Channels.SimpleChannel()
+            .fromSource @nestedVar
+            .toConnectionTarget @nestedBackwardChannelVar
+            .withTransform (payload) =>
+              payload.map (nestedObject) =>
+                valueVarDynamic = [nestedObject?.valueVar].filter (v) -> v?
+                new Transmitter.Channels.SimpleChannel()
+                  .inBackwardDirection()
+                  .fromSource @serializedVar
+                  .toDynamicTargets valueVarDynamic
+                  .withTransform (serializedPayload) ->
+                    [serializedPayload.map (serialized) -> serialized?.value]
+
+        .defineChannel =>
+          new Transmitter.Channels.SimpleChannel()
+            .fromSource @nestedVar
+            .toConnectionTarget @nestedForwardChannelVar
+            .withTransform (payload) =>
+              payload.map (nestedObject) =>
+                valueVarDynamic = [nestedObject?.valueVar].filter (v) -> v?
+                new Transmitter.Channels.SimpleChannel()
+                  .inForwardDirection()
+                  .fromDynamicSources valueVarDynamic
+                  .toTarget @flatVar
+                  .withTransform (valuePayloads) =>
+                    valuePayloads.merge().map ([value]) -> value
 
 
   describe 'initialization', ->
 
     specify 'has default const value after initialization', ->
       Transmitter.startTransmission (tr) =>
-        @createBackwardChannel().init(tr)
+        @createFlatChannel().init(tr)
 
       # Separate transmissions to test channel init querying
       Transmitter.startTransmission (tr) =>
@@ -81,7 +96,7 @@ describe 'Flattening connection', ->
 
     beforeEach ->
       Transmitter.startTransmission (tr) =>
-        @createBackwardChannel().init(tr)
+        @createFlatChannel().init(tr)
         @createNestedChannel().init(tr)
 
 
@@ -154,7 +169,7 @@ describe 'Flattening connection', ->
 
         Transmitter.startTransmission (tr) =>
           tr.reverseOrder = order is 'reverse'
-          @createBackwardChannel().init(tr)
+          @createFlatChannel().init(tr)
           @createNestedChannel().init(tr)
           @createDerivedChannel().init(tr)
 
