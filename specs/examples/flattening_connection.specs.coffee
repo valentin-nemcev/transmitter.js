@@ -18,9 +18,21 @@ describe 'Flattening connection', ->
     @define 'flatVar', new Transmitter.Nodes.Variable()
     @define 'nestedVar', new Transmitter.Nodes.Variable()
     @define 'nestedBackwardChannelVar',
-      new Transmitter.ChannelNodes.ChannelVariable()
+      new Transmitter.ChannelNodes.DynamicChannelVariable('targets', =>
+        new Transmitter.Channels.SimpleChannel()
+          .inBackwardDirection()
+          .fromSource @serializedVar
+          .withTransform (serializedPayload) ->
+            [serializedPayload.map (serialized) -> serialized?.value]
+      )
     @define 'nestedForwardChannelVar',
-      new Transmitter.ChannelNodes.ChannelVariable()
+      new Transmitter.ChannelNodes.DynamicChannelVariable('sources', =>
+        new Transmitter.Channels.SimpleChannel()
+          .inForwardDirection()
+          .toTarget @flatVar
+          .withTransform (valuePayloads) =>
+            valuePayloads.merge().map ([value]) -> value
+      )
 
 
     @createFlatChannel = =>
@@ -55,13 +67,7 @@ describe 'Flattening connection', ->
             .toConnectionTarget @nestedBackwardChannelVar
             .withTransform (payload) =>
               payload.map (nestedObject) =>
-                valueVarDynamic = [nestedObject?.valueVar].filter (v) -> v?
-                new Transmitter.Channels.SimpleChannel()
-                  .inBackwardDirection()
-                  .fromSource @serializedVar
-                  .toDynamicTargets valueVarDynamic
-                  .withTransform (serializedPayload) ->
-                    [serializedPayload.map (serialized) -> serialized?.value]
+                [nestedObject?.valueVar].filter (v) -> v?
 
         .defineChannel =>
           new Transmitter.Channels.SimpleChannel()
@@ -69,13 +75,7 @@ describe 'Flattening connection', ->
             .toConnectionTarget @nestedForwardChannelVar
             .withTransform (payload) =>
               payload.map (nestedObject) =>
-                valueVarDynamic = [nestedObject?.valueVar].filter (v) -> v?
-                new Transmitter.Channels.SimpleChannel()
-                  .inForwardDirection()
-                  .fromDynamicSources valueVarDynamic
-                  .toTarget @flatVar
-                  .withTransform (valuePayloads) =>
-                    valuePayloads.merge().map ([value]) -> value
+                [nestedObject?.valueVar].filter (v) -> v?
 
 
   describe 'initialization', ->
