@@ -7,10 +7,19 @@ noop = require './noop'
 Payload = require './payload'
 
 
+zip = (payloads) ->
+  SetPayload.create get: ->
+    length = payloads[0]?.getSize() ? 0
+    for i in [0...length]
+      for p in payloads
+        p.getAt(i)
+
 class ListPayload extends Payload
 
   flatten: ->
     @map (nested) -> nested.get()
+
+  zip: (otherPayloads...) -> zip([this, otherPayloads...])
 
 
 class SetConstPayload extends ListPayload

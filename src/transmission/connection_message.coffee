@@ -8,6 +8,7 @@ FastSet = require 'collections/fast-set'
 Pass = require './pass'
 
 MergedMessage = require './merged_message'
+SeparatedMessage = require './separated_message'
 
 
 module.exports = class ConnectionMessage
@@ -50,6 +51,12 @@ module.exports = class ConnectionMessage
 
   joinMergedMessage: (source) ->
     MergedMessage
+      .getOrCreate(this, source)
+      .joinConnectionMessage(this)
+
+
+  joinSeparatedMessage: (source) ->
+    SeparatedMessage
       .getOrCreate(this, source)
       .joinConnectionMessage(this)
 

@@ -38,7 +38,7 @@ module.exports = class MergingConnectionTarget
 
 
   receiveMessage: (message) ->
-    message.sendMergedTo(this)
+    message.joinMergedMessage(this)
     return this
 
 

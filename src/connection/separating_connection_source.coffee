@@ -15,11 +15,15 @@ module.exports = class SeparatingConnectionSource
     @targets.forEach (target, node) => target.setSource(this)
 
 
+  getTargets: -> @targets
+
+
   setSource: (@source) -> this
 
 
   connect: (message) ->
     @targets.forEach (target) -> target.connect(message)
+    message.joinSeparatedMessage(this)
     return this
 
 
@@ -29,7 +33,7 @@ module.exports = class SeparatingConnectionSource
 
 
   receiveMessage: (message) ->
-    message.sendSeparatedTo(@targets)
+    message.joinSeparatedMessage(this)
     return this
 
 

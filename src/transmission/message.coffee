@@ -8,6 +8,7 @@ Map = require 'collections/map'
 Pass = require './pass'
 Precedence = require './precedence'
 MergedMessage = require './merged_message'
+SeparatedMessage = require './separated_message'
 
 
 module.exports = class Message
@@ -87,16 +88,15 @@ module.exports = class Message
     return this
 
 
-  sendSeparatedTo: (targetNodes) ->
-    i = 0
-    targetNodes.forEach (target, node) =>
-      msg = Message.createNext(this, @payload[i], @getPriority())
-      target.receiveMessage(msg)
-      i += 1
+  joinSeparatedMessage: (target) ->
+    SeparatedMessage
+      .getOrCreate(this, target)
+      .joinMessage(this)
+
     return this
 
 
-  sendMergedTo: (source) ->
+  joinMergedMessage: (source) ->
     MergedMessage
       .getOrCreate(this, source)
       .joinMessageFrom(this, @sourceNode)
