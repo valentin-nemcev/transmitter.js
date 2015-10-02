@@ -23,10 +23,16 @@ module.exports = class CompositeChannel
     return this
 
 
+  addChannel: (channel) ->
+    (@instanceChannels ?= []).push channel
+    return this
+
+
   createChannels: ->
     (@classChannelCreateFunctions ? [])
       .concat(@instanceChannelCreateFunctions ? [])
       .map (createChannel) => createChannel.call(this)
+      .concat(@instanceChannels ? [])
 
 
   getChannels: -> @channels ?= @createChannels()
