@@ -25,6 +25,7 @@ module.exports = class MergingConnectionTarget
 
   connect: (message) ->
     @sources.forEach (source) -> source.connect(message)
+    message.joinMergedMessage(this)
     return this
 
 

@@ -30,6 +30,12 @@ module.exports = class MergedMessage
     @nodesToMessages = new Map()
 
 
+  joinConnectionMessage: (message) ->
+    throw new Error "!" if @query?
+    @sourceChannelNode = message.getSourceChannelNode()
+    return this
+
+
   joinQuery: (query) ->
     unless @query?
       @query = query
@@ -72,18 +78,28 @@ module.exports = class MergedMessage
 
 
   _getEmptyPayload: ->
-    payload = []
-    payload.merge = -> merge(this)
+    payload = @sourceChannelNode?.getPayload()
+    unless payload?
+      payload = []
+      payload.merge = -> merge(this)
     [payload, 0]
 
 
   _getMergedPayload: (sourceNodes) ->
     @transmission.log this
-    payload = []
-    payload.merge = -> merge(this)
+    payload = @sourceChannelNode?.getPayload()
+    unless payload?
+      payload = sourceNodes
+
     priority = null
-    sourceNodes.forEach (node) =>
-      message = @nodesToMessages.get(node)
+    payloads = new Map()
+    @nodesToMessages.forEach (message, node) =>
       priority = Math.max(priority, message.getPriority())
-      payload.push message.payload
+      payloads.set node, message.payload
+
+    payload = payload.map (node) => payloads.get(node)
+    if payload.length?
+      payload.merge = -> merge(this)
+    else
+      payload = payload.flatten()
     return [payload, priority]

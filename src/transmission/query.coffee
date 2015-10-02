@@ -4,6 +4,7 @@
 {inspect} = require 'util'
 
 FastSet = require 'collections/fast-set'
+
 Pass = require './pass'
 Precedence = require './precedence'
 

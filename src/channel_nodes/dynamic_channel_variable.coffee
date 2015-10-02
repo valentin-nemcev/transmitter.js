@@ -2,6 +2,7 @@
 
 
 ChannelNode = require './channel_node'
+ListPayload = require '../payloads/list'
 
 
 module.exports = class DynamicChannelVariable extends ChannelNode
@@ -23,6 +24,8 @@ module.exports = class DynamicChannelVariable extends ChannelNode
 
     @channel = newChannel = @createChannel.call(null)
 
+    @payload = ListPayload.setConst(newNodes)
+
     switch @type
       when 'sources' then newChannel.fromDynamicSources newNodes
       when 'targets' then newChannel.toDynamicTargets newNodes
@@ -30,3 +33,6 @@ module.exports = class DynamicChannelVariable extends ChannelNode
 
     newChannel.connect(@message) if newChannel?
     this
+
+
+  getPayload: -> @payload

@@ -7,6 +7,8 @@ FastSet = require 'collections/fast-set'
 
 Pass = require './pass'
 
+MergedMessage = require './merged_message'
+
 
 module.exports = class ConnectionMessage
 
@@ -44,6 +46,12 @@ module.exports = class ConnectionMessage
 
   createNextQuery: ->
     @transmission.Query.createNext(this)
+
+
+  joinMergedMessage: (source) ->
+    MergedMessage
+      .getOrCreate(this, source)
+      .joinConnectionMessage(this)
 
 
   getSourceChannelNode: -> @sourceChannelNode

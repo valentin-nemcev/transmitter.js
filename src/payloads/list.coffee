@@ -7,7 +7,13 @@ noop = require './noop'
 Payload = require './payload'
 
 
-class SetConstPayload extends Payload
+class ListPayload extends Payload
+
+  flatten: ->
+    @map (nested) -> nested.get()
+
+
+class SetConstPayload extends ListPayload
 
   @create = (value) => new this(value)
 
@@ -43,7 +49,7 @@ class SetConstPayload extends Payload
 
 
 
-class SetLazyPayload extends Payload
+class SetLazyPayload extends ListPayload
 
   @create = (getValue) => new this(getValue)
 
@@ -79,7 +85,7 @@ class SetLazyPayload extends Payload
 
 
 
-class RemovePayload extends Payload
+class RemovePayload extends ListPayload
 
   @create = (@source) => new this(@source)
 
@@ -94,7 +100,7 @@ class RemovePayload extends Payload
     return this
 
 
-class AddAtPayload extends Payload
+class AddAtPayload extends ListPayload
 
   @create = (@source) => new this(@source)
 
@@ -107,7 +113,7 @@ class AddAtPayload extends Payload
     return this
 
 
-class UpdateMatchingPayload extends Payload
+class UpdateMatchingPayload extends ListPayload
 
   constructor: (@source, opts = {}) ->
     @mapFn = opts.map
@@ -156,7 +162,7 @@ class UpdateMatchingPayload extends Payload
 
 
 
-class SetPayload extends Payload
+class SetPayload extends ListPayload
 
   @create = (source) =>
     return new this(source)

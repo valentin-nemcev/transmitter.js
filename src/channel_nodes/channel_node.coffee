@@ -58,3 +58,6 @@ module.exports = class ChannelNode
     @message.sendToTargetPoints()
     @message = null
     return this
+
+
+  getPayload: -> null

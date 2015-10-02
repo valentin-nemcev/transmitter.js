@@ -23,7 +23,9 @@ describe 'Flattening connection', ->
           .inBackwardDirection()
           .fromSource @serializedVar
           .withTransform (serializedPayload) ->
-            [serializedPayload.map (serialized) -> serialized?.value]
+            serializedPayload
+              .map (serialized) -> [serialized?.value]
+              .toSetList()
       )
     @define 'nestedForwardChannelVar',
       new Transmitter.ChannelNodes.DynamicChannelVariable('sources', =>
@@ -31,7 +33,7 @@ describe 'Flattening connection', ->
           .inForwardDirection()
           .toTarget @flatVar
           .withTransform (valuePayloads) =>
-            valuePayloads.merge().map ([value]) -> value
+            valuePayloads.toSetVariable().map ([value]) -> value
       )
 
 
