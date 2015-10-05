@@ -52,6 +52,9 @@ module.exports = class Message
     @payload.fixedPriority ? @priority
 
 
+  getPayload: -> @payload
+
+
   sendToLine: (line) ->
     @log line
     line.receiveMessage(this)

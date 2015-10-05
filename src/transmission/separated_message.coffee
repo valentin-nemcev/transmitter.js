@@ -35,7 +35,7 @@ module.exports = class MergedMessage
       srcPayload = @source.getTargets().keys()
 
     msgPriority = message.getPriority()
-    msgPayload = message.payload
+    msgPayload = message.getPayload()
 
     nodesToLines = @source.getTargets()
     if srcPayload.length?

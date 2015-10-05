@@ -151,7 +151,7 @@ module.exports = class JointMessage
 
   _processMessage: (prevMessage) ->
     @transmission.log prevMessage, @node
-    prevPayload = prevMessage.payload
+    prevPayload = prevMessage.getPayload()
     nextPayload = @node.processPayload(prevPayload)
     @transmission.Message
       .createNext(this, nextPayload, prevMessage.getPriority())
@@ -164,7 +164,7 @@ module.exports = class JointMessage
 
   respond: ->
     @transmission.log @query, 'respond', @node
-    prevPayload = @precedingMessage?.payload
+    prevPayload = @precedingMessage?.getPayload()
     nextPayload = @node.createResponsePayload(prevPayload)
     nextMessage = @transmission.Message
       .createNext(this, nextPayload, @precedingMessage?.getPriority() ? 0)
