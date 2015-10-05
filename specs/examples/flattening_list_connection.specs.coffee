@@ -13,39 +13,39 @@ class NestedObject extends Transmitter.Nodes.Record
 
 describe 'Flattening list connection', ->
 
-  class NestedChannel extends Transmitter.Channels.CompositeChannel
-
-    constructor: (@nestedObjects, @serializedVar) ->
-
-    @defineChannel ->
-      new Transmitter.Channels.SimpleChannel()
-        .inForwardDirection()
-        .fromDynamicSources @nestedObjects.map (o) -> o.valueVar
-        .toTarget @serializedVar
-        .withTransform (valuePayloads) =>
-          valuePayloads.merge().map (values) =>
-            for value, i in values
-              {name: @nestedObjects[i].name, value}
-
-
-    @defineChannel ->
-      new Transmitter.Channels.SimpleChannel()
-        .inBackwardDirection()
-        .fromSource @serializedVar
-        .toDynamicTargets @nestedObjects.map (o) -> o.valueVar
-        .withTransform (serializedPayload) =>
-          serializedPayload
-            .map (serialized = []) =>
-              serialized[i]?.value for {valueVar}, i in @nestedObjects
-            .separate()
-
-
   beforeEach ->
     @define 'serializedVar', new Transmitter.Nodes.Variable()
+    @define 'flatList', new Transmitter.Nodes.List()
     @define 'nestedList', new Transmitter.Nodes.List()
-    @define 'nestedChannelVar', new Transmitter.ChannelNodes.ChannelVariable()
+    @define 'nestedBackwardChannelVar',
+      new Transmitter.ChannelNodes.DynamicChannelVariable('targets', =>
+        new Transmitter.Channels.SimpleChannel()
+          .inBackwardDirection()
+          .fromSource @serializedVar
+          .withTransform (serializedPayload) =>
+            serializedPayload
+              .toSetList()
+              .map (serialized) => serialized?.value
+      )
+    @define 'nestedForwardChannelVar',
+      new Transmitter.ChannelNodes.DynamicChannelVariable('sources', =>
+        new Transmitter.Channels.SimpleChannel()
+          .inForwardDirection()
+          .toTarget @flatList
+      )
 
     Transmitter.startTransmission (tr) =>
+      new Transmitter.Channels.SimpleChannel()
+        .inForwardDirection()
+        .fromSources @flatList, @nestedList
+        .toTarget @serializedVar
+        .withTransform ([flatPayload, nestedPayload]) ->
+          flatPayload.zip(nestedPayload)
+            .map ([value, nestedObject]) ->
+              {name: nestedObject?.name ? null, value: value ? null}
+            .toSetVariable()
+        .init(tr)
+
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSource @serializedVar
@@ -55,14 +55,18 @@ describe 'Flattening list connection', ->
             new NestedObject(serialized.name)
         .init(tr)
 
-    # Separate transmissions to test channel init querying
-    Transmitter.startTransmission (tr) =>
       new Transmitter.Channels.SimpleChannel()
         .fromSource @nestedList
-        .toConnectionTarget @nestedChannelVar
-        .withTransform (nestedList) =>
-          nestedList.toSetVariable().map (nested) =>
-            new NestedChannel(nested, @serializedVar)
+        .toConnectionTarget @nestedBackwardChannelVar
+        .withTransform (nestedList) ->
+          nestedList.map (nested) -> nested.valueVar
+        .init(tr)
+
+      new Transmitter.Channels.SimpleChannel()
+        .fromSource @nestedList
+        .toConnectionTarget @nestedForwardChannelVar
+        .withTransform (nestedList) ->
+          nestedList.map (nested) -> nested.valueVar
         .init(tr)
 
 

@@ -81,7 +81,6 @@ module.exports = class MergedMessage
     payload = @sourceChannelNode?.getPayload()
     unless payload?
       payload = []
-      payload.merge = -> merge(this)
     [payload, 0]
 
 
@@ -98,8 +97,6 @@ module.exports = class MergedMessage
       payloads.set node, message.payload
 
     payload = payload.map (node) => payloads.get(node)
-    if payload.length?
-      payload.merge = -> merge(this)
-    else
+    unless payload.length?
       payload = payload.flatten()
     return [payload, priority]

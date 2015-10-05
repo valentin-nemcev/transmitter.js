@@ -5,9 +5,11 @@ Transmitter = require 'transmitter'
 
 VariableNode = Transmitter.Nodes.Variable
 
+merge = Transmitter.Payloads.Variable.merge
+
 reduceMergedPayload = (nodes...) ->
   (payloads) ->
-    payloads.merge().map (values) ->
+    merge(payloads).map (values) ->
       result = {}
       values.forEach (value, i) -> result[nodes[i].inspect()] = value
       return result
