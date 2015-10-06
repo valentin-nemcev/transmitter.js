@@ -22,16 +22,17 @@ describe 'Flattening list connection', ->
         new Transmitter.Channels.SimpleChannel()
           .inBackwardDirection()
           .fromSource @serializedVar
-          .withTransform (serializedPayload) =>
-            serializedPayload
-              .toSetList()
-              .map (serialized) => serialized?.value
+          .withTransform (serializedPayload, nestedPayload) =>
+            nestedPayload.zip(serializedPayload.toSetList())
+              .map ([nested, serialized]) => serialized?.value
+              .unflatten()
       )
     @define 'nestedForwardChannelVar',
       new Transmitter.ChannelNodes.DynamicChannelVariable('sources', =>
         new Transmitter.Channels.SimpleChannel()
           .inForwardDirection()
           .toTarget @flatList
+          .withTransform (payload) -> payload.flatten()
       )
 
     Transmitter.startTransmission (tr) =>

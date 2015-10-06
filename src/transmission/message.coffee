@@ -3,12 +3,10 @@
 
 {inspect} = require 'util'
 
-Map = require 'collections/map'
-
-Pass = require './pass'
-Precedence = require './precedence'
 MergedMessage = require './merged_message'
-SeparatedMessage = require './separated_message'
+TargetMessage = require './target_message'
+
+Precedence = require './precedence'
 
 
 module.exports = class Message
@@ -32,20 +30,20 @@ module.exports = class Message
     new this(prevMessage.transmission, prevMessage.pass, payload, priority)
 
 
+  @createTarget = (prevMessage, transform) ->
+    TargetMessage.create(prevMessage, transform)
+
+
   constructor: (@transmission, @pass, @payload, @priority) ->
     throw new Error "Missing payload" unless @payload?
 
 
-  createNextConnectionMessage: (channelNode) ->
-    @transmission.ConnectionMessage.createNext(this, channelNode)
-
+  # TODO: Refactor
+  getSelectPrecedence: ->
+    @selectPrecedence ?= Precedence.createSelect(@getPriority())
 
 
   directionMatches: (direction) -> @pass.directionMatches(direction)
-
-
-  getSelectPrecedence: ->
-    @selectPrecedence ?= Precedence.createSelect(@getPriority())
 
 
   getPriority: ->
@@ -61,41 +59,8 @@ module.exports = class Message
     return this
 
 
-  sendToNodeTarget: (line, nodeTarget) ->
-    @transmission.JointMessage
-      .getOrCreate(this, {nodeTarget})
-      .joinMessageFrom(this, line)
-    return this
-
-
-  sendToChannelNode: (node) ->
-    @log node
-    existing = @transmission.getCommunicationFor(@pass, node)
-    existing ?= @transmission.getCommunicationFor(@pass.getNext(), node)
-    if existing?
-      throw new Error "Message already sent to #{inspect node}. " \
-        + "Previous: #{inspect existing}, " \
-        + "current: #{inspect this}"
-    @transmission.addCommunicationFor(this, node)
-    node.routeMessage(this, @payload)
-    return this
-
-
   sendTransformedTo: (transform, target) ->
-    transformed = if transform?
-      payload = transform(@payload, @transmission)
-      Message.createNext(this, payload, @getPriority())
-    else
-      this
-    target.receiveMessage(transformed)
-    return this
-
-
-  joinSeparatedMessage: (target) ->
-    SeparatedMessage
-      .getOrCreate(this, target)
-      .joinMessage(this)
-
+    target.receiveMessage(Message.createTarget(this, transform))
     return this
 
 

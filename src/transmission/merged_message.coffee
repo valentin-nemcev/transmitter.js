@@ -31,7 +31,6 @@ module.exports = class MergedMessage
 
 
   joinConnectionMessage: (message) ->
-    throw new Error "!" if @query?
     @sourceChannelNode = message.getSourceChannelNode()
     return this
 
@@ -54,13 +53,15 @@ module.exports = class MergedMessage
     @nodesToMessages.set(node, message)
 
     # TODO: Compare contents
-    if @nodesToMessages.length == @source.getSourceNodes().length
-      [payload, priority] = if @source.prioritiesShouldMatch and not @_prioritiesMatch()
+    unless @nodesToMessages.length == @source.getSourceNodes().length
+      return this
+
+    [payload, priority] =
+      if @source.prioritiesShouldMatch and not @_prioritiesMatch()
         @_getNoopPayload()
       else
-        @_getMergedPayload(@source.getSourceNodes())
-      @_sendMessage([payload, priority])
-    return this
+        @_getMergedPayload()
+    @_sendMessage([payload, priority])
 
 
   _prioritiesMatch: ->
@@ -78,25 +79,18 @@ module.exports = class MergedMessage
 
 
   _getEmptyPayload: ->
-    payload = @sourceChannelNode?.getPayload()
-    unless payload?
-      payload = []
+    payload = @sourceChannelNode?.getPayload() ? []
     [payload, 0]
 
 
-  _getMergedPayload: (sourceNodes) ->
+  _getMergedPayload: ->
     @transmission.log this
-    payload = @sourceChannelNode?.getPayload()
-    unless payload?
-      payload = sourceNodes
+    srcPayload = @sourceChannelNode?.getPayload() ? @source.getSourceNodes()
 
     priority = null
-    payloads = new Map()
     @nodesToMessages.forEach (message, node) =>
       priority = Math.max(priority, message.getPriority())
-      payloads.set node, message.payload
 
-    payload = payload.map (node) => payloads.get(node)
-    unless payload.length?
-      payload = payload.flatten()
+    payload = srcPayload.map (node) => @nodesToMessages.get(node).getPayload()
+
     return [payload, priority]

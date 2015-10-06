@@ -4,6 +4,7 @@
 {inspect} = require 'util'
 
 noop = require './noop'
+VariablePayload = require './variable'
 Payload = require './payload'
 
 
@@ -19,7 +20,15 @@ class ListPayload extends Payload
   flatten: ->
     @map (nested) -> nested.get()
 
+  unflatten: ->
+    @map (value) -> VariablePayload.setConst(value)
+
   zip: (otherPayloads...) -> zip([this, otherPayloads...])
+
+  setSize: (size) ->
+    SetLazyPayload.create =>
+      @getAt(i) for i in [0...size]
+
 
 
 class SetConstPayload extends ListPayload

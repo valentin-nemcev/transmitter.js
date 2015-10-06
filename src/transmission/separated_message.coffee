@@ -3,6 +3,9 @@
 {inspect} = require 'util'
 
 
+Map = require 'collections/map'
+
+
 module.exports = class MergedMessage
   inspect: ->
     [
@@ -29,29 +32,46 @@ module.exports = class MergedMessage
     return this
 
 
-  joinMessage: (message) ->
-    srcPayload = @sourceChannelNode?.getPayload()
-    unless srcPayload?
-      srcPayload = @source.getTargets().keys()
+  getPriority: -> @sourceMessage.getPriority()
 
-    msgPriority = message.getPriority()
-    msgPayload = message.getPayload()
+
+  joinMessage: (message) ->
+    @sourceMessage = message
 
     nodesToLines = @source.getTargets()
+    srcPayload = @sourceChannelNode?.getPayload() ? nodesToLines.keys()
+    payload = message.getPayload(srcPayload)
+
+    @_combinePayload(nodesToLines, payload, srcPayload)
+      .forEach (payload, target) =>
+        target.receiveMessage(message.createSeparate(this, payload))
+
+    return this
+
+
+  _combinePayload: (nodesToLines, payload, srcPayload) ->
     if srcPayload.length?
       zippedPayload = for targetNode, i in srcPayload
         target = nodesToLines.get(targetNode)
-        [target, msgPayload[i]]
+        [target, payload[i]]
     else
       zippedPayload = for targetNode, i in srcPayload.get()
         target = nodesToLines.get(targetNode)
-        value = msgPayload.getAt(i)
-        payload = targetNode.createUpdatePayload(value)
-        [target, payload]
+        [target, payload.getAt(i)]
 
+    nonNull = zippedPayload.filter ([target, payload]) -> payload?
+    if nonNull.length != zippedPayload.length
+      throw new Error "Payload element count mismatch, " \
+        + "expected #{zippedPayload.length}, " \
+        + "got #{nonNull.length}"
+
+    targetsToPayloads = new Map()
     zippedPayload.forEach ([target, payload]) =>
-      msg = @transmission.Message
-        .createNext(this, payload, msgPriority)
-      target.receiveMessage(msg)
+      existingPayload = targetsToPayloads.get(target)
+      if existingPayload? && existingPayload != payload
+        throw new Error "Payload already set for #{inspect target}. " \
+          + "Previous #{inspect existingPayload}, " \
+          + "current #{inspect payload}"
+      targetsToPayloads.set(target, payload)
 
-    return this
+    return targetsToPayloads

@@ -43,6 +43,7 @@ module.exports = class JointMessage
       "Already received message from #{inspect line}. " \
       + "Previous: #{inspect prev}, " \
       + "current: #{inspect message}"
+    console.log message unless message.getSelectPrecedence?
     @linesToMessages.set(line, message)
     @_ensureQuerySent()
     @_selectAndSendMessageIfReady()
