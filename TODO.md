@@ -24,9 +24,12 @@
 * Refactor
   * Don't use context in isolated tests, use context in scenarios.
   * Refactor payload creation methods
+  * Simplify payload transformation, always use merged and separated messages
+
 
 * Implement
   * Better checks for message pass ordering in joint message
+  * Update inner and outer nodes in separating channels
 
 * Later
   * Remove use strict (needs custom compiler for mocha, browserify and npm)
