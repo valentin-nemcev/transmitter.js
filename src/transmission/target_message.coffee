@@ -79,8 +79,7 @@ module.exports = class TargetMessage
 
   getPayload: (args...) ->
     @payload ?= if @transform?
-      args = [@sourceMessage.getPayload(), args...]
-      @transform.call(null, args..., @transmission)
+      @transform.apply(null, [@sourceMessage.getPayload(), args..., @transmission])
     else if @payload?
       @payload
     else

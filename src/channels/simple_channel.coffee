@@ -11,6 +11,8 @@ ConnectionNodeLine = require '../connection/connection_node_line'
 MergingConnectionTarget = require '../connection/merging_connection_target'
 SeparatingConnectionSource =
   require '../connection/separating_connection_source'
+DuplicatingConnectionSource =
+  require '../connection/duplicating_connection_source'
 Connection = require '../connection/connection'
 
 
@@ -23,15 +25,10 @@ module.exports = class SimpleChannel
   inspect: -> '[' + @constructor.name + ']'
 
 
-  assertPresent: (name, value) ->
-    if not value or (value?.length? and value.length is 0)
-      throw new Error name + " must be present, #{inspect value} given"
-    return this
-
-
   constructor: ->
     @sources = []
     @targets = []
+    @connectionTargets = []
 
 
   inForwardDirection: -> @inDirection(directions.forward)
@@ -41,7 +38,7 @@ module.exports = class SimpleChannel
     return this
 
   getDirection: ->
-    if @connectionTarget?
+    if @connectionTargets.length
       directions.omni
     else
       @direction ? directions.null
@@ -110,8 +107,22 @@ module.exports = class SimpleChannel
 
 
 
-  toConnectionTarget: (@connectionTarget) ->
-    @assertPresent('Connection target', @connectionTarget)
+  assertConnectionTarget: (connectionTarget) ->
+    unless connectionTarget?.isConnectionTarget?()
+      throw new Error "#{inspect connectionTarget} is not a valid target node"
+    return this
+
+
+  toConnectionTarget: (connectionTarget) ->
+    @assertConnectionTarget(connectionTarget)
+    @connectionTargets.push connectionTarget
+    return this
+
+
+  toConnectionTargets: (connectionTargets...) ->
+    for connectionTarget in connectionTargets
+      @assertConnectionTarget(connectionTarget)
+      @connectionTargets.push connectionTarget
     return this
 
 
@@ -139,8 +150,8 @@ module.exports = class SimpleChannel
 
 
   getTarget: ->
-    @target ?= if @connectionTarget?
-      @connectionTarget
+    @target ?= if @connectionTargets.length
+      @createDuplicatingTarget(@connectionTargets)
     else if @forceSeparating or @targets.length > 1
       if @targets.length
         @createSeparatingTarget(@targets)
@@ -159,6 +170,10 @@ module.exports = class SimpleChannel
       line = new ConnectionNodeLine(target.getNodeTarget(), @getDirection())
       [target, line]
     new SeparatingConnectionSource(new Map(parts))
+
+
+  createDuplicatingTarget: (targets) ->
+    new DuplicatingConnectionSource(targets)
 
 
   getTransform: -> @transform ? returnArg

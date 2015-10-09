@@ -8,6 +8,8 @@ module.exports = class ChannelNode
 
   inspect: -> '[' + @constructor.name + ']'
 
+  isConnectionTarget: -> yes
+
 
   setSource: (@source) ->
 

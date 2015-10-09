@@ -63,22 +63,13 @@ describe 'Flattening connection', ->
 
 
     @createNestedChannel = =>
-      new Transmitter.Channels.CompositeChannel()
-        .defineChannel =>
-          new Transmitter.Channels.SimpleChannel()
-            .fromSource @nestedVar
-            .toConnectionTarget @nestedBackwardChannelVar
-            .withTransform (payload) =>
-              payload.map (nestedObject) =>
-                [nestedObject?.valueVar].filter (v) -> v?
-
-        .defineChannel =>
-          new Transmitter.Channels.SimpleChannel()
-            .fromSource @nestedVar
-            .toConnectionTarget @nestedForwardChannelVar
-            .withTransform (payload) =>
-              payload.map (nestedObject) =>
-                [nestedObject?.valueVar].filter (v) -> v?
+      new Transmitter.Channels.SimpleChannel()
+        .fromSource @nestedVar
+        .toConnectionTargets \
+          @nestedBackwardChannelVar, @nestedForwardChannelVar
+        .withTransform (payload) =>
+          payload.map (nestedObject) =>
+            [nestedObject?.valueVar].filter (v) -> v?
 
 
   describe 'initialization', ->
