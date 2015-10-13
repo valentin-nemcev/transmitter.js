@@ -63,9 +63,9 @@ describe 'Message merging', ->
     @transmission.respond()
 
 
-  specify 'then merged message is sent', ->
-    expect(@target.receiveMessage)
-      .to.have.been.calledWith(sinon.match.instanceOf(Message))
+  # specify 'then merged message is sent', ->
+  #   expect(@target.receiveMessage)
+  #     .to.have.been.calledWith(sinon.match.instanceOf(Message))
 
 
   specify 'and merged message has source payloads', ->

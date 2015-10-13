@@ -68,6 +68,9 @@ module.exports = class Transmission
   reverseOrder: no
 
 
+  inspect: -> '[Transmission]'
+
+
   constructor: ->
     @comms = for priority in [0..Pass.maxPriority]
       {map: new WeakMap(), queue: []}

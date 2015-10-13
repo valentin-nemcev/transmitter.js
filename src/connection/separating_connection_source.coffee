@@ -8,10 +8,11 @@ Map = require 'collections/map'
 module.exports = class SeparatingConnectionSource
 
   inspect: ->
-    ':[' + @target.keys().map(inspect).join(', ') + ']'
+    ':[' + @targets.keys().map(inspect).join(', ') + ']'
 
 
-  constructor: (@targets) ->
+  constructor: (@targets, opts = {}) ->
+    {@singleTarget} = opts
     @targets.forEach (target, node) => target.setSource(this)
 
 

@@ -5,7 +5,6 @@
 
 FastMap = require 'collections/fast-map'
 Set = require 'collections/set'
-Precedence = require './precedence'
 NodePointTransmissionHub = require './node_point_transmission_hub'
 
 
@@ -43,7 +42,6 @@ module.exports = class JointMessage
       "Already received message from #{inspect line}. " \
       + "Previous: #{inspect prev}, " \
       + "current: #{inspect message}"
-    console.log message unless message.getSelectPrecedence?
     @linesToMessages.set(line, message)
     @_ensureQuerySent()
     @_selectAndSendMessageIfReady()
@@ -77,8 +75,7 @@ module.exports = class JointMessage
         throw new Error "Message already originated at #{inspect @node}. " \
           + "Previous: #{inspect @message}"
     payload = @node.processPayload(payload)
-    message = @transmission.Message
-      .createNext(this, payload, 1)
+    message = @transmission.Message.create(this, payload, 1)
     @_sendMessage(message)
     return this
 
@@ -133,12 +130,10 @@ module.exports = class JointMessage
 
 
   _assertMessage: (message) ->
-    if @message != message \
-      and message.getSelectPrecedence()
-        .compare(@message.getSelectPrecedence()) >= 0
-          throw new Error "Message already sent at #{inspect @node}. " \
-            + "Previous: #{inspect @message}, " \
-            + "current: #{inspect message}"
+    if @message != message and message.getPriority() >= @message.getPriority()
+      throw new Error "Message already sent at #{inspect @node}. " \
+        + "Previous: #{inspect @message}, " \
+        + "current: #{inspect message}"
     return this
 
 
@@ -146,7 +141,7 @@ module.exports = class JointMessage
     # TODO: Add checks for more than one message with precedence of 1
     messages = @linesToMessages.values()
     sorted = messages.sorted (a, b) ->
-      -1 * a.getSelectPrecedence().compare(b.getSelectPrecedence())
+      -1 * (a.getPriority() - b.getPriority())
     return sorted[0]
 
 
@@ -155,7 +150,7 @@ module.exports = class JointMessage
     prevPayload = prevMessage.getPayload()
     nextPayload = @node.processPayload(prevPayload)
     @transmission.Message
-      .createNext(this, nextPayload, prevMessage.getPriority())
+      .create(this, nextPayload, prevMessage.getPriority())
 
 
   readyToRespond: ->
@@ -168,7 +163,7 @@ module.exports = class JointMessage
     prevPayload = @precedingMessage?.getPayload()
     nextPayload = @node.createResponsePayload(prevPayload)
     nextMessage = @transmission.Message
-      .createNext(this, nextPayload, @precedingMessage?.getPriority() ? 0)
+      .create(this, nextPayload, @precedingMessage?.getPriority() ? 0)
     @_sendMessage(nextMessage)
 
 

@@ -13,7 +13,7 @@ module.exports = class MergingConnectionTarget
 
 
   constructor: (@sources, opts = {}) ->
-    {@prioritiesShouldMatch} = opts
+    {@singleSource, @prioritiesShouldMatch} = opts
     @sources.forEach (source, node) => source.setTarget(this)
 
 

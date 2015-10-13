@@ -6,8 +6,6 @@
 MergedMessage = require './merged_message'
 TargetMessage = require './target_message'
 
-Precedence = require './precedence'
-
 
 module.exports = class Message
 
@@ -26,31 +24,15 @@ module.exports = class Message
     return this
 
 
-  @createNext = (prevMessage, payload, priority) ->
+  @create = (prevMessage, payload, priority) ->
     new this(prevMessage.transmission, prevMessage.pass, payload, priority)
-
-
-  @createTarget = (prevMessage, transform) ->
-    TargetMessage.create(prevMessage, transform)
 
 
   constructor: (@transmission, @pass, @payload, @priority) ->
     throw new Error "Missing payload" unless @payload?
 
 
-  # TODO: Refactor
-  getSelectPrecedence: ->
-    @selectPrecedence ?= Precedence.createSelect(@getPriority())
-
-
   directionMatches: (direction) -> @pass.directionMatches(direction)
-
-
-  getPriority: ->
-    @payload.fixedPriority ? @priority
-
-
-  getPayload: -> @payload
 
 
   sendToLine: (line) ->
@@ -59,14 +41,15 @@ module.exports = class Message
     return this
 
 
-  sendTransformedTo: (transform, target) ->
-    target.receiveMessage(Message.createTarget(this, transform))
-    return this
-
-
   joinMergedMessage: (source) ->
     MergedMessage
       .getOrCreate(this, source)
       .joinMessageFrom(this, @sourceNode)
-
     return this
+
+
+  getPriority: ->
+    @payload.fixedPriority ? @priority
+
+
+  getPayload: -> @payload

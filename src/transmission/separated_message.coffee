@@ -6,7 +6,9 @@
 Map = require 'collections/map'
 
 
-module.exports = class MergedMessage
+TargetMessage = require './target_message'
+
+module.exports = class SeparatedMessage
   inspect: ->
     [
       'SM'
@@ -39,12 +41,17 @@ module.exports = class MergedMessage
     @sourceMessage = message
 
     nodesToLines = @source.getTargets()
-    srcPayload = @sourceChannelNode?.getPayload() ? nodesToLines.keys()
-    payload = message.getPayload(srcPayload)
+    srcPayload = @sourceChannelNode?.getTargetPayload() ? nodesToLines.keys()
+
+    payload =
+      if @source.singleTarget
+        [message.getPayload()]
+      else
+        message.getPayload(srcPayload)
 
     @_combinePayload(nodesToLines, payload, srcPayload)
       .forEach (payload, target) =>
-        target.receiveMessage(message.createSeparate(this, payload))
+        target.receiveMessage(TargetMessage.createSeparate(this, payload))
 
     return this
 

@@ -3,9 +3,6 @@
 
 {inspect} = require 'util'
 
-Precedence = require './precedence'
-SeparatedMessage = require './separated_message'
-
 
 module.exports = class TargetMessage
 
@@ -28,7 +25,7 @@ module.exports = class TargetMessage
     new this(prevMessage, transform, null)
 
 
-  createSeparate: (prevMessage, payload) ->
+  @createSeparate = (prevMessage, payload) ->
     new TargetMessage(prevMessage, null, payload)
 
 
@@ -40,11 +37,6 @@ module.exports = class TargetMessage
     @transmission.ConnectionMessage.createNext(this, channelNode)
 
 
-  # TODO: Refactor
-  getSelectPrecedence: ->
-    @selectPrecedence ?= Precedence.createSelect(@getPriority())
-
-
   sendToNodeTarget: (line, nodeTarget) ->
     @transmission.JointMessage
       .getOrCreate(this, {nodeTarget})
@@ -52,35 +44,8 @@ module.exports = class TargetMessage
     return this
 
 
-  sendToChannelNode: (node) ->
-    @log node
-    existing = @transmission.getCommunicationFor(@pass, node)
-    existing ?= @transmission.getCommunicationFor(@pass.getNext(), node)
-    if existing?
-      throw new Error "Message already sent to #{inspect node}. " \
-        + "Previous: #{inspect existing}, " \
-        + "current: #{inspect this}"
-    @transmission.addCommunicationFor(this, node)
-    node.routeMessage(this, @getPayload())
-    return this
-
-
-  joinSeparatedMessage: (target) ->
-    SeparatedMessage
-      .getOrCreate(this, target)
-      .joinMessage(this)
-
-    return this
-
-
   getPriority: ->
     @getPayload().fixedPriority ? @sourceMessage.getPriority()
 
 
-  getPayload: (args...) ->
-    @payload ?= if @transform?
-      @transform.apply(null, [@sourceMessage.getPayload(), args..., @transmission])
-    else if @payload?
-      @payload
-    else
-      @sourceMessage.getPayload()
+  getPayload: -> @payload

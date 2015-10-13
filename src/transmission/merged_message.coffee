@@ -7,6 +7,9 @@ noop = require '../payloads/noop'
 {merge} = require '../payloads/variable'
 
 
+SeparatedMessage = require './separated_message'
+
+
 module.exports = class MergedMessage
 
   inspect: ->
@@ -17,6 +20,13 @@ module.exports = class MergedMessage
     ].join(' ')
 
 
+  log: ->
+    args = [this]
+    args.push arg for arg in arguments
+    @transmission.log args...
+    return this
+
+
   @getOrCreate = (message, source) ->
     {transmission, pass} = message
     merged = transmission.getCommunicationFor(pass, source)
@@ -24,6 +34,10 @@ module.exports = class MergedMessage
       merged = new this(transmission, pass, source)
       transmission.addCommunicationFor(merged, source)
     return merged
+
+
+  createNextConnectionMessage: (channelNode) ->
+    @transmission.ConnectionMessage.createNext(this, channelNode)
 
 
   constructor: (@transmission, @pass, @source) ->
@@ -39,14 +53,15 @@ module.exports = class MergedMessage
     unless @query?
       @query = query
       if @source.getSourceNodes().length is 0
-        @_sendMessage(@_getEmptyPayload())
+        [@payload, @priority] = @_getEmptyPayload()
+        @source.sendMessage(this)
       else
         @source.sendQuery(@query)
     return this
 
 
   joinMessageFrom: (message, node) ->
-    unless @query?
+    unless @query? or @source.singleSource
       @query = @transmission.Query.createNext(this)
       @source.sendQuery(@query)
 
@@ -56,12 +71,12 @@ module.exports = class MergedMessage
     unless @nodesToMessages.length == @source.getSourceNodes().length
       return this
 
-    [payload, priority] =
+    [@payload, @priority] =
       if @source.prioritiesShouldMatch and not @_prioritiesMatch()
         @_getNoopPayload()
       else
         @_getMergedPayload()
-    @_sendMessage([payload, priority])
+    @source.sendMessage(this)
 
 
   _prioritiesMatch: ->
@@ -69,9 +84,36 @@ module.exports = class MergedMessage
     priorities.every (p) -> p == priorities[0]
 
 
-  _sendMessage: ([payload, priority]) ->
-    message = @transmission.Message.createNext(this, payload, priority)
-    @source.sendMessage(message)
+  getPayload: (args...) ->
+    @transformedPayload ?= if @transform?
+      @transform.apply(null, [@payload, args..., @transmission])
+    else
+      @payload
+
+  getPriority: -> @priority
+
+
+  addTransform: (@transform) ->
+    return this
+
+
+  joinSeparatedMessage: (target) ->
+    SeparatedMessage
+      .getOrCreate(this, target)
+      .joinMessage(this)
+    return this
+
+
+  sendToChannelNode: (node) ->
+    @log node
+    existing = @transmission.getCommunicationFor(@pass, node)
+    existing ?= @transmission.getCommunicationFor(@pass.getNext(), node)
+    if existing?
+      throw new Error "Message already sent to #{inspect node}. " \
+        + "Previous: #{inspect existing}, " \
+        + "current: #{inspect this}"
+    @transmission.addCommunicationFor(this, node)
+    node.routeMessage(this, @getPayload())
     return this
 
 
@@ -79,18 +121,21 @@ module.exports = class MergedMessage
 
 
   _getEmptyPayload: ->
-    payload = @sourceChannelNode?.getPayload() ? []
+    payload = @sourceChannelNode?.getSourcePayload() ? []
     [payload, 0]
 
 
   _getMergedPayload: ->
     @transmission.log this
-    srcPayload = @sourceChannelNode?.getPayload() ? @source.getSourceNodes()
+    srcPayload = @sourceChannelNode?.getSourcePayload() ? @source.getSourceNodes()
 
     priority = null
     @nodesToMessages.forEach (message, node) =>
       priority = Math.max(priority, message.getPriority())
 
-    payload = srcPayload.map (node) => @nodesToMessages.get(node).getPayload()
+    payload = srcPayload.map (node) =>
+      @nodesToMessages.get(node).getPayload()
+
+    payload = payload[0] if @source.singleSource
 
     return [payload, priority]

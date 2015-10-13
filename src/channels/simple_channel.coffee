@@ -131,15 +131,11 @@ module.exports = class SimpleChannel
 
 
   getSource: ->
-    @source ?= if @forceMerging or @sources.length > 1
-      @createMergingSource(@sources,
-        prioritiesShouldMatch: @sourcePrioritiesShouldMatch)
-    else
-      @createSingleSource(@sources[0])
-
-
-  createSingleSource: (source) ->
-    new NodeConnectionLine(source?.getNodeSource(), @getDirection())
+    @source ?= @createMergingSource(
+      @sources,
+      singleSource: not @forceMerging and @sources.length == 1,
+      prioritiesShouldMatch: @sourcePrioritiesShouldMatch
+    )
 
 
   createMergingSource: (sources, opts) ->
@@ -150,26 +146,21 @@ module.exports = class SimpleChannel
 
 
   getTarget: ->
-    @target ?= if @connectionTargets.length
-      @createDuplicatingTarget(@connectionTargets)
-    else if @forceSeparating or @targets.length > 1
-      if @targets.length
-        @createSeparatingTarget(@targets)
+    @target ?=
+      if @connectionTargets.length
+        @createDuplicatingTarget(@connectionTargets)
       else
-        null
-    else
-      @createSingleTarget(@targets[0])
+        @createSeparatingTarget(
+          @targets,
+          singleTarget: not @forceSeparating and @targets.length == 1
+        )
 
 
-  createSingleTarget: (target) ->
-    new ConnectionNodeLine(target?.getNodeTarget(), @getDirection())
-
-
-  createSeparatingTarget: (targets) ->
+  createSeparatingTarget: (targets, opts) ->
     parts = for target in targets
       line = new ConnectionNodeLine(target.getNodeTarget(), @getDirection())
       [target, line]
-    new SeparatingConnectionSource(new Map(parts))
+    new SeparatingConnectionSource(new Map(parts), opts)
 
 
   createDuplicatingTarget: (targets) ->

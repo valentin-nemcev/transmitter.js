@@ -35,4 +35,9 @@ module.exports = class DynamicChannelVariable extends ChannelNode
     this
 
 
-  getPayload: -> @payload
+  getPlaceholderPayload: ->
+    ListPayload.setConst([])
+
+
+  getSourcePayload: -> @payload if @type is 'sources'
+  getTargetPayload: -> @payload if @type is 'targets'

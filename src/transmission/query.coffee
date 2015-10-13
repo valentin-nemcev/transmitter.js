@@ -6,7 +6,6 @@
 FastSet = require 'collections/fast-set'
 
 Pass = require './pass'
-Precedence = require './precedence'
 
 MergedMessage = require './merged_message'
 

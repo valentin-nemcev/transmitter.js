@@ -27,7 +27,7 @@ module.exports = class Connection
 
 
   receiveMessage: (message) ->
-    message.sendTransformedTo(@transform, @target)
+    @target.receiveMessage(message.addTransform(@transform))
     return this
 
 

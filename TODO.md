@@ -23,7 +23,8 @@
 
 * Refactor
   * Don't use context in isolated tests, use context in scenarios.
-  * Refactor payload creation methods
+  * Refactor payload creation methods for regular nodes and dynamic channel
+    nodes
   * Simplify payload transformation, always use merged and separated messages
 
 
