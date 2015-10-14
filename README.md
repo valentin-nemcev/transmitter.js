@@ -1,7 +1,16 @@
-# TODO
+# Transmitter.js
+
+Declarative data-binding JavaScript framework for web applications.
+Transmitter.js helps you manage your application state, all the way from DOM to
+backend storage, no matter how complex your application is.
+
+**Transmitter.js is in early development stage and is not ready for production
+yet**
 
 
-## Proposed usage examples
+## TODO
+
+### Proposed usage examples
 
 * Canceling todo item label change
 * Setting empty todo label removes todo
@@ -19,7 +28,7 @@
 * Accepting or canceling changes with intermediate models
 
 
-## Development tasks
+### Development tasks
 
 * Refactor
   * Don't use context in isolated tests, use context in scenarios.
