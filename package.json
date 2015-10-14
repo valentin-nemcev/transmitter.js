@@ -1,5 +1,5 @@
 {
-  "name": "transmitter",
+  "name": "transmitter-framework",
   "version": "0.3.0",
   "description": "Declarative data-binding framework",
   "main": "build/index.js",
