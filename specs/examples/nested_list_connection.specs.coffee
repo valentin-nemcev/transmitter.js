@@ -4,13 +4,12 @@
 Transmitter = require 'transmitter'
 
 
-class ListItem extends Transmitter.Nodes.Record
+class ListItem
 
   inspect: -> "[#{@name}]"
 
   constructor: (@name) ->
-
-  @defineVar 'valueVar'
+    @valueVar = new Transmitter.Nodes.Variable()
 
 
 

@@ -5,7 +5,6 @@ module.exports = {
   TargetNode: require './target_node'
   RelayNode:  require './relay_node'
 
-  Record:   require './record'
   Variable: require './variable'
   List:     require './list'
 

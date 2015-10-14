@@ -4,11 +4,10 @@
 Transmitter = require 'transmitter'
 
 
-class NestedObject extends Transmitter.Nodes.Record
+class NestedObject
 
   constructor: (@name) ->
-
-  @defineVar 'valueVar'
+    @valueVar = new Transmitter.Nodes.Variable()
 
 
 describe 'Flattening list connection', ->

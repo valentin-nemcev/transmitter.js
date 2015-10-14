@@ -2,10 +2,17 @@
 
 
 BidirectionalChannel = require './bidirectional_channel'
+CompositeChannel = require './composite_channel'
 SimpleChannel = require './simple_channel'
 ChannelList = require '../channel_nodes/channel_list'
 ListPayload = require '../payloads/list'
 noop = require '../payloads/noop'
+
+
+CompositeChannel::defineListChannel = ->
+  channel = new ListChannel()
+  @addChannel(channel)
+  return channel
 
 
 module.exports = class ListChannel extends BidirectionalChannel
@@ -14,7 +21,10 @@ module.exports = class ListChannel extends BidirectionalChannel
     return this
 
 
-  @defineLazy 'nestedChannelList', -> new ChannelList()
+  constructor: ->
+    super
+    @nestedChannelList = new ChannelList()
+
 
   withOriginDerivedChannel: (createOriginDerivedChannel) ->
     @defineChannel ->

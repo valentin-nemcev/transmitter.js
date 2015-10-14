@@ -4,23 +4,21 @@
 Transmitter = require 'transmitter'
 
 
-class Model extends Transmitter.Nodes.Record
+class Model
 
   inspect: -> "[Model #{@name}]"
 
   constructor: (@name) ->
+    @valueVar = new Transmitter.Nodes.Variable()
 
-  @defineVar 'valueVar'
 
-class View extends Transmitter.Nodes.Record
+class View
 
   inspect: -> "[View #{@model.name}]"
 
   constructor: (@model) ->
-
-  @defineLazy 'removeEvt', -> new Transmitter.Nodes.SourceNode()
-
-  @defineVar 'valueVar'
+    @removeEvt = new Transmitter.Nodes.SourceNode()
+    @valueVar = new Transmitter.Nodes.Variable()
 
 
 describe 'Flattening with nested list connections', ->
