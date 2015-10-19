@@ -8,7 +8,7 @@ Transmission = require '../transmission/transmission'
 module.exports = class InputValueVar extends Variable
 
   constructor: (@element) ->
-    @element.addEventListener 'input', =>
+    @element.addEventListener 'change', =>
       Transmission.start (tr) =>
         @originate(tr)
 
