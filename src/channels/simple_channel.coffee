@@ -44,6 +44,12 @@ module.exports = class SimpleChannel
       @direction ? directions.null
 
 
+  assertSingleArgument: (count) ->
+    if count != 1
+      throw new Error "Single argument expected, got #{count} instead"
+    return this
+
+
   assertSource: (source) ->
     unless source?.getNodeSource?
       throw new Error "#{inspect source} is not a valid source node"
@@ -51,6 +57,7 @@ module.exports = class SimpleChannel
 
 
   fromSource: (source) ->
+    @assertSingleArgument(arguments.length)
     @assertSource(source)
     @sources.push source
     return this
@@ -65,6 +72,7 @@ module.exports = class SimpleChannel
 
 
   fromDynamicSources: (sources) ->
+    @assertSingleArgument(arguments.length)
     for source in sources
       @assertSource(source)
       @sources.push source
@@ -85,6 +93,7 @@ module.exports = class SimpleChannel
 
 
   toTarget: (target) ->
+    @assertSingleArgument(arguments.length)
     @assertTarget(target)
     @targets.push target
     return this
@@ -99,6 +108,7 @@ module.exports = class SimpleChannel
 
 
   toDynamicTargets: (targets) ->
+    @assertSingleArgument(arguments.length)
     for target in targets
       @assertTarget(target)
       @targets.push target
@@ -114,6 +124,7 @@ module.exports = class SimpleChannel
 
 
   toConnectionTarget: (connectionTarget) ->
+    @assertSingleArgument(arguments.length)
     @assertConnectionTarget(connectionTarget)
     @connectionTargets.push connectionTarget
     return this
