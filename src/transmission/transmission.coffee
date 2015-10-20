@@ -17,6 +17,29 @@ module.exports = class Transmission
   ConnectionMessage : require './connection_message'
   JointMessage      : require './joint_message'
 
+
+  @queue = []
+  @queueCallback = null
+
+  @startAsync = (doWithTransmission) ->
+    @queue.push(doWithTransmission)
+    console.warn "pushed #{@queue.length}"
+    @queueCallback ?= setInterval((=> @processQueue()), 0)
+    return this
+
+  @processQueue = ->
+    @start (tr) =>
+      while (cb = @queue.shift())
+        console.warn "shifted #{@queue.length}"
+        cb(tr)
+      return
+
+    console.warn "completed #{@queue.length}"
+    clearInterval(@queueCallback)
+    @queueCallback = null
+    return this
+
+
   @start = (doWithTransmission) ->
     # assert(not @instance, "Transmissions can't be nested")
     @instance = new Transmission()
