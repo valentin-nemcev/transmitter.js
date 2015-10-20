@@ -10,7 +10,7 @@ module.exports = class Pass
 
   @maxPriority = 1
 
-  inspect: -> 'P:' + @priority + ' ' + @direction.inspect()
+  inspect: -> @direction.inspect()
 
 
   @getForward = -> @forwardPass ?= new Pass(directions.forward, 1)

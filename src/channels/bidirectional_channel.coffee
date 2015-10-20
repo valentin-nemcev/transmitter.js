@@ -45,12 +45,12 @@ module.exports = class BidirectionalChannel extends CompositeChannel
 
 
   getMatchOriginDerived: ->
-      @matchOriginDerived or
+      @matchOriginDerived ?=
         if @matchDerivedOrigin?
           (origin, derived) => @matchDerivedOrigin(derived, origin)
 
   getMatchDerivedOrigin: ->
-      @matchDerivedOrigin or
+      @matchDerivedOrigin ?=
         if @matchOriginDerived?
           (derived, origin) => @matchOriginDerived(origin, derived)
 

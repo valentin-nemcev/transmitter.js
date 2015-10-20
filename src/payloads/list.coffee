@@ -8,12 +8,17 @@ VariablePayload = require './variable'
 Payload = require './payload'
 
 
-zip = (payloads) ->
+zip = (payloads, coerceSize = no) ->
   SetPayload.create get: ->
     length = payloads[0]?.getSize() ? 0
+    unless coerceSize
+      for p in payloads when p.getSize() != length
+        throw new Error "Can't zip lists with different sizes: " + \
+                          payloads.map(inspect).join(', ')
     for i in [0...length]
       for p in payloads
         p.getAt(i)
+
 
 class ListPayload extends Payload
 
@@ -22,6 +27,8 @@ class ListPayload extends Payload
 
   unflatten: ->
     @map (value) -> VariablePayload.setConst(value)
+
+  zipCoercingSize: (otherPayloads...) -> zip([this, otherPayloads...], true)
 
   zip: (otherPayloads...) -> zip([this, otherPayloads...])
 

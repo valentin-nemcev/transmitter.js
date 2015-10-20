@@ -22,7 +22,7 @@ describe 'Flattening list connection', ->
           .inBackwardDirection()
           .fromSource @serializedVar
           .withTransform (serializedPayload, nestedPayload) =>
-            nestedPayload.zip(serializedPayload.toSetList())
+            nestedPayload.zipCoercingSize(serializedPayload.toSetList())
               .map ([nested, serialized]) => serialized?.value
               .unflatten()
       )

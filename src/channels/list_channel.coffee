@@ -1,5 +1,6 @@
 'use strict'
 
+{inspect} = require 'util'
 
 BidirectionalChannel = require './bidirectional_channel'
 CompositeChannel = require './composite_channel'
@@ -27,6 +28,17 @@ module.exports = class ListChannel extends BidirectionalChannel
 
 
   withOriginDerivedChannel: (createOriginDerivedChannel) ->
+    createChannel = ([originItem, derivedItem]) =>
+      match = @getMatchOriginDerived()
+      if match? and not match(originItem, derivedItem)
+        throw new Error "Binding mismatched items: " + \
+                          [originItem, derivedItem].map(inspect).join(' ')
+      createOriginDerivedChannel(originItem, derivedItem)
+
+    matchChannel = if @matchOriginDerivedChannel?
+      ([originItem, derivedItem], channel) =>
+        @matchOriginDerivedChannel(originItem, derivedItem, channel)
+
     @defineChannel ->
       new SimpleChannel()
         .fromSource @origin
@@ -35,19 +47,12 @@ module.exports = class ListChannel extends BidirectionalChannel
         .toConnectionTarget @nestedChannelList
         .withTransform (payloads) =>
           return payloads unless payloads.length?
+
           [origin, derived] = payloads
 
-          zipped = ListPayload.setLazy( -> origin.get().zip(derived.get()))
+          zipped = origin.zip(derived)
 
-          if @matchOriginDerivedChannel?
-            zipped.updateMatching(
-              ([originItem, derivedItem]) ->
-                createOriginDerivedChannel(originItem, derivedItem)
-              ([originItem, derivedItem], channel) =>
-                @matchOriginDerivedChannel(originItem, derivedItem, channel)
-            )
+          if matchChannel?
+            zipped.updateMatching(createChannel, matchChannel)
           else
-            zipped.map(
-              ([originItem, derivedItem]) ->
-                createOriginDerivedChannel(originItem, derivedItem)
-            )
+            zipped.map(createChannel)

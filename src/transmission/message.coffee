@@ -13,6 +13,7 @@ module.exports = class Message
     [
       'M'
       inspect @pass
+      "P:#{@getPriority()}"
       @payload.inspect()
     ].filter( (s) -> s.length).join(' ')
 
