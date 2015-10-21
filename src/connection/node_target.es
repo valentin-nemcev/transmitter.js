@@ -1,10 +1,7 @@
-'use strict';
+import NodePoint from './node_point';
 
 
-var NodePoint = require('./node_point');
-
-
-module.exports = class NodeTarget extends NodePoint {
+export default class NodeTarget extends NodePoint {
 
   inspect() { return '>' + this.node.inspect(); }
 
@@ -14,4 +11,4 @@ module.exports = class NodeTarget extends NodePoint {
       .joinTargetConnectionMessage(channelNode);
     return this;
   }
-};
+}
