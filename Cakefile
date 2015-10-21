@@ -10,8 +10,8 @@ unitSpecs = 'specs/unit.specs.coffee'
 exampleSpecs = 'specs/examples.specs.coffee'
 
 task 'build', ->
-  exec "#{bin}/coffee -o build -c src"
   exec "#{bin}/babel --only '*.es' src --out-dir build"
+  exec "#{bin}/coffee -o build -c src"
 
 task 'clean', ->
   rm '-rf', 'build/*'
