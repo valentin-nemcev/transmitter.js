@@ -1,5 +1,11 @@
 'use strict'
 
+require('source-map-support').install()
+
+require('babel/register')({
+  only: '*.es'
+})
+
 Error.stackTraceLimit = 5
 
 chai = require 'chai'

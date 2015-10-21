@@ -9,6 +9,7 @@
   "author": "Valentin Nemcev <mail@valentin-nemcev.com>",
   "license": "MIT",
   "devDependencies": {
+    "babel": "^5.8.23",
     "chai": "^1.10.0",
     "coffee-coverage": "^0.4.5",
     "coffee-script": "^1.9.0",
@@ -18,7 +19,8 @@
     "shelljs": "^0.3.0",
     "sinon": "^1.12.2",
     "sinon-chai": "^2.6.0",
-    "sloc": "^0.1.9"
+    "sloc": "^0.1.9",
+    "source-map-support": "^0.3.2"
   },
   "dependencies": {
     "collections": "^1.2.3"
