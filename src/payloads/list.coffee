@@ -249,7 +249,7 @@ NoopPayload = noop().constructor
 Payload::toSetList = -> SetPayload.create(this)
 NoopPayload::toSetList = -> this
 
-Payload::toAppendListElement = -> AddAtPayload.create(this.map (el) -> [el, null])
+Payload::toAppendListElement = -> AddAtPayload.create(this.map (el) -> [el])
 NoopPayload::toAppendListElement = -> this
 
 Payload::toRemoveListElement = -> RemovePayload.create(this)
@@ -260,9 +260,9 @@ module.exports = {
   setLazy: (getValue) -> SetLazyPayload.create(getValue)
   setConst: SetConstPayload.create
   append: (elementSource) ->
-    AddAtPayload.create(elementSource.map (el) -> [el, null])
+    AddAtPayload.create(elementSource.map (el) -> [el])
   appendConst: (element) ->
-    AddAtPayload.create(get: -> [element, null])
+    AddAtPayload.create(get: -> [element])
   removeConst: (element) ->
     RemovePayload.create(get: -> element)
 }

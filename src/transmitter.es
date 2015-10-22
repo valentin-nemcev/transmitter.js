@@ -1,10 +1,10 @@
-import Transmission from './transmission/transmission';
-import Nodes        from './nodes';
-import Payloads     from './payloads';
-import Channels     from './channels';
-import ChannelNodes from './channel_nodes';
-import DOMElement   from './dom_element';
-import Browser      from './browser';
+import Transmission      from './transmission/transmission';
+import * as Nodes        from './nodes';
+import * as Payloads     from './payloads';
+import * as Channels     from './channels';
+import * as ChannelNodes from './channel_nodes';
+import * as DOMElement   from './dom_element';
+import * as Browser      from './browser';
 
 
 export default {
