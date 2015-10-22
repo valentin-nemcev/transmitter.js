@@ -29,7 +29,7 @@ const backwardPass = new Pass(directions.backward, 0);
 
 
 export default {
-  maxPriority: 1,
+  priorities: Object.freeze([0, 1]),
 
   getForward() { return forwardPass; },
 

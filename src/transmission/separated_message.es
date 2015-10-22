@@ -38,6 +38,7 @@ module.exports = class SeparatedMessage {
   getPriority() { return this.sourceMessage.getPriority(); }
 
   getSrcPayload(nodesToLines) {
+    // TODO: remove sourceChannelNode null checks
     if (this.sourceChannelNode == null) return nodesToLines.keys();
     const payload = this.sourceChannelNode.getTargetPayload();
     return payload != null ? payload : nodesToLines.keys();

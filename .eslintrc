@@ -5,6 +5,7 @@
     "no-console": 1,
     "id-length": 0,
     "eqeqeq": [2, "smart"],
+    "no-cond-assign": [2, "except-parens"],
     "no-multi-spaces": [2, { exceptions: { "ImportDeclaration": true } }],
     "indent": [
       2,
