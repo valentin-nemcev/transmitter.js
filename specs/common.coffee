@@ -6,7 +6,7 @@ require('babel/register')({
   only: '*.es'
 })
 
-Error.stackTraceLimit = 5
+Error.stackTraceLimit = 15
 
 chai = require 'chai'
 global.expect = chai.expect
