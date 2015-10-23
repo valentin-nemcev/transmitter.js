@@ -10,7 +10,7 @@ export default class CompositeChannel {
   }
 
   addChannel(channel) {
-    this.channel.push(channel);
+    this.channels.push(channel);
     return this;
   }
 

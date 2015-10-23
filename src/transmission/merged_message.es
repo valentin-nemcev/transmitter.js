@@ -17,7 +17,7 @@ export default class MergedMessage {
   }
 
   log(...args) {
-    this.transmission.log(...[this, ...args]);
+    this.transmission.log(this, ...args);
     return this;
   }
 
@@ -62,7 +62,7 @@ export default class MergedMessage {
   }
 
   joinMessageFrom(message, node) {
-    if (!((this.query != null) || this.source.singleSource)) {
+    if (!(this.query != null || this.source.singleSource)) {
       this.query = this.transmission.Query.createNext(this);
       this.source.sendQuery(this.query);
     }

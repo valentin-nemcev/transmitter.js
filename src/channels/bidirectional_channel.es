@@ -131,9 +131,13 @@ export default class BidirectionalChannel extends CompositeChannel {
     }
   }
 
-  constructor() {
-    super();
-    this.addChannel(this.getForwardChannel());
-    this.addChannel(this.getBackwardChannel());
+  getChannels() {
+    if (this.channels.length === 0) {
+      this.channels = [
+        this.getForwardChannel(),
+        this.getBackwardChannel(),
+      ];
+    }
+    return this.channels;
   }
 }

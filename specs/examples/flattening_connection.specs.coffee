@@ -38,27 +38,27 @@ describe 'Flattening connection', ->
 
 
     @createFlatChannel = =>
-      new Transmitter.Channels.CompositeChannel()
-        .defineChannel =>
-          new Transmitter.Channels.SimpleChannel()
-            .inForwardDirection()
-            .fromSources @flatVar, @nestedVar
-            .toTarget @serializedVar
-            .withTransform ([flatPayload, nestedPayload]) ->
-              flatPayload.merge(nestedPayload).map ([value, nestedObject]) ->
-                {name: nestedObject?.name ? null, value: value ? null}
+      ch = new Transmitter.Channels.CompositeChannel()
+      ch.defineSimpleChannel()
+        .inForwardDirection()
+        .fromSources @flatVar, @nestedVar
+        .toTarget @serializedVar
+        .withTransform ([flatPayload, nestedPayload]) ->
+          flatPayload.merge(nestedPayload).map ([value, nestedObject]) ->
+            {name: nestedObject?.name ? null, value: value ? null}
 
-        .defineChannel =>
-          new Transmitter.Channels.SimpleChannel()
-            .inBackwardDirection()
-            .fromSource @serializedVar
-            .toTarget @nestedVar
-            .withTransform (payload) ->
-              payload.map (serialized) ->
-                if serialized?
-                  return new NestedObject(serialized.name)
-                else
-                  null
+      ch.defineSimpleChannel()
+        .inBackwardDirection()
+        .fromSource @serializedVar
+        .toTarget @nestedVar
+        .withTransform (payload) ->
+          payload.map (serialized) ->
+            if serialized?
+              return new NestedObject(serialized.name)
+            else
+              null
+
+      return ch
 
 
     @createNestedChannel = =>

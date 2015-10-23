@@ -164,7 +164,7 @@ export default class SimpleChannel {
   }
 
   createMergingSource(sources, opts) {
-    const parts = sources.forEach( (source) => {
+    const parts = sources.map( (source) => {
       const line = new NodeConnectionLine(
           source.getNodeSource(), this.getDirection());
       return [source, line];
@@ -186,7 +186,7 @@ export default class SimpleChannel {
   }
 
   createSeparatingTarget(targets, opts) {
-    const parts = targets.forEach( (target) => {
+    const parts = targets.map( (target) => {
       const line = new ConnectionNodeLine(
           target.getNodeTarget(), this.getDirection());
       return [target, line];

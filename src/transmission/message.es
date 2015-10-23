@@ -15,7 +15,7 @@ export default class Message {
   }
 
   log(...args) {
-    this.transmission.log(...[this, ...args]);
+    this.transmission.log(this, ...args);
     return this;
   }
 

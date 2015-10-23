@@ -1,11 +1,11 @@
 // Enable here to support babel stack traces
-// require('coffee-script/register');
+require('coffee-script/register');
 
 require('source-map-support').install();
 require('babel/register')({only: '*.es'});
 
 // Enable here to support coffee stack traces
-require('coffee-script/register');
+// require('coffee-script/register');
 
 
 Error.stackTraceLimit = 15;

@@ -4,6 +4,7 @@ import BidirectionalChannel from './bidirectional_channel';
 import CompositeChannel from './composite_channel';
 import SimpleChannel from './simple_channel';
 import ChannelList from '../channel_nodes/channel_list';
+import getNullChannel from './null_channel';
 
 export default class ListChannel extends BidirectionalChannel {
 
@@ -35,29 +36,31 @@ export default class ListChannel extends BidirectionalChannel {
           this.matchOriginDerivedChannel(originItem, derivedItem, channel)
         : null;
 
-    this.defineChannel( () => {
-      return new SimpleChannel()
-        .fromSources(this.origin, this.derived)
-        .requireMatchingSourcePriorities()
-        .toConnectionTarget(this.nestedChannelList)
-        .withTransform( (payloads) => {
-          if (payloads.length == null) return payloads;
+    this.nestingChannel = new SimpleChannel()
+      .fromSources(this.origin, this.derived)
+      .requireMatchingSourcePriorities()
+      .toConnectionTarget(this.nestedChannelList)
+      .withTransform( (payloads) => {
+        if (payloads.length == null) return payloads;
 
-          const [origin, derived] = payloads;
+        const [origin, derived] = payloads;
 
-          const zipped = origin.zip(derived);
+        const zipped = origin.zip(derived);
 
-          return matchChannel != null
-            ? zipped.updateMatching(createChannel, matchChannel)
-            : zipped.map(createChannel);
-        });
-    });
+        return matchChannel != null
+          ? zipped.updateMatching(createChannel, matchChannel)
+          : zipped.map(createChannel);
+      });
 
     return this;
   }
+
+  getChannels() {
+    return super.getChannels().concat([this.nestingChannel || getNullChannel()]);
+  }
 }
 
-CompositeChannel.prototype.defineListChannel = function() { // eslint-disable-line func-names
+CompositeChannel.prototype.defineListChannel = function() {
   const channel = new ListChannel();
   this.addChannel(channel);
   return channel;
