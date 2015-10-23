@@ -6,8 +6,8 @@ mochaCmd = (args...) ->
   "#{bin}/mocha --bail --no-debug
     --colors --opts specs/mocha.opts #{args.join(' ')}"
 
-unitSpecs = 'specs/unit.specs.coffee'
-exampleSpecs = 'specs/examples.specs.coffee'
+unitSpecs = 'specs/unit.specs.js'
+exampleSpecs = 'specs/examples.specs.js'
 
 task 'build', ->
   exec "#{bin}/babel --only '*.es' src --out-dir build"
