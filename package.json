@@ -26,7 +26,5 @@
     "sloc": "^0.1.9",
     "source-map-support": "^0.3.2"
   },
-  "dependencies": {
-    "collections": "^1.2.3"
-  }
+  "dependencies": {}
 }

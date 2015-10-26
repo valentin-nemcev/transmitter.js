@@ -1,7 +1,5 @@
 import {inspect} from 'util';
 
-import Map from 'collections/map';
-
 import TargetMessage from './target_message';
 
 module.exports = class SeparatedMessage {
@@ -39,9 +37,9 @@ module.exports = class SeparatedMessage {
 
   getSrcPayload(nodesToLines) {
     // TODO: remove sourceChannelNode null checks
-    if (this.sourceChannelNode == null) return nodesToLines.keys();
+    if (this.sourceChannelNode == null) return Array.from(nodesToLines.keys());
     const payload = this.sourceChannelNode.getTargetPayload();
-    return payload != null ? payload : nodesToLines.keys();
+    return payload != null ? payload : Array.from(nodesToLines.keys());
   }
 
   joinMessage(message) {

@@ -1,7 +1,5 @@
 import {inspect} from 'util';
 
-import FastSet from 'collections/fast-set';
-
 import MergedMessage from './merged_message';
 
 
@@ -32,8 +30,7 @@ export default class Query {
   constructor(transmission, pass) {
     this.transmission = transmission;
     this.pass = pass;
-    this.passedLines = new FastSet();
-    this.queriedChannelNodes = new FastSet();
+    this.passedLines = new Set();
   }
 
   createQueryResponseMessage(payload) {
@@ -70,6 +67,6 @@ export default class Query {
   }
 
   wasDelivered() {
-    return this.passedLines.length > 0;
+    return this.passedLines.size > 0;
   }
 }

@@ -1,6 +1,3 @@
-import FastSet from 'collections/fast-set';
-
-
 export default class ChannelNode {
 
   inspect() { return '[' + this.constructor.name + ']'; }
@@ -13,7 +10,7 @@ export default class ChannelNode {
   }
 
   getTargetPoints() {
-    if (this.targetPoints == null) this.targetPoints = new FastSet();
+    if (this.targetPoints == null) this.targetPoints = new Set();
     return this.targetPoints;
   }
 

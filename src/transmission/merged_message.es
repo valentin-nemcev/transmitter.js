@@ -1,6 +1,5 @@
 import {inspect} from 'util';
 
-import Map from 'collections/map';
 import noop from '../payloads/noop';
 
 import SeparatedMessage from './separated_message';
@@ -12,7 +11,7 @@ export default class MergedMessage {
     return [
       'MM',
       inspect(this.pass),
-      this.nodesToMessages.values().map(inspect).join(', '),
+      Array.from(this.nodesToMessages.values()).map(inspect).join(', '),
     ].join(' ');
   }
 
@@ -70,7 +69,7 @@ export default class MergedMessage {
     this.nodesToMessages.set(node, message);
 
     // TODO: Compare contents
-    if (this.nodesToMessages.length !== this.source.getSourceNodes().length) {
+    if (this.nodesToMessages.size !== this.source.getSourceNodes().length) {
       return this;
     }
 
@@ -83,7 +82,8 @@ export default class MergedMessage {
   }
 
   _prioritiesMatch() {
-    const priorities = this.nodesToMessages.map( (msg) => msg.getPriority() );
+    const priorities =
+      Array.from(this.nodesToMessages.values(), (msg) => msg.getPriority() );
     return priorities.every( (p) => p === priorities[0] );
   }
 

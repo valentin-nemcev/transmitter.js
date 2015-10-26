@@ -16,7 +16,7 @@ export default class MergingConnectionTarget {
     this.sources.forEach( (source) => source.setTarget(this) );
   }
 
-  getSourceNodes() { return this.sources.keys(); }
+  getSourceNodes() { return Array.from(this.sources.keys()); }
 
   setTarget(target) {
     this.target = target;

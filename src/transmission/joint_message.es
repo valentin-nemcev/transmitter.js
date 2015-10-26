@@ -1,7 +1,5 @@
 import {inspect} from 'util';
 
-import FastMap from 'collections/fast-map';
-
 import NodePointTransmissionHub from './node_point_transmission_hub';
 
 
@@ -13,7 +11,7 @@ export default class JointMessage {
       inspect(this.pass),
       inspect(this.query),
       ',',
-      this.linesToMessages.values().map(inspect).join(', '),
+      Array.from(this.linesToMessages.values()).map(inspect).join(', '),
     ].join(' ');
   }
 
@@ -35,7 +33,7 @@ export default class JointMessage {
     this.transmission = transmission;
     this.pass = pass;
     this.node = node;
-    this.linesToMessages = new FastMap();
+    this.linesToMessages = new Map();
   }
 
   joinMessageFrom(message, line) {
@@ -111,11 +109,11 @@ export default class JointMessage {
   _selectAndSendMessageIfReady() {
     if (!this.queryHub.areAllChannelNodesUpdated()) return this;
 
-    this.transmission.log(this.node, ...this.linesToMessages.entries());
+    this.transmission.log(this.node, ...this.linesToMessages);
     this.transmission.log(this.node, this.query,
-                          ...this.query.getPassedLines().toArray());
+                          ...this.query.getPassedLines());
     // TODO: Compare contents
-    if (this.linesToMessages.length !== this.query.getPassedLines().length) {
+    if (this.linesToMessages.size !== this.query.getPassedLines().size) {
       return this;
     }
 
@@ -162,11 +160,11 @@ export default class JointMessage {
 
   _selectMessage() {
     // TODO: Add checks for more than one message with precedence of 1
-    const messages = this.linesToMessages.values();
-    const sorted = messages.sorted( (a, b) =>
+    const messages = Array.from(this.linesToMessages.values());
+    messages.sort( (a, b) =>
       -1 * (a.getPriority() - b.getPriority())
     );
-    return sorted[0];
+    return messages[0];
   }
 
   _processMessage(prevMessage) {

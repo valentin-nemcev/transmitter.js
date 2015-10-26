@@ -1,7 +1,5 @@
 import {inspect} from 'util';
 
-import FastSet from 'collections/fast-set';
-
 import Pass from './pass';
 
 import MergedMessage from './merged_message';
@@ -38,10 +36,10 @@ export default class ConnectionMessage {
     this.pass = pass;
     this.sourceChannelNode = sourceChannelNode;
 
-    this.targetPointsToUpdate = new FastSet();
+    this.targetPointsToUpdate = new Set();
     if (this.sourceChannelNode != null) {
-      this.targetPointsToUpdate
-        .addEach(this.sourceChannelNode.getTargetPoints());
+      this.sourceChannelNode.getTargetPoints()
+        .forEach( (point) => this.targetPointsToUpdate.add(point) );
     }
   }
 

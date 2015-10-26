@@ -1,17 +1,35 @@
-import MultiMap from 'collections/multi-map';
-import Set from 'collections/set';
+class LineSet {
 
+  constructor() {
+    this.set = new Set();
+  }
 
-class LineSet extends Set {
+  add(line) {
+    this.set.add(line);
+    return this;
+  }
+
+  delete(line) {
+    this.set.delete(line);
+    return this;
+  }
+
+  get size() {
+    return this.set.size;
+  }
 
   acceptsCommunication(comm) {
-    return this.some( (line) => line.acceptsCommunication(comm) );
+    for (const line of this.set) {
+      if (line.acceptsCommunication(comm)) return true;
+    }
+    return false;
   }
 
   receiveCommunication(comm) {
-    return this.forEach( (line) => {
+    for (const line of this.set) {
       if (line.acceptsCommunication(comm)) comm.sendToLine(line);
-    });
+    }
+    return this;
   }
 }
 
@@ -20,34 +38,44 @@ export default class NodeLineMap {
 
   constructor(node) {
     this.node = node;
-    this.channelNodeToLines = new MultiMap(null, () => new LineSet() );
+    this.channelNodeToLines = new Map();
   }
 
   getChannelNodesFor(comm) {
     return [
-      for ([channelNode, lines] of this.channelNodeToLines.entries())
+      for ([channelNode, lines] of this.channelNodeToLines)
         if (lines.acceptsCommunication(comm)) channelNode
     ];
+  }
+
+  _getLinesForChannelNode(channelNode) {
+    let lines = this.channelNodeToLines.get(channelNode);
+    if (lines == null) {
+      lines = new LineSet();
+      this.channelNodeToLines.set(channelNode, lines);
+    }
+    return lines;
   }
 
   connectLine(message, line) {
     const channelNode = message.getSourceChannelNode();
     message.addTargetPoint(this);
-    this.channelNodeToLines.get(channelNode).add(line);
+    const lines = this._getLinesForChannelNode(channelNode);
+    lines.add(line);
     return this;
   }
 
   disconnectLine(message, line) {
     const channelNode = message.getSourceChannelNode();
     message.removeTargetPoint(this);
-    const lines = this.channelNodeToLines.get(channelNode);
+    const lines = this._getLinesForChannelNode(channelNode);
     lines.delete(line);
-    if (lines.length === 0) this.channelNodeToLines.delete(channelNode);
+    if (lines.size === 0) this.channelNodeToLines.delete(channelNode);
     return this;
   }
 
   receiveCommunicationForChannelNode(comm, channelNode) {
-    const lines = this.channelNodeToLines.get(channelNode);
+    const lines = this._getLinesForChannelNode(channelNode);
     lines.receiveCommunication(comm);
     return this;
   }

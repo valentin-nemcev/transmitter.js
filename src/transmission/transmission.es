@@ -1,5 +1,3 @@
-import WeakMap from 'collections/weak-map';
-
 import {inspect} from 'util';
 
 import Pass from './pass';

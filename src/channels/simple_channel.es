@@ -1,5 +1,4 @@
 import {inspect} from 'util';
-import Map from 'collections/map';
 
 import * as directions from '../directions';
 
