@@ -60,19 +60,21 @@ module.exports = class SeparatedMessage {
     return this;
   }
 
-  _combinePayload(nodesToLines, tgtPayload, srcPayload) {
-    let zippedPayload;
+  _zipPayload(nodesToLines, tgtPayload, srcPayload) {
     if (srcPayload.length != null) {
-      zippedPayload = [
-        for ([i, targetNode] of srcPayload.entries())
-          [nodesToLines.get(targetNode), tgtPayload[i]]
-      ];
+      return Array.from(srcPayload.entries())
+        .map( ([i, targetNode]) =>
+             [nodesToLines.get(targetNode), tgtPayload[i]] );
     } else {
-      zippedPayload = [
-        for ([i, targetNode] of srcPayload.get().entries())
-          [nodesToLines.get(targetNode), tgtPayload.getAt(i)]
-      ];
+      return Array.from(srcPayload.get().entries())
+        .map( ([i, targetNode]) =>
+             [nodesToLines.get(targetNode), tgtPayload.getAt(i)] );
     }
+  }
+
+  _combinePayload(nodesToLines, tgtPayload, srcPayload) {
+    const zippedPayload =
+      this._zipPayload(nodesToLines, tgtPayload, srcPayload);
 
     const nonNull = zippedPayload.filter( ([ , payload]) => payload != null );
     if (nonNull.length !== zippedPayload.length) {

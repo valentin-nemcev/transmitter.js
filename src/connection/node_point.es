@@ -41,11 +41,9 @@ export default class NodeLineMap {
     this.channelNodeToLines = new Map();
   }
 
-  getChannelNodesFor(comm) {
-    return [
-      for ([channelNode, lines] of this.channelNodeToLines)
-        if (lines.acceptsCommunication(comm)) channelNode
-    ];
+  *getChannelNodesFor(comm) {
+    for (const [channelNode, lines] of this.channelNodeToLines)
+      if (lines.acceptsCommunication(comm)) yield channelNode;
   }
 
   _getLinesForChannelNode(channelNode) {

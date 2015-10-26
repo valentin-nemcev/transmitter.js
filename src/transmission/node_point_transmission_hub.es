@@ -9,11 +9,11 @@ export default class NodePointTransmissionHub {
   }
 
   sendForAll() {
-    this.nodePoint.getChannelNodesFor(this.comm).forEach((channelNode) => {
+    for (const channelNode of this.nodePoint.getChannelNodesFor(this.comm)) {
       if (this._tryQueryChannelNode(channelNode)) {
         this.sendForChannelNode(channelNode);
       }
-    });
+    }
     return this;
   }
 
