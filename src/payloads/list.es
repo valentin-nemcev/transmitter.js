@@ -4,8 +4,6 @@ import noop from './noop';
 import VariablePayload from './variable';
 import Payload from './payload';
 
-/* eslint-disable no-use-before-define */
-
 function zip(payloads, coerceSize = false) {
   return SetPayload.create({
     get() {
@@ -34,14 +32,16 @@ function zip(payloads, coerceSize = false) {
 class ListPayload extends Payload {
 
   flatten() {
-    return this.map(function(nested) { return nested.get(); });
+    return this.map( (nested) => nested.get() );
   }
 
   unflatten() {
-    return this.map(function(value) { return VariablePayload.setConst(value); });
+    return this.map( (value) => VariablePayload.setConst(value) );
   }
 
-  zipCoercingSize(...otherPayloads) { return zip([this, ...otherPayloads], true); }
+  zipCoercingSize(...otherPayloads) {
+    return zip([this, ...otherPayloads], true);
+  }
 
   zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
 
@@ -229,7 +229,8 @@ class UpdateMatchingPayload extends ListPayload {
           sourcePosInTarget++;
         }
 
-        if (sourcePosInTarget < targetLength) { // Target contains source element
+        // Target contains source element
+        if (sourcePosInTarget < targetLength) {
           if (sourcePosInTarget !== targetPos) {
             target.move(sourcePosInTarget, targetPos);
           }
@@ -334,7 +335,9 @@ class SetPayload extends ListPayload {
 
 const NoopPayload = noop().constructor;
 
-Payload.prototype.toSetList = function() { return SetPayload.create(this); };
+Payload.prototype.toSetList = function() {
+  return SetPayload.create(this);
+};
 NoopPayload.prototype.toSetList = function() { return this; };
 
 Payload.prototype.toAppendListElement = function() {
@@ -342,7 +345,9 @@ Payload.prototype.toAppendListElement = function() {
 };
 NoopPayload.prototype.toAppendListElement = function() { return this; };
 
-Payload.prototype.toRemoveListElement = function() { return RemovePayload.create(this); };
+Payload.prototype.toRemoveListElement = function() {
+  return RemovePayload.create(this);
+};
 NoopPayload.prototype.toRemoveListElement = function() { return this; };
 
 module.exports = {
@@ -350,7 +355,7 @@ module.exports = {
   setLazy(getValue) { return SetLazyPayload.create(getValue); },
   setConst: SetConstPayload.create,
   append(elementSource) {
-    return AddAtPayload.create(elementSource.map(function(el) { return [el]; }));
+    return AddAtPayload.create(elementSource.map( (el) => [el] ));
   },
   appendConst(element) {
     return AddAtPayload.create({get() { return [element]; }});

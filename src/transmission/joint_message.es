@@ -17,9 +17,11 @@ export default class JointMessage {
     ].join(' ');
   }
 
-  static getOrCreate(comm, {node, nodeTarget, nodeSource}) {
+  static getOrCreate(comm, opts) {
     const {transmission, pass} = comm;
-    node = node || (nodeTarget || {}).node || (nodeSource || {}).node; // eslint-disable-line no-param-reassign
+    const node = opts.node
+       || (opts.nodeTarget || {}).node
+       || (opts.nodeSource || {}).node;
 
     let selected = transmission.getCommunicationFor(pass, node);
     if (selected == null) {
@@ -110,9 +112,10 @@ export default class JointMessage {
     if (!this.queryHub.areAllChannelNodesUpdated()) return this;
 
     this.transmission.log(this.node, ...this.linesToMessages.entries());
-    this.transmission.log(this.node, this.query, ...this.query.getPassedLines().toArray());
+    this.transmission.log(this.node, this.query,
+                          ...this.query.getPassedLines().toArray());
     // TODO: Compare contents
-    if (!(this.linesToMessages.length === this.query.getPassedLines().length)) {
+    if (this.linesToMessages.length !== this.query.getPassedLines().length) {
       return this;
     }
 

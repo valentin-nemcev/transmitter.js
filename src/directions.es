@@ -1,7 +1,7 @@
 export const forward = Object.freeze({
   isForward: true,
   inspect() { return '→'; },
-  reverse() { return backward; }, // eslint-disable-line no-use-before-define
+  reverse() { return backward; },
   matches(other) { return other.isOmni || other.isForward; },
 });
 

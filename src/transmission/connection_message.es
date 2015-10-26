@@ -29,7 +29,8 @@ export default class ConnectionMessage {
   }
 
   static createNext(prevMessage, sourceChannelNode) {
-    return new this(prevMessage.transmission, prevMessage.pass, sourceChannelNode);
+    const {transmission, pass} = prevMessage;
+    return new this(transmission, pass, sourceChannelNode);
   }
 
   constructor(transmission, pass, sourceChannelNode) {

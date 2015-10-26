@@ -111,9 +111,11 @@ export default class MergedMessage {
 
   sendToChannelNode(node) {
     this.log(node);
-    let existing = this.transmission.getCommunicationFor(this.pass, node);
+    let existing = this.transmission
+      .getCommunicationFor(this.pass, node);
     if (existing == null) {
-      existing = this.transmission.getCommunicationFor(this.pass.getNext(), node);
+      existing = this.transmission
+        .getCommunicationFor(this.pass.getNext(), node);
     }
     if (existing != null) {
       throw new Error(

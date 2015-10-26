@@ -12,13 +12,14 @@ class Pass {
   directionMatches(direction) { return this.direction.matches(direction); }
 
   equals(other) {
-    return this.direction === other.direction && this.priority === other.priority;
+    return this.direction === other.direction
+        && this.priority === other.priority;
   }
 
   compare(other) { return this.priority - other.priority; }
 
   getNext() {
-    return this.priority === 1 ? null : forwardPass; // eslint-disable-line no-use-before-define
+    return this.priority === 1 ? null : forwardPass;
   }
 
   getForResponse() { return this.getNext(); }

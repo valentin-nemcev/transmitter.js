@@ -11,7 +11,8 @@ function id(a) { return a; }
 export default class BidirectionalChannel extends CompositeChannel {
 
   inspect() {
-    return '(' + [this.origin, this.getDirection(), this.derived].map(inspect).join('') + ')';
+    const components = [this.origin, this.getDirection(), this.derived];
+    return '(' + components.map(inspect).join('') + ')';
   }
 
   inForwardDirection() { return this.inDirection(directions.forward); }
@@ -98,11 +99,13 @@ export default class BidirectionalChannel extends CompositeChannel {
   }
 
   getTransformOrigin() {
-    return this.transformOrigin || this.createTransform(this.mapOrigin || id, this.getMatchOriginDerived());
+    return this.transformOrigin || this.createTransform(
+      this.mapOrigin || id, this.getMatchOriginDerived());
   }
 
   getTransformDerived() {
-    return this.transformDerived || this.createTransform(this.mapDerived || id, this.getMatchDerivedOrigin());
+    return this.transformDerived || this.createTransform(
+      this.mapDerived || id, this.getMatchDerivedOrigin());
   }
 
   createSimple(source, target, transform, direction) {
@@ -115,8 +118,11 @@ export default class BidirectionalChannel extends CompositeChannel {
 
   getForwardChannel() {
     if (this.getDirection().matches(directions.forward)) {
-      return this.createSimple(this.origin, this.derived, this.getTransformOrigin())
-        .inForwardDirection();
+      return new SimpleChannel()
+        .inForwardDirection()
+        .fromSource(this.origin)
+        .toTarget(this.derived)
+        .withTransform(this.getTransformOrigin());
     } else {
       return getNullChannel();
     }
@@ -124,8 +130,11 @@ export default class BidirectionalChannel extends CompositeChannel {
 
   getBackwardChannel() {
     if (this.getDirection().matches(directions.backward)) {
-      return this.createSimple(this.derived, this.origin, this.getTransformDerived())
-        .inBackwardDirection();
+      return new SimpleChannel()
+        .inBackwardDirection()
+        .fromSource(this.derived)
+        .toTarget(this.origin)
+        .withTransform(this.getTransformDerived());
     } else {
       return getNullChannel();
     }

@@ -63,7 +63,9 @@ export default class Transmission {
   log(...args) {
     if (!this.loggingIsEnabled) return this;
     const msg = args.map(inspect).join(', ');
-    if (this.loggingFilter(msg)) console.log(msg); // eslint-disable-line no-console
+    if (this.loggingFilter(msg)) {
+      console.log(msg); // eslint-disable-line no-console
+    }
     return this;
   }
 

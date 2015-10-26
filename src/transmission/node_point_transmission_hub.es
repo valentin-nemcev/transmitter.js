@@ -20,7 +20,8 @@ export default class NodePointTransmissionHub {
   sendForChannelNode(channelNode) {
     if (!this.updatedChannelNodes.has(channelNode)) {
       this.updatedChannelNodes.add(channelNode);
-      this.nodePoint.receiveCommunicationForChannelNode(this.comm, channelNode);
+      this.nodePoint
+        .receiveCommunicationForChannelNode(this.comm, channelNode);
     }
     return this;
   }
@@ -36,7 +37,7 @@ export default class NodePointTransmissionHub {
       this.transmission.Query.createNextConnection(this.comm)
         .sendToChannelNode(channelNode);
       return false;
-    } else { // eslint-disable-line no-else-return
+    } else {
       return true;
     }
   }

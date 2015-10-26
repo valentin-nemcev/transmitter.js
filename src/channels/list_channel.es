@@ -56,7 +56,8 @@ export default class ListChannel extends BidirectionalChannel {
   }
 
   getChannels() {
-    return super.getChannels().concat([this.nestingChannel || getNullChannel()]);
+    return super.getChannels()
+      .concat([this.nestingChannel || getNullChannel()]);
   }
 }
 

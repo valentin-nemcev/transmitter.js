@@ -5,9 +5,12 @@ import * as directions from '../directions';
 
 import NodeConnectionLine          from '../connection/node_connection_line';
 import ConnectionNodeLine          from '../connection/connection_node_line';
-import MergingConnectionTarget     from '../connection/merging_connection_target';
-import SeparatingConnectionSource  from '../connection/separating_connection_source';
-import DuplicatingConnectionSource from '../connection/duplicating_connection_source';
+import MergingConnectionTarget
+  from '../connection/merging_connection_target';
+import SeparatingConnectionSource
+  from '../connection/separating_connection_source';
+import DuplicatingConnectionSource
+  from '../connection/duplicating_connection_source';
 import Connection                  from '../connection/connection';
 
 
@@ -128,7 +131,8 @@ export default class SimpleChannel {
 
   assertConnectionTarget(connectionTarget) {
     if (!(connectionTarget || {}).isConnectionTarget) {
-      throw new Error(`${inspect(connectionTarget)} is not a valid target node`);
+      throw new Error(
+        `${inspect(connectionTarget)} is not a valid target node`);
     }
     return this;
   }

@@ -3,9 +3,8 @@ import {inspect} from 'util';
 import Payload from './payload';
 import noop from './noop';
 
-
 function merge(payloads) {
-  return SetPayload.create({ // eslint-disable-line no-use-before-define
+  return SetPayload.create({
     get() {
       return payloads.map( (p) => p.get() );
     },
@@ -22,7 +21,7 @@ class VariablePayload extends Payload {
 
   separate() {
     return this.get().map( (value) =>
-      SetConstPayload.create(value) // eslint-disable-line no-use-before-define
+      SetConstPayload.create(value)
     );
   }
 }
@@ -40,7 +39,7 @@ class SetConstPayload extends VariablePayload {
   inspect() { return `setConst(${inspect(this.value)})`; }
 
   map(map) {
-    return new SetPayload(this, {map}); // eslint-disable-line no-use-before-define
+    return new SetPayload(this, {map});
   }
 
   get() { return this.value; }
@@ -136,7 +135,9 @@ class SetPayload extends VariablePayload {
 
 const NoopPayload = noop().constructor;
 
-Payload.prototype.toSetVariable = function() { return SetPayload.create(this); };
+Payload.prototype.toSetVariable = function() {
+  return SetPayload.create(this);
+};
 NoopPayload.prototype.toSetVariable = function() { return this; };
 
 export default {
