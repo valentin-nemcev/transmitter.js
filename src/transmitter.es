@@ -1,6 +1,6 @@
 import Transmission      from './transmission/transmission';
 import * as Nodes        from './nodes';
-import Payloads     from './payloads';
+import * as Payloads     from './payloads';
 import * as Channels     from './channels';
 import * as ChannelNodes from './channel_nodes';
 import * as DOMElement   from './dom_element';
