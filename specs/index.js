@@ -1,13 +1,16 @@
-var Transmitter;
-
 require('./common');
 
-Transmitter = require('transmitter');
-
+require('./unit/message_and_query_transmission.specs');
+require('./unit/message_merging.specs');
+require('./unit/query_queue.specs');
+require('./unit/list_update.specs');
 describe('Examples', function() {
+
   before(function() {
-    return Transmitter.Transmission.prototype.reverseOrder = false;
+    var Transmitter = require('transmitter');
+    Transmitter.Transmission.prototype.reverseOrder = false;
   });
+
   require('./examples/define');
   require('./examples/connection_with_merge_and_query.specs');
   require('./examples/bidirectional_state_message_routing.specs');
@@ -19,6 +22,5 @@ describe('Examples', function() {
   require('./examples/flattening_with_nested_connections.specs');
   require('./examples/reversing_messages_in_the_middle_of_the_chain.specs');
   require('./examples/merging_after_splitting.specs');
-  return require('./examples/flattening_with_nested_list_connections.specs');
+  require('./examples/flattening_with_nested_list_connections.specs');
 });
-

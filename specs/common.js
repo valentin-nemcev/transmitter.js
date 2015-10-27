@@ -1,12 +1,5 @@
-// Enable here to support babel stack traces
-require('coffee-script/register');
-
 require('source-map-support').install();
-require('babel/register')({only: '*.es'});
-
-// Enable here to support coffee stack traces
-// require('coffee-script/register');
-
+require('babel/register')();
 
 Error.stackTraceLimit = 15;
 
@@ -19,16 +12,12 @@ global.sinon = require('sinon');
 
 require('mocha-sinon');
 
-const sinonChai = require('sinon-chai');
-const dirtyChai = require('dirty-chai');
-
-chai.use(dirtyChai);
-chai.use(sinonChai);
+chai.use(require('dirty-chai'));
+chai.use(require('sinon-chai'));
 
 chai.use(function() {
-  const Assertion = chai.Assertion;
-  return Assertion.addMethod('calledWithSame', function() {
+  chai.Assertion.addMethod('calledWithSame', function() {
     const match = global.sinon.match;
-    return this.calledWith(match.same.apply(match, arguments));
+    this.calledWith(match.same.apply(match, arguments));
   });
 });

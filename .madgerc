@@ -1,0 +1,6 @@
+{
+  "format": "es6",
+  "extensions": "es",
+  "paths": "src",
+  "exclude": "^(index|dom|browser|assert|util)"
+}
