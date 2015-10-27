@@ -20,7 +20,9 @@ global.sinon = require('sinon');
 require('mocha-sinon');
 
 const sinonChai = require('sinon-chai');
+const dirtyChai = require('dirty-chai');
 
+chai.use(dirtyChai);
 chai.use(sinonChai);
 
 chai.use(function() {

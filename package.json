@@ -15,6 +15,7 @@
     "chai": "^1.10.0",
     "coffee-coverage": "^0.4.5",
     "coffee-script": "^1.9.0",
+    "dirty-chai": "^1.2.2",
     "eslint": "^1.7.2",
     "eslint-config-airbnb": "^0.1.0",
     "madge": "^0.4.1",

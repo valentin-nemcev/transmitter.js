@@ -1,7 +1,3 @@
-/* eslint-env mocha, chai */
-/* global expect */
-/* eslint-disable padded-blocks */
-
 import Transmitter from 'transmitter';
 
 class Model {

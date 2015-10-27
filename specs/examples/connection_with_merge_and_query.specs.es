@@ -1,7 +1,3 @@
-/* eslint-env mocha, chai */
-/* global expect, sinon */
-/* eslint-disable padded-blocks */
-
 import Transmitter from 'transmitter';
 
 class AlertEmitter extends Transmitter.Nodes.TargetNode {
