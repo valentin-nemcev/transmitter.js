@@ -7,7 +7,7 @@ require('./unit/list_update.specs');
 describe('Examples', function() {
 
   before(function() {
-    var Transmitter = require('transmitter');
+    const Transmitter = require('transmitter');
     Transmitter.Transmission.prototype.reverseOrder = false;
   });
 
