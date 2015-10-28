@@ -15,7 +15,7 @@ export default class TargetMessage {
   }
 
   log(...args) {
-    this.transmission.log(...[this, ...args]);
+    this.transmission.log(this, ...args);
     return this;
   }
 
