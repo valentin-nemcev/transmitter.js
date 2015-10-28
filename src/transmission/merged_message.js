@@ -3,6 +3,8 @@ import {inspect} from 'util';
 import noop from '../payloads/noop';
 
 import SeparatedMessage from './separated_message';
+import Query from './query';
+import ConnectionMessage from './connection_message';
 
 
 export default class MergedMessage {
@@ -32,7 +34,7 @@ export default class MergedMessage {
   }
 
   createNextConnectionMessage(channelNode) {
-    return this.transmission.ConnectionMessage.createNext(this, channelNode);
+    return ConnectionMessage.createNext(this, channelNode);
   }
 
   constructor(transmission, pass, source) {
@@ -62,7 +64,7 @@ export default class MergedMessage {
 
   joinMessageFrom(message, node) {
     if (!(this.query != null || this.source.singleSource)) {
-      this.query = this.transmission.Query.createNext(this);
+      this.query = Query.createNext(this);
       this.source.sendQuery(this.query);
     }
 

@@ -2,6 +2,8 @@ import {inspect} from 'util';
 
 import Pass from './pass';
 
+import Query from './query';
+import JointMessage from './joint_message';
 import MergedMessage from './merged_message';
 import SeparatedMessage from './separated_message';
 
@@ -48,7 +50,7 @@ export default class ConnectionMessage {
   }
 
   createNextQuery() {
-    return this.transmission.Query.createNext(this);
+    return Query.createNext(this);
   }
 
   joinMergedMessage(source) {
@@ -82,7 +84,7 @@ export default class ConnectionMessage {
   }
 
   getJointMessage(node) {
-    return this.transmission.JointMessage.getOrCreate(this, {node});
+    return JointMessage.getOrCreate(this, {node});
   }
 
   sendToTargetPoints() {

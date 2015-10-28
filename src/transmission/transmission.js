@@ -2,8 +2,6 @@ import {inspect} from 'util';
 
 import Pass from './pass';
 
-import Query             from './query';
-import Message           from './message';
 import ConnectionMessage from './connection_message';
 import JointMessage      from './joint_message';
 
@@ -100,26 +98,24 @@ export default class Transmission {
 
 
   constructor() {
-    Object.assign(this, {Query, Message, ConnectionMessage, JointMessage});
-
     this.comms = [];
     Pass.priorities
       .forEach( (p) => this.comms[p] = {map: new WeakMap(), queue: []} );
   }
 
   createInitialConnectionMessage() {
-    return this.ConnectionMessage.createInitial(this);
+    return ConnectionMessage.createInitial(this);
   }
 
   originateQuery(node) {
-    return this.JointMessage
+    return JointMessage
       .getOrCreate(
           {transmission: this, pass: Pass.createQueryDefault()}, {node})
       .originateQuery();
   }
 
   originateMessage(node, payload) {
-    return this.JointMessage
+    return JointMessage
       .getOrCreate(
           {transmission: this, pass: Pass.createMessageDefault()}, {node})
       .originateMessage(payload);

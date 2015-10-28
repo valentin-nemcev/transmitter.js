@@ -1,6 +1,8 @@
 import {inspect} from 'util';
 
 import NodePointTransmissionHub from './node_point_transmission_hub';
+import Query from './query';
+import Message from './message';
 
 
 export default class JointMessage {
@@ -85,7 +87,7 @@ export default class JointMessage {
         );
     }
     const nextPayload = this.node.processPayload(payload);
-    const message = this.transmission.Message.create(this, nextPayload, 1);
+    const message = Message.create(this, nextPayload, 1);
     this._sendMessage(message);
     return this;
   }
@@ -93,7 +95,7 @@ export default class JointMessage {
   _ensureQuerySent() {
     if ((this.query != null)) { return this; }
     // This method is reentrant, so assign @query before sending
-    this.query = this.transmission.Query.createNext(this);
+    this.query = Query.createNext(this);
     this.queryHub =
       new NodePointTransmissionHub(this.query, this.node.getNodeTarget());
     this.queryHub.sendForAll();
@@ -171,8 +173,7 @@ export default class JointMessage {
     this.transmission.log(prevMessage, this.node);
     const prevPayload = prevMessage.getPayload();
     const nextPayload = this.node.processPayload(prevPayload);
-    return this.transmission.Message
-      .create(this, nextPayload, prevMessage.getPriority());
+    return Message.create(this, nextPayload, prevMessage.getPriority());
   }
 
 
@@ -192,8 +193,7 @@ export default class JointMessage {
       : 0;
 
     const nextPayload = this.node.createResponsePayload(prevPayload);
-    const nextMessage = this.transmission.Message
-      .create(this, nextPayload, prevPriority);
+    const nextMessage = Message.create(this, nextPayload, prevPriority);
 
     return this._sendMessage(nextMessage);
   }

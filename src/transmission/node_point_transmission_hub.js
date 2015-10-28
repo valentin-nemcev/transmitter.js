@@ -1,3 +1,6 @@
+import Query from './query';
+
+
 export default class NodePointTransmissionHub {
 
   constructor(comm, nodePoint) {
@@ -34,8 +37,7 @@ export default class NodePointTransmissionHub {
 
   _tryQueryChannelNode(channelNode) {
     if (!this._channelNodeUpdated(channelNode)) {
-      this.transmission.Query.createNextConnection(this.comm)
-        .sendToChannelNode(channelNode);
+      Query.createNextConnection(this.comm).sendToChannelNode(channelNode);
       return false;
     } else {
       return true;

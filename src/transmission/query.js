@@ -1,5 +1,6 @@
 import {inspect} from 'util';
 
+import JointMessage from './joint_message';
 import MergedMessage from './merged_message';
 
 
@@ -33,10 +34,6 @@ export default class Query {
     this.passedLines = new Set();
   }
 
-  createQueryResponseMessage(payload) {
-    return this.transmission.Message.createNext(this, payload);
-  }
-
 
   directionMatches(direction) { return this.pass.directionMatches(direction); }
 
@@ -54,7 +51,7 @@ export default class Query {
   }
 
   sendToNodeSource(line, nodeSource) {
-    this.transmission.JointMessage
+    JointMessage
       .getOrCreate(this, {nodeSource})
       .joinQueryFrom(this, line);
     return this;

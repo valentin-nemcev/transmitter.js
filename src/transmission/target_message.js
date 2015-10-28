@@ -1,5 +1,7 @@
 import {inspect} from 'util';
 
+import JointMessage from './joint_message';
+
 
 export default class TargetMessage {
 
@@ -33,12 +35,8 @@ export default class TargetMessage {
     this.payload = payload;
   }
 
-  createNextConnectionMessage(channelNode) {
-    return this.transmission.ConnectionMessage.createNext(this, channelNode);
-  }
-
   sendToNodeTarget(line, nodeTarget) {
-    this.transmission.JointMessage
+    JointMessage
       .getOrCreate(this, {nodeTarget})
       .joinMessageFrom(this, line);
     return this;
