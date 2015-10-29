@@ -7,7 +7,7 @@ export default class TargetMessage {
 
   inspect() {
     return [
-      'TM',
+      'M-',
       inspect(this.pass),
       `P:${this.getPriority()}`,
       this.payload.inspect(),
@@ -38,7 +38,7 @@ export default class TargetMessage {
   sendToNodeTarget(line, nodeTarget) {
     JointMessage
       .getOrCreate(this, {nodeTarget})
-      .joinMessageFrom(this, line);
+      .receiveMessageFrom(this, line);
     return this;
   }
 

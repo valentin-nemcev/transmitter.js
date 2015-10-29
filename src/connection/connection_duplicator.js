@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 
-export default class SeparatingConnectionSource {
+export default class ConnectionDuplicator {
 
   inspect() { return '=[' + this.target.map(inspect).join(', ') + ']'; }
 

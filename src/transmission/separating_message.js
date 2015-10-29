@@ -2,10 +2,10 @@ import {inspect} from 'util';
 
 import TargetMessage from './target_message';
 
-module.exports = class SeparatedMessage {
+module.exports = class SeparatingMessage {
   inspect() {
     return [
-      'SM',
+      'M<',
       inspect(this.pass),
       this.nodesToMessages.values().map(inspect).join(', '),
     ].join(' ');
@@ -28,7 +28,7 @@ module.exports = class SeparatedMessage {
     this.source = source;
   }
 
-  joinConnectionMessage(message) {
+  receiveConnectionMessage(message) {
     this.sourceChannelNode = message.getSourceChannelNode();
     return this;
   }
@@ -42,7 +42,7 @@ module.exports = class SeparatedMessage {
     return payload != null ? payload : Array.from(nodesToLines.keys());
   }
 
-  joinMessage(message) {
+  receiveMessage(message) {
     this.sourceMessage = message;
 
     const nodesToLines = this.source.getTargets();

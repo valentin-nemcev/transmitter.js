@@ -34,13 +34,13 @@ describe('Message merging', function() {
     sinon.stub(this.passiveSource, 'createResponsePayload')
       .returns(this.passivePayload);
 
-    this.compositeSource = new SimpleChannel()
+    this.merger = new SimpleChannel()
       .inDirection(this.pass.direction)
-      .createMergingSource([this.activeSource, this.passiveSource]);
+      .createMerger([this.activeSource, this.passiveSource]);
 
-    this.compositeSource.setTarget(this.target);
+    this.merger.setTarget(this.target);
     const message = this.transmission.createInitialConnectionMessage();
-    this.compositeSource.connect(message);
+    this.merger.connect(message);
     message.sendToTargetPoints();
   });
 

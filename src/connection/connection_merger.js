@@ -3,20 +3,20 @@ import {inspect} from 'util';
 import noop from '../payloads/noop';
 
 
-export default class MergingConnectionTarget {
+export default class ConnectionMerger {
 
   inspect() {
     return '[' + this.sources.keys().map(inspect).join(', ') + ']:';
   }
 
-  constructor(sources, {singleSource, prioritiesShouldMatch} = {}) {
-    this.sources = sources;
+  constructor(sourceLines, {singleSource, prioritiesShouldMatch} = {}) {
+    this.sourceLines = sourceLines;
     this.singleSource = singleSource;
     this.prioritiesShouldMatch = prioritiesShouldMatch;
-    this.sources.forEach( (source) => source.setTarget(this) );
+    this.sourceLines.forEach( (line) => line.setTarget(this) );
   }
 
-  getSourceNodes() { return Array.from(this.sources.keys()); }
+  getSourceNodes() { return Array.from(this.sourceLines.keys()); }
 
   setTarget(target) {
     this.target = target;
@@ -24,20 +24,20 @@ export default class MergingConnectionTarget {
   }
 
   connect(message) {
-    this.sources.forEach( (source) => source.connect(message) );
-    message.joinMergedMessage(this);
+    this.sourceLines.forEach( (line) => line.connect(message) );
+    message.sendToMergedMessage(this);
     return this;
   }
 
   disconnect(message) {
-    this.sources.forEach( (source) => source.disconnect(message) );
+    this.sourceLines.forEach( (line) => line.disconnect(message) );
     return this;
   }
 
   getPlaceholderPayload() { return noop(); }
 
   receiveMessage(message) {
-    message.joinMergedMessage(this);
+    message.sendToConnectionMerger(this);
     return this;
   }
 
@@ -47,12 +47,12 @@ export default class MergingConnectionTarget {
   }
 
   sendQuery(query) {
-    this.sources.forEach( (source) => source.receiveQuery(query) );
+    this.sourceLines.forEach( (line) => line.receiveQuery(query) );
     return this;
   }
 
   receiveQuery(query) {
-    query.joinMergedMessage(this);
+    query.sendToMergedMessage(this);
     return this;
   }
 }

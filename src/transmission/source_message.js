@@ -1,13 +1,13 @@
 import {inspect} from 'util';
 
-import MergedMessage from './merged_message';
+import MergingMessage from './merging_message';
 
 
 export default class SourceMessage {
 
   inspect() {
     return [
-      'M',
+      '-M',
       inspect(this.pass),
       `P:${this.getPriority()}`,
       this.payload.inspect(),
@@ -40,10 +40,10 @@ export default class SourceMessage {
     return this;
   }
 
-  joinMergedMessage(source) {
-    MergedMessage
-      .getOrCreate(this, source)
-      .joinMessageFrom(this, this.sourceNode);
+  sendToConnectionMerger(connectionMerger) {
+    MergingMessage
+      .getOrCreate(this, connectionMerger)
+      .receiveMessageFrom(this, this.sourceNode);
     return this;
   }
 

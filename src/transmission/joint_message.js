@@ -38,7 +38,7 @@ export default class JointMessage {
     this.linesToMessages = new Map();
   }
 
-  joinMessageFrom(message, line) {
+  receiveMessageFrom(message, line) {
     this.transmission.log(line, message);
     const prev = this.linesToMessages.get(line);
     if (prev != null) {
@@ -53,7 +53,7 @@ export default class JointMessage {
     return this._selectAndSendMessageIfReady();
   }
 
-  joinQueryFrom() {
+  receiveQuery() {
     return this._ensureQuerySent();
   }
 
@@ -61,20 +61,20 @@ export default class JointMessage {
     return this._ensureQuerySent();
   }
 
-  joinTargetConnectionMessage(channelNode) {
+  receiveTargetConnectionMessage(channelNode) {
     this._ensureQuerySent();
     this._sendQueryForChannelNode(channelNode);
     return this._selectAndSendMessageIfReady();
   }
 
-  joinSourceConnectionMessage(channelNode) {
+  receiveSourceConnectionMessage(channelNode) {
     if (this.messageHub != null) {
       this.messageHub.sendForChannelNode(channelNode);
     }
     return this;
   }
 
-  joinPrecedingMessage(precedingMessage) {
+  receivePrecedingMessage(precedingMessage) {
     this.precedingMessage = precedingMessage;
     return this._ensureQuerySent();
   }
@@ -206,14 +206,14 @@ export default class JointMessage {
     this.transmission.log(this.message, this.node.getNodeSource());
 
     this.message.sourceNode = this.node;
-    this._joinMessageToSucceeding();
+    this._sendMessageToSucceeding();
     this.messageHub =
       new NodePointTransmissionHub(this.message, this.node.getNodeSource());
     this.messageHub.sendForAll();
     return this;
   }
 
-  _joinMessageToSucceeding() {
+  _sendMessageToSucceeding() {
     const responsePass = this.pass.getForResponse();
     if (responsePass != null) {
       JointMessage
@@ -221,7 +221,7 @@ export default class JointMessage {
             {transmission: this.transmission, pass: responsePass },
             {node: this.node}
           )
-        .joinPrecedingMessage(this.message);
+        .receivePrecedingMessage(this.message);
     }
     return this;
   }

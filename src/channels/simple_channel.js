@@ -2,15 +2,12 @@ import {inspect} from 'util';
 
 import * as directions from '../directions';
 
-import NodeConnectionLine          from '../connection/node_connection_line';
-import ConnectionNodeLine          from '../connection/connection_node_line';
-import MergingConnectionTarget
-  from '../connection/merging_connection_target';
-import SeparatingConnectionSource
-  from '../connection/separating_connection_source';
-import DuplicatingConnectionSource
-  from '../connection/duplicating_connection_source';
-import Connection                  from '../connection/connection';
+import NodeConnectionLine   from '../connection/node_connection_line';
+import ConnectionNodeLine   from '../connection/connection_node_line';
+import ConnectionMerger     from '../connection/connection_merger';
+import ConnectionSeparator  from '../connection/connection_separator';
+import ConnectionDuplicator from '../connection/connection_duplicator';
+import Connection           from '../connection/connection';
 
 
 function returnArg(arg) { return arg; }
@@ -158,7 +155,7 @@ export default class SimpleChannel {
 
   getSource() {
     if (this.source == null) {
-      this.source = this.createMergingSource(this.sources, {
+      this.source = this.createMerger(this.sources, {
         singleSource: !this.forceMerging && this.sources.length === 1,
         prioritiesShouldMatch: this.sourcePrioritiesShouldMatch,
       });
@@ -166,21 +163,21 @@ export default class SimpleChannel {
     return this.source;
   }
 
-  createMergingSource(sources, opts) {
+  createMerger(sources, opts) {
     const parts = sources.map( (source) => {
       const line = new NodeConnectionLine(
           source.getNodeSource(), this.getDirection());
       return [source, line];
     });
-    return new MergingConnectionTarget(new Map(parts), opts);
+    return new ConnectionMerger(new Map(parts), opts);
   }
 
   getTarget() {
     if (this.target == null) {
       if (this.connectionTargets.length) {
-        this.target = this.createDuplicatingTarget(this.connectionTargets);
+        this.target = this.createDuplicator(this.connectionTargets);
       } else {
-        this.target = this.createSeparatingTarget(this.targets,
+        this.target = this.createSeparator(this.targets,
           {singleTarget: !this.forceSeparating && this.targets.length === 1}
         );
       }
@@ -188,17 +185,17 @@ export default class SimpleChannel {
     return this.target;
   }
 
-  createSeparatingTarget(targets, opts) {
+  createSeparator(targets, opts) {
     const parts = targets.map( (target) => {
       const line = new ConnectionNodeLine(
           target.getNodeTarget(), this.getDirection());
       return [target, line];
     });
-    return new SeparatingConnectionSource(new Map(parts), opts);
+    return new ConnectionSeparator(new Map(parts), opts);
   }
 
-  createDuplicatingTarget(targets) {
-    return new DuplicatingConnectionSource(targets);
+  createDuplicator(targets) {
+    return new ConnectionDuplicator(targets);
   }
 
   getTransform() {

@@ -1,9 +1,9 @@
 export default class NodeConnectionLine {
 
-  inspect() { return this.source.inspect() + this.direction.inspect(); }
+  inspect() { return this.nodeSource.inspect() + this.direction.inspect(); }
 
-  constructor(source, direction) {
-    this.source = source;
+  constructor(nodeSource, direction) {
+    this.nodeSource = nodeSource;
     this.direction = direction;
   }
 
@@ -13,12 +13,12 @@ export default class NodeConnectionLine {
   }
 
   connect(message) {
-    this.source.connectLine(message, this);
+    this.nodeSource.connectLine(message, this);
     return this;
   }
 
   disconnect(message) {
-    this.source.disconnectLine(message, this);
+    this.nodeSource.disconnectLine(message, this);
     return this;
   }
 
@@ -27,7 +27,7 @@ export default class NodeConnectionLine {
   }
 
   getPlaceholderPayload() {
-    return this.source.getPlaceholderPayload();
+    return this.nodeSource.getPlaceholderPayload();
   }
 
   receiveMessage(message) {
@@ -36,7 +36,7 @@ export default class NodeConnectionLine {
   }
 
   receiveQuery(query) {
-    query.sendToNodeSource(this, this.source);
+    query.sendToNodeSource(this, this.nodeSource);
     return this;
   }
 }

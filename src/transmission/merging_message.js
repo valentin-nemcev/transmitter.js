@@ -2,16 +2,16 @@ import {inspect} from 'util';
 
 import noop from '../payloads/noop';
 
-import SeparatedMessage from './separated_message';
 import Query from './query';
+import SeparatingMessage from './separating_message';
 import ConnectionMessage from './connection_message';
 
 
-export default class MergedMessage {
+export default class MergingMessage {
 
   inspect() {
     return [
-      'MM',
+      '>M',
       inspect(this.pass),
       Array.from(this.nodesToMessages.values()).map(inspect).join(', '),
     ].join(' ');
@@ -21,7 +21,6 @@ export default class MergedMessage {
     this.transmission.log(this, ...args);
     return this;
   }
-
 
   static getOrCreate(message, source) {
     const {transmission, pass} = message;
@@ -44,12 +43,12 @@ export default class MergedMessage {
     this.nodesToMessages = new Map();
   }
 
-  joinConnectionMessage(message) {
+  receiveConnectionMessage(message) {
     this.sourceChannelNode = message.getSourceChannelNode();
     return this;
   }
 
-  joinQuery(query) {
+  receiveQuery(query) {
     if (this.query == null) {
       this.query = query;
       if (this.source.getSourceNodes().length === 0) {
@@ -62,7 +61,7 @@ export default class MergedMessage {
     return this;
   }
 
-  joinMessageFrom(message, node) {
+  receiveMessageFrom(message, node) {
     if (!(this.query != null || this.source.singleSource)) {
       this.query = Query.createNext(this);
       this.source.sendQuery(this.query);
@@ -106,8 +105,8 @@ export default class MergedMessage {
     return this;
   }
 
-  joinSeparatedMessage(target) {
-    SeparatedMessage.getOrCreate(this, target).joinMessage(this);
+  sendToSeparatedMessage(target) {
+    SeparatingMessage.getOrCreate(this, target).receiveMessage(this);
     return this;
   }
 

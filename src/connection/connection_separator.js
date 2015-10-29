@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-export default class SeparatingConnectionSource {
+export default class ConnectionSeparator {
 
   inspect() {
     return ':[' + this.targets.keys().map(inspect).join(', ') + ']';
@@ -12,7 +12,6 @@ export default class SeparatingConnectionSource {
     this.targets.forEach( (target) => target.setSource(this) );
   }
 
-
   getTargets() { return this.targets; }
 
   setSource(source) {
@@ -20,25 +19,21 @@ export default class SeparatingConnectionSource {
     return this;
   }
 
-
   connect(message) {
     this.targets.forEach( (target) => target.connect(message) );
-    message.joinSeparatedMessage(this);
+    message.sendToSeparatedMessage(this);
     return this;
   }
-
 
   disconnect(message) {
     this.targets.forEach( (target) => target.disconnect(message) );
     return this;
   }
 
-
   receiveMessage(message) {
-    message.joinSeparatedMessage(this);
+    message.sendToSeparatedMessage(this);
     return this;
   }
-
 
   receiveQuery(query) {
     this.source.receiveQuery(query);

@@ -1,9 +1,9 @@
 export default class ConnectionNodeLine {
 
-  inspect() { return this.direction.inspect() + this.target.inspect(); }
+  inspect() { return this.direction.inspect() + this.nodeTarget.inspect(); }
 
-  constructor(target, direction) {
-    this.target = target;
+  constructor(nodeTarget, direction) {
+    this.nodeTarget = nodeTarget;
     this.direction = direction;
   }
 
@@ -13,12 +13,12 @@ export default class ConnectionNodeLine {
   }
 
   connect(message) {
-    this.target.connectLine(message, this);
+    this.nodeTarget.connectLine(message, this);
     return this;
   }
 
   disconnect(message) {
-    this.target.disconnectLine(message, this);
+    this.nodeTarget.disconnectLine(message, this);
     return this;
   }
 
@@ -32,7 +32,7 @@ export default class ConnectionNodeLine {
   }
 
   receiveMessage(message) {
-    message.sendToNodeTarget(this, this.target);
+    message.sendToNodeTarget(this, this.nodeTarget);
     return this;
   }
 }

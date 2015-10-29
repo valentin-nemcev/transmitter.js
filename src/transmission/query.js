@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 import JointMessage from './joint_message';
-import MergedMessage from './merged_message';
+import MergingMessage from './merging_message';
 
 
 export default class Query {
@@ -46,14 +46,17 @@ export default class Query {
     return this;
   }
 
-  joinMergedMessage(source) {
-    return MergedMessage.getOrCreate(this, source).joinQuery(this);
+  sendToMergedMessage(source) {
+    MergingMessage
+      .getOrCreate(this, source)
+      .receiveQuery(this);
+    return this;
   }
 
   sendToNodeSource(line, nodeSource) {
     JointMessage
       .getOrCreate(this, {nodeSource})
-      .joinQueryFrom(this, line);
+      .receiveQuery(this, line);
     return this;
   }
 
