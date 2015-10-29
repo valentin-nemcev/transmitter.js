@@ -2,7 +2,7 @@ import {inspect} from 'util';
 
 import NodePointTransmissionHub from './node_point_transmission_hub';
 import Query from './query';
-import Message from './message';
+import SourceMessage from './source_message';
 
 
 export default class JointMessage {
@@ -87,7 +87,7 @@ export default class JointMessage {
         );
     }
     const nextPayload = this.node.processPayload(payload);
-    const message = Message.create(this, nextPayload, 1);
+    const message = SourceMessage.create(this, nextPayload, 1);
     this._sendMessage(message);
     return this;
   }
@@ -173,7 +173,7 @@ export default class JointMessage {
     this.transmission.log(prevMessage, this.node);
     const prevPayload = prevMessage.getPayload();
     const nextPayload = this.node.processPayload(prevPayload);
-    return Message.create(this, nextPayload, prevMessage.getPriority());
+    return SourceMessage.create(this, nextPayload, prevMessage.getPriority());
   }
 
 
@@ -193,7 +193,7 @@ export default class JointMessage {
       : 0;
 
     const nextPayload = this.node.createResponsePayload(prevPayload);
-    const nextMessage = Message.create(this, nextPayload, prevPriority);
+    const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
 
     return this._sendMessage(nextMessage);
   }

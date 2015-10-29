@@ -3,7 +3,7 @@ import {inspect} from 'util';
 import MergedMessage from './merged_message';
 
 
-export default class Message {
+export default class SourceMessage {
 
   inspect() {
     return [
