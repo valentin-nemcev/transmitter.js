@@ -3,16 +3,16 @@ import {inspect} from 'util';
 export default class ConnectionSeparator {
 
   inspect() {
-    return ':[' + this.targets.keys().map(inspect).join(', ') + ']';
+    return ':[' + this.targetNodesToLines.keys().map(inspect).join(', ') + ']';
   }
 
-  constructor(targets, {singleTarget} = {}) {
-    this.targets = targets;
+  constructor(targetNodesToLines, {singleTarget} = {}) {
+    this.targetNodesToLines = targetNodesToLines;
     this.singleTarget = singleTarget;
-    this.targets.forEach( (target) => target.setSource(this) );
+    this.targetNodesToLines.forEach( (line) => line.setSource(this) );
   }
 
-  getTargets() { return this.targets; }
+  getTargetNodesToLines() { return this.targetNodesToLines; }
 
   setSource(source) {
     this.source = source;
@@ -20,13 +20,13 @@ export default class ConnectionSeparator {
   }
 
   connect(message) {
-    this.targets.forEach( (target) => target.connect(message) );
+    this.targetNodesToLines.forEach( (line) => line.connect(message) );
     message.sendToSeparatedMessage(this);
     return this;
   }
 
   disconnect(message) {
-    this.targets.forEach( (target) => target.disconnect(message) );
+    this.targetNodesToLines.forEach( (line) => line.disconnect(message) );
     return this;
   }
 

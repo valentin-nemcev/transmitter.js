@@ -44,14 +44,14 @@ export default class MergingMessage {
   }
 
   receiveConnectionMessage(message) {
-    this.sourceChannelNode = message.getSourceChannelNode();
+    this.channelNode = message.getSourceChannelNode();
     return this;
   }
 
   receiveQuery(query) {
     if (this.query == null) {
       this.query = query;
-      if (this.source.getSourceNodes().length === 0) {
+      if (this.source.getSourceNodesToLines().size === 0) {
         [this.payload, this.priority] = this._getEmptyPayload();
         this.source.sendMessage(this);
       } else {
@@ -70,7 +70,8 @@ export default class MergingMessage {
     this.nodesToMessages.set(node, message);
 
     // TODO: Compare contents
-    if (this.nodesToMessages.size !== this.source.getSourceNodes().length) {
+    if (this.nodesToMessages.size !==
+        this.source.getSourceNodesToLines().size) {
       return this;
     }
 
@@ -132,23 +133,29 @@ export default class MergingMessage {
   _getNoopPayload() { return [noop(), null]; }
 
   _getEmptyPayload() {
-    const payload = this.sourceChannelNode != null
-      ? this.sourceChannelNode.getSourcePayload() : null;
+    const payload = this.channelNode != null
+      ? this.channelNode.getSourcePayload() : null;
     return [payload || [], 0];
+  }
+
+  _getNodePayload(nodesToLines) {
+    const payload = this.channelNode != null
+      ? this.channelNode.getSourcePayload() : null;
+    return payload || Array.from(nodesToLines.keys());
   }
 
   _getMergedPayload() {
     this.transmission.log(this);
-    let srcPayload = this.sourceChannelNode != null
-      ? this.sourceChannelNode.getSourcePayload() : null;
-    srcPayload = srcPayload || this.source.getSourceNodes();
+
+    const nodesToLines = this.source.getSourceNodesToLines();
+    const nodePayload = this._getNodePayload(nodesToLines);
 
     let priority = null;
     this.nodesToMessages.forEach( (message) =>
       priority = Math.max(priority, message.getPriority())
     );
 
-    let payload = srcPayload.map((node) => {
+    let payload = nodePayload.map((node) => {
       return this.nodesToMessages.get(node).getPayload();
     });
 

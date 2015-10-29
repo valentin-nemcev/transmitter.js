@@ -6,17 +6,17 @@ import noop from '../payloads/noop';
 export default class ConnectionMerger {
 
   inspect() {
-    return '[' + this.sources.keys().map(inspect).join(', ') + ']:';
+    return '[' + this.sourceNodesToLines.keys().map(inspect).join(', ') + ']:';
   }
 
-  constructor(sourceLines, {singleSource, prioritiesShouldMatch} = {}) {
-    this.sourceLines = sourceLines;
+  constructor(sourceNodesToLines, {singleSource, prioritiesShouldMatch} = {}) {
+    this.sourceNodesToLines = sourceNodesToLines;
     this.singleSource = singleSource;
     this.prioritiesShouldMatch = prioritiesShouldMatch;
-    this.sourceLines.forEach( (line) => line.setTarget(this) );
+    this.sourceNodesToLines.forEach( (line) => line.setTarget(this) );
   }
 
-  getSourceNodes() { return Array.from(this.sourceLines.keys()); }
+  getSourceNodesToLines() { return this.sourceNodesToLines; }
 
   setTarget(target) {
     this.target = target;
@@ -24,13 +24,13 @@ export default class ConnectionMerger {
   }
 
   connect(message) {
-    this.sourceLines.forEach( (line) => line.connect(message) );
+    this.sourceNodesToLines.forEach( (line) => line.connect(message) );
     message.sendToMergedMessage(this);
     return this;
   }
 
   disconnect(message) {
-    this.sourceLines.forEach( (line) => line.disconnect(message) );
+    this.sourceNodesToLines.forEach( (line) => line.disconnect(message) );
     return this;
   }
 
@@ -47,7 +47,7 @@ export default class ConnectionMerger {
   }
 
   sendQuery(query) {
-    this.sourceLines.forEach( (line) => line.receiveQuery(query) );
+    this.sourceNodesToLines.forEach( (line) => line.receiveQuery(query) );
     return this;
   }
 
