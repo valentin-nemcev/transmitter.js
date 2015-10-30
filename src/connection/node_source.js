@@ -9,9 +9,8 @@ export default class NodeSource extends NodePoint {
     return this.node.createPlaceholderPayload();
   }
 
-  receiveConnectionMessage(connectionMessage, channelNode) {
-    connectionMessage.getJointMessage(this.node)
-      .receiveSourceConnectionMessage(channelNode);
+  receiveConnectionMessage(connectionMessage) {
+    connectionMessage.sendToJointMessageFromSource(this.node);
     return this;
   }
 }

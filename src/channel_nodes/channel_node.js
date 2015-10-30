@@ -36,25 +36,21 @@ export default class ChannelNode {
     return this;
   }
 
-
   receiveConnectionMessage(connectionMessage) {
     connectionMessage.createNextQuery()
       .sendToChannelNode(this);
     return this;
   }
 
-
   receiveQuery(query) {
     this.source.receiveQuery(query);
     return this;
   }
 
-
   receiveMessage(message) {
     message.sendToChannelNode(this);
     return this;
   }
-
 
   routeMessage(tr, payload) {
     this.message = tr.createNextConnectionMessage(this);
@@ -63,7 +59,6 @@ export default class ChannelNode {
     this.message = null;
     return this;
   }
-
 
   getPlaceholderPayload() {
     return this.source.getPlaceholderPayload();

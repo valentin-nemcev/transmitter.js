@@ -28,8 +28,8 @@ module.exports = class SeparatingMessage {
     this.source = source;
   }
 
-  receiveConnectionMessage(message) {
-    this.channelNode = message.getSourceChannelNode();
+  receiveConnectionMessage(channelNode) {
+    this.channelNode = channelNode;
     return this;
   }
 

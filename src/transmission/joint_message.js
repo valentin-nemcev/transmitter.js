@@ -50,7 +50,8 @@ export default class JointMessage {
     }
     this.linesToMessages.set(line, message);
     this._ensureQuerySent();
-    return this._selectAndSendMessageIfReady();
+    this._selectAndSendMessageIfReady();
+    return this;
   }
 
   receiveQuery() {
@@ -64,7 +65,8 @@ export default class JointMessage {
   receiveTargetConnectionMessage(channelNode) {
     this._ensureQuerySent();
     this._sendQueryForChannelNode(channelNode);
-    return this._selectAndSendMessageIfReady();
+    this._selectAndSendMessageIfReady();
+    return this;
   }
 
   receiveSourceConnectionMessage(channelNode) {

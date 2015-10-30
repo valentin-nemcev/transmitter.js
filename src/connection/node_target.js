@@ -5,9 +5,8 @@ export default class NodeTarget extends NodePoint {
 
   inspect() { return '>' + this.node.inspect(); }
 
-  receiveConnectionMessage(connectionMessage, channelNode) {
-    connectionMessage.getJointMessage(this.node)
-      .receiveTargetConnectionMessage(channelNode);
+  receiveConnectionMessage(connectionMessage) {
+    connectionMessage.sendToJointMessageFromTarget(this.node);
     return this;
   }
 }

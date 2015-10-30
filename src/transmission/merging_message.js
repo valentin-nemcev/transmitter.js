@@ -43,8 +43,8 @@ export default class MergingMessage {
     this.nodesToMessages = new Map();
   }
 
-  receiveConnectionMessage(message) {
-    this.channelNode = message.getSourceChannelNode();
+  receiveConnectionMessage(channelNode) {
+    this.channelNode = channelNode;
     return this;
   }
 

@@ -46,19 +46,15 @@ export default class NodeLineMap {
       if (lines.acceptsCommunication(comm)) yield channelNode;
   }
 
-  _getLinesForChannelNode(channelNode) {
+  connectLine(message, line) {
+    const channelNode = message.getSourceChannelNode();
+    message.addTargetPoint(this);
+
     let lines = this.channelNodeToLines.get(channelNode);
     if (lines == null) {
       lines = new LineSet();
       this.channelNodeToLines.set(channelNode, lines);
     }
-    return lines;
-  }
-
-  connectLine(message, line) {
-    const channelNode = message.getSourceChannelNode();
-    message.addTargetPoint(this);
-    const lines = this._getLinesForChannelNode(channelNode);
     lines.add(line);
     return this;
   }
@@ -66,15 +62,16 @@ export default class NodeLineMap {
   disconnectLine(message, line) {
     const channelNode = message.getSourceChannelNode();
     message.removeTargetPoint(this);
-    const lines = this._getLinesForChannelNode(channelNode);
+
+    const lines = this.channelNodeToLines.get(channelNode);
     lines.delete(line);
     if (lines.size === 0) this.channelNodeToLines.delete(channelNode);
     return this;
   }
 
   receiveCommunicationForChannelNode(comm, channelNode) {
-    const lines = this._getLinesForChannelNode(channelNode);
-    lines.receiveCommunication(comm);
+    const lines = this.channelNodeToLines.get(channelNode);
+    if (lines != null) lines.receiveCommunication(comm);
     return this;
   }
 }

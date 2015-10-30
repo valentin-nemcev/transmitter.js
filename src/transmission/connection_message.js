@@ -56,14 +56,14 @@ export default class ConnectionMessage {
   sendToMergedMessage(merger) {
     MergingMessage
       .getOrCreate(this, merger)
-      .receiveConnectionMessage(this);
+      .receiveConnectionMessage(this.sourceChannelNode);
     return this;
   }
 
   sendToSeparatedMessage(separator) {
     SeparatingMessage
       .getOrCreate(this, separator)
-      .receiveConnectionMessage(this);
+      .receiveConnectionMessage(this.sourceChannelNode);
     return this;
   }
 
@@ -85,14 +85,24 @@ export default class ConnectionMessage {
     return this;
   }
 
-  getJointMessage(node) {
-    return JointMessage.getOrCreate(this, {node});
+  sendToJointMessageFromSource(node) {
+    JointMessage
+      .getOrCreate(this, {node})
+      .receiveSourceConnectionMessage(this.sourceChannelNode);
+    return this;
+  }
+
+  sendToJointMessageFromTarget(node) {
+    JointMessage
+      .getOrCreate(this, {node})
+      .receiveTargetConnectionMessage(this.sourceChannelNode);
+    return this;
   }
 
   sendToTargetPoints() {
     this.targetPointsToUpdate.forEach( (targetPoint) => {
       this.log(targetPoint);
-      targetPoint.receiveConnectionMessage(this, this.sourceChannelNode);
+      targetPoint.receiveConnectionMessage(this);
     });
     return this;
   }

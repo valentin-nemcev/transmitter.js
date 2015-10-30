@@ -336,7 +336,7 @@ class SetPayload extends ListPayload {
 const NoopPayload = noop().constructor;
 
 Payload.prototype.toSetList = function() {
-  return SetPayload.create(this);
+  return SetPayload.create(this.map( (v) => v != null ? Array.from(v) : [] ));
 };
 NoopPayload.prototype.toSetList = function() { return this; };
 
