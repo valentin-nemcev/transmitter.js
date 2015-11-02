@@ -1,12 +1,8 @@
 import {inspect} from 'util';
 
-import * as directions from '../directions';
-
 import getNullChannel from './null_channel';
 import SimpleChannel from './simple_channel';
 import CompositeChannel from './composite_channel';
-
-function id(a) { return a; }
 
 export default class BidirectionalChannel extends CompositeChannel {
 
@@ -15,45 +11,59 @@ export default class BidirectionalChannel extends CompositeChannel {
     return '(' + components.map(inspect).join('') + ')';
   }
 
-  inForwardDirection() { return this.inDirection(directions.forward); }
-  inBackwardDirection() { return this.inDirection(directions.backward); }
+  constructor() {
+    // TODO: Refactor
+    super();
+    this.channels = null;
+  }
 
-  inDirection(direction) {
-    this.direction = direction;
+  inForwardDirection() {
+    this.channels = {
+      forward: new SimpleChannel().inForwardDirection(),
+      backward: getNullChannel(),
+    };
     return this;
   }
 
-  getDirection() {
-    return this.direction != null ? this.direction : directions.omni;
+  inBackwardDirection() {
+    this.channels = {
+      forward: getNullChannel(),
+      backward: new SimpleChannel().inBackwardDirection(),
+    };
+    return this;
+  }
+
+  inBothDirections() {
+    this.channels = {
+      forward: new SimpleChannel().inForwardDirection(),
+      backward: new SimpleChannel().inBackwardDirection(),
+    };
+    return this;
   }
 
   withOrigin(origin) {
-    this.origin = origin;
+    this._getChannels().forward.fromSource(origin);
+    this._getChannels().backward.toTarget(origin);
     return this;
   }
 
   withDerived(derived) {
-    this.derived = derived;
-    return this;
-  }
-
-  withTransformOrigin(transformOrigin) {
-    this.transformOrigin = transformOrigin;
-    return this;
-  }
-
-  withTransformDerived(transformDerived) {
-    this.transformDerived = transformDerived;
+    this._getChannels().forward.toTarget(derived);
+    this._getChannels().backward.fromSource(derived);
     return this;
   }
 
   withMapOrigin(mapOrigin) {
-    this.mapOrigin = mapOrigin;
+    this._getChannels().forward.withTransform(
+      this._createTransform(mapOrigin, this.getMatchOriginDerived())
+    );
     return this;
   }
 
   withMapDerived(mapDerived) {
-    this.mapDerived = mapDerived;
+    this._getChannels().backward.withTransform(
+      this._createTransform(mapDerived, this.getMatchDerivedOrigin())
+    );
     return this;
   }
 
@@ -88,7 +98,7 @@ export default class BidirectionalChannel extends CompositeChannel {
   }
 
 
-  createTransform(map, match) {
+  _createTransform(map, match) {
     if (match != null) {
       return (payload, tr) =>
         payload.updateMatching( (...args) => map(...args, tr), match);
@@ -98,55 +108,14 @@ export default class BidirectionalChannel extends CompositeChannel {
     }
   }
 
-  getTransformOrigin() {
-    return this.transformOrigin || this.createTransform(
-      this.mapOrigin || id, this.getMatchOriginDerived());
-  }
-
-  getTransformDerived() {
-    return this.transformDerived || this.createTransform(
-      this.mapDerived || id, this.getMatchDerivedOrigin());
-  }
-
-  createSimple(source, target, transform, direction) {
-    return new SimpleChannel()
-      .inDirection(direction)
-      .fromSource(source)
-      .toTarget(target)
-      .withTransform(transform);
-  }
-
-  getForwardChannel() {
-    if (this.getDirection().matches(directions.forward)) {
-      return new SimpleChannel()
-        .inForwardDirection()
-        .fromSource(this.origin)
-        .toTarget(this.derived)
-        .withTransform(this.getTransformOrigin());
-    } else {
-      return getNullChannel();
+  _getChannels() {
+    if (this.channels == null) {
+      throw new Error('Direction was not specified');
     }
-  }
-
-  getBackwardChannel() {
-    if (this.getDirection().matches(directions.backward)) {
-      return new SimpleChannel()
-        .inBackwardDirection()
-        .fromSource(this.derived)
-        .toTarget(this.origin)
-        .withTransform(this.getTransformDerived());
-    } else {
-      return getNullChannel();
-    }
+    return this.channels;
   }
 
   getChannels() {
-    if (this.channels.length === 0) {
-      this.channels = [
-        this.getForwardChannel(),
-        this.getBackwardChannel(),
-      ];
-    }
-    return this.channels;
+    return [this._getChannels().backward, this._getChannels().forward];
   }
 }

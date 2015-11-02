@@ -11,6 +11,11 @@ export default class DynamicChannelVariable extends ChannelNode {
 
   constructor(type, createChannel) {
     super();
+
+    if (type !== 'sources' && type !== 'targets') {
+      throw new Error(`Unknown DynamicChannelVariable type: ${type}`);
+    }
+
     this.type = type;
     this.createChannel = createChannel;
   }
@@ -21,21 +26,10 @@ export default class DynamicChannelVariable extends ChannelNode {
     const oldChannel = this.channel;
     if (oldChannel != null) oldChannel.disconnect(this.message);
 
-    const newChannel = this.createChannel.call(null);
+    const newChannel = this.createChannel.call(null, newNodes);
     this.channel = newChannel;
 
     this.payload = ListPayload.setConst(newNodes);
-
-    switch (this.type) {
-    case 'sources':
-      newChannel.fromDynamicSources(newNodes);
-      break;
-    case 'targets':
-      newChannel.toDynamicTargets(newNodes);
-      break;
-    default:
-      throw new Error(`Unknown DynamicChannelVariable type: ${this.type}`);
-    }
 
     if (newChannel != null) newChannel.connect(this.message);
     return this;

@@ -16,26 +16,30 @@ describe('Flattening list connection', function() {
     this.define('nestedList', new Transmitter.Nodes.List());
     this.define(
       'nestedBackwardChannelVar',
-      new Transmitter.ChannelNodes.DynamicChannelVariable('targets', () =>
-        new Transmitter.Channels.SimpleChannel()
-          .inBackwardDirection()
-          .fromSource(this.serializedVar)
-          .withTransform( (serializedPayload, nestedPayload) =>
-            nestedPayload
-              .zipCoercingSize(serializedPayload.toSetList())
-              .map( ([ , serialized]) => (serialized || {}).value )
-              .unflatten()
-          )
+      new Transmitter.ChannelNodes.DynamicChannelVariable(
+        'targets', (targets) =>
+          new Transmitter.Channels.SimpleChannel()
+            .inBackwardDirection()
+            .fromSource(this.serializedVar)
+            .toDynamicTargets(targets)
+            .withTransform( (serializedPayload, nestedPayload) =>
+              nestedPayload
+                .zipCoercingSize(serializedPayload.toSetList())
+                .map( ([ , serialized]) => (serialized || {}).value )
+                .unflatten()
+            )
       )
     );
     this.define(
       'nestedForwardChannelVar',
-      new Transmitter.ChannelNodes.DynamicChannelVariable('sources', () =>
-        new Transmitter.Channels.SimpleChannel()
-          .inForwardDirection()
-          .toTarget(this.flatList)
-          .withTransform( (payload) => payload.flatten() )
-      )
+      new Transmitter.ChannelNodes.DynamicChannelVariable(
+        'sources', (sources) =>
+          new Transmitter.Channels.SimpleChannel()
+            .inForwardDirection()
+            .fromDynamicSources(sources)
+            .toTarget(this.flatList)
+            .withTransform( (payload) => payload.flatten() )
+        )
     );
 
     Transmitter.startTransmission( (tr) => {
@@ -68,6 +72,7 @@ describe('Flattening list connection', function() {
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()
+        .inOmniDirection()
         .fromSource(this.nestedList)
         .toConnectionTarget(this.nestedBackwardChannelVar)
         .withTransform( (nestedList) =>
@@ -76,6 +81,7 @@ describe('Flattening list connection', function() {
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()
+        .inOmniDirection()
         .fromSource(this.nestedList)
         .toConnectionTarget(this.nestedForwardChannelVar)
         .withTransform( (nestedList) =>

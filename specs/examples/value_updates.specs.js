@@ -16,13 +16,14 @@ describe('Value updates preserve identity', function() {
 
       Transmitter.startTransmission( (tr) =>
         new Transmitter.Channels.VariableChannel()
+          .inBothDirections()
           .withOrigin(this.objectVar)
           .withDerived(this.stringVar)
-          .withMapOrigin( (object) => object.name )
-          .withMapDerived( (string) => new StatefulObject(string) )
           .withMatchDerivedOrigin( (string, object) =>
             (object != null) && string === object.name
           )
+          .withMapOrigin( (object) => object.name )
+          .withMapDerived( (string) => new StatefulObject(string) )
           .init(tr)
       );
     });
@@ -51,13 +52,14 @@ describe('Value updates preserve identity', function() {
 
       Transmitter.startTransmission( (tr) =>
         new Transmitter.Channels.ListChannel()
+          .inBothDirections()
           .withOrigin(this.objectList)
           .withDerived(this.stringList)
-          .withMapOrigin( (object) => object.name )
-          .withMapDerived( (string) => new StatefulObject(string) )
           .withMatchDerivedOrigin( (string, object) =>
             (object != null) && string === object.name
           )
+          .withMapOrigin( (object) => object.name )
+          .withMapDerived( (string) => new StatefulObject(string) )
           .init(tr)
       );
     });

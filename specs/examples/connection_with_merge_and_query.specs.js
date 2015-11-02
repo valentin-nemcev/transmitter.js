@@ -26,13 +26,12 @@ describe('Connection with merge and query', function() {
 
     Transmitter.startTransmission( (tr) =>
       new Transmitter.Channels.SimpleChannel()
-        .fromSource(this.button)
-        .fromSource(this.textInput)
         .inBackwardDirection()
+        .fromSources(this.button, this.textInput)
+        .toTarget(this.alertEmitter)
         .withTransform( ([buttonWasClickedPayload, textValuePayload]) =>
           textValuePayload.replaceByNoop(buttonWasClickedPayload)
         )
-        .toTarget(this.alertEmitter)
         .init(tr)
     );
   });

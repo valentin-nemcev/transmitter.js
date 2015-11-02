@@ -9,23 +9,22 @@ describe('Reversing messages in the middle of the chain', function() {
 
     Transmitter.startTransmission( (tr) => {
       new Transmitter.Channels.SimpleChannel()
-        .fromSource(this.button)
-        .fromSource(this.textInput)
         .inBackwardDirection()
+        .fromSources(this.button, this.textInput)
+        .toTarget(this.tagList)
         .withTransform( ([buttonWasClickedPayload, textValuePayload]) =>
           textValuePayload.replaceByNoop(buttonWasClickedPayload)
             .toAppendListElement()
         )
-        .toTarget(this.tagList)
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()
-        .fromSource(this.button)
         .inForwardDirection()
+        .fromSource(this.button)
+        .toTarget(this.textInput)
         .withTransform( (buttonWasClickedPayload) =>
           buttonWasClickedPayload.map( () => '' )
         )
-        .toTarget(this.textInput)
         .init(tr);
 
       this.tagList.init(tr, ['value 1']);

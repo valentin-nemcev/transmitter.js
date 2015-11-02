@@ -36,7 +36,7 @@ describe('Message merging', function() {
 
     this.merger = new SimpleChannel()
       .inDirection(this.pass.direction)
-      .createMerger([this.activeSource, this.passiveSource]);
+      ._createMerger([this.activeSource, this.passiveSource]);
 
     this.merger.setTarget(this.target);
     const message = this.transmission.createInitialConnectionMessage();

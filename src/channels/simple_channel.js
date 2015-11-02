@@ -12,24 +12,16 @@ import Connection           from '../connection/connection';
 
 function returnArg(arg) { return arg; }
 
-const nullConnection = {
-  connect() { return this; },
-  disconnect() { return this; },
-};
-
 
 export default class SimpleChannel {
 
   inspect() { return '[' + this.constructor.name + ']'; }
 
-  constructor() {
-    this.sources = [];
-    this.targets = [];
-    this.connectionTargets = [];
-  }
+  constructor() { }
 
   inForwardDirection() { return this.inDirection(directions.forward); }
   inBackwardDirection() { return this.inDirection(directions.backward); }
+  inOmniDirection() { return this.inDirection(directions.omni); }
 
   inDirection(direction) {
     this.direction = direction;
@@ -37,134 +29,74 @@ export default class SimpleChannel {
   }
 
   getDirection() {
-    return this.connectionTargets.length
-      ? directions.omni
-      : (this.direction || directions.null);
+    if (this.direction == null) {
+      throw new Error('Direction must be specified first');
+    }
+    return this.direction;
   }
 
-  assertSingleArgument(count) {
+  _assertSingleArgument(count) {
     if (count !== 1) {
       throw new Error(`Single argument expected, got ${count} instead`);
     }
     return this;
   }
 
-  assertSource(source) {
+  _assertSource(source) {
     if (source == null || source.getNodeSource == null) {
       throw new Error(`${inspect(source)} is not a valid source node`);
     }
     return this;
   }
 
+  _setConnectionSourceOnce(connectionSource) {
+    if (this._connectionSource != null) {
+      throw new Error('Source already specified');
+    }
+    this._connectionSource = connectionSource;
+    return this;
+  }
+
+  _getConnectionSource() {
+    if (this._connectionSource == null) {
+      throw new Error('Source was not specified');
+    }
+    return this._connectionSource;
+  }
 
   fromSource(source) {
-    this.assertSingleArgument(arguments.length);
-    this.assertSource(source);
-    this.sources.push(source);
+    this._assertSingleArgument(arguments.length);
+    this._setConnectionSourceOnce(
+      this._createMerger([source], {singleSource: true})
+    );
     return this;
   }
-
 
   fromSources(...sources) {
-    for (const source of sources) {
-      this.assertSource(source);
-      this.sources.push(source);
-    }
-    this.forceMerging = true;
-    return this;
+    return this._fromSourcesArray(sources);
   }
 
+  fromSourcesWithMatchingPriorities(...sources) {
+    return this._fromSourcesArray(sources, {prioritiesShouldMatch: true});
+  }
 
   fromDynamicSources(sources) {
-    this.assertSingleArgument(arguments.length);
-    for (const source of sources) {
-      this.assertSource(source);
-      this.sources.push(source);
-    }
-    this.forceMerging = true;
+    this._assertSingleArgument(arguments.length);
+    this._fromSourcesArray(sources);
     return this;
   }
 
-
-  requireMatchingSourcePriorities() {
-    this.sourcePrioritiesShouldMatch = true;
+  _fromSourcesArray(sources, {prioritiesShouldMatch = false} = {}) {
+    this._setConnectionSourceOnce(this._createMerger(sources, {
+      prioritiesShouldMatch,
+      singleSource: false,
+    }));
     return this;
   }
 
-
-  assertTarget(target) {
-    if (target == null || target.getNodeTarget == null) {
-      throw new Error(`${inspect(target)} is not a valid target node`);
-    }
-    return this;
-  }
-
-  toTarget(target) {
-    this.assertSingleArgument(arguments.length);
-    this.assertTarget(target);
-    this.targets.push(target);
-    return this;
-  }
-
-  toTargets(...targets) {
-    for (const target of targets) {
-      this.assertTarget(target);
-      this.targets.push(target);
-    }
-    this.forceSeparating = true;
-    return this;
-  }
-
-  toDynamicTargets(targets) {
-    this.assertSingleArgument(arguments.length);
-    for (const target of targets) {
-      this.assertTarget(target);
-      this.targets.push(target);
-    }
-    this.forceSeparating = true;
-    return this;
-  }
-
-  assertConnectionTarget(connectionTarget) {
-    if (!(connectionTarget || {}).isConnectionTarget) {
-      throw new Error(
-        `${inspect(connectionTarget)} is not a valid target node`);
-    }
-    return this;
-  }
-
-  toConnectionTarget(connectionTarget) {
-    this.assertSingleArgument(arguments.length);
-    this.assertConnectionTarget(connectionTarget);
-    this.connectionTargets.push(connectionTarget);
-    return this;
-  }
-
-  toConnectionTargets(...connectionTargets) {
-    for (const connectionTarget of connectionTargets) {
-      this.assertConnectionTarget(connectionTarget);
-      this.connectionTargets.push(connectionTarget);
-    }
-    return this;
-  }
-
-  withTransform(transform) {
-    this.transform = transform;
-    return this;
-  }
-
-  getSource() {
-    if (this.source == null) {
-      this.source = this.createMerger(this.sources, {
-        singleSource: !this.forceMerging && this.sources.length === 1,
-        prioritiesShouldMatch: this.sourcePrioritiesShouldMatch,
-      });
-    }
-    return this.source;
-  }
-
-  createMerger(sources, opts) {
+  _createMerger(sources, opts) {
     const parts = sources.map( (source) => {
+      this._assertSource(source);
       const line = new NodeConnectionLine(
           source.getNodeSource(), this.getDirection());
       return [source, line];
@@ -172,21 +104,58 @@ export default class SimpleChannel {
     return new ConnectionMerger(new Map(parts), opts);
   }
 
-  getTarget() {
-    if (this.target == null) {
-      if (this.connectionTargets.length) {
-        this.target = this.createDuplicator(this.connectionTargets);
-      } else {
-        this.target = this.createSeparator(this.targets,
-          {singleTarget: !this.forceSeparating && this.targets.length === 1}
-        );
-      }
+
+  _assertTarget(target) {
+    if (target == null || target.getNodeTarget == null) {
+      throw new Error(`${inspect(target)} is not a valid target node`);
     }
-    return this.target;
+    return this;
   }
 
-  createSeparator(targets, opts) {
+  _setConnectionTargetOnce(connectionTarget) {
+    if (this.connectionTarget != null) {
+      throw new Error('Target already specified');
+    }
+    this._connectionTarget = connectionTarget;
+    return this;
+  }
+
+  _getConnectionTarget() {
+    if (this._connectionTarget == null) {
+      throw new Error('Target was not specified');
+    }
+    return this._connectionTarget;
+  }
+
+  toTarget(target) {
+    this._assertSingleArgument(arguments.length);
+    this._setConnectionTargetOnce(this._createSeparator([target],
+      {singleTarget: true}
+    ));
+    return this;
+  }
+
+  toTargets(...targets) {
+    this._toTargetsArray(targets);
+    return this;
+  }
+
+  toDynamicTargets(targets) {
+    this._assertSingleArgument(arguments.length);
+    this._toTargetsArray(targets);
+    return this;
+  }
+
+  _toTargetsArray(targets) {
+    this._setConnectionTargetOnce(this._createSeparator(targets,
+      {singleTarget: false}
+    ));
+    return this;
+  }
+
+  _createSeparator(targets, opts) {
     const parts = targets.map( (target) => {
+      this._assertTarget(target);
       const line = new ConnectionNodeLine(
           target.getNodeTarget(), this.getDirection());
       return [target, line];
@@ -194,24 +163,52 @@ export default class SimpleChannel {
     return new ConnectionSeparator(new Map(parts), opts);
   }
 
-  createDuplicator(targets) {
-    return new ConnectionDuplicator(targets);
+  _assertConnectionTarget(connectionTarget) {
+    if (!(connectionTarget || {}).isConnectionTarget) {
+      throw new Error(
+        `${inspect(connectionTarget)} is not a valid target node`);
+    }
+    return this;
   }
 
-  getTransform() {
-    return this.transform != null ? this.transform : returnArg;
+  // TODO: Rename this to avoid name collision with this._connectionTarget
+  toConnectionTarget(connectionTarget) {
+    this._assertSingleArgument(arguments.length);
+    this._setConnectionTargetOnce(this._createDuplicator([connectionTarget]));
+    return this;
+  }
+
+  toConnectionTargets(...connectionTargets) {
+    this._setConnectionTargetOnce(this._createDuplicator(connectionTargets));
+    return this;
+  }
+
+  _createDuplicator(connectionTargets) {
+    for (const connectionTarget of connectionTargets) {
+      this._assertConnectionTarget(connectionTarget);
+    }
+    return new ConnectionDuplicator(connectionTargets);
+  }
+
+  withTransform(transform) {
+    this._connection = new Connection(
+      this._getConnectionSource(),
+      this._getConnectionTarget(),
+      transform
+    );
+    return this;
+  }
+
+  withoutTransform() {
+    this.withTransform(returnArg);
+    return this;
   }
 
   getConnection() {
-    if (this.connection == null) {
-      if (this.getTarget() == null) {
-        this.connection = nullConnection;
-      } else {
-        this.connection = new Connection(
-            this.getSource(), this.getTarget(), this.getTransform());
-      }
+    if (this._connection == null) {
+      throw new Error('Transform was not specified');
     }
-    return this.connection;
+    return this._connection;
   }
 
   connect(message) {

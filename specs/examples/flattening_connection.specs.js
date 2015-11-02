@@ -14,27 +14,31 @@ describe('Flattening connection', function() {
     this.define('nestedVar', new Transmitter.Nodes.Variable());
     this.define(
       'nestedBackwardChannelVar',
-      new Transmitter.ChannelNodes.DynamicChannelVariable('targets', () =>
-        new Transmitter.Channels.SimpleChannel()
-          .inBackwardDirection()
-          .fromSource(this.serializedVar)
-          .withTransform( (serializedPayload) =>
-            serializedPayload
-              .map( (serialized) => [(serialized || {}).value] )
-              .toSetList()
-              .unflatten()
-          )
+      new Transmitter.ChannelNodes.DynamicChannelVariable(
+        'targets', (targets) =>
+          new Transmitter.Channels.SimpleChannel()
+            .inBackwardDirection()
+            .fromSource(this.serializedVar)
+            .toDynamicTargets(targets)
+            .withTransform( (serializedPayload) =>
+              serializedPayload
+                .map( (serialized) => [(serialized || {}).value] )
+                .toSetList()
+                .unflatten()
+            )
       )
     );
     this.define(
       'nestedForwardChannelVar',
-      new Transmitter.ChannelNodes.DynamicChannelVariable('sources', () =>
-        new Transmitter.Channels.SimpleChannel()
-          .inForwardDirection()
-          .toTarget(this.flatVar)
-          .withTransform( (valuePayloads) =>
-            valuePayloads.flatten().toSetVariable().map( ([value]) => value )
-          )
+      new Transmitter.ChannelNodes.DynamicChannelVariable(
+        'sources', (sources) =>
+          new Transmitter.Channels.SimpleChannel()
+            .inForwardDirection()
+            .fromDynamicSources(sources)
+            .toTarget(this.flatVar)
+            .withTransform( (valuePayloads) =>
+              valuePayloads.flatten().toSetVariable().map( ([value]) => value )
+            )
       )
     );
 
@@ -69,6 +73,7 @@ describe('Flattening connection', function() {
 
     this.createNestedChannel = function() {
       return new Transmitter.Channels.SimpleChannel()
+      .inOmniDirection()
       .fromSource(this.nestedVar)
       .toConnectionTargets(
         this.nestedBackwardChannelVar,
@@ -170,12 +175,17 @@ describe('Flattening connection', function() {
 
   describe('nesting order', function() {
 
+    function id(arg) { return arg; }
+
     beforeEach(function() {
       this.define('serializedDerivedVar', new Transmitter.Nodes.Variable());
       this.createDerivedChannel = function() {
         return new Transmitter.Channels.VariableChannel()
+          .inBothDirections()
           .withOrigin(this.serializedVar)
-          .withDerived(this.serializedDerivedVar);
+          .withDerived(this.serializedDerivedVar)
+          .withMapOrigin(id)
+          .withMapDerived(id);
       };
     });
 

@@ -24,19 +24,21 @@ describe('Nested list connection', function() {
     this.define('derivedList', new Transmitter.Nodes.List());
 
     const listChannel = new Transmitter.Channels.ListChannel()
+      .inBothDirections()
       .withOrigin(this.originList)
+      .withDerived(this.derivedList)
       .withMapOrigin( (originItem) =>
         new ListItem(originToDerived(originItem.name))
       )
-      .withDerived(this.derivedList)
       .withMapDerived( (derivedItem) =>
         new ListItem(derivedToOrigin(derivedItem.name))
       )
       .withOriginDerivedChannel( (originItem, derivedItem) =>
         new Transmitter.Channels.VariableChannel()
+          .inBothDirections()
           .withOrigin(originItem.valueVar)
-          .withMapOrigin(originToDerived)
           .withDerived(derivedItem.valueVar)
+          .withMapOrigin(originToDerived)
           .withMapDerived(derivedToOrigin)
       );
 

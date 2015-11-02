@@ -36,6 +36,7 @@ describe('Message and query transmission', function() {
         .inBackwardDirection()
         .fromSource(this.source)
         .toTarget(this.target)
+        .withoutTransform()
         .init(tr)
     );
 
@@ -60,6 +61,7 @@ describe('Message and query transmission', function() {
         .inForwardDirection()
         .fromSource(this.source)
         .toTarget(this.target)
+        .withoutTransform()
         .init(tr)
     );
 

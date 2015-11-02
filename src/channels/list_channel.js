@@ -18,6 +18,16 @@ export default class ListChannel extends BidirectionalChannel {
     this.nestedChannelList = new ChannelList();
   }
 
+  withOrigin(origin) {
+    this.origin = origin;
+    return super.withOrigin(origin);
+  }
+
+  withDerived(derived) {
+    this.derived = derived;
+    return super.withDerived(derived);
+  }
+
   withOriginDerivedChannel(createOriginDerivedChannel) {
     const createChannel = ([originItem, derivedItem]) => {
       const match = this.getMatchOriginDerived();
@@ -37,8 +47,8 @@ export default class ListChannel extends BidirectionalChannel {
         : null;
 
     this.nestingChannel = new SimpleChannel()
-      .fromSources(this.origin, this.derived)
-      .requireMatchingSourcePriorities()
+      .inOmniDirection()
+      .fromSourcesWithMatchingPriorities(this.origin, this.derived)
       .toConnectionTarget(this.nestedChannelList)
       .withTransform( (payloads) => {
         if (payloads.length == null) return payloads;

@@ -45,21 +45,22 @@ describe('Multilevel merging 1', function() {
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSources(this.d1, this.d2)
-        .withTransform(reduceMergedPayload(this.d1, this.d2))
         .toTarget(this.b1)
+        .withTransform(reduceMergedPayload(this.d1, this.d2))
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSource(this.c1)
         .toTarget(this.b1)
+        .withoutTransform()
         .init(tr);
 
       return new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSources(this.b1, this.b2)
-        .withTransform(reduceMergedPayload(this.b1, this.b2))
         .toTarget(this.a)
+        .withTransform(reduceMergedPayload(this.b1, this.b2))
         .init(tr);
     });
   });
@@ -103,8 +104,8 @@ describe('Multilevel merging 2', function() {
       return new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
         .fromSources(this.b1, this.b2)
-        .withTransform(reduceMergedPayload(this.b1, this.b2))
         .toTarget(this.a)
+        .withTransform(reduceMergedPayload(this.b1, this.b2))
         .init(tr);
     };
 
@@ -113,6 +114,7 @@ describe('Multilevel merging 2', function() {
         .inBackwardDirection()
         .fromSource(this.b2)
         .toTarget(this.a)
+        .withoutTransform()
         .init(tr);
     };
   });

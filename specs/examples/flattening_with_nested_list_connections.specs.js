@@ -22,20 +22,25 @@ class View {
 
 describe('Flattening with nested list connections', function() {
 
+  function id(arg) { return arg; }
+
   before(function() {
     this.define('originList', new Transmitter.Nodes.List());
     this.define('derivedList', new Transmitter.Nodes.List());
 
     const originDerivedChannel = new Transmitter.Channels.ListChannel()
+      .inForwardDirection()
       .withOrigin(this.originList)
       .withDerived(this.derivedList)
+      .withMatchOriginDerived( (model, view) => model === view.model )
       .withMapOrigin( (model) => new View(model) )
-      .withMatchOriginDerived( (model, view) => model === view.model )
-      .withMatchOriginDerived( (model, view) => model === view.model )
       .withOriginDerivedChannel( (model, view) =>
         new Transmitter.Channels.VariableChannel()
+          .inBothDirections()
           .withOrigin(model.valueVar)
           .withDerived(view.valueVar)
+          .withMapOrigin(id)
+          .withMapDerived(id)
       )
       .withMatchOriginDerivedChannel( (model, view, channel) =>
         channel.origin === model && channel.derived === view
@@ -47,6 +52,7 @@ describe('Flattening with nested list connections', function() {
     );
 
     const flatteningChannel = new Transmitter.Channels.SimpleChannel()
+      .inOmniDirection()
       .fromSource(this.derivedList)
       .toConnectionTarget(this.flatteningChannelList)
       .withTransform( (viewList) =>
