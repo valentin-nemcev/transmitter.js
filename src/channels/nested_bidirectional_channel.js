@@ -3,9 +3,9 @@ import {inspect} from 'util';
 import BidirectionalChannel from './bidirectional_channel';
 import CompositeChannel from './composite_channel';
 import NestedSimpleChannel from './nested_simple_channel';
-import ChannelList from '../channel_nodes/channel_list';
+import {getChannelNodeFor} from '../channel_nodes';
 
-export default class ListChannel extends BidirectionalChannel {
+export default class NestedBidirectionalChannel extends BidirectionalChannel {
 
   withMatchOriginDerivedChannel(matchOriginDerivedChannel) {
     this.matchOriginDerivedChannel = matchOriginDerivedChannel;
@@ -14,9 +14,7 @@ export default class ListChannel extends BidirectionalChannel {
 
   constructor() {
     super();
-    this.nestedChannelList = new ChannelList();
-    this.nestingChannel = new NestedSimpleChannel()
-      .toChannelTarget(this.nestedChannelList);
+    this.nestingChannel = new NestedSimpleChannel();
   }
 
   getChannels() {
@@ -24,8 +22,19 @@ export default class ListChannel extends BidirectionalChannel {
   }
 
   withOriginDerived(origin, derived) {
+    if (getChannelNodeFor(origin) !== getChannelNodeFor(derived)) {
+      throw new Error(
+        'Origin derived node type mismatch: ' +
+        [origin, derived].map(inspect).join(' ')
+      );
+    }
+
+    const ChannelNode = getChannelNodeFor(origin);
+
     this.nestingChannel
-      .fromSourcesWithMatchingPriorities(origin, derived);
+      .fromSourcesWithMatchingPriorities(origin, derived)
+      .toChannelTarget(new ChannelNode());
+
     return super.withOriginDerived(origin, derived);
   }
 
@@ -64,8 +73,8 @@ export default class ListChannel extends BidirectionalChannel {
 
 }
 
-CompositeChannel.prototype.defineListChannel = function() {
-  const channel = new ListChannel();
+CompositeChannel.prototype.defineNestedBidirectionalChannel = function() {
+  const channel = new NestedBidirectionalChannel();
   this.addChannel(channel);
   return channel;
 };

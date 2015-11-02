@@ -28,13 +28,14 @@ describe('Flattening with nested list connections', function() {
     this.define('originList', new Transmitter.Nodes.List());
     this.define('derivedList', new Transmitter.Nodes.List());
 
-    const originDerivedChannel = new Transmitter.Channels.ListChannel()
+    const originDerivedChannel =
+      new Transmitter.Channels.NestedBidirectionalChannel()
       .inForwardDirection()
       .withOriginDerived(this.originList, this.derivedList)
       .withMatchOriginDerived( (model, view) => model === view.model )
       .withMapOrigin( (model) => new View(model) )
       .withOriginDerivedChannel( (model, view) =>
-        new Transmitter.Channels.VariableChannel()
+        new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(model.valueVar, view.valueVar)
           .withMapOrigin(id)

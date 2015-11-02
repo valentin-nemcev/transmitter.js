@@ -179,7 +179,7 @@ describe('Flattening connection', function() {
     beforeEach(function() {
       this.define('serializedDerivedVar', new Transmitter.Nodes.Variable());
       this.createDerivedChannel = function() {
-        return new Transmitter.Channels.VariableChannel()
+        return new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(this.serializedVar, this.serializedDerivedVar)
           .withMapOrigin(id)

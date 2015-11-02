@@ -23,7 +23,7 @@ describe('Nested list connection', function() {
     this.define('originList', new Transmitter.Nodes.List());
     this.define('derivedList', new Transmitter.Nodes.List());
 
-    const listChannel = new Transmitter.Channels.ListChannel()
+    const listChannel = new Transmitter.Channels.NestedBidirectionalChannel()
       .inBothDirections()
       .withOriginDerived(this.originList, this.derivedList)
       .withMapOrigin( (originItem) =>
@@ -33,7 +33,7 @@ describe('Nested list connection', function() {
         new ListItem(derivedToOrigin(derivedItem.name))
       )
       .withOriginDerivedChannel( (originItem, derivedItem) =>
-        new Transmitter.Channels.VariableChannel()
+        new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(originItem.valueVar, derivedItem.valueVar)
           .withMapOrigin(originToDerived)

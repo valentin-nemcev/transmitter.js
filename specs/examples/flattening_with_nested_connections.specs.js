@@ -20,7 +20,8 @@ describe('Flattening with nested connections', function() {
     this.define('derivedVar', new Transmitter.Nodes.Variable());
     this.define('originVar', new Transmitter.Nodes.Variable());
 
-    const originDerivedChannel = new Transmitter.Channels.VariableChannel()
+    const originDerivedChannel =
+      new Transmitter.Channels.BidirectionalChannel()
       .inForwardDirection()
       .withOriginDerived(this.originVar, this.derivedVar)
       .withMatchOriginDerived(function(model, view) {
@@ -84,7 +85,7 @@ describe('Flattening with nested connections', function() {
     before(function() {
       this.define('supOriginVar', new Transmitter.Nodes.Variable());
 
-      const supOriginChannel = new Transmitter.Channels.VariableChannel()
+      const supOriginChannel = new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()
         .withOriginDerived(this.supOriginVar, this.originVar)
         .withMapOrigin(id)

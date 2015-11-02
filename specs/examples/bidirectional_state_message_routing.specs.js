@@ -9,7 +9,7 @@ describe('Bidirectional state message routing', function() {
 
     this.define('tagSortedList', new Transmitter.Nodes.Variable());
     Transmitter.startTransmission( (tr) =>
-      new Transmitter.Channels.VariableChannel()
+      new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()
         .withOriginDerived(this.tagSet, this.tagSortedList)
         .withMapOrigin( (tags) => Array.from(tags).sort() )
@@ -19,7 +19,7 @@ describe('Bidirectional state message routing', function() {
 
     this.define('tagJSON', new Transmitter.Nodes.Variable());
     Transmitter.startTransmission( (tr) =>
-      new Transmitter.Channels.VariableChannel()
+      new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()
         .withOriginDerived(this.tagSortedList, this.tagJSON)
         .withMapOrigin( (tags) => JSON.stringify(tags) )
@@ -29,7 +29,7 @@ describe('Bidirectional state message routing', function() {
 
     this.define('tagInput', new Transmitter.Nodes.Variable());
     return Transmitter.startTransmission( (tr) =>
-      new Transmitter.Channels.VariableChannel()
+      new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()
         .withOriginDerived(this.tagSortedList, this.tagInput)
         .withMapOrigin( (tags) => (tags != null ? tags : []).join(', ') )

@@ -15,7 +15,7 @@ describe('Value updates preserve identity', function() {
       this.define('stringVar', new Transmitter.Nodes.Variable());
 
       Transmitter.startTransmission( (tr) =>
-        new Transmitter.Channels.VariableChannel()
+        new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(this.objectVar, this.stringVar)
           .withMatchDerivedOrigin( (string, object) =>
