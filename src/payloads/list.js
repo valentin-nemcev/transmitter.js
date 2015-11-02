@@ -45,10 +45,18 @@ class ListPayload extends Payload {
 
   zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
 
-  setSize(size) {
+  unzip(size) {
+    return Array.from(Array(size).keys()).map( (i) =>
+      this.map( (values) => values[i] )
+    );
+  }
+
+  coerceSize(otherPayload) {
     return SetLazyPayload.create(() => {
       const result = [];
-      for (let i = 0; i < size; i++) result.push(this.getAt(i));
+      for (let i = 0; i < otherPayload.getSize(); i++) {
+        result.push(this.getAt(i));
+      }
       return result;
     });
   }
