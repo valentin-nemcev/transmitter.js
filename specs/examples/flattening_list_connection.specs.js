@@ -10,6 +10,22 @@ class NestedObject {
 
 describe('Flattening list connection', function() {
 
+  /**
+   *
+   *
+   *
+   *         nestedList          serializedVar
+   *           .  |<------------------|
+   *           .  |                   |
+   *           .  |------------------>|
+   *      ......  |   flatList---/    |
+   *      .       |..     |           |
+   * valueVars      .     |           |
+   *     |----------*---->|           |
+   *     |          .                 |
+   *     |<---------*-----------------|
+   */
+
   beforeEach(function() {
     this.define('serializedVar', new Transmitter.Nodes.Variable());
     this.define('flatList', new Transmitter.Nodes.List());
@@ -73,15 +89,10 @@ describe('Flattening list connection', function() {
 
       new Transmitter.Channels.NestedSimpleChannel()
         .fromSource(this.nestedList)
-        .toChannelTarget(this.nestedBackwardChannelVar)
-        .withTransform( (nestedList) =>
-          nestedList.map( (nested) => nested.valueVar )
+        .toChannelTargets(
+          this.nestedBackwardChannelVar,
+          this.nestedForwardChannelVar
         )
-        .init(tr);
-
-      new Transmitter.Channels.NestedSimpleChannel()
-        .fromSource(this.nestedList)
-        .toChannelTarget(this.nestedForwardChannelVar)
         .withTransform( (nestedList) =>
           nestedList.map( (nested) => nested.valueVar )
         )

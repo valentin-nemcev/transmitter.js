@@ -20,10 +20,10 @@ describe('Flattening connection', function() {
             .inBackwardDirection()
             .fromSource(this.serializedVar)
             .toDynamicTargets(targets)
-            .withTransform( (serializedPayload) =>
-              serializedPayload
-                .map( (serialized) => [(serialized || {}).value] )
-                .toSetList()
+            .withTransform( (serializedPayload, nestedPayload) =>
+              nestedPayload
+                .zipCoercingSize(serializedPayload.fromOptionalToList())
+                .map( ([ , serialized]) => (serialized || {}).value )
                 .unflatten()
             )
       )
@@ -36,8 +36,8 @@ describe('Flattening connection', function() {
             .inForwardDirection()
             .fromDynamicSources(sources)
             .toTarget(this.flatVar)
-            .withTransform( (valuePayloads) =>
-              valuePayloads.flatten().toSetVariable().map( ([value]) => value )
+            .withTransform( (payload) =>
+              payload.flatten().toSetVariable().map( ([value]) => value )
             )
       )
     );
@@ -80,7 +80,7 @@ describe('Flattening connection', function() {
       .withTransform( (payload) =>
         payload.map( (nestedObject) =>
           nestedObject != null ? [nestedObject.valueVar] : []
-        )
+        ).toSetList()
       );
     };
   });
