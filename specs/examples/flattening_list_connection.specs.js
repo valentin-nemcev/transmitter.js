@@ -71,19 +71,17 @@ describe('Flattening list connection', function() {
         )
         .init(tr);
 
-      new Transmitter.Channels.SimpleChannel()
-        .inOmniDirection()
+      new Transmitter.Channels.NestedSimpleChannel()
         .fromSource(this.nestedList)
-        .toConnectionTarget(this.nestedBackwardChannelVar)
+        .toChannelTarget(this.nestedBackwardChannelVar)
         .withTransform( (nestedList) =>
           nestedList.map( (nested) => nested.valueVar )
         )
         .init(tr);
 
-      new Transmitter.Channels.SimpleChannel()
-        .inOmniDirection()
+      new Transmitter.Channels.NestedSimpleChannel()
         .fromSource(this.nestedList)
-        .toConnectionTarget(this.nestedForwardChannelVar)
+        .toChannelTarget(this.nestedForwardChannelVar)
         .withTransform( (nestedList) =>
           nestedList.map( (nested) => nested.valueVar )
         )

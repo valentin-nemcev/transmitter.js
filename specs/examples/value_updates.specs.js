@@ -17,8 +17,7 @@ describe('Value updates preserve identity', function() {
       Transmitter.startTransmission( (tr) =>
         new Transmitter.Channels.VariableChannel()
           .inBothDirections()
-          .withOrigin(this.objectVar)
-          .withDerived(this.stringVar)
+          .withOriginDerived(this.objectVar, this.stringVar)
           .withMatchDerivedOrigin( (string, object) =>
             (object != null) && string === object.name
           )
@@ -51,10 +50,9 @@ describe('Value updates preserve identity', function() {
       this.define('stringList', new Transmitter.Nodes.List());
 
       Transmitter.startTransmission( (tr) =>
-        new Transmitter.Channels.ListChannel()
+        new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
-          .withOrigin(this.objectList)
-          .withDerived(this.stringList)
+          .withOriginDerived(this.objectList, this.stringList)
           .withMatchDerivedOrigin( (string, object) =>
             (object != null) && string === object.name
           )

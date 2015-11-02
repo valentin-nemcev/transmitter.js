@@ -72,10 +72,9 @@ describe('Flattening connection', function() {
     };
 
     this.createNestedChannel = function() {
-      return new Transmitter.Channels.SimpleChannel()
-      .inOmniDirection()
+      return new Transmitter.Channels.NestedSimpleChannel()
       .fromSource(this.nestedVar)
-      .toConnectionTargets(
+      .toChannelTargets(
         this.nestedBackwardChannelVar,
         this.nestedForwardChannelVar)
       .withTransform( (payload) =>
@@ -182,8 +181,7 @@ describe('Flattening connection', function() {
       this.createDerivedChannel = function() {
         return new Transmitter.Channels.VariableChannel()
           .inBothDirections()
-          .withOrigin(this.serializedVar)
-          .withDerived(this.serializedDerivedVar)
+          .withOriginDerived(this.serializedVar, this.serializedDerivedVar)
           .withMapOrigin(id)
           .withMapDerived(id);
       };

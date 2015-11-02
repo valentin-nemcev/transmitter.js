@@ -2,7 +2,7 @@ export default class ChannelNode {
 
   inspect() { return '[' + this.constructor.name + ']'; }
 
-  isConnectionTarget() { return true; }
+  isChannelTarget() { return true; }
 
   setSource(source) {
     this.source = source;

@@ -2,9 +2,8 @@ import {inspect} from 'util';
 
 import BidirectionalChannel from './bidirectional_channel';
 import CompositeChannel from './composite_channel';
-import SimpleChannel from './simple_channel';
+import NestedSimpleChannel from './nested_simple_channel';
 import ChannelList from '../channel_nodes/channel_list';
-import getNullChannel from './null_channel';
 
 export default class ListChannel extends BidirectionalChannel {
 
@@ -16,16 +15,18 @@ export default class ListChannel extends BidirectionalChannel {
   constructor() {
     super();
     this.nestedChannelList = new ChannelList();
+    this.nestingChannel = new NestedSimpleChannel()
+      .toChannelTarget(this.nestedChannelList);
   }
 
-  withOrigin(origin) {
-    this.origin = origin;
-    return super.withOrigin(origin);
+  getChannels() {
+    return [...super.getChannels(), this.nestingChannel];
   }
 
-  withDerived(derived) {
-    this.derived = derived;
-    return super.withDerived(derived);
+  withOriginDerived(origin, derived) {
+    this.nestingChannel
+      .fromSourcesWithMatchingPriorities(origin, derived);
+    return super.withOriginDerived(origin, derived);
   }
 
   withOriginDerivedChannel(createOriginDerivedChannel) {
@@ -46,29 +47,21 @@ export default class ListChannel extends BidirectionalChannel {
           this.matchOriginDerivedChannel(originItem, derivedItem, channel)
         : null;
 
-    this.nestingChannel = new SimpleChannel()
-      .inOmniDirection()
-      .fromSourcesWithMatchingPriorities(this.origin, this.derived)
-      .toConnectionTarget(this.nestedChannelList)
-      .withTransform( (payloads) => {
-        if (payloads.length == null) return payloads;
+    this.nestingChannel.withTransform( (payloads) => {
+      if (payloads.length == null) return payloads;
 
-        const [origin, derived] = payloads;
+      const [origin, derived] = payloads;
 
-        const zipped = origin.zip(derived);
+      const zipped = origin.zip(derived);
 
-        return matchChannel != null
-          ? zipped.updateMatching(createChannel, matchChannel)
-          : zipped.map(createChannel);
-      });
+      return matchChannel != null
+        ? zipped.updateMatching(createChannel, matchChannel)
+        : zipped.map(createChannel);
+    });
 
     return this;
   }
 
-  getChannels() {
-    return super.getChannels()
-      .concat([this.nestingChannel || getNullChannel()]);
-  }
 }
 
 CompositeChannel.prototype.defineListChannel = function() {

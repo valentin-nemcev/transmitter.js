@@ -41,15 +41,9 @@ export default class BidirectionalChannel extends CompositeChannel {
     return this;
   }
 
-  withOrigin(origin) {
-    this._getChannels().forward.fromSource(origin);
-    this._getChannels().backward.toTarget(origin);
-    return this;
-  }
-
-  withDerived(derived) {
-    this._getChannels().forward.toTarget(derived);
-    this._getChannels().backward.fromSource(derived);
+  withOriginDerived(origin, derived) {
+    this._getChannels().forward.fromSource(origin).toTarget(derived);
+    this._getChannels().backward.fromSource(derived).toTarget(origin);
     return this;
   }
 
