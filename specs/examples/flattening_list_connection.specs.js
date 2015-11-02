@@ -7,6 +7,50 @@ class NestedObject {
   }
 }
 
+class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
+
+  inBothDirections() {
+    this.channelNodes = [
+      new Transmitter.ChannelNodes.DynamicChannelVariable(
+        'targets', (targets) =>
+          new Transmitter.Channels.SimpleChannel()
+            .inBackwardDirection()
+            .fromSource(this.flatList)
+            .toDynamicTargets(targets)
+            .withTransform( (flatPayload, nestedPayload) =>
+              flatPayload.coerceSize(nestedPayload).unflatten()
+            )
+      ),
+      new Transmitter.ChannelNodes.DynamicChannelVariable(
+        'sources', (sources) =>
+          new Transmitter.Channels.SimpleChannel()
+            .inForwardDirection()
+            .fromDynamicSources(sources)
+            .toTarget(this.flatList)
+            .withTransform( (payload) => payload.flatten() )
+        ),
+    ];
+    return this;
+  }
+
+  withNested(nestedList, mapNested) {
+    this.nestedChannel = new Transmitter.Channels.NestedSimpleChannel()
+      .fromSource(nestedList)
+      .toChannelTargets(...this.channelNodes)
+      .withTransform( (payload) => payload.map(mapNested) );
+    return this;
+  }
+
+  withFlat(flatList) {
+    this.flatList = flatList;
+    return this;
+  }
+
+  getChannels() {
+    return [this.nestedChannel];
+  }
+}
+
 
 describe('Flattening list connection', function() {
 
@@ -27,43 +71,15 @@ describe('Flattening list connection', function() {
 
   beforeEach(function() {
     this.define('serializedVar', new Transmitter.Nodes.Variable());
-    this.define('flatList', new Transmitter.Nodes.List());
     this.define('nestedList', new Transmitter.Nodes.List());
-    this.define(
-      'nestedBackwardChannelVar',
-      new Transmitter.ChannelNodes.DynamicChannelVariable(
-        'targets', (targets) =>
-          new Transmitter.Channels.SimpleChannel()
-            .inBackwardDirection()
-            .fromSource(this.flatList)
-            .toDynamicTargets(targets)
-            .withTransform( (flatPayload, nestedPayload) =>
-              flatPayload.coerceSize(nestedPayload).unflatten()
-            )
-      )
-    );
-    this.define(
-      'nestedForwardChannelVar',
-      new Transmitter.ChannelNodes.DynamicChannelVariable(
-        'sources', (sources) =>
-          new Transmitter.Channels.SimpleChannel()
-            .inForwardDirection()
-            .fromDynamicSources(sources)
-            .toTarget(this.flatList)
-            .withTransform( (payload) => payload.flatten() )
-        )
-    );
+
+    this.define('flatList', new Transmitter.Nodes.List());
 
     Transmitter.startTransmission( (tr) => {
-      new Transmitter.Channels.NestedSimpleChannel()
-        .fromSource(this.nestedList)
-        .toChannelTargets(
-          this.nestedBackwardChannelVar,
-          this.nestedForwardChannelVar
-        )
-        .withTransform( (nestedList) =>
-          nestedList.map( (nested) => nested.valueVar )
-        )
+      new FlatteningListChannel()
+        .inBothDirections()
+        .withNested(this.nestedList, (nested) => nested.valueVar )
+        .withFlat(this.flatList)
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()

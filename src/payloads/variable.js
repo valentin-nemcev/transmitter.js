@@ -140,6 +140,11 @@ Payload.prototype.toSetVariable = function() {
 };
 NoopPayload.prototype.toSetVariable = function() { return this; };
 
+Payload.prototype.fromListToOptional = function() {
+  return SetPayload.create(this).map( (v) => v[0] );
+};
+
+
 export default {
   merge,
   set: SetPayload.create,
