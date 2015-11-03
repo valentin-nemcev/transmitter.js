@@ -1,7 +1,7 @@
-import SourceNode from 'transmitter/nodes/source_node';
-import SimpleChannel from 'transmitter/channels/simple_channel';
-import Transmission from 'transmitter/transmission/transmission';
-import Pass from 'transmitter/transmission/pass';
+import SourceNode from 'transmitter/nodes/SourceNode';
+import SimpleChannel from 'transmitter/channels/SimpleChannel';
+import Transmission from 'transmitter/transmission/Transmission';
+import Passes from 'transmitter/transmission/Passes';
 
 class StubPayload {
   inspect() { return 'stub()'; }
@@ -23,7 +23,7 @@ describe('Message merging', function() {
     sinon.spy(this.target, 'receiveMessage');
 
     this.transmission = new Transmission();
-    this.pass = Pass.createMessageDefault();
+    this.pass = Passes.createMessageDefault();
 
     this.activePayload = new StubPayload();
     this.passivePayload = new StubPayload();

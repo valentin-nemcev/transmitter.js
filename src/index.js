@@ -1,4 +1,4 @@
-import Transmission      from './transmission/transmission';
+import Transmission      from './transmission/Transmission';
 import * as Nodes        from './nodes';
 import * as Payloads     from './payloads';
 import * as Channels     from './channels';

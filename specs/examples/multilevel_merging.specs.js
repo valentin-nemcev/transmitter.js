@@ -2,7 +2,7 @@ import Transmitter from 'transmitter';
 
 const VariableNode = Transmitter.Nodes.Variable;
 
-const merge = Transmitter.Payloads.Variable.merge;
+const merge = Transmitter.Payloads.VariablePayload.merge;
 
 function reduceMergedPayload(...nodes) {
   return function(payloads) {

@@ -1,1 +1,1 @@
-export LocationHash from './location_hash';
+export LocationHash from './LocationHash';

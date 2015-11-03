@@ -1,7 +1,7 @@
-import SourceNode from 'transmitter/nodes/source_node';
-import TargetNode from 'transmitter/nodes/target_node';
-import SimpleChannel from 'transmitter/channels/simple_channel';
-import Transmission from 'transmitter/transmission/transmission';
+import SourceNode from 'transmitter/nodes/SourceNode';
+import TargetNode from 'transmitter/nodes/TargetNode';
+import SimpleChannel from 'transmitter/channels/SimpleChannel';
+import Transmission from 'transmitter/transmission/Transmission';
 import Transmitter from 'transmitter';
 
 

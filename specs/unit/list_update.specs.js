@@ -1,5 +1,5 @@
-import ListPayload from 'transmitter/payloads/list';
-import List from 'transmitter/nodes/list';
+import ListPayload from 'transmitter/payloads/ListPayload';
+import List from 'transmitter/nodes/List';
 
 
 describe('List update', function() {

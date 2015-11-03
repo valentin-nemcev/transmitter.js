@@ -1,15 +1,15 @@
 import {inspect} from 'util';
 
-export ChannelNode            from './channel_node';
-export DynamicChannelVariable from './dynamic_channel_variable';
+export ChannelNode            from './ChannelNode';
+export DynamicChannelVariable from './DynamicChannelVariable';
 
-import ChannelVariable from './channel_variable';
-import ChannelList     from './channel_list';
+import ChannelVariable from './ChannelVariable';
+import ChannelList     from './ChannelList';
 
 export {ChannelVariable, ChannelList};
 
-import Variable from '../nodes/variable';
-import List from '../nodes/list';
+import Variable from '../nodes/Variable';
+import List from '../nodes/List';
 
 export function getChannelNodeFor(node) {
   switch (node.constructor) {

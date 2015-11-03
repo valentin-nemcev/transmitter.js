@@ -1,5 +1,5 @@
-import Transmission from 'transmitter/transmission/transmission';
-import Pass from 'transmitter/transmission/pass';
+import Transmission from 'transmitter/transmission/Transmission';
+import Passes from 'transmitter/transmission/Passes';
 
 class QueryStub {
   constructor(pass) {
@@ -26,7 +26,7 @@ describe('Query queue', function() {
   });
 
   it('responds to queries from nodes', function() {
-    this.query = new QueryStub(Pass.getBackward());
+    this.query = new QueryStub(Passes.getBackward());
     sinon.spy(this.query, 'respond');
 
     this.transmission
@@ -38,8 +38,8 @@ describe('Query queue', function() {
 
 
   it('responds to queries with lower pass priority first', function() {
-    this.query1 = new QueryStub(Pass.getBackward());
-    this.query2 = new QueryStub(Pass.getForward());
+    this.query1 = new QueryStub(Passes.getBackward());
+    this.query2 = new QueryStub(Passes.getForward());
     const callOrder = [];
     sinon.stub(this.query1, 'respond', function() {
       callOrder.push(1);
@@ -61,8 +61,8 @@ describe('Query queue', function() {
 
 
   it('behaves like FIFO for queries with the same order', function() {
-    this.query1 = new QueryStub(Pass.getBackward());
-    this.query2 = new QueryStub(Pass.getBackward());
+    this.query1 = new QueryStub(Passes.getBackward());
+    this.query2 = new QueryStub(Passes.getBackward());
     const callOrder = [];
     sinon.stub(this.query1, 'respond', function() {
       callOrder.push(1);
@@ -85,8 +85,8 @@ describe('Query queue', function() {
 
   it('has option to reverse queries with the same order for testing',
   function() {
-    this.query1 = new QueryStub(Pass.getBackward());
-    this.query2 = new QueryStub(Pass.getBackward());
+    this.query1 = new QueryStub(Passes.getBackward());
+    this.query2 = new QueryStub(Passes.getBackward());
     const callOrder = [];
     sinon.stub(this.query1, 'respond', function() {
       callOrder.push(1);
@@ -110,8 +110,8 @@ describe('Query queue', function() {
 
   it('responds to queries created as a result of previous response',
   function() {
-    this.query1 = new QueryStub(Pass.getBackward());
-    this.query2 = new QueryStub(Pass.getBackward());
+    this.query1 = new QueryStub(Passes.getBackward());
+    this.query2 = new QueryStub(Passes.getBackward());
     sinon.stub(this.query1, 'respond', () => {
       this.transmission
         .addCommunicationForAndEnqueue(this.query2, new PointStub());

@@ -1,8 +1,8 @@
-export SourceNode       from './source_node';
-export TargetNode       from './target_node';
-export RelayNode        from './relay_node';
+export SourceNode       from './SourceNode';
+export TargetNode       from './TargetNode';
+export RelayNode        from './RelayNode';
 
-export Variable         from './variable';
-export List             from './list';
+export Variable         from './Variable';
+export List             from './List';
 
-export PropertyVariable from './property_variable';
+export PropertyVariable from './PropertyVariable';
