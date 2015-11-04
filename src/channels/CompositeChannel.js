@@ -1,39 +1,25 @@
 import SimpleChannel from './SimpleChannel';
+import ChannelMethods from './ChannelMethods';
 
 
-export default class CompositeChannel {
+export default function CompositeChannel() {
+  this.channels = [];
+}
 
-  inspect() { return '[' + this.constructor.name + ']'; }
+Object.assign(CompositeChannel.prototype, ChannelMethods, {
 
-  constructor() {
-    this.channels = [];
-  }
+  inspect() { return '[' + this.constructor.name + ']'; },
 
   addChannel(channel) {
     this.channels.push(channel);
     return this;
-  }
+  },
 
   defineSimpleChannel() {
     const channel = new SimpleChannel();
     this.addChannel(channel);
     return channel;
-  }
+  },
 
-  getChannels() { return this.channels; }
-
-
-  connect(message) {
-    this.getChannels().forEach( (channel) => channel.connect(message) );
-    return this;
-  }
-
-
-  disconnect(message) {
-    this.getChannels().forEach( (channel) => channel.disconnect(message) );
-    return this;
-  }
-
-
-  init = SimpleChannel.prototype.init;
-}
+  getChannels() { return this.channels; },
+});

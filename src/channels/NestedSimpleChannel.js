@@ -1,41 +1,16 @@
-import {inspect} from 'util';
-
-import BaseChannel from './BaseChannel';
-
 import * as Directions from '../Directions';
 
-import ConnectionDuplicator from '../connection/ConnectionDuplicator';
+import UnidirectionalChannel from './UnidirectionalChannel';
+import defineNodeSource from './defineNodeSource';
+import defineChannelTarget from './defineChannelTarget';
 
-export default class NestedSimpleChannel extends BaseChannel {
 
-  inspect() { return '[' + this.constructor.name + ']'; }
+export default class NestedSimpleChannel extends UnidirectionalChannel {}
 
-  getDirection() { return Directions.omni; }
+defineNodeSource(NestedSimpleChannel.prototype);
+defineChannelTarget(NestedSimpleChannel.prototype);
 
-  _assertChannelTarget(channelTarget) {
-    if (!(channelTarget || {}).isChannelTarget) {
-      throw new Error(
-        `${inspect(channelTarget)} is not a valid target node`);
-    }
-    return this;
-  }
-
-  toChannelTarget(channelTarget) {
-    this._assertSingleArgument(arguments.length);
-    this._setConnectionTargetOnce(this._createDuplicator([channelTarget]));
-    return this;
-  }
-
-  toChannelTargets(...channelTargets) {
-    this._setConnectionTargetOnce(this._createDuplicator(channelTargets));
-    return this;
-  }
-
-  _createDuplicator(channelTargets) {
-    for (const channelTarget of channelTargets) {
-      this._assertChannelTarget(channelTarget);
-    }
-    return new ConnectionDuplicator(channelTargets);
-  }
-
-}
+Object.defineProperty(
+  NestedSimpleChannel.prototype, '_direction', {
+    get() { return Directions.omni; },
+  });

@@ -2,9 +2,9 @@ import {inspect} from 'util';
 
 import getNullChannel from './getNullChannel';
 import SimpleChannel from './SimpleChannel';
-import CompositeChannel from './CompositeChannel';
+import ChannelMethods from './ChannelMethods';
 
-export default class BidirectionalChannel extends CompositeChannel {
+export default class BidirectionalChannel {
 
   inspect() {
     const components = [this.origin, this.getDirection(), this.derived];
@@ -13,7 +13,6 @@ export default class BidirectionalChannel extends CompositeChannel {
 
   constructor() {
     // TODO: Refactor
-    super();
     this.channels = null;
   }
 
@@ -113,3 +112,5 @@ export default class BidirectionalChannel extends CompositeChannel {
     return [this._getChannels().backward, this._getChannels().forward];
   }
 }
+
+Object.assign(BidirectionalChannel.prototype, ChannelMethods);
