@@ -1,12 +1,11 @@
 import {inspect} from 'util';
 
+import buildPrototype from './buildPrototype';
+
 import ConnectionNodeLine  from '../connection/ConnectionNodeLine';
 import ConnectionSeparator from '../connection/ConnectionSeparator';
 
-import assertSingleArgument from './dsl/assertSingleArgument';
-
-import defineSetOnceMandatoryProperty
-from './dsl/defineSetOnceMandatoryProperty';
+import assertSingleArgument from './assertSingleArgument';
 
 
 function assertTarget(target) {
@@ -16,9 +15,10 @@ function assertTarget(target) {
   return this;
 }
 
-export default function defineNodeTarget(obj) {
-  defineSetOnceMandatoryProperty(obj, '_connectionTarget', 'Target');
-  Object.assign(obj, {
+
+export default buildPrototype()
+  .setOnceMandatoryProperty('_connectionTarget', 'Target')
+  .methods({
     toTarget(target) {
       assertSingleArgument(arguments.length);
       this._connectionTarget = this._createSeparator([target],
@@ -54,6 +54,5 @@ export default function defineNodeTarget(obj) {
       });
       return new ConnectionSeparator(new Map(parts), opts);
     },
-  });
-  return obj;
-}
+  })
+  .freezeAndReturn();

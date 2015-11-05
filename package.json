@@ -8,7 +8,7 @@
     "prebuild": "npm run clean",
     "build": "babel src --out-dir build",
     "clean": "rm -rf build/*",
-    "test": "mocha --no-bail --colors --reporter spec specs/index.js",
+    "test": "mocha --bail --colors --reporter spec specs/index.js",
     "deps": "madge --config .madgerc --image build/deps.png src"
   },
   "author": "Valentin Nemcev <mail@valentin-nemcev.com>",

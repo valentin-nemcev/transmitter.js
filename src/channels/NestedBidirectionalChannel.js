@@ -1,13 +1,53 @@
 import {inspect} from 'util';
 
+import buildPrototype from './buildPrototype';
+
 import BidirectionalChannel from './BidirectionalChannel';
 import NestedSimpleChannel from './NestedSimpleChannel';
 import {getChannelNodeConstructorFor} from '../channel_nodes';
 
-import defineSetOnceLazyProperty
-from './dsl/defineSetOnceLazyProperty';
 
-import defineLazyReadOnlyProperty from './dsl/defineLazyReadOnlyProperty';
+export default class NestedBidirectionalChannel {}
+
+NestedBidirectionalChannel.prototype = buildPrototype()
+  .include(BidirectionalChannel.prototype, {override: {
+    getChannels(_super) { return [ ..._super(), this._nestingChannel]; },
+
+    withOriginDerived(_super, origin, derived) {
+      const ChannelNode = getChannelNodeConstructorForPair(origin, derived);
+
+      this._nestingChannel
+        .fromSourcesWithMatchingPriorities(origin, derived)
+        .toChannelTarget(new ChannelNode());
+
+      return _super(origin, derived);
+    },
+  }})
+
+  .lazyReadOnlyProperty('_nestingChannel', () => new NestedSimpleChannel() )
+  .setOnceLazyProperty('_matchOriginDerivedChannel', () => null,
+                        {title: 'MatchOriginDerivedChannel'})
+
+  .methods({
+    withMatchOriginDerivedChannel(matchOriginDerivedChannel) {
+      this._matchOriginDerivedChannel = matchOriginDerivedChannel;
+      return this;
+    },
+
+    withOriginDerivedChannel(createOriginDerivedChannel) {
+      this._nestingChannel.withTransform(
+        createChannelTransform(
+          createOriginDerivedChannel,
+          this._matchOriginDerivedChannel,
+          this._matchOriginDerived
+        )
+      );
+      return this;
+    },
+  })
+
+  .freezeAndReturn();
+
 
 function getChannelNodeConstructorForPair(origin, derived) {
   const originC = getChannelNodeConstructorFor(origin);
@@ -21,18 +61,14 @@ function getChannelNodeConstructorForPair(origin, derived) {
   return originC;
 }
 
-function createChannelTransform(
-  createOriginDerivedChannel, matchOriginDerivedChannel, matchOriginDerived) {
-  const createChannel = ([originItem, derivedItem]) => {
-    const match = matchOriginDerived;
-    if (match != null && !match(originItem, derivedItem)) {
-      throw new Error(
-          'Binding mismatched items: ' +
-          [originItem, derivedItem].map(inspect).join(' ')
-        );
-    }
-    return createOriginDerivedChannel(originItem, derivedItem);
-  };
+function createChannelTransform(createOriginDerivedChannel,
+                                matchOriginDerivedChannel,
+                                matchOriginDerived) {
+  const createChannel =
+    ([originItem, derivedItem]) => {
+      checkItemsMatch(matchOriginDerived, originItem, derivedItem);
+      return createOriginDerivedChannel(originItem, derivedItem);
+    };
 
   const matchChannel =
     matchOriginDerivedChannel != null
@@ -42,58 +78,19 @@ function createChannelTransform(
 
   return (payloads) => {
     if (payloads.length == null) return payloads;
-
     const [origin, derived] = payloads;
-
     const zipped = origin.zip(derived);
-
     return matchChannel != null
       ? zipped.updateMatching(createChannel, matchChannel)
       : zipped.map(createChannel);
   };
 }
 
-export default class NestedBidirectionalChannel extends BidirectionalChannel {}
-
-defineLazyReadOnlyProperty(
-  NestedBidirectionalChannel.prototype, '_nestingChannel', function() {
-    return new NestedSimpleChannel();
-  });
-
-defineSetOnceLazyProperty(
-  NestedBidirectionalChannel.prototype,
-  '_matchOriginDerivedChannel', 'MatchOriginDerivedChannel', () => null );
-
-Object.assign(NestedBidirectionalChannel.prototype, {
-  withMatchOriginDerivedChannel(matchOriginDerivedChannel) {
-    this._matchOriginDerivedChannel = matchOriginDerivedChannel;
-    return this;
-  },
-
-  getChannels() {
-    return [this._backwardChannel, this._forwardChannel, this._nestingChannel];
-  },
-
-  withOriginDerived(origin, derived) {
-    const ChannelNode = getChannelNodeConstructorForPair(origin, derived);
-
-    this._nestingChannel
-      .fromSourcesWithMatchingPriorities(origin, derived)
-      .toChannelTarget(new ChannelNode());
-
-    return BidirectionalChannel.prototype
-      .withOriginDerived.call(this, origin, derived);
-  },
-
-  withOriginDerivedChannel(createOriginDerivedChannel) {
-    this._nestingChannel.withTransform(
-      createChannelTransform(
-        createOriginDerivedChannel,
-        this._matchOriginDerivedChannel,
-        this._matchOriginDerived
-      )
-    );
-    return this;
-  },
-
-});
+function checkItemsMatch(match, originItem, derivedItem) {
+  if (match != null && !match(originItem, derivedItem)) {
+    throw new Error(
+        'Binding mismatched items: ' +
+        [originItem, derivedItem].map(inspect).join(' ')
+      );
+  }
+}

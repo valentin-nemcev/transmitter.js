@@ -1,10 +1,9 @@
 import {inspect} from 'util';
 
-import ConnectionDuplicator from '../connection/ConnectionDuplicator';
-import assertSingleArgument from './dsl/assertSingleArgument';
+import buildPrototype from './buildPrototype';
 
-import defineSetOnceMandatoryProperty
-from './dsl/defineSetOnceMandatoryProperty';
+import ConnectionDuplicator from '../connection/ConnectionDuplicator';
+import assertSingleArgument from './assertSingleArgument';
 
 function assertChannelTarget(channelTarget) {
   if (!(channelTarget || {}).isChannelTarget) {
@@ -14,9 +13,9 @@ function assertChannelTarget(channelTarget) {
   return this;
 }
 
-export default function defineChannelTarget(obj) {
-  defineSetOnceMandatoryProperty(obj, '_connectionTarget', 'Target');
-  Object.assign(obj, {
+export default buildPrototype()
+  .setOnceMandatoryProperty('_connectionTarget', 'Target')
+  .methods({
     toChannelTarget(channelTarget) {
       assertSingleArgument(arguments.length);
       this._connectionTarget = this._createDuplicator([channelTarget]);
@@ -34,6 +33,5 @@ export default function defineChannelTarget(obj) {
       }
       return new ConnectionDuplicator(channelTargets);
     },
-  });
-  return obj;
-}
+  })
+  .freezeAndReturn();

@@ -1,29 +1,28 @@
+import buildPrototype from './buildPrototype';
+
 import SimpleChannel from './SimpleChannel';
-import ChannelMethods from './ChannelMethods';
+import channelPrototype from './channelPrototype';
 
 
-export default class CompositeChannel {
-  constructor() {
-    this.channels = [];
-  }
-}
+export default class CompositeChannel {}
 
-Object.assign(CompositeChannel.prototype, ChannelMethods);
+CompositeChannel.prototype = buildPrototype()
+  .include(channelPrototype)
+  .lazyReadOnlyProperty('_channels', () => [])
+  .methods({
+    inspect() { return '[' + this.constructor.name + ']'; },
 
-Object.assign(CompositeChannel.prototype, {
+    addChannel(channel) {
+      this._channels.push(channel);
+      return this;
+    },
 
-  inspect() { return '[' + this.constructor.name + ']'; },
+    defineSimpleChannel() {
+      const channel = new SimpleChannel();
+      this.addChannel(channel);
+      return channel;
+    },
 
-  addChannel(channel) {
-    this.channels.push(channel);
-    return this;
-  },
-
-  defineSimpleChannel() {
-    const channel = new SimpleChannel();
-    this.addChannel(channel);
-    return channel;
-  },
-
-  getChannels() { return this.channels; },
-});
+    getChannels() { return this._channels; },
+  })
+  .freezeAndReturn();

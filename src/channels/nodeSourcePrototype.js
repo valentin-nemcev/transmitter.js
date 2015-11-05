@@ -3,10 +3,9 @@ import {inspect} from 'util';
 import NodeConnectionLine from '../connection/NodeConnectionLine';
 import ConnectionMerger   from '../connection/ConnectionMerger';
 
-import assertSingleArgument from './dsl/assertSingleArgument';
+import buildPrototype from './buildPrototype';
 
-import defineSetOnceMandatoryProperty
-from './dsl/defineSetOnceMandatoryProperty';
+import assertSingleArgument from './assertSingleArgument';
 
 
 function assertSource(source) {
@@ -15,10 +14,9 @@ function assertSource(source) {
   }
 }
 
-
-export default function defineNodeSource(obj) {
-  defineSetOnceMandatoryProperty(obj, '_connectionSource', 'Source');
-  Object.assign(obj, {
+export default buildPrototype()
+  .setOnceMandatoryProperty('_connectionSource', 'Source')
+  .methods({
     fromSource(source) {
       assertSingleArgument(arguments.length);
       this._connectionSource =
@@ -57,6 +55,5 @@ export default function defineNodeSource(obj) {
       });
       return new ConnectionMerger(new Map(parts), opts);
     },
-  });
-  return obj;
-}
+  })
+  .freezeAndReturn();

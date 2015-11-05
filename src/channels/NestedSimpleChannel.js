@@ -1,16 +1,17 @@
 import * as Directions from '../Directions';
 
-import UnidirectionalChannel from './UnidirectionalChannel';
-import defineNodeSource from './defineNodeSource';
-import defineChannelTarget from './defineChannelTarget';
+import buildPrototype from './buildPrototype';
+
+import unidirectionalChannelPrototype from './unidirectionalChannelPrototype';
+import nodeSourcePrototype from './nodeSourcePrototype';
+import channelTargetPrototype from './channelTargetPrototype';
 
 
-export default class NestedSimpleChannel extends UnidirectionalChannel {}
+export default class NestedSimpleChannel {}
 
-defineNodeSource(NestedSimpleChannel.prototype);
-defineChannelTarget(NestedSimpleChannel.prototype);
-
-Object.defineProperty(
-  NestedSimpleChannel.prototype, '_direction', {
-    get() { return Directions.omni; },
-  });
+NestedSimpleChannel.prototype = buildPrototype()
+  .include(unidirectionalChannelPrototype)
+  .include(nodeSourcePrototype)
+  .include(channelTargetPrototype)
+  .readOnlyProperty('_direction', Directions.omni)
+  .freezeAndReturn();

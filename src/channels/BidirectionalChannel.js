@@ -1,68 +1,80 @@
-import {inspect} from 'util';
+import buildPrototype from './buildPrototype';
 
 import getNullChannel from './getNullChannel';
 import SimpleChannel from './SimpleChannel';
-import ChannelMethods from './ChannelMethods';
-
-import defineSetOnceMandatoryProperty
-from './dsl/defineSetOnceMandatoryProperty';
-
-import defineSetOnceLazyProperty
-from './dsl/defineSetOnceLazyProperty';
-
-import defineLazyReadOnlyProperty from './dsl/defineLazyReadOnlyProperty';
+import channelPrototype from './channelPrototype';
 
 import {forward, backward} from '../Directions';
 
-export default class BidirectionalChannel {
-  inspect() {
-    const components = [this.origin, this.getDirection(), this.derived];
-    return '(' + components.map(inspect).join('') + ')';
-  }
-}
+export default class BidirectionalChannel {}
 
-Object.assign(BidirectionalChannel.prototype, ChannelMethods);
+BidirectionalChannel.prototype = buildPrototype()
+  .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
-defineSetOnceMandatoryProperty(
-  BidirectionalChannel.prototype, '_directions', 'Direction');
+  .setOnceMandatoryProperty('_directions', {title: 'Direction'})
+  .methods({
+    inForwardDirection() {
+      this._directions = new Set([forward]);
+      return this;
+    },
 
-Object.assign(BidirectionalChannel.prototype, {
-  inForwardDirection() {
-    this._directions = new Set([forward]);
-    return this;
-  },
+    inBackwardDirection() {
+      this._directions = new Set([backward]);
+      return this;
+    },
 
-  inBackwardDirection() {
-    this._directions = new Set([backward]);
-    return this;
-  },
+    inBothDirections() {
+      this._directions = new Set([forward, backward]);
+      return this;
+    },
+  })
 
-  inBothDirections() {
-    this._directions = new Set([forward, backward]);
-    return this;
-  },
-});
+  .include(channelPrototype)
+  .method('getChannels', function() {
+    return [this._backwardChannel, this._forwardChannel];
+  })
 
-
-defineLazyReadOnlyProperty(
-  BidirectionalChannel.prototype, '_forwardChannel', function() {
+  .lazyReadOnlyProperty('_forwardChannel', function() {
     return this._directions.has(forward)
       ? new SimpleChannel().inForwardDirection()
       : getNullChannel();
-  });
-
-defineLazyReadOnlyProperty(
-  BidirectionalChannel.prototype, '_backwardChannel', function() {
+  })
+  .lazyReadOnlyProperty('_backwardChannel', function() {
     return this._directions.has(backward)
       ? new SimpleChannel().inBackwardDirection()
       : getNullChannel();
-  });
+  })
 
-Object.assign(BidirectionalChannel.prototype, {
-  getChannels() {
-    return [this._backwardChannel, this._forwardChannel];
-  },
-});
+  .method('withOriginDerived', function(origin, derived) {
+    this._forwardChannel.fromSource(origin).toTarget(derived);
+    this._backwardChannel.fromSource(derived).toTarget(origin);
+    return this;
+  })
+
+  .setOnceLazyProperty('_matchOriginDerived', () => null,
+                       {title: 'MatchOriginDerived'})
+
+  .methods({
+    withMapOrigin(mapOrigin) {
+      this._forwardChannel.withTransform(
+        createTransform(mapOrigin, this._matchOriginDerived)
+      );
+      return this;
+    },
+
+    withMapDerived(mapDerived) {
+      this._backwardChannel.withTransform(createTransform(
+        mapDerived, this._matchOriginDerived, {swapMatch: true}));
+      return this;
+    },
+
+    withMatchOriginDerived(matchOriginDerived) {
+      this._matchOriginDerived = matchOriginDerived;
+      return this;
+    },
+  })
+
+  .freezeAndReturn();
 
 
 function createTransform(map, match, {swapMatch = false} = {}) {
@@ -81,34 +93,3 @@ function createTransform(map, match, {swapMatch = false} = {}) {
 function swapArgs(f) {
   return function(a1, a2) { return f.call(this, a2, a1); };
 }
-
-defineSetOnceLazyProperty(
-  BidirectionalChannel.prototype,
-  '_matchOriginDerived', 'MatchOriginDerived', () => null );
-
-Object.assign(BidirectionalChannel.prototype, {
-  withOriginDerived(origin, derived) {
-    this._forwardChannel.fromSource(origin).toTarget(derived);
-    this._backwardChannel.fromSource(derived).toTarget(origin);
-    return this;
-  },
-
-  withMapOrigin(mapOrigin) {
-    this._forwardChannel.withTransform(
-      createTransform(mapOrigin, this._matchOriginDerived)
-    );
-    return this;
-  },
-
-  withMapDerived(mapDerived) {
-    this._backwardChannel.withTransform(
-      createTransform(mapDerived, this._matchOriginDerived, {swapMatch: true})
-    );
-    return this;
-  },
-
-  withMatchOriginDerived(matchOriginDerived) {
-    this._matchOriginDerived = matchOriginDerived;
-    return this;
-  },
-});

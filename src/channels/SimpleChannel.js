@@ -1,34 +1,33 @@
 import * as Directions from '../Directions';
 
-import UnidirectionalChannel  from './UnidirectionalChannel';
-import defineNodeSource from './defineNodeSource';
-import defineNodeTarget from './defineNodeTarget';
+import buildPrototype from './buildPrototype';
 
-import defineSetOnceMandatoryProperty
-from './dsl/defineSetOnceMandatoryProperty';
+import unidirectionalChannelPrototype  from './unidirectionalChannelPrototype';
+import nodeSourcePrototype from './nodeSourcePrototype';
+import nodeTargetPrototype from './nodeTargetPrototype';
 
 
-export default class SimpleChannel extends UnidirectionalChannel {}
+export default class SimpleChannel {}
 
-defineNodeSource(SimpleChannel.prototype);
-defineNodeTarget(SimpleChannel.prototype);
+SimpleChannel.prototype = buildPrototype()
+  .include(unidirectionalChannelPrototype)
+  .include(nodeSourcePrototype)
+  .include(nodeTargetPrototype)
+  .setOnceMandatoryProperty('_direction', 'Direction')
+  .methods({
+    inForwardDirection() { return this.inDirection(Directions.forward); },
+    inBackwardDirection() { return this.inDirection(Directions.backward); },
 
-defineSetOnceMandatoryProperty(
-  SimpleChannel.prototype, '_direction', 'Direction');
+    inDirection(direction) {
+      this._direction = direction;
+      return this;
+    },
+
+    withoutTransform() {
+      this.withTransform(returnArg);
+      return this;
+    },
+  })
+  .freezeAndReturn();
 
 function returnArg(arg) { return arg; }
-
-Object.assign(SimpleChannel.prototype, {
-  inForwardDirection() { return this.inDirection(Directions.forward); },
-  inBackwardDirection() { return this.inDirection(Directions.backward); },
-
-  inDirection(direction) {
-    this._direction = direction;
-    return this;
-  },
-
-  withoutTransform() {
-    this.withTransform(returnArg);
-    return this;
-  },
-});
