@@ -18,7 +18,7 @@ describe('Value updates preserve identity', function() {
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(this.objectVar, this.stringVar)
-          .withMatchDerivedOrigin( (string, object) =>
+          .withMatchOriginDerived( (object, string) =>
             (object != null) && string === object.name
           )
           .withMapOrigin( (object) => object.name )
@@ -53,7 +53,7 @@ describe('Value updates preserve identity', function() {
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(this.objectList, this.stringList)
-          .withMatchDerivedOrigin( (string, object) =>
+          .withMatchOriginDerived( (object, string) =>
             (object != null) && string === object.name
           )
           .withMapOrigin( (object) => object.name )

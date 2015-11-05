@@ -1,4 +1,4 @@
-export default function defineSetOnceMandatoryProperty(obj, prop, name) {
+export default function defineSetOnceLazyProperty(obj, prop, name, getValue) {
   const hiddenProp = '_' + prop;
   Object.defineProperty(obj, prop, {
     set(newValue) {
@@ -11,9 +11,10 @@ export default function defineSetOnceMandatoryProperty(obj, prop, name) {
 
     get() {
       if (!this.hasOwnProperty(hiddenProp)) {
-        throw new Error(name + ' was not specified');
+        this[hiddenProp] = getValue.call(this);
       }
       return this[hiddenProp];
     },
   });
 }
+

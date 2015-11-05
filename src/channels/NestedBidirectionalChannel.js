@@ -1,80 +1,99 @@
 import {inspect} from 'util';
 
 import BidirectionalChannel from './BidirectionalChannel';
-import CompositeChannel from './CompositeChannel';
 import NestedSimpleChannel from './NestedSimpleChannel';
-import {getChannelNodeFor} from '../channel_nodes';
+import {getChannelNodeConstructorFor} from '../channel_nodes';
 
-export default class NestedBidirectionalChannel extends BidirectionalChannel {
+import defineSetOnceLazyProperty
+from './dsl/defineSetOnceLazyProperty';
 
+import defineLazyReadOnlyProperty from './dsl/defineLazyReadOnlyProperty';
+
+function getChannelNodeConstructorForPair(origin, derived) {
+  const originC = getChannelNodeConstructorFor(origin);
+  const derivedC = getChannelNodeConstructorFor(derived);
+  if (originC !== derivedC) {
+    throw new Error(
+      'Origin derived node type mismatch: ' +
+      [origin, derived].map(inspect).join(' ')
+    );
+  }
+  return originC;
+}
+
+function createChannelTransform(
+  createOriginDerivedChannel, matchOriginDerivedChannel, matchOriginDerived) {
+  const createChannel = ([originItem, derivedItem]) => {
+    const match = matchOriginDerived;
+    if (match != null && !match(originItem, derivedItem)) {
+      throw new Error(
+          'Binding mismatched items: ' +
+          [originItem, derivedItem].map(inspect).join(' ')
+        );
+    }
+    return createOriginDerivedChannel(originItem, derivedItem);
+  };
+
+  const matchChannel =
+    matchOriginDerivedChannel != null
+      ? ([originItem, derivedItem], channel) =>
+          matchOriginDerivedChannel(originItem, derivedItem, channel)
+      : null;
+
+  return (payloads) => {
+    if (payloads.length == null) return payloads;
+
+    const [origin, derived] = payloads;
+
+    const zipped = origin.zip(derived);
+
+    return matchChannel != null
+      ? zipped.updateMatching(createChannel, matchChannel)
+      : zipped.map(createChannel);
+  };
+}
+
+export default class NestedBidirectionalChannel extends BidirectionalChannel {}
+
+defineLazyReadOnlyProperty(
+  NestedBidirectionalChannel.prototype, '_nestingChannel', function() {
+    return new NestedSimpleChannel();
+  });
+
+defineSetOnceLazyProperty(
+  NestedBidirectionalChannel.prototype,
+  '_matchOriginDerivedChannel', 'MatchOriginDerivedChannel', () => null );
+
+Object.assign(NestedBidirectionalChannel.prototype, {
   withMatchOriginDerivedChannel(matchOriginDerivedChannel) {
-    this.matchOriginDerivedChannel = matchOriginDerivedChannel;
+    this._matchOriginDerivedChannel = matchOriginDerivedChannel;
     return this;
-  }
-
-  constructor() {
-    super();
-    this.nestingChannel = new NestedSimpleChannel();
-  }
+  },
 
   getChannels() {
-    return [...super.getChannels(), this.nestingChannel];
-  }
+    return [this._backwardChannel, this._forwardChannel, this._nestingChannel];
+  },
 
   withOriginDerived(origin, derived) {
-    if (getChannelNodeFor(origin) !== getChannelNodeFor(derived)) {
-      throw new Error(
-        'Origin derived node type mismatch: ' +
-        [origin, derived].map(inspect).join(' ')
-      );
-    }
+    const ChannelNode = getChannelNodeConstructorForPair(origin, derived);
 
-    const ChannelNode = getChannelNodeFor(origin);
-
-    this.nestingChannel
+    this._nestingChannel
       .fromSourcesWithMatchingPriorities(origin, derived)
       .toChannelTarget(new ChannelNode());
 
-    return super.withOriginDerived(origin, derived);
-  }
+    return BidirectionalChannel.prototype
+      .withOriginDerived.call(this, origin, derived);
+  },
 
   withOriginDerivedChannel(createOriginDerivedChannel) {
-    const createChannel = ([originItem, derivedItem]) => {
-      const match = this.getMatchOriginDerived();
-      if (match != null && !match(originItem, derivedItem)) {
-        throw new Error(
-            'Binding mismatched items: ' +
-            [originItem, derivedItem].map(inspect).join(' ')
-          );
-      }
-      return createOriginDerivedChannel(originItem, derivedItem);
-    };
-
-    const matchChannel =
-      this.matchOriginDerivedChannel != null
-        ? ([originItem, derivedItem], channel) =>
-          this.matchOriginDerivedChannel(originItem, derivedItem, channel)
-        : null;
-
-    this.nestingChannel.withTransform( (payloads) => {
-      if (payloads.length == null) return payloads;
-
-      const [origin, derived] = payloads;
-
-      const zipped = origin.zip(derived);
-
-      return matchChannel != null
-        ? zipped.updateMatching(createChannel, matchChannel)
-        : zipped.map(createChannel);
-    });
-
+    this._nestingChannel.withTransform(
+      createChannelTransform(
+        createOriginDerivedChannel,
+        this._matchOriginDerivedChannel,
+        this._matchOriginDerived
+      )
+    );
     return this;
-  }
+  },
 
-}
-
-CompositeChannel.prototype.defineNestedBidirectionalChannel = function() {
-  const channel = new NestedBidirectionalChannel();
-  this.addChannel(channel);
-  return channel;
-};
+});

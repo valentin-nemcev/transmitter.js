@@ -11,7 +11,7 @@ export {ChannelVariable, ChannelList};
 import Variable from '../nodes/Variable';
 import List from '../nodes/List';
 
-export function getChannelNodeFor(node) {
+export function getChannelNodeConstructorFor(node) {
   switch (node.constructor) {
   case Variable:
     return ChannelVariable;

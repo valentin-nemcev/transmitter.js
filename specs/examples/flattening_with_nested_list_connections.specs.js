@@ -34,15 +34,15 @@ describe('Flattening with nested list connections', function() {
       .withOriginDerived(this.originList, this.derivedList)
       .withMatchOriginDerived( (model, view) => model === view.model )
       .withMapOrigin( (model) => new View(model) )
+      .withMatchOriginDerivedChannel( (model, view, channel) =>
+        channel.origin === model && channel.derived === view
+      )
       .withOriginDerivedChannel( (model, view) =>
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
           .withOriginDerived(model.valueVar, view.valueVar)
           .withMapOrigin(id)
           .withMapDerived(id)
-      )
-      .withMatchOriginDerivedChannel( (model, view, channel) =>
-        channel.origin === model && channel.derived === view
       );
 
     this.define(
