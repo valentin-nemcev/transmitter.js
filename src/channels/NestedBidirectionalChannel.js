@@ -10,25 +10,29 @@ import {getChannelNodeConstructorFor} from '../channel_nodes';
 export default class NestedBidirectionalChannel {}
 
 NestedBidirectionalChannel.prototype = buildPrototype()
-  .include(BidirectionalChannel.prototype, {override: {
-    getChannels(_super) { return [ ..._super(), this._nestingChannel]; },
+  .include(BidirectionalChannel.prototype, {rename: {
+    _channels: '_bidirectionalChannels',
+    withOriginDerived: 'shallowWithOriginDerived',
+  }})
 
-    withOriginDerived(_super, origin, derived) {
+  .lazyReadOnlyProperty('_nestingChannel', () => new NestedSimpleChannel() )
+
+  .lazyReadOnlyProperty('_channels', function() {
+    return [...this._bidirectionalChannels, this._nestingChannel];
+  })
+
+  .setOnceLazyProperty('_matchOriginDerivedChannel', () => null,
+                        {title: 'MatchOriginDerivedChannel'})
+  .methods({
+    withOriginDerived(origin, derived) {
       const ChannelNode = getChannelNodeConstructorForPair(origin, derived);
 
       this._nestingChannel
         .fromSourcesWithMatchingPriorities(origin, derived)
         .toChannelTarget(new ChannelNode());
 
-      return _super(origin, derived);
+      return this.shallowWithOriginDerived(origin, derived);
     },
-  }})
-
-  .lazyReadOnlyProperty('_nestingChannel', () => new NestedSimpleChannel() )
-  .setOnceLazyProperty('_matchOriginDerivedChannel', () => null,
-                        {title: 'MatchOriginDerivedChannel'})
-
-  .methods({
     withMatchOriginDerivedChannel(matchOriginDerivedChannel) {
       this._matchOriginDerivedChannel = matchOriginDerivedChannel;
       return this;

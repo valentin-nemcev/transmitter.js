@@ -34,20 +34,16 @@ class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
   }
 
   withNested(nestedList, mapNested) {
-    this.nestedChannel = new Transmitter.Channels.NestedSimpleChannel()
+    this.addChannel(new Transmitter.Channels.NestedSimpleChannel()
       .fromSource(nestedList)
       .toChannelTargets(...this.channelNodes)
-      .withTransform( (payload) => payload.map(mapNested) );
+      .withTransform( (payload) => payload.map(mapNested) ));
     return this;
   }
 
   withFlat(flatList) {
     this.flatList = flatList;
     return this;
-  }
-
-  getChannels() {
-    return [this.nestedChannel];
   }
 }
 

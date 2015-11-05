@@ -21,5 +21,5 @@ export default buildPrototype()
       this._transform
     );
   })
-  .method('getChannels', function() { return [this._connection]; })
+  .lazyReadOnlyProperty('_channels', function() { return [this._connection]; })
   .freezeAndReturn();

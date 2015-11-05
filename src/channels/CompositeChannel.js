@@ -22,7 +22,5 @@ CompositeChannel.prototype = buildPrototype()
       this.addChannel(channel);
       return channel;
     },
-
-    getChannels() { return this._channels; },
   })
   .freezeAndReturn();

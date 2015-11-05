@@ -28,22 +28,11 @@ class PrototypeBuilder {
     return this;
   }
 
-  include(otherProto, {override = {}} = {}) {
-    const withoutSet = new Set(Object.keys(override));
+  include(otherProto, {rename = {}} = {}) {
     for (const propName of Object.keys(otherProto)) {
-      if (withoutSet.has(propName)) continue;
+      const newPropName = rename[propName] || propName;
       const desc = Object.getOwnPropertyDescriptor(otherProto, propName);
-      Object.defineProperty(this.proto, propName, desc);
-    }
-    for (const [prop, newMethod] of Object.entries(override)) {
-      const oldMethod = otherProto[prop];
-      const oldMethodProp = '_super_' + prop;
-      this.method(prop, function(...args) {
-        if (this[oldMethodProp] == null) {
-          this[oldMethodProp] = oldMethod.bind(this);
-        }
-        return newMethod.call(this, this[oldMethodProp], ...args);
-      });
+      Object.defineProperty(this.proto, newPropName, desc);
     }
     return this;
   }

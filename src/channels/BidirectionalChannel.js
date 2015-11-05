@@ -30,7 +30,7 @@ BidirectionalChannel.prototype = buildPrototype()
   })
 
   .include(channelPrototype)
-  .method('getChannels', function() {
+  .lazyReadOnlyProperty('_channels', function() {
     return [this._backwardChannel, this._forwardChannel];
   })
 

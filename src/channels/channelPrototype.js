@@ -1,11 +1,11 @@
 export default {
   connect(message) {
-    this.getChannels().forEach( (channel) => channel.connect(message) );
+    this._channels.forEach( (channel) => channel.connect(message) );
     return this;
   },
 
   disconnect(message) {
-    this.getChannels().forEach( (channel) => channel.disconnect(message) );
+    this._channels.forEach( (channel) => channel.disconnect(message) );
     return this;
   },
 
