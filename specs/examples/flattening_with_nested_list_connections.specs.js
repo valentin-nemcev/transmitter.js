@@ -70,9 +70,9 @@ describe('Flattening with nested list connections', function() {
       flatteningChannel.init(tr);
       this.model1 = new Model('model1');
       this.model2 = new Model('model2');
-      this.model1.valueVar.init(tr, 'value1');
-      this.model2.valueVar.init(tr, 'value2');
-      this.originList.init(tr, [this.model1, this.model2]);
+      this.model1.valueVar.set('value1').init(tr);
+      this.model2.valueVar.set('value2').init(tr);
+      this.originList.set([this.model1, this.model2]).init(tr);
     });
   });
 
@@ -91,7 +91,7 @@ describe('Flattening with nested list connections', function() {
 
   specify('when derived nested node is updated', function() {
     Transmitter.startTransmission( (tr) =>
-      this.derivedList.getAt(0).valueVar.init(tr, 'value2a')
+      this.derivedList.getAt(0).valueVar.set('value2a').init(tr)
     );
   });
 

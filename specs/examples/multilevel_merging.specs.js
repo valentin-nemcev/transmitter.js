@@ -71,8 +71,8 @@ describe('Multilevel merging 1', function() {
             + 'in correct order (' + order + ')', function() {
       Transmitter.startTransmission( (tr) => {
         tr.reverseOrder = order === 'reverse';
-        this.d2.init(tr, 'd2UpdatedValue');
-        this.b2.init(tr, 'b2UpdatedValue');
+        this.d2.set('d2UpdatedValue').init(tr);
+        this.b2.set('b2UpdatedValue').init(tr);
       });
 
       expect(this.a.get()).to.deep.equal({
@@ -133,7 +133,7 @@ describe('Multilevel merging 2', function() {
         }
       });
 
-      Transmitter.startTransmission( (tr) => this.b1.init(tr, 'b1Value') );
+      Transmitter.startTransmission( (tr) => this.b1.set('b1Value').init(tr) );
 
       expect(this.a.get()).to.deep.equal({
         b1: 'b1Value',

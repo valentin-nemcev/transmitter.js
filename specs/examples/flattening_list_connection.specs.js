@@ -121,7 +121,7 @@ describe('Flattening list connection', function() {
     ];
 
     Transmitter.startTransmission( (tr) =>
-        this.serializedVar.init(tr, serialized)
+        this.serializedVar.set(serialized).init(tr)
     );
 
     const nestedObjects = this.nestedList.get();
@@ -139,9 +139,9 @@ describe('Flattening list connection', function() {
     const nestedObjectB = new NestedObject('objectB');
 
     Transmitter.startTransmission( (tr) => {
-      nestedObjectA.valueVar.init(tr, 'value1');
-      nestedObjectB.valueVar.init(tr, 'value2');
-      this.nestedList.init(tr, [nestedObjectA, nestedObjectB]);
+      nestedObjectA.valueVar.set('value1').init(tr);
+      nestedObjectB.valueVar.set('value2').init(tr);
+      this.nestedList.set([nestedObjectA, nestedObjectB]).init(tr);
     });
 
     expect(this.serializedVar.get()).to.deep.equal([

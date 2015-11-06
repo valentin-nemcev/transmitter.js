@@ -108,8 +108,9 @@ describe('Flattening connection', function() {
     specify('creation of nested target after flat source update', function() {
       const serialized = {name: 'objectA', value: 'value1'};
 
-      Transmitter
-        .startTransmission( (tr) => this.serializedVar.init(tr, serialized) );
+      Transmitter.startTransmission( (tr) =>
+        this.serializedVar.set(serialized).init(tr)
+      );
 
       const nestedObject = this.nestedVar.get();
       expect(nestedObject.name).to.equal('objectA');
@@ -122,8 +123,8 @@ describe('Flattening connection', function() {
       const nestedObject = new NestedObject('objectA');
 
       Transmitter.startTransmission( (tr) => {
-        nestedObject.valueVar.init(tr, 'value1');
-        this.nestedVar.init(tr, nestedObject);
+        nestedObject.valueVar.set('value1').init(tr);
+        this.nestedVar.set(nestedObject).init(tr);
       });
 
       expect(this.serializedVar.get())
@@ -137,7 +138,7 @@ describe('Flattening connection', function() {
       this.serializedVar.set({name: 'objectA', value: 'value1'});
 
       Transmitter.startTransmission( (tr) =>
-          this.nestedVar.init(tr, nestedObject)
+          this.nestedVar.set(nestedObject).init(tr)
       );
 
       expect(nestedObject.valueVar.get()).to.deep.equal('value1');
@@ -183,8 +184,8 @@ describe('Flattening connection', function() {
           tr.reverseOrder = order === 'reverse';
 
           const nestedObject = new NestedObject('objectA');
-          nestedObject.valueVar.init(tr, 'value1');
-          this.nestedVar.init(tr, nestedObject);
+          nestedObject.valueVar.set('value1').init(tr);
+          this.nestedVar.set(nestedObject).init(tr);
         });
 
         expect(this.serializedDerivedVar.get())

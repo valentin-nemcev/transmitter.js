@@ -35,7 +35,7 @@ describe('Value updates preserve identity', function() {
         this.objectVar.set(this.object);
 
         Transmitter.startTransmission( (tr) =>
-          this.stringVar.init(tr, 'nameA')
+          this.stringVar.set('nameA').init(tr)
         );
 
         expect(this.objectVar.get()).to.equal(this.object);
@@ -71,7 +71,7 @@ describe('Value updates preserve identity', function() {
         this.objectList.set([this.objectA, this.objectB]);
 
         Transmitter.startTransmission( (tr) =>
-          this.stringList.init(tr, ['nameB', 'nameA'])
+          this.stringList.set(['nameB', 'nameA']).init(tr)
         );
 
         const objects = this.objectList.get();

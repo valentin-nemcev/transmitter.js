@@ -58,7 +58,7 @@ describe('Bidirectional state message routing', function() {
     'when origin node is updated, change is transmitted to derived nodes',
     function() {
       Transmitter.startTransmission( (tr) =>
-        this.tagSet.init(tr, new Set(['tagB', 'tagA']))
+        this.tagSet.set(new Set(['tagB', 'tagA'])).init(tr)
       );
 
       expect(this.tagJSON.get()).to.equal('["tagA","tagB"]');
@@ -71,7 +71,7 @@ describe('Bidirectional state message routing', function() {
      'change is transmitted to origin and other derived nodes',
     function() {
       Transmitter.startTransmission( (tr) =>
-        this.tagInput.init(tr, 'tagA, tagB')
+        this.tagInput.set('tagA, tagB').init(tr)
       );
 
       expect(Array.from(this.tagSet.get())).to.deep.equal(['tagA', 'tagB']);
@@ -84,7 +84,7 @@ describe('Bidirectional state message routing', function() {
     'change is transmitted to origin and derived nodes',
     function() {
       Transmitter.startTransmission( (tr) =>
-        this.tagSet.init(tr, ['tagA', 'tagB'])
+        this.tagSet.set(['tagA', 'tagB']).init(tr)
       );
 
       expect(Array.from(this.tagSet.get())).to.deep.equal(['tagA', 'tagB']);

@@ -27,8 +27,8 @@ describe('Reversing messages in the middle of the chain', function() {
         )
         .init(tr);
 
-      this.tagList.init(tr, ['value 1']);
-      this.textInput.init(tr, 'value 2');
+      this.tagList.set(['value 1']).init(tr);
+      this.textInput.set('value 2').init(tr);
     });
   });
 

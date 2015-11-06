@@ -14,10 +14,6 @@ export default class Variable extends RelayNode {
     return this.payload.set(this);
   }
 
-  createUpdatePayload(value) {
-    return this.payload.setConst(value);
-  }
-
   createPlaceholderPayload() {
     return this.payload.setConst(null);
   }

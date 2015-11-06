@@ -40,7 +40,7 @@ describe('Connection with merge and query', function() {
   it('should emit alert with text input value when button is clicked',
   function() {
     Transmitter.startTransmission( (tr) =>
-      this.textInput.init(tr, 'Text input value')
+      this.textInput.set('Text input value').init(tr)
     );
     Transmitter.startTransmission( (tr) =>
       this.button.originate(tr, 'click')
@@ -52,7 +52,7 @@ describe('Connection with merge and query', function() {
 
   it('should not emit alert when button is not clicked', function() {
     Transmitter.startTransmission( (tr) =>
-      this.textInput.init(tr, 'Text input value')
+      this.textInput.set('Text input value').init(tr)
     );
     expect(this.alertEmitter.alert).to.not.have.been.called();
   });

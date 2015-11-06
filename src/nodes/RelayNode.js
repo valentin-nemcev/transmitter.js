@@ -26,7 +26,8 @@ export default class RelayNode {
   }
 
   init(tr, value) {
-    return this.receivePayload(tr, this.createUpdatePayload(value));
+    if (value !== undefined) throw new Error('Init with value deprecated');
+    return this.originate(tr);
   }
 
   receivePayload(tr, payload) {
@@ -44,8 +45,6 @@ export default class RelayNode {
   createResponsePayload(payload) { return payload != null ? payload : noop(); }
 
   createOriginPayload() {}
-
-  createUpdatePayload() {}
 
   createPlaceholderPayload() { return noop(); }
 }

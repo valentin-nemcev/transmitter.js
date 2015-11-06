@@ -51,9 +51,9 @@ describe('Nested list connection', function() {
     const item2 = new ListItem('Origin item 2');
 
     Transmitter.startTransmission( (tr) => {
-      item1.valueVar.init(tr, 'Origin value 1');
-      item2.valueVar.init(tr, 'Origin value 2');
-      this.originList.init(tr, [item1, item2]);
+      item1.valueVar.set('Origin value 1').init(tr);
+      item2.valueVar.set('Origin value 2').init(tr);
+      this.originList.set([item1, item2]).init(tr);
     });
   });
 

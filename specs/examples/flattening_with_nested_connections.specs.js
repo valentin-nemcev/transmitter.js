@@ -56,7 +56,7 @@ describe('Flattening with nested connections', function() {
     Transmitter.startTransmission( (tr) => {
       originDerivedChannel.init(tr);
       flatteningChannel.init(tr);
-      this.originVar.init(tr, new Model());
+      this.originVar.set(new Model()).init(tr);
     });
   });
 
@@ -100,7 +100,7 @@ describe('Flattening with nested connections', function() {
     specify('when super origin is updated', function() {
       Transmitter.startTransmission( (tr) => {
         this.model = new Model();
-        this.originVar.init(tr, this.model);
+        this.originVar.set(this.model).init(tr);
       });
     });
 
