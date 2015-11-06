@@ -20,7 +20,7 @@ describe('Connection with merge and query', function() {
 
   beforeEach(function() {
     this.define('button', new Transmitter.Nodes.SourceNode());
-    this.define('textInput', new Transmitter.Nodes.Variable());
+    this.define('textInput', new Transmitter.Nodes.Value());
     this.define('alertEmitter', new AlertEmitter());
     sinon.spy(this.alertEmitter, 'alert');
 

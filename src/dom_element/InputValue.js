@@ -1,8 +1,8 @@
-import Variable from '../nodes/Variable';
+import Value from '../nodes/Value';
 import Transmission from '../transmission/Transmission';
 
 
-export default class InputValueVar extends Variable {
+export default class InputValue extends Value {
 
   constructor(element) {
     super();

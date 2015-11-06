@@ -1,20 +1,20 @@
 import {inspect} from 'util';
 
 export ChannelNode            from './ChannelNode';
-export DynamicChannelVariable from './DynamicChannelVariable';
+export DynamicChannelValue from './DynamicChannelValue';
 
-import ChannelVariable from './ChannelVariable';
+import ChannelValue from './ChannelValue';
 import ChannelList     from './ChannelList';
 
-export {ChannelVariable, ChannelList};
+export {ChannelValue, ChannelList};
 
-import Variable from '../nodes/Variable';
+import Value from '../nodes/Value';
 import List from '../nodes/List';
 
 export function getChannelNodeConstructorFor(node) {
   switch (node.constructor) {
-  case Variable:
-    return ChannelVariable;
+  case Value:
+    return ChannelValue;
   case List:
     return ChannelList;
   default:

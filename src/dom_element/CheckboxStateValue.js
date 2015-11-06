@@ -1,8 +1,8 @@
-import Variable from '../nodes/Variable';
+import Value from '../nodes/Value';
 import Transmission from '../transmission/Transmission';
 
 
-export default class CheckboxStateVar extends Variable {
+export default class CheckboxStateValue extends Value {
 
     constructor(element) {
       super();

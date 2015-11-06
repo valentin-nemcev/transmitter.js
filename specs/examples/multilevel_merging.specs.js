@@ -1,8 +1,8 @@
 import Transmitter from 'transmitter';
 
-const VariableNode = Transmitter.Nodes.Variable;
+const Value = Transmitter.Nodes.Value;
 
-const merge = Transmitter.Payloads.VariablePayload.merge;
+const merge = Transmitter.Payloads.ValuePayload.merge;
 
 function reduceMergedPayload(...nodes) {
   return function(payloads) {
@@ -23,20 +23,20 @@ describe('Multilevel merging 1', function() {
   //      b2    d2
 
   beforeEach(function() {
-    this.define('a', new VariableNode());
-    this.define('b1', new VariableNode());
-    this.define('b2', new VariableNode());
+    this.define('a', new Value());
+    this.define('b1', new Value());
+    this.define('b2', new Value());
 
     this.b2.set('b2Value');
 
-    this.define('c1', new VariableNode());
+    this.define('c1', new Value());
 
     // c1 should always have same value as b1, but this particular test
     // assertions should never see it
     this.c1.set('UnusedValue');
 
-    this.define('d1', new VariableNode());
-    this.define('d2', new VariableNode());
+    this.define('d1', new Value());
+    this.define('d2', new Value());
 
     this.d1.set('d1Value');
     this.d2.set('d2Value');
@@ -94,9 +94,9 @@ describe('Multilevel merging 2', function() {
   //   ---b2
 
   beforeEach(function() {
-    this.define('a', new VariableNode());
-    this.define('b1', new VariableNode());
-    this.define('b2', new VariableNode());
+    this.define('a', new Value());
+    this.define('b1', new Value());
+    this.define('b2', new Value());
 
     this.b2.set('b2Value');
 

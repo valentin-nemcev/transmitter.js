@@ -1,7 +1,7 @@
-import Variable from '../nodes/Variable';
+import Value from '../nodes/Value';
 
 
-export default class TextVar extends Variable {
+export default class TextValue extends Value {
 
   constructor(element, attributeName) {
     super();

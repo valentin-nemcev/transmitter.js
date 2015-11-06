@@ -5,7 +5,7 @@ class Model {
 
   constructor(name) {
     this.name = name;
-    this.valueVar = new Transmitter.Nodes.Variable();
+    this.valueNode = new Transmitter.Nodes.Value();
   }
 }
 
@@ -15,7 +15,7 @@ class View {
   constructor(model) {
     this.model = model;
     this.removeEvt = new Transmitter.Nodes.SourceNode();
-    this.valueVar = new Transmitter.Nodes.Variable();
+    this.valueNode = new Transmitter.Nodes.Value();
   }
 }
 
@@ -40,7 +40,7 @@ describe('Flattening with nested list connections', function() {
       .withOriginDerivedChannel( (model, view) =>
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
-          .withOriginDerived(model.valueVar, view.valueVar)
+          .withOriginDerived(model.valueNode, view.valueNode)
           .withMapOrigin(id)
           .withMapDerived(id)
       );
@@ -70,8 +70,8 @@ describe('Flattening with nested list connections', function() {
       flatteningChannel.init(tr);
       this.model1 = new Model('model1');
       this.model2 = new Model('model2');
-      this.model1.valueVar.set('value1').init(tr);
-      this.model2.valueVar.set('value2').init(tr);
+      this.model1.valueNode.set('value1').init(tr);
+      this.model2.valueNode.set('value2').init(tr);
       this.originList.set([this.model1, this.model2]).init(tr);
     });
   });
@@ -91,13 +91,13 @@ describe('Flattening with nested list connections', function() {
 
   specify('when derived nested node is updated', function() {
     Transmitter.startTransmission( (tr) =>
-      this.derivedList.getAt(0).valueVar.set('value2a').init(tr)
+      this.derivedList.getAt(0).valueNode.set('value2a').init(tr)
     );
   });
 
 
   specify('then update is transmitted to derived nested node', function() {
-    expect(this.originList.get().map( (model) => model.valueVar.get() ))
+    expect(this.originList.get().map( (model) => model.valueNode.get() ))
       .to.deep.equal(['value2a']);
   });
 });

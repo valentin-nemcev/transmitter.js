@@ -5,7 +5,7 @@ class ListItem {
 
   constructor(name) {
     this.name = name;
-    this.valueVar = new Transmitter.Nodes.Variable();
+    this.valueNode = new Transmitter.Nodes.Value();
   }
 }
 
@@ -35,7 +35,7 @@ describe('Nested list connection', function() {
       .withOriginDerivedChannel( (originItem, derivedItem) =>
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
-          .withOriginDerived(originItem.valueVar, derivedItem.valueVar)
+          .withOriginDerived(originItem.valueNode, derivedItem.valueNode)
           .withMapOrigin(originToDerived)
           .withMapDerived(derivedToOrigin)
       );
@@ -51,8 +51,8 @@ describe('Nested list connection', function() {
     const item2 = new ListItem('Origin item 2');
 
     Transmitter.startTransmission( (tr) => {
-      item1.valueVar.set('Origin value 1').init(tr);
-      item2.valueVar.set('Origin value 2').init(tr);
+      item1.valueNode.set('Origin value 1').init(tr);
+      item2.valueNode.set('Origin value 2').init(tr);
       this.originList.set([item1, item2]).init(tr);
     });
   });
@@ -63,7 +63,7 @@ describe('Nested list connection', function() {
 
     expect(derivedItems.map( (item) => item.name ))
       .to.deep.equal(['Derived item 1', 'Derived item 2']);
-    expect(derivedItems.map( (item) => item.valueVar.get() ))
+    expect(derivedItems.map( (item) => item.valueNode.get() ))
       .to.deep.equal(['Derived value 1', 'Derived value 2']);
   });
 });

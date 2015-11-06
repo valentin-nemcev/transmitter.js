@@ -3,7 +3,7 @@ import Transmitter from 'transmitter';
 class NestedObject {
   constructor(name) {
     this.name = name;
-    this.valueVar = new Transmitter.Nodes.Variable();
+    this.valueNode = new Transmitter.Nodes.Value();
   }
 }
 
@@ -11,7 +11,7 @@ class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
 
   inBothDirections() {
     this.channelNodes = [
-      new Transmitter.ChannelNodes.DynamicChannelVariable(
+      new Transmitter.ChannelNodes.DynamicChannelValue(
         'targets', (targets) =>
           new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
@@ -21,7 +21,7 @@ class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
               flatPayload.coerceSize(nestedPayload).unflatten()
             )
       ),
-      new Transmitter.ChannelNodes.DynamicChannelVariable(
+      new Transmitter.ChannelNodes.DynamicChannelValue(
         'sources', (sources) =>
           new Transmitter.Channels.SimpleChannel()
             .inForwardDirection()
@@ -52,21 +52,21 @@ describe('Flattening list connection', function() {
 
   /**
    *
-   *         nestedList          serializedVar
+   *         nestedList          serializedValue
    *           .  |<------------------|
    *           .  |                /  |
    *           .  |---------------/-->|
    *           .  |           /  /
    *      ......  | flatList /  /
    *      .       |..     |--  /
-   * valueVars      .     |   /
+   * valueNodes      .     |   /
    *     |----------*---->|<--
    *     |          .     |
    *     |<---------*-----|
    */
 
   beforeEach(function() {
-    this.define('serializedVar', new Transmitter.Nodes.Variable());
+    this.define('serializedValue', new Transmitter.Nodes.Value());
     this.define('nestedList', new Transmitter.Nodes.List());
 
     this.define('flatList', new Transmitter.Nodes.List());
@@ -74,14 +74,14 @@ describe('Flattening list connection', function() {
     Transmitter.startTransmission( (tr) => {
       new FlatteningListChannel()
         .inBothDirections()
-        .withNested(this.nestedList, (nested) => nested.valueVar )
+        .withNested(this.nestedList, (nested) => nested.valueNode )
         .withFlat(this.flatList)
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()
         .inForwardDirection()
         .fromSources(this.flatList, this.nestedList)
-        .toTarget(this.serializedVar)
+        .toTarget(this.serializedValue)
         .withTransform( ([flatPayload, nestedPayload]) =>
           flatPayload.zip(nestedPayload)
             .map( ([value, nestedObject]) => {
@@ -91,13 +91,13 @@ describe('Flattening list connection', function() {
                 value: value != null ? value : null,
               };
             })
-            .toSetVariable()
+            .toSetValue()
         )
         .init(tr);
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
-        .fromSource(this.serializedVar)
+        .fromSource(this.serializedValue)
         .toTargets(this.flatList, this.nestedList)
         .withTransform( (serializedPayload) =>
           serializedPayload.toSetList()
@@ -110,7 +110,7 @@ describe('Flattening list connection', function() {
 
 
   specify('has default const value after initialization', function() {
-    expect(this.serializedVar.get()).to.deep.equal([]);
+    expect(this.serializedValue.get()).to.deep.equal([]);
   });
 
 
@@ -121,15 +121,15 @@ describe('Flattening list connection', function() {
     ];
 
     Transmitter.startTransmission( (tr) =>
-        this.serializedVar.set(serialized).init(tr)
+        this.serializedValue.set(serialized).init(tr)
     );
 
     const nestedObjects = this.nestedList.get();
     expect(nestedObjects.length).to.equal(2);
     expect(nestedObjects[0].name).to.equal('objectA');
-    expect(nestedObjects[0].valueVar.get()).to.equal('value1');
+    expect(nestedObjects[0].valueNode.get()).to.equal('value1');
     expect(nestedObjects[1].name).to.equal('objectB');
-    expect(nestedObjects[1].valueVar.get()).to.equal('value2');
+    expect(nestedObjects[1].valueNode.get()).to.equal('value2');
   });
 
 
@@ -139,12 +139,12 @@ describe('Flattening list connection', function() {
     const nestedObjectB = new NestedObject('objectB');
 
     Transmitter.startTransmission( (tr) => {
-      nestedObjectA.valueVar.set('value1').init(tr);
-      nestedObjectB.valueVar.set('value2').init(tr);
+      nestedObjectA.valueNode.set('value1').init(tr);
+      nestedObjectB.valueNode.set('value2').init(tr);
       this.nestedList.set([nestedObjectA, nestedObjectB]).init(tr);
     });
 
-    expect(this.serializedVar.get()).to.deep.equal([
+    expect(this.serializedValue.get()).to.deep.equal([
       {name: 'objectA', value: 'value1'},
       {name: 'objectB', value: 'value2'},
     ]);
@@ -154,15 +154,15 @@ describe('Flattening list connection', function() {
   specify('querying flat target after outer source update', function() {
     const nestedObjectA = new NestedObject('objectA');
     const nestedObjectB = new NestedObject('objectB');
-    nestedObjectA.valueVar.set('value1');
-    nestedObjectB.valueVar.set('value2');
+    nestedObjectA.valueNode.set('value1');
+    nestedObjectB.valueNode.set('value2');
     this.nestedList.set([nestedObjectA, nestedObjectB]);
 
     Transmitter.startTransmission( (tr) =>
-        this.serializedVar.queryState(tr)
+        this.serializedValue.queryState(tr)
     );
 
-    expect(this.serializedVar.get()).to.deep.equal([
+    expect(this.serializedValue.get()).to.deep.equal([
       {name: 'objectA', value: 'value1'},
       {name: 'objectB', value: 'value2'},
     ]);

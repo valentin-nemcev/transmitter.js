@@ -27,7 +27,7 @@ export default class List extends RelayNode {
     if ((payload.deliverToList != null)) {
       payload.deliverToList(this);
     } else {
-      payload.deliverToVariable(this);
+      payload.deliverToValue(this);
     }
     return this;
   }

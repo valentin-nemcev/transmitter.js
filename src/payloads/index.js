@@ -1,3 +1,3 @@
 export noop            from './noop';
-export VariablePayload from './VariablePayload';
+export ValuePayload from './ValuePayload';
 export ListPayload     from './ListPayload';

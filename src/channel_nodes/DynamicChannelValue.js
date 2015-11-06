@@ -2,10 +2,10 @@ import ChannelNode from './ChannelNode';
 import ListPayload from '../payloads/ListPayload';
 
 
-export default class DynamicChannelVariable extends ChannelNode {
+export default class DynamicChannelValue extends ChannelNode {
 
   acceptPayload(payload) {
-    payload.deliverToVariable(this);
+    payload.deliverToValue(this);
     return this;
   }
 
@@ -13,7 +13,7 @@ export default class DynamicChannelVariable extends ChannelNode {
     super();
 
     if (type !== 'sources' && type !== 'targets') {
-      throw new Error(`Unknown DynamicChannelVariable type: ${type}`);
+      throw new Error(`Unknown DynamicChannelValue type: ${type}`);
     }
 
     this.type = type;

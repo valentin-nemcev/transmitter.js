@@ -2,7 +2,7 @@ export SourceNode       from './SourceNode';
 export TargetNode       from './TargetNode';
 export RelayNode        from './RelayNode';
 
-export Variable         from './Variable';
+export Value         from './Value';
 export List             from './List';
 
-export PropertyVariable from './PropertyVariable';
+export PropertyValue from './PropertyValue';

@@ -4,16 +4,16 @@ import Transmitter from 'transmitter';
 describe('Merging after splitting', function() {
 
   before(function() {
-    this.define('keypressVar', new Transmitter.Nodes.SourceNode());
-    this.define('stateVar', new Transmitter.Nodes.Variable());
+    this.define('keypressValue', new Transmitter.Nodes.SourceNode());
+    this.define('stateValue', new Transmitter.Nodes.Value());
 
-    this.stateVar.set(false);
+    this.stateValue.set(false);
 
     Transmitter.startTransmission( (tr) => {
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
-        .fromSource(this.keypressVar)
-        .toTarget(this.stateVar)
+        .fromSource(this.keypressValue)
+        .toTarget(this.stateValue)
         .withTransform( (keypress) =>
           keypress.noopIf( (key) => key !== 'enter' ).map( () => true )
         )
@@ -21,8 +21,8 @@ describe('Merging after splitting', function() {
 
       new Transmitter.Channels.SimpleChannel()
         .inBackwardDirection()
-        .fromSource(this.keypressVar)
-        .toTarget(this.stateVar)
+        .fromSource(this.keypressValue)
+        .toTarget(this.stateValue)
         .withTransform( (keypress) =>
           keypress.noopIf( (key) => key !== 'esc' ).map( () => false )
         )
@@ -33,18 +33,18 @@ describe('Merging after splitting', function() {
 
   specify('splitted message is merged correctly', function() {
     Transmitter.startTransmission( (tr) =>
-      this.keypressVar.originate(tr, 'enter')
+      this.keypressValue.originate(tr, 'enter')
     );
 
-    expect(this.stateVar.get()).to.equal(true);
+    expect(this.stateValue.get()).to.equal(true);
   });
 
 
   specify('...independent of order', function() {
     Transmitter.startTransmission( (tr) =>
-      this.keypressVar.originate(tr, 'esc')
+      this.keypressValue.originate(tr, 'esc')
     );
 
-    expect(this.stateVar.get()).to.equal(false);
+    expect(this.stateValue.get()).to.equal(false);
   });
 });

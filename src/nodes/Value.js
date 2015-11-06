@@ -1,10 +1,10 @@
 import RelayNode from './RelayNode';
-import VariablePayload from '../payloads/VariablePayload';
+import ValuePayload from '../payloads/ValuePayload';
 
 
-export default class Variable extends RelayNode {
+export default class Value extends RelayNode {
 
-  payload = VariablePayload;
+  payload = ValuePayload;
 
   createResponsePayload() {
     return this.payload.set(this);
@@ -19,7 +19,7 @@ export default class Variable extends RelayNode {
   }
 
   acceptPayload(payload) {
-    payload.deliverToVariable(this);
+    payload.deliverToValue(this);
     return this;
   }
 

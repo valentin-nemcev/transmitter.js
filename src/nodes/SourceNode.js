@@ -1,6 +1,6 @@
 import NodeSource from '../connection/NodeSource';
 import BlindNodeTarget from '../connection/BlindNodeTarget';
-import VariablePayload from '../payloads/VariablePayload';
+import ValuePayload from '../payloads/ValuePayload';
 import noop from '../payloads/noop';
 
 
@@ -28,6 +28,6 @@ export default class SourceNode {
   createResponsePayload(payload) { return payload != null ? payload : noop(); }
 
   createOriginPayload(value) {
-    return VariablePayload.setConst(value);
+    return ValuePayload.setConst(value);
   }
 }

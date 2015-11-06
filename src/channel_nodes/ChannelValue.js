@@ -1,10 +1,10 @@
 import ChannelNode from './ChannelNode';
 
 
-export default class ChannelVariable extends ChannelNode {
+export default class ChannelValue extends ChannelNode {
 
   acceptPayload(payload) {
-    payload.deliverToVariable(this);
+    payload.deliverToValue(this);
     return this;
   }
 

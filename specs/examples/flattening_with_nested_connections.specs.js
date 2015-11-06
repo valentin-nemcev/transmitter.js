@@ -17,13 +17,13 @@ class View {
 describe('Flattening with nested connections', function() {
 
   before(function() {
-    this.define('derivedVar', new Transmitter.Nodes.Variable());
-    this.define('originVar', new Transmitter.Nodes.Variable());
+    this.define('derivedValue', new Transmitter.Nodes.Value());
+    this.define('originValue', new Transmitter.Nodes.Value());
 
     const originDerivedChannel =
       new Transmitter.Channels.BidirectionalChannel()
       .inForwardDirection()
-      .withOriginDerived(this.originVar, this.derivedVar)
+      .withOriginDerived(this.originValue, this.derivedValue)
       .withMatchOriginDerived(function(model, view) {
         return model === view.model;
       })
@@ -32,20 +32,20 @@ describe('Flattening with nested connections', function() {
       });
 
     this.define(
-      'flatteningChannelVar',
-      new Transmitter.ChannelNodes.ChannelVariable()
+      'flatteningChannelValue',
+      new Transmitter.ChannelNodes.ChannelValue()
     );
 
     const flatteningChannel = new Transmitter.Channels.NestedSimpleChannel()
-      .fromSource(this.derivedVar)
-      .toChannelTarget(this.flatteningChannelVar)
+      .fromSource(this.derivedValue)
+      .toChannelTarget(this.flatteningChannelValue)
       .withTransform( (viewVal) =>
         viewVal.map( (view) => {
           if (view != null) {
             return new Transmitter.Channels.SimpleChannel()
               .inBackwardDirection()
               .fromSource(view.removeEvt)
-              .toTarget(this.originVar)
+              .toTarget(this.originValue)
               .withTransform( (ev) => ev.map( () => null ) );
           } else {
             return Transmitter.Channels.getNullChannel();
@@ -56,25 +56,25 @@ describe('Flattening with nested connections', function() {
     Transmitter.startTransmission( (tr) => {
       originDerivedChannel.init(tr);
       flatteningChannel.init(tr);
-      this.originVar.set(new Model()).init(tr);
+      this.originValue.set(new Model()).init(tr);
     });
   });
 
 
   specify('when derived nested node originates update', function() {
     Transmitter.startTransmission( (tr) =>
-      this.derivedVar.get().removeEvt.originate(tr, true)
+      this.derivedValue.get().removeEvt.originate(tr, true)
     );
   });
 
 
   specify('then it propagates to origin node', function() {
-    expect(this.originVar.get()).to.be.null();
+    expect(this.originValue.get()).to.be.null();
   });
 
 
   specify('and it propagates back to derived node', function() {
-    expect(this.derivedVar.get()).to.be.null();
+    expect(this.derivedValue.get()).to.be.null();
   });
 
 
@@ -83,11 +83,11 @@ describe('Flattening with nested connections', function() {
     function id(arg) { return arg; }
 
     before(function() {
-      this.define('supOriginVar', new Transmitter.Nodes.Variable());
+      this.define('supOriginValue', new Transmitter.Nodes.Value());
 
       const supOriginChannel = new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()
-        .withOriginDerived(this.supOriginVar, this.originVar)
+        .withOriginDerived(this.supOriginValue, this.originValue)
         .withMapOrigin(id)
         .withMapDerived(id);
 
@@ -100,13 +100,13 @@ describe('Flattening with nested connections', function() {
     specify('when super origin is updated', function() {
       Transmitter.startTransmission( (tr) => {
         this.model = new Model();
-        this.originVar.set(this.model).init(tr);
+        this.originValue.set(this.model).init(tr);
       });
     });
 
 
     specify('then it propagates to derived node', function() {
-      expect(this.derivedVar.get().model).to.equal(this.model);
+      expect(this.derivedValue.get().model).to.equal(this.model);
     });
   });
 });

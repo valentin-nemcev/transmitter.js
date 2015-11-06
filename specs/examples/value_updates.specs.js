@@ -8,16 +8,16 @@ class StatefulObject {
 
 describe('Value updates preserve identity', function() {
 
-  describe('for variables', function() {
+  describe('for values', function() {
 
     beforeEach(function() {
-      this.define('objectVar', new Transmitter.Nodes.Variable());
-      this.define('stringVar', new Transmitter.Nodes.Variable());
+      this.define('objectValue', new Transmitter.Nodes.Value());
+      this.define('stringValue', new Transmitter.Nodes.Value());
 
       Transmitter.startTransmission( (tr) =>
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()
-          .withOriginDerived(this.objectVar, this.stringVar)
+          .withOriginDerived(this.objectValue, this.stringValue)
           .withMatchOriginDerived( (object, string) =>
             (object != null) && string === object.name
           )
@@ -32,13 +32,13 @@ describe('Value updates preserve identity', function() {
       'state change message update target value instead of replacing',
       function() {
         this.object = new StatefulObject('nameA');
-        this.objectVar.set(this.object);
+        this.objectValue.set(this.object);
 
         Transmitter.startTransmission( (tr) =>
-          this.stringVar.set('nameA').init(tr)
+          this.stringValue.set('nameA').init(tr)
         );
 
-        expect(this.objectVar.get()).to.equal(this.object);
+        expect(this.objectValue.get()).to.equal(this.object);
       });
   });
 

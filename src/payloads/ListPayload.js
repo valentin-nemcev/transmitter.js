@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 import noop from './noop';
-import VariablePayload from './VariablePayload';
+import ValuePayload from './ValuePayload';
 import Payload from './Payload';
 
 function zip(payloads, coerceSize = false) {
@@ -36,7 +36,7 @@ class ListPayload extends Payload {
   }
 
   unflatten() {
-    return this.map( (value) => VariablePayload.setConst(value) );
+    return this.map( (value) => ValuePayload.setConst(value) );
   }
 
   zipCoercingSize(...otherPayloads) {
@@ -97,8 +97,8 @@ class SetConstPayload extends ListPayload {
   getSize() { return this.value.length; }
 
 
-  deliverToVariable(variable) {
-    variable.set(this.get());
+  deliverToValue(value) {
+    value.set(this.get());
     return this;
   }
 
@@ -150,8 +150,8 @@ class SetLazyPayload extends ListPayload {
   getSize() { return this.get().length; }
 
 
-  deliverToVariable(variable) {
-    variable.set(this.get());
+  deliverToValue(value) {
+    value.set(this.get());
     return this;
   }
 
@@ -328,8 +328,8 @@ class SetPayload extends ListPayload {
   }
 
 
-  deliverToVariable(variable) {
-    variable.set(this.get());
+  deliverToValue(value) {
+    value.set(this.get());
     return this;
   }
 

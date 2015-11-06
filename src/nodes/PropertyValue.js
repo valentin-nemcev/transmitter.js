@@ -1,7 +1,7 @@
-import Variable from './Variable';
+import Value from './Value';
 
 
-export default class PropertyVariable extends Variable {
+export default class PropertyValue extends Value {
 
   constructor(object, key) {
     super();

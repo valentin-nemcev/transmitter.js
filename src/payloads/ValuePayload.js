@@ -11,7 +11,7 @@ function merge(payloads) {
   });
 }
 
-class VariablePayload extends Payload {
+class ValuePayload extends Payload {
 
   noopIf(conditionCb) {
     if (conditionCb(this.get())) { return noop(); } else { return this; }
@@ -27,7 +27,7 @@ class VariablePayload extends Payload {
 }
 
 
-class SetConstPayload extends VariablePayload {
+class SetConstPayload extends ValuePayload {
 
   static create(value) { return new this(value); }
 
@@ -44,8 +44,8 @@ class SetConstPayload extends VariablePayload {
 
   get() { return this.value; }
 
-  deliverToVariable(variable) {
-    variable.set(this.value);
+  deliverToValue(value) {
+    value.set(this.value);
     return this;
   }
 }
@@ -54,7 +54,7 @@ class SetConstPayload extends VariablePayload {
 function id(a) { return a; }
 
 
-class UpdateMatchingPayload extends VariablePayload {
+class UpdateMatchingPayload extends ValuePayload {
 
   constructor(source, {map, match} = {}) {
     super();
@@ -67,7 +67,7 @@ class UpdateMatchingPayload extends VariablePayload {
   inspect() { return `valueUpdate(${inspect(this.source)})`; }
 
 
-  deliverToVariable(target) {
+  deliverToValue(target) {
     const sourceValue = this.source.get();
     const targetValue = target.get();
     if (sourceValue != null && targetValue != null
@@ -83,7 +83,7 @@ class UpdateMatchingPayload extends VariablePayload {
 }
 
 
-class SetPayload extends VariablePayload {
+class SetPayload extends ValuePayload {
 
   static create(source) {
     return new SetPayload(source);
@@ -126,8 +126,8 @@ class SetPayload extends VariablePayload {
   }
 
 
-  deliverToVariable(variable) {
-    variable.set(this.get());
+  deliverToValue(value) {
+    value.set(this.get());
     return this;
   }
 }
@@ -135,10 +135,10 @@ class SetPayload extends VariablePayload {
 
 const NoopPayload = noop().constructor;
 
-Payload.prototype.toSetVariable = function() {
+Payload.prototype.toSetValue = function() {
   return SetPayload.create(this);
 };
-NoopPayload.prototype.toSetVariable = function() { return this; };
+NoopPayload.prototype.toSetValue = function() { return this; };
 
 Payload.prototype.fromListToOptional = function() {
   return SetPayload.create(this).map( (v) => v[0] );
