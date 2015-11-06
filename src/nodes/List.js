@@ -6,11 +6,7 @@ export default class List extends RelayNode {
 
   payload = ListPayload;
 
-  createResponsePayload() {
-    return this.payload.set(this);
-  }
-
-  createOriginPayload() {
+  createPayload() {
     return this.payload.set(this);
   }
 

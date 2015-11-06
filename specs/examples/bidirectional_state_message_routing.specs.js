@@ -45,8 +45,8 @@ describe('Bidirectional state message routing', function() {
       this.tagSet.set(new Set(['tagB', 'tagA']));
 
       Transmitter.startTransmission( (tr) => {
-        this.tagJSON.queryState(tr);
-        this.tagInput.queryState(tr);
+        this.tagJSON.query(tr);
+        this.tagInput.query(tr);
       });
 
       expect(this.tagJSON.get()).to.equal('["tagA","tagB"]');

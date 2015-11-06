@@ -15,34 +15,24 @@ export default class RelayNode {
   getNodeSource() { return this.nodeSource; }
   getNodeTarget() { return this.nodeTarget; }
 
-  processPayload(payload) {
-    payload.deliver(this);
-    return this.createResponsePayload(payload);
-  }
-
   originate(tr) {
-    tr.originateMessage(this, this.createOriginPayload());
+    tr.originateMessage(this, this.createPayload());
     return this;
   }
 
-  init(tr, value) {
-    if (value !== undefined) throw new Error('Init with value deprecated');
+  init(tr) {
     return this.originate(tr);
   }
 
-  receivePayload(tr, payload) {
-    tr.originateMessage(this, payload);
-    return this;
-  }
-
-  queryState(tr) {
+  query(tr) {
     tr.originateQuery(this);
     return this;
   }
 
-  createResponsePayload(payload) { return payload != null ? payload : noop(); }
-
-  createOriginPayload() {}
+  processPayload(payload) {
+    payload.deliver(this);
+    return this.createPayload(payload);
+  }
 
   createPlaceholderPayload() { return noop(); }
 }

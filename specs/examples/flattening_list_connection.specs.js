@@ -159,7 +159,7 @@ describe('Flattening list connection', function() {
     this.nestedList.set([nestedObjectA, nestedObjectB]);
 
     Transmitter.startTransmission( (tr) =>
-        this.serializedValue.queryState(tr)
+        this.serializedValue.query(tr)
     );
 
     expect(this.serializedValue.get()).to.deep.equal([

@@ -1,5 +1,7 @@
 import {inspect} from 'util';
 
+import noop from '../payloads/noop';
+
 import NodePointTransmissionHub from './NodePointTransmissionHub';
 import Query from './Query';
 import SourceMessage from './SourceMessage';
@@ -88,8 +90,7 @@ export default class JointMessage {
           `Previous: ${inspect(this.message)}`
         );
     }
-    const nextPayload = this.node.processPayload(payload);
-    const message = SourceMessage.create(this, nextPayload, 1);
+    const message = SourceMessage.create(this, payload, 1);
     this._sendMessage(message);
     return this;
   }
@@ -194,7 +195,7 @@ export default class JointMessage {
       ? this.precedingMessage.getPriority()
       : 0;
 
-    const nextPayload = this.node.createResponsePayload(prevPayload);
+    const nextPayload = prevPayload || this.node.processPayload(noop());
     const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
 
     return this._sendMessage(nextMessage);

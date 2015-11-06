@@ -151,7 +151,7 @@ describe('Flattening connection', function() {
       this.nestedValue.set(nestedObject);
 
       Transmitter.startTransmission( (tr) =>
-        this.serializedValue.queryState(tr)
+        this.serializedValue.query(tr)
       );
 
       expect(this.serializedValue.get())

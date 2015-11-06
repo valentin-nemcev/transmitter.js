@@ -6,11 +6,7 @@ export default class Value extends RelayNode {
 
   payload = ValuePayload;
 
-  createResponsePayload() {
-    return this.payload.set(this);
-  }
-
-  createOriginPayload() {
+  createPayload() {
     return this.payload.set(this);
   }
 

@@ -16,7 +16,7 @@ class TargetStub {
 }
 
 
-describe('Message merging', function() {
+describe.skip('Message merging', function() {
 
   before(function() {
     this.target = new TargetStub();
