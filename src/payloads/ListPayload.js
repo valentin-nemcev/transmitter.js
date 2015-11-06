@@ -97,13 +97,7 @@ class SetConstPayload extends ListPayload {
   getSize() { return this.value.length; }
 
 
-  deliverToValue(value) {
-    value.set(this.get());
-    return this;
-  }
-
-
-  deliverToList(list) {
+  deliver(list) {
     list.set(this.get());
     return this;
   }
@@ -150,13 +144,7 @@ class SetLazyPayload extends ListPayload {
   getSize() { return this.get().length; }
 
 
-  deliverToValue(value) {
-    value.set(this.get());
-    return this;
-  }
-
-
-  deliverToList(list) {
+  deliver(list) {
     list.set(this.get());
     return this;
   }
@@ -176,7 +164,7 @@ class RemovePayload extends ListPayload {
 
   inspect() { return `listRemove(${inspect(this.source)})`; }
 
-  deliverToList(target) {
+  deliver(target) {
     const element = this.source.get();
     const iterable = target.get();
     for (let pos = 0; pos < iterable.length; pos++) {
@@ -201,7 +189,7 @@ class AddAtPayload extends ListPayload {
 
   inspect() { return `listAddAt(${inspect(this.source.get())})`; }
 
-  deliverToList(target) {
+  deliver(target) {
     target.addAt(...this.source.get());
     return this;
   }
@@ -220,7 +208,7 @@ class UpdateMatchingPayload extends ListPayload {
   inspect() { return `listUpdate(${inspect(this.source)})`; }
 
 
-  deliverToList(target) {
+  deliver(target) {
     let targetLength = target.getSize();
     const sourceLength = this.source.getSize();
 
@@ -321,20 +309,7 @@ class SetPayload extends ListPayload {
     return new UpdateMatchingPayload(this, {map, match});
   }
 
-
-  deliverValue(targetNode) {
-    targetNode.receiveValue(this.get());
-    return this;
-  }
-
-
-  deliverToValue(value) {
-    value.set(this.get());
-    return this;
-  }
-
-
-  deliverToList(list) {
+  deliver(list) {
     list.set(this.get());
     return this;
   }

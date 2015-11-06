@@ -12,7 +12,7 @@ describe('List update', function() {
     this.updateTarget = (list) =>
         ListPayload.setConst(list)
           .updateMatching(id, equals)
-          .deliverToList(this.target);
+          .deliver(this.target);
 
     this.added = sinon.spy(this.target, 'addAt');
     this.removed = sinon.spy(this.target, 'removeAt');

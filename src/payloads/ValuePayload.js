@@ -44,7 +44,7 @@ class SetConstPayload extends ValuePayload {
 
   get() { return this.value; }
 
-  deliverToValue(value) {
+  deliver(value) {
     value.set(this.value);
     return this;
   }
@@ -67,7 +67,7 @@ class UpdateMatchingPayload extends ValuePayload {
   inspect() { return `valueUpdate(${inspect(this.source)})`; }
 
 
-  deliverToValue(target) {
+  deliver(target) {
     const sourceValue = this.source.get();
     const targetValue = target.get();
     if (sourceValue != null && targetValue != null
@@ -120,13 +120,7 @@ class SetPayload extends ValuePayload {
   }
 
 
-  deliverValue(targetNode) {
-    targetNode.receiveValue(this.get());
-    return this;
-  }
-
-
-  deliverToValue(value) {
+  deliver(value) {
     value.set(this.get());
     return this;
   }

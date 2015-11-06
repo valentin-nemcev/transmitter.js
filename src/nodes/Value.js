@@ -18,11 +18,6 @@ export default class Value extends RelayNode {
     return this.payload.setConst(null);
   }
 
-  acceptPayload(payload) {
-    payload.deliverToValue(this);
-    return this;
-  }
-
   set(value) {
     this.value = value;
     return this;

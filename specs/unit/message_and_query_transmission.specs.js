@@ -15,10 +15,6 @@ class NodeSourceStub extends SourceNode {
 }
 
 class NodeTargetStub extends TargetNode {
-  acceptPayload(payload) {
-    payload.deliver(this);
-    return this;
-  }
 }
 
 

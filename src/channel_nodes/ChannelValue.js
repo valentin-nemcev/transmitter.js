@@ -3,11 +3,6 @@ import ChannelNode from './ChannelNode';
 
 export default class ChannelValue extends ChannelNode {
 
-  acceptPayload(payload) {
-    payload.deliverToValue(this);
-    return this;
-  }
-
   get() { return this.channel; }
 
   set(newChannel) {

@@ -3,12 +3,7 @@ import Transmitter from 'transmitter';
 class AlertEmitter extends Transmitter.Nodes.TargetNode {
   alert() {}
 
-  acceptPayload(payload) {
-    payload.deliverValue(this);
-    return this;
-  }
-
-  receiveValue(messageStr) {
+  set(messageStr) {
     if (messageStr != null) {
       return this.alert(messageStr);
     }

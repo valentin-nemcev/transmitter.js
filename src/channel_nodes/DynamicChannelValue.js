@@ -4,11 +4,6 @@ import ListPayload from '../payloads/ListPayload';
 
 export default class DynamicChannelValue extends ChannelNode {
 
-  acceptPayload(payload) {
-    payload.deliverToValue(this);
-    return this;
-  }
-
   constructor(type, createChannel) {
     super();
 

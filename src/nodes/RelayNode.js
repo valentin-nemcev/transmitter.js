@@ -16,7 +16,7 @@ export default class RelayNode {
   getNodeTarget() { return this.nodeTarget; }
 
   processPayload(payload) {
-    this.acceptPayload(payload);
+    payload.deliver(this);
     return this.createResponsePayload(payload);
   }
 
@@ -39,8 +39,6 @@ export default class RelayNode {
     tr.originateQuery(this);
     return this;
   }
-
-  acceptPayload() { return this; }
 
   createResponsePayload(payload) { return payload != null ? payload : noop(); }
 

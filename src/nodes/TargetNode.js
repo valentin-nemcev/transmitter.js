@@ -17,7 +17,7 @@ export default class TargetNode {
   getNodeTarget() { return this.nodeTarget; }
 
   processPayload(payload) {
-    this.acceptPayload(payload);
+    payload.deliver(this);
     return this.createResponsePayload(payload);
   }
 

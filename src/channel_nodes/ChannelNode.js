@@ -30,7 +30,7 @@ export default class ChannelNode {
     const payload = this.getPlaceholderPayload();
     if (payload != null) {
       this.message = message.createPlaceholderConnectionMessage(this);
-      this.acceptPayload(payload);
+      payload.deliver(this);
       this.message = null;
     }
     return this;
@@ -54,7 +54,7 @@ export default class ChannelNode {
 
   routeMessage(tr, payload) {
     this.message = tr.createNextConnectionMessage(this);
-    this.acceptPayload(payload);
+    payload.deliver(this);
     this.message.sendToTargetPoints();
     this.message = null;
     return this;

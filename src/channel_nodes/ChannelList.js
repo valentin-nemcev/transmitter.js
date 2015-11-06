@@ -8,11 +8,6 @@ export default class ChannelList extends ChannelNode {
     this.channels = [];
   }
 
-  acceptPayload(payload) {
-    payload.deliverToList(this);
-    return this;
-  }
-
   set(newChannels) {
     const oldChannels = this.channels;
 

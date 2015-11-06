@@ -23,15 +23,6 @@ export default class List extends RelayNode {
     this.list = [];
   }
 
-  acceptPayload(payload) {
-    if ((payload.deliverToList != null)) {
-      payload.deliverToList(this);
-    } else {
-      payload.deliverToValue(this);
-    }
-    return this;
-  }
-
   set(list) {
     this.list.length = 0;
     this.list.push(...list);

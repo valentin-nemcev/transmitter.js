@@ -18,15 +18,7 @@ class NoopPayload {
 
   filter() { return this; }
 
-  deliverToValue() {
-    return this;
-  }
-
-  deliverToList() {
-    return this;
-  }
-
-  deliverValue() {
+  deliver() {
     return this;
   }
 }
