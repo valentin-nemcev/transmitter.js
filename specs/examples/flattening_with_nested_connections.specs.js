@@ -9,7 +9,7 @@ class View {
 
   constructor(model) {
     this.model = model;
-    this.removeEvt = new Transmitter.Nodes.SourceNode();
+    this.removeEvt = new Transmitter.Nodes.ValueSource();
   }
 }
 
@@ -63,7 +63,7 @@ describe('Flattening with nested connections', function() {
 
   specify('when derived nested node originates update', function() {
     Transmitter.startTransmission( (tr) =>
-      this.derivedValue.get().removeEvt.originate(tr, true)
+      this.derivedValue.get().removeEvt.originateValue(tr, true)
     );
   });
 

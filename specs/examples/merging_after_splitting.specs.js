@@ -4,7 +4,7 @@ import Transmitter from 'transmitter';
 describe('Merging after splitting', function() {
 
   before(function() {
-    this.define('keypressValue', new Transmitter.Nodes.SourceNode());
+    this.define('keypressValue', new Transmitter.Nodes.ValueSource());
     this.define('stateValue', new Transmitter.Nodes.Value());
 
     this.stateValue.set(false);
@@ -33,7 +33,7 @@ describe('Merging after splitting', function() {
 
   specify('splitted message is merged correctly', function() {
     Transmitter.startTransmission( (tr) =>
-      this.keypressValue.originate(tr, 'enter')
+      this.keypressValue.originateValue(tr, 'enter')
     );
 
     expect(this.stateValue.get()).to.equal(true);
@@ -42,7 +42,7 @@ describe('Merging after splitting', function() {
 
   specify('...independent of order', function() {
     Transmitter.startTransmission( (tr) =>
-      this.keypressValue.originate(tr, 'esc')
+      this.keypressValue.originateValue(tr, 'esc')
     );
 
     expect(this.stateValue.get()).to.equal(false);

@@ -3,7 +3,7 @@ import NodeTarget from '../connection/NodeTarget';
 import noop from '../payloads/noop';
 
 
-export default class RelayNode {
+export default class SourceTargetNode {
 
   inspect() { return '[' + this.constructor.name + ']'; }
 
@@ -15,8 +15,8 @@ export default class RelayNode {
   getNodeSource() { return this.nodeSource; }
   getNodeTarget() { return this.nodeTarget; }
 
-  originate(tr) {
-    tr.originateMessage(this, this.createPayload());
+  originate(tr, payload = null) {
+    tr.originateMessage(this, payload || this.processPayload(noop()));
     return this;
   }
 
@@ -28,11 +28,4 @@ export default class RelayNode {
     tr.originateQuery(this);
     return this;
   }
-
-  processPayload(payload) {
-    payload.deliver(this);
-    return this.createPayload(payload);
-  }
-
-  createPlaceholderPayload() { return noop(); }
 }

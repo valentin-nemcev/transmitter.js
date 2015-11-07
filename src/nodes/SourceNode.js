@@ -1,7 +1,5 @@
 import NodeSource from '../connection/NodeSource';
 import BlindNodeTarget from '../connection/BlindNodeTarget';
-import ValuePayload from '../payloads/ValuePayload';
-import noop from '../payloads/noop';
 
 
 export default class SourceNode {
@@ -16,18 +14,8 @@ export default class SourceNode {
   getNodeSource() { return this.nodeSource; }
   getNodeTarget() { return this.nodeTarget; }
 
-  processPayload(payload) {
-    return this.createResponsePayload(payload);
-  }
-
-  originate(tr, value) {
-    tr.originateMessage(this, this.createOriginPayload(value));
+  originate(tr, payload) {
+    tr.originateMessage(this, payload);
     return this;
-  }
-
-  createResponsePayload(payload) { return payload != null ? payload : noop(); }
-
-  createOriginPayload(value) {
-    return ValuePayload.setConst(value);
   }
 }

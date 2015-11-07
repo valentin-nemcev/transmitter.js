@@ -14,7 +14,7 @@ class AlertEmitter extends Transmitter.Nodes.TargetNode {
 describe('Connection with merge and query', function() {
 
   beforeEach(function() {
-    this.define('button', new Transmitter.Nodes.SourceNode());
+    this.define('button', new Transmitter.Nodes.ValueSource());
     this.define('textInput', new Transmitter.Nodes.Value());
     this.define('alertEmitter', new AlertEmitter());
     sinon.spy(this.alertEmitter, 'alert');
@@ -38,7 +38,7 @@ describe('Connection with merge and query', function() {
       this.textInput.set('Text input value').init(tr)
     );
     Transmitter.startTransmission( (tr) =>
-      this.button.originate(tr, 'click')
+      this.button.originateValue(tr, 'click')
     );
     expect(this.alertEmitter.alert)
       .to.have.been.calledWith('Text input value');

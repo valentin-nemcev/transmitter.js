@@ -1,8 +1,8 @@
-import SourceNode from '../nodes/SourceNode';
+import ValueSource from '../nodes/ValueSource';
 import Transmission from '../transmission/Transmission';
 
 
-export default class DOMEvent extends SourceNode {
+export default class DOMEvent extends ValueSource {
 
   constructor(element, type) {
     super();
@@ -12,6 +12,6 @@ export default class DOMEvent extends SourceNode {
   }
 
   triggerEvent(ev) {
-    return Transmission.start( (tr) => this.originate(tr, ev) );
+    return Transmission.start( (tr) => this.originateValue(tr, ev) );
   }
 }

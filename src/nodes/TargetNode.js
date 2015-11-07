@@ -18,8 +18,6 @@ export default class TargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return this.createResponsePayload(payload);
+    return noop();
   }
-
-  createResponsePayload(payload) { return payload != null ? payload : noop(); }
 }

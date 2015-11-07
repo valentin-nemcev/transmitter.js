@@ -1,17 +1,16 @@
-import RelayNode from './RelayNode';
+import SourceTargetNode from './SourceTargetNode';
 import ListPayload from '../payloads/ListPayload';
 
 
-export default class List extends RelayNode {
+export default class List extends SourceTargetNode {
 
-  payload = ListPayload;
-
-  createPayload() {
-    return this.payload.set(this);
+  processPayload(payload) {
+    payload.deliver(this);
+    return ListPayload.set(this);
   }
 
   createPlaceholderPayload() {
-    return this.payload.setConst([]);
+    return ListPayload.setConst([]);
   }
 
   constructor() {

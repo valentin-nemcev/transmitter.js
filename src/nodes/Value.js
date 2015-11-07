@@ -1,17 +1,16 @@
-import RelayNode from './RelayNode';
+import SourceTargetNode from './SourceTargetNode';
 import ValuePayload from '../payloads/ValuePayload';
 
 
-export default class Value extends RelayNode {
+export default class Value extends SourceTargetNode {
 
-  payload = ValuePayload;
-
-  createPayload() {
-    return this.payload.set(this);
+  processPayload(payload) {
+    payload.deliver(this);
+    return ValuePayload.set(this);
   }
 
   createPlaceholderPayload() {
-    return this.payload.setConst(null);
+    return ValuePayload.setConst(null);
   }
 
   set(value) {

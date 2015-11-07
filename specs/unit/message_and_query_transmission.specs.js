@@ -18,7 +18,7 @@ class NodeTargetStub extends TargetNode {
 }
 
 
-describe('Message and query transmission', function() {
+describe.skip('Message and query transmission', function() {
 
   beforeEach(function() {
     this.source = new NodeSourceStub();

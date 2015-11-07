@@ -3,7 +3,7 @@ import Transmitter from 'transmitter';
 describe('Reversing messages in the middle of the chain', function() {
 
   before(function() {
-    this.define('button', new Transmitter.Nodes.SourceNode());
+    this.define('button', new Transmitter.Nodes.ValueSource());
     this.define('textInput', new Transmitter.Nodes.Value());
     this.define('tagList', new Transmitter.Nodes.List());
 
@@ -35,7 +35,7 @@ describe('Reversing messages in the middle of the chain', function() {
 
   specify('when button is clicked', function() {
     Transmitter.startTransmission( (tr) =>
-      this.button.originate(tr, 'click')
+      this.button.originateValue(tr, 'click')
     );
   });
 

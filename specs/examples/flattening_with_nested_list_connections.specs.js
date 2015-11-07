@@ -14,7 +14,7 @@ class View {
 
   constructor(model) {
     this.model = model;
-    this.removeEvt = new Transmitter.Nodes.SourceNode();
+    this.removeEvt = new Transmitter.Nodes.ValueSource();
     this.valueNode = new Transmitter.Nodes.Value();
   }
 }
@@ -79,7 +79,7 @@ describe('Flattening with nested list connections', function() {
 
   specify('when derived nested node originates update', function() {
     Transmitter.startTransmission( (tr) =>
-        this.derivedList.getAt(0).removeEvt.originate(tr, true)
+        this.derivedList.getAt(0).removeEvt.originateValue(tr, true)
     );
   });
 
