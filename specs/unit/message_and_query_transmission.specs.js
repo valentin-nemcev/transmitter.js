@@ -2,7 +2,7 @@ import SourceNode from 'transmitter/nodes/SourceNode';
 import TargetNode from 'transmitter/nodes/TargetNode';
 import SimpleChannel from 'transmitter/channels/SimpleChannel';
 import Transmission from 'transmitter/transmission/Transmission';
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
 
 
 class StubPayload {

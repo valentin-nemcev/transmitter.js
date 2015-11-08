@@ -1,16 +1,18 @@
 import SourceTargetNode from './SourceTargetNode';
-import ListPayload from '../payloads/ListPayload';
+import {
+  createListPayload, createListPayloadFromConst,
+} from '../payloads/ListPayload';
 
 
 export default class List extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return ListPayload.create(this);
+    return createListPayload(this);
   }
 
   createPlaceholderPayload() {
-    return ListPayload.createFromConst([]);
+    return createListPayloadFromConst([]);
   }
 
   constructor() {

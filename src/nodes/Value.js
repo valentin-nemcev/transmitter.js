@@ -1,16 +1,18 @@
 import SourceTargetNode from './SourceTargetNode';
-import ValuePayload from '../payloads/ValuePayload';
+import {
+  createValuePayload, createValuePayloadFromConst,
+} from '../payloads/ValuePayload';
 
 
 export default class Value extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return ValuePayload.create(this);
+    return createValuePayload(this);
   }
 
   createPlaceholderPayload() {
-    return ValuePayload.createFromConst(null);
+    return createValuePayloadFromConst(null);
   }
 
   set(value) {

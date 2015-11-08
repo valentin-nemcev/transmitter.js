@@ -3,14 +3,6 @@ import {inspect} from 'util';
 import Payload from './Payload';
 import noop from './noop';
 
-function merge(payloads) {
-  return ValuePayload.create({
-    get() {
-      return payloads.map( (p) => p.get() );
-    },
-  });
-}
-
 function id(a) { return a; }
 
 
@@ -42,13 +34,24 @@ class UpdateMatchingPayload extends Payload {
   }
 }
 
+function create(source) {
+  return new ValuePayload(source);
+}
+
+function createFromConst(value) {
+  return create({get() { return value; }});
+}
+
+function merge(payloads) {
+  return create({
+    get() {
+      return payloads.map( (p) => p.get() );
+    },
+  });
+}
+
 
 class ValuePayload extends Payload {
-
-  static create(source) {
-    return new ValuePayload(source);
-  }
-
 
   constructor(source, {map} = {}) {
     super();
@@ -87,8 +90,7 @@ class ValuePayload extends Payload {
   merge(...otherPayloads) { return merge([this, ...otherPayloads]); }
 
   separate() {
-    return this.get().map( (value) =>
-      ValuePayload.create({get() { return value; }})
+    return this.get().map( (value) => create({get() { return value; }})
     );
   }
 }
@@ -97,19 +99,17 @@ class ValuePayload extends Payload {
 const NoopPayload = noop().constructor;
 
 Payload.prototype.toValue = function() {
-  return ValuePayload.create(this);
+  return create(this);
 };
 NoopPayload.prototype.toValue = function() { return this; };
 
 Payload.prototype.fromListToOptional = function() {
-  return ValuePayload.create(this).map( (v) => v[0] );
+  return create(this).map( (v) => v[0] );
 };
 
 
-export default {
-  merge,
-  create: ValuePayload.create,
-  createFromConst(value) {
-    return ValuePayload.create({get() { return value; }});
-  },
+export {
+  merge as mergeValuePayloads,
+  create as createValuePayload,
+  createFromConst as createValuePayloadFromConst,
 };

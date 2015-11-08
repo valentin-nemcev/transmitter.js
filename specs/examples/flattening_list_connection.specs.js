@@ -1,4 +1,4 @@
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
 
 class NestedObject {
   constructor(name) {
@@ -59,7 +59,7 @@ describe('Flattening list connection', function() {
    *           .  |           /  /
    *      ......  | flatList /  /
    *      .       |..     |--  /
-   * valueNodes      .     |   /
+   * valueNodes     .     |   /
    *     |----------*---->|<--
    *     |          .     |
    *     |<---------*-----|

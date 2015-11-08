@@ -1,4 +1,4 @@
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
 
 describe('Reversing messages in the middle of the chain', function() {
 

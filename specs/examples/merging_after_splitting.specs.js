@@ -1,4 +1,4 @@
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
 
 
 describe('Merging after splitting', function() {

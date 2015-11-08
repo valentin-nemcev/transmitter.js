@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 import noop from './noop';
-import ValuePayload from './ValuePayload';
+import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
 
 function zip(payloads, coerceSize = false) {
@@ -133,6 +133,14 @@ class UpdateMatchingPayload extends Payload {
   }
 }
 
+function create(source) {
+  return new ListPayload(source);
+}
+
+function createFromConst(value) {
+  return create({get() { return value; }});
+}
+
 
 function id(a) { return a; }
 function getTrue() { return true; }
@@ -187,7 +195,7 @@ class ListPayload extends Payload {
   }
 
   unflatten() {
-    return this.map( (value) => ValuePayload.createFromConst(value) );
+    return this.map( (value) => createValuePayloadFromConst(value) );
   }
 
   zipCoercingSize(...otherPayloads) {
@@ -245,9 +253,8 @@ Payload.prototype.toRemoveElementAction = function() {
 };
 NoopPayload.prototype.toRemoveElementAction = function() { return this; };
 
-module.exports = {
-  create: ListPayload.create,
-  createFromConst(value) {
-    return ListPayload.create({get() { return value; }});
-  },
+export {
+  zip,
+  create as createListPayload,
+  createFromConst as createListPayloadFromConst,
 };

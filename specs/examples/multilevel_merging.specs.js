@@ -1,12 +1,12 @@
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
+
+console.log(Transmitter);
 
 const Value = Transmitter.Nodes.Value;
 
-const merge = Transmitter.Payloads.ValuePayload.merge;
-
 function reduceMergedPayload(...nodes) {
   return function(payloads) {
-    return merge(payloads).map( (values) => {
+    return Transmitter.mergeValuePayloads(payloads).map( (values) => {
       const result = {};
       values.forEach( (value, i) => result[nodes[i].inspect()] = value );
       return result;

@@ -1,4 +1,4 @@
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
 
 class Model {
   inspect() { return '[Model ' + this.name + ']'; }

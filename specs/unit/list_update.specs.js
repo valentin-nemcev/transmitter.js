@@ -1,4 +1,4 @@
-import ListPayload from 'transmitter/payloads/ListPayload';
+import {createListPayloadFromConst} from 'transmitter/payloads/ListPayload';
 import List from 'transmitter/nodes/List';
 
 
@@ -10,9 +10,9 @@ describe('List update', function() {
   beforeEach(function() {
     this.target = new List();
     this.updateTarget = (list) =>
-        ListPayload.createFromConst(list)
-          .updateMatching(id, equals)
-          .deliver(this.target);
+      createListPayloadFromConst(list)
+        .updateMatching(id, equals)
+        .deliver(this.target);
 
     this.added = sinon.spy(this.target, 'addAt');
     this.removed = sinon.spy(this.target, 'removeAt');

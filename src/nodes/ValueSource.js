@@ -1,5 +1,5 @@
 import SourceNode from './SourceNode';
-import ValuePayload from '../payloads/ValuePayload';
+import {createValuePayloadFromConst} from '../payloads/ValuePayload';
 
 export default class ValueSource extends SourceNode {
 
@@ -8,6 +8,6 @@ export default class ValueSource extends SourceNode {
   }
 
   originateValue(tr, value) {
-    return this.originate(tr, ValuePayload.createFromConst(value));
+    return this.originate(tr, createValuePayloadFromConst(value));
   }
 }

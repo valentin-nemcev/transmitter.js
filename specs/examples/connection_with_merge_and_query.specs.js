@@ -1,4 +1,4 @@
-import Transmitter from 'transmitter';
+import * as Transmitter from 'transmitter';
 
 class AlertEmitter extends Transmitter.Nodes.TargetNode {
   alert() {}
