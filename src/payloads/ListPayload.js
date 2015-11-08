@@ -5,7 +5,7 @@ import ValuePayload from './ValuePayload';
 import Payload from './Payload';
 
 function zip(payloads, coerceSize = false) {
-  return SetPayload.create({
+  return ListPayload.create({
     get() {
       const length = payloads[0] != null ? payloads[0].getSize() : 0;
       if (!coerceSize) {
@@ -29,132 +29,10 @@ function zip(payloads, coerceSize = false) {
 }
 
 
-class ListPayload extends Payload {
-
-  flatten() {
-    return this.map( (nested) => nested.get() );
-  }
-
-  unflatten() {
-    return this.map( (value) => ValuePayload.setConst(value) );
-  }
-
-  zipCoercingSize(...otherPayloads) {
-    return zip([this, ...otherPayloads], true);
-  }
-
-  zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
-
-  unzip(size) {
-    return Array.from(Array(size).keys()).map( (i) =>
-      this.map( (values) => values[i] )
-    );
-  }
-
-  coerceSize(otherPayload) {
-    return SetLazyPayload.create(() => {
-      const result = [];
-      for (let i = 0; i < otherPayload.getSize(); i++) {
-        result.push(this.getAt(i));
-      }
-      return result;
-    });
-  }
-}
-
-
-class SetConstPayload extends ListPayload {
-
-  static create(value) {
-    return new SetConstPayload(value);
-  }
-
-  constructor(value) {
-    super();
-    this.value = value;
-  }
-
-  inspect() { return `setConst(${inspect(this.value)})`; }
-
-  map(map) {
-    return new SetPayload(this, {map});
-  }
-
-  filter(filter) {
-    return new SetPayload(this, {filter});
-  }
-
-  updateMatching(map, match) {
-    return new UpdateMatchingPayload(this, {map, match});
-  }
-
-  get() { return this.value; }
-
-  getAt(pos) {
-    return this.value[pos];
-  }
-
-  getSize() { return this.value.length; }
-
-
-  deliver(list) {
-    list.set(this.get());
-    return this;
-  }
-}
-
-
-class SetLazyPayload extends ListPayload {
-
-  static create(getValue) {
-    return new SetLazyPayload(getValue);
-  }
-
-  constructor(getValue) {
-    super();
-    this.getValue = getValue;
-  }
-
-  inspect() { return `setLazy(${inspect(this.getValue())})`; }
-
-  map(map) {
-    return new SetPayload(this, {map});
-  }
-
-  filter(filter) {
-    return new SetPayload(this, {filter});
-  }
-
-  updateMatching(map, match) {
-    return new UpdateMatchingPayload(this, {map, match});
-  }
-
-  get() {
-    if (!this.gotValue) {
-      this.value = this.getValue();
-      this.gotValue = true;
-    }
-    return this.value;
-  }
-
-  getAt(pos) {
-    return this.get()[pos];
-  }
-
-  getSize() { return this.get().length; }
-
-
-  deliver(list) {
-    list.set(this.get());
-    return this;
-  }
-}
-
-
-class RemovePayload extends ListPayload {
+class RemoveAction extends Payload {
 
   static create(source) {
-    return new RemovePayload(source);
+    return new RemoveAction(source);
   }
 
   constructor(source) {
@@ -176,10 +54,10 @@ class RemovePayload extends ListPayload {
 }
 
 
-class AddAtPayload extends ListPayload {
+class AddAtAction extends Payload {
 
   static create(source) {
-    return new AddAtPayload(source);
+    return new AddAtAction(source);
   }
 
   constructor(source) {
@@ -196,7 +74,7 @@ class AddAtPayload extends ListPayload {
 }
 
 
-class UpdateMatchingPayload extends ListPayload {
+class UpdateMatchingPayload extends Payload {
 
   constructor(source, opts = {}) {
     super();
@@ -259,10 +137,10 @@ class UpdateMatchingPayload extends ListPayload {
 function id(a) { return a; }
 function getTrue() { return true; }
 
-class SetPayload extends ListPayload {
+class ListPayload extends Payload {
 
   static create(source) {
-    return new SetPayload(source);
+    return new ListPayload(source);
   }
 
   constructor(source, {map, filter} = {}) {
@@ -296,14 +174,43 @@ class SetPayload extends ListPayload {
 
 
   map(map) {
-    return new SetPayload(this, {map});
+    return new ListPayload(this, {map});
   }
 
 
   filter(filter) {
-    return new SetPayload(this, {filter});
+    return new ListPayload(this, {filter});
   }
 
+  flatten() {
+    return this.map( (nested) => nested.get() );
+  }
+
+  unflatten() {
+    return this.map( (value) => ValuePayload.createFromConst(value) );
+  }
+
+  zipCoercingSize(...otherPayloads) {
+    return zip([this, ...otherPayloads], true);
+  }
+
+  zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
+
+  unzip(size) {
+    return Array.from(Array(size).keys()).map( (i) =>
+      this.map( (values) => values[i] )
+    );
+  }
+
+  coerceSize(otherPayload) {
+    return ListPayload.create({get: () => {
+      const result = [];
+      for (let i = 0; i < otherPayload.getSize(); i++) {
+        result.push(this.getAt(i));
+      }
+      return result;
+    }});
+  }
 
   updateMatching(map, match) {
     return new UpdateMatchingPayload(this, {map, match});
@@ -319,36 +226,28 @@ class SetPayload extends ListPayload {
 const NoopPayload = noop().constructor;
 
 Payload.prototype.fromOptionalToList = function() {
-  return SetPayload.create(this.map( (v) => v != null ? [v] : [] ));
+  return ListPayload.create(this.map( (v) => v != null ? [v] : [] ));
 };
-NoopPayload.prototype.toSetList = function() { return this; };
+NoopPayload.prototype.fromOptionalToList = function() { return this; };
 
-Payload.prototype.toSetList = function() {
-  return SetPayload.create(this.map( (v) => v != null ? Array.from(v) : [] ));
+Payload.prototype.toList = function() {
+  return ListPayload.create(this.map( (v) => v != null ? Array.from(v) : [] ));
 };
-NoopPayload.prototype.toSetList = function() { return this; };
+NoopPayload.prototype.toList = function() { return this; };
 
-Payload.prototype.toAppendListElement = function() {
-  return AddAtPayload.create(this.map( (el) => [el] ));
+Payload.prototype.toAppendElementAction = function() {
+  return AddAtAction.create(this.map( (el) => [el] ));
 };
-NoopPayload.prototype.toAppendListElement = function() { return this; };
+NoopPayload.prototype.toAppendElementAction = function() { return this; };
 
-Payload.prototype.toRemoveListElement = function() {
-  return RemovePayload.create(this);
+Payload.prototype.toRemoveElementAction = function() {
+  return RemoveAction.create(this);
 };
-NoopPayload.prototype.toRemoveListElement = function() { return this; };
+NoopPayload.prototype.toRemoveElementAction = function() { return this; };
 
 module.exports = {
-  set: SetPayload.create,
-  setLazy(getValue) { return SetLazyPayload.create(getValue); },
-  setConst: SetConstPayload.create,
-  append(elementSource) {
-    return AddAtPayload.create(elementSource.map( (el) => [el] ));
-  },
-  appendConst(element) {
-    return AddAtPayload.create({get() { return [element]; }});
-  },
-  removeConst(element) {
-    return RemovePayload.create({get() { return element; }});
+  create: ListPayload.create,
+  createFromConst(value) {
+    return ListPayload.create({get() { return value; }});
   },
 };

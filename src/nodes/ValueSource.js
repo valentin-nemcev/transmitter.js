@@ -8,6 +8,6 @@ export default class ValueSource extends SourceNode {
   }
 
   originateValue(tr, value) {
-    return this.originate(tr, ValuePayload.setConst(value));
+    return this.originate(tr, ValuePayload.createFromConst(value));
   }
 }

@@ -24,14 +24,14 @@ export default class DynamicChannelValue extends ChannelNode {
     const newChannel = this.createChannel.call(null, newNodes);
     this.channel = newChannel;
 
-    this.payload = ListPayload.setConst(newNodes);
+    this.payload = ListPayload.createFromConst(newNodes);
 
     if (newChannel != null) newChannel.connect(this.message);
     return this;
   }
 
   getPlaceholderPayload() {
-    return ListPayload.setConst([]);
+    return ListPayload.createFromConst([]);
   }
 
   getSourcePayload() { return this.type === 'sources' ? this.payload : null; }

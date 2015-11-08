@@ -4,57 +4,17 @@ import Payload from './Payload';
 import noop from './noop';
 
 function merge(payloads) {
-  return SetPayload.create({
+  return ValuePayload.create({
     get() {
       return payloads.map( (p) => p.get() );
     },
   });
 }
 
-class ValuePayload extends Payload {
-
-  noopIf(conditionCb) {
-    if (conditionCb(this.get())) { return noop(); } else { return this; }
-  }
-
-  merge(...otherPayloads) { return merge([this, ...otherPayloads]); }
-
-  separate() {
-    return this.get().map( (value) =>
-      SetConstPayload.create(value)
-    );
-  }
-}
-
-
-class SetConstPayload extends ValuePayload {
-
-  static create(value) { return new this(value); }
-
-  constructor(value) {
-    super();
-    this.value = value;
-  }
-
-  inspect() { return `setConst(${inspect(this.value)})`; }
-
-  map(map) {
-    return new SetPayload(this, {map});
-  }
-
-  get() { return this.value; }
-
-  deliver(value) {
-    value.set(this.value);
-    return this;
-  }
-}
-
-
 function id(a) { return a; }
 
 
-class UpdateMatchingPayload extends ValuePayload {
+class UpdateMatchingPayload extends Payload {
 
   constructor(source, {map, match} = {}) {
     super();
@@ -83,10 +43,10 @@ class UpdateMatchingPayload extends ValuePayload {
 }
 
 
-class SetPayload extends ValuePayload {
+class ValuePayload extends Payload {
 
   static create(source) {
-    return new SetPayload(source);
+    return new ValuePayload(source);
   }
 
 
@@ -106,7 +66,7 @@ class SetPayload extends ValuePayload {
 
 
   map(map) {
-    return new SetPayload(this, {map});
+    return new ValuePayload(this, {map});
   }
 
 
@@ -115,33 +75,41 @@ class SetPayload extends ValuePayload {
   }
 
 
-  flatMap(map) {
-    return this.map( (value) => map(value).get() );
-  }
-
-
   deliver(value) {
     value.set(this.get());
     return this;
+  }
+
+  noopIf(conditionCb) {
+    if (conditionCb(this.get())) { return noop(); } else { return this; }
+  }
+
+  merge(...otherPayloads) { return merge([this, ...otherPayloads]); }
+
+  separate() {
+    return this.get().map( (value) =>
+      ValuePayload.create({get() { return value; }})
+    );
   }
 }
 
 
 const NoopPayload = noop().constructor;
 
-Payload.prototype.toSetValue = function() {
-  return SetPayload.create(this);
+Payload.prototype.toValue = function() {
+  return ValuePayload.create(this);
 };
-NoopPayload.prototype.toSetValue = function() { return this; };
+NoopPayload.prototype.toValue = function() { return this; };
 
 Payload.prototype.fromListToOptional = function() {
-  return SetPayload.create(this).map( (v) => v[0] );
+  return ValuePayload.create(this).map( (v) => v[0] );
 };
 
 
 export default {
   merge,
-  set: SetPayload.create,
-  setLazy(getValue) { return SetPayload.create({get: getValue}); },
-  setConst(value) { return SetConstPayload.create(value); },
+  create: ValuePayload.create,
+  createFromConst(value) {
+    return ValuePayload.create({get() { return value; }});
+  },
 };

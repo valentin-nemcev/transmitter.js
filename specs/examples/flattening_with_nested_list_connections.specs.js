@@ -60,7 +60,7 @@ describe('Flattening with nested list connections', function() {
             .fromSource(view.removeEvt)
             .toTarget(this.originList)
             .withTransform( (ev) =>
-               ev.map( () => view.model ).toRemoveListElement()
+               ev.map( () => view.model ).toRemoveElementAction()
             )
           )
       );

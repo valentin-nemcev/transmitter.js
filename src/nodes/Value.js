@@ -6,11 +6,11 @@ export default class Value extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return ValuePayload.set(this);
+    return ValuePayload.create(this);
   }
 
   createPlaceholderPayload() {
-    return ValuePayload.setConst(null);
+    return ValuePayload.createFromConst(null);
   }
 
   set(value) {

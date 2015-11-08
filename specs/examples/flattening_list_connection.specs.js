@@ -91,7 +91,7 @@ describe('Flattening list connection', function() {
                 value: value != null ? value : null,
               };
             })
-            .toSetValue()
+            .toValue()
         )
         .init(tr);
 
@@ -100,7 +100,7 @@ describe('Flattening list connection', function() {
         .fromSource(this.serializedValue)
         .toTargets(this.flatList, this.nestedList)
         .withTransform( (serializedPayload) =>
-          serializedPayload.toSetList()
+          serializedPayload.toList()
             .map( ({value, name}) => [value, new NestedObject(name)] )
             .unzip(2)
         )

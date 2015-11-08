@@ -6,11 +6,11 @@ export default class List extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return ListPayload.set(this);
+    return ListPayload.create(this);
   }
 
   createPlaceholderPayload() {
-    return ListPayload.setConst([]);
+    return ListPayload.createFromConst([]);
   }
 
   constructor() {

@@ -10,7 +10,7 @@ describe('List update', function() {
   beforeEach(function() {
     this.target = new List();
     this.updateTarget = (list) =>
-        ListPayload.setConst(list)
+        ListPayload.createFromConst(list)
           .updateMatching(id, equals)
           .deliver(this.target);
 
