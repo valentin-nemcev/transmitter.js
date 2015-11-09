@@ -1,7 +1,5 @@
 import * as Transmitter from 'transmitter';
 
-console.log(Transmitter);
-
 const Value = Transmitter.Nodes.Value;
 
 function reduceMergedPayload(...nodes) {

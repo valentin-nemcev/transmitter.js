@@ -239,8 +239,12 @@ Payload.prototype.fromOptionalToList = function() {
 NoopPayload.prototype.fromOptionalToList = function() { return this; };
 
 Payload.prototype.toList = function() {
-  return ListPayload.create(this.map( (v) => v != null ? Array.from(v) : [] ));
+  return create({get: () => {
+    const v = this.get();
+    return v != null ? Array.from(v) : [];
+  }});
 };
+ListPayload.prototype.toList = function() { return this; };
 NoopPayload.prototype.toList = function() { return this; };
 
 Payload.prototype.toAppendElementAction = function() {

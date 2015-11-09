@@ -7,48 +7,42 @@ class NestedObject {
   }
 }
 
-
 class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
 
   inBothDirections() {
     this.channelNodes = [
-      new Transmitter.ChannelNodes.DynamicChannelValue(
+      new Transmitter.ChannelNodes.DynamicOptionalChannelValue(
         'targets', (targets) =>
           new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
-            .fromSource(this.flatList)
+            .fromSource(this.flatNode)
             .toDynamicTargets(targets)
             .withTransform( (flatPayload, nestedPayload) =>
-              flatPayload.fromOptionalToList()
-                .coerceSize(nestedPayload).unflatten()
+              flatPayload.coerceSize(nestedPayload).unflatten()
             )
       ),
-      new Transmitter.ChannelNodes.DynamicChannelValue(
+      new Transmitter.ChannelNodes.DynamicOptionalChannelValue(
         'sources', (sources) =>
           new Transmitter.Channels.SimpleChannel()
             .inForwardDirection()
             .fromDynamicSources(sources)
-            .toTarget(this.flatList)
-            .withTransform(
-              (payload) => payload.flatten().fromListToOptional()
-            )
+            .toTarget(this.flatNode)
+            .withTransform( (payload) => payload.flatten() )
         ),
     ];
     return this;
   }
 
-  withNested(nestedList, mapNested) {
+  withNested(nestedNode, mapNested) {
     this.addChannel(new Transmitter.Channels.NestedSimpleChannel()
-      .fromSource(nestedList)
+      .fromSource(nestedNode)
       .toChannelTargets(...this.channelNodes)
-      .withTransform(
-        (payload) => payload.map(mapNested).fromOptionalToList()
-      ));
+      .withTransform( (payload) => payload.map(mapNested) ));
     return this;
   }
 
-  withFlat(flatList) {
-    this.flatList = flatList;
+  withFlat(flatNode) {
+    this.flatNode = flatNode;
     return this;
   }
 }
@@ -57,14 +51,14 @@ class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
 describe('Flattening connection', function() {
   beforeEach(function() {
     this.define('serializedValue', new Transmitter.Nodes.Value());
-    this.define('nestedValue', new Transmitter.Nodes.Value());
+    this.define('nestedValue', new Transmitter.Nodes.Optional());
 
-    this.define('flatValue', new Transmitter.Nodes.Value());
+    this.define('flatValue', new Transmitter.Nodes.Optional());
 
     Transmitter.startTransmission( (tr) => {
       new FlatteningListChannel()
         .inBothDirections()
-        .withNested(this.nestedValue, (nested) => (nested || {}).valueNode )
+        .withNested(this.nestedValue, (nested) => nested.valueNode )
         .withFlat(this.flatValue)
         .init(tr);
 
@@ -73,13 +67,11 @@ describe('Flattening connection', function() {
         .fromSources(this.flatValue, this.nestedValue)
         .toTarget(this.serializedValue)
         .withTransform( ([flatPayload, nestedPayload]) =>
-          flatPayload.merge(nestedPayload).map( ([value, nestedObject]) => {
-            const name = (nestedObject || {}).name;
-            return {
-              name: name != null ? name : null,
-              value: value != null ? value : null,
-            };
-          })
+          nestedPayload.zipCoercingSize(flatPayload)
+            .map( ([nestedObject, value]) => {
+              const name = nestedObject.name;
+              return {name, value};
+            })
         )
         .init(tr);
 
@@ -89,8 +81,9 @@ describe('Flattening connection', function() {
         .toTargets(this.flatValue, this.nestedValue)
         .withTransform( (serializedPayload) =>
           serializedPayload
+            .toOptional()
             .map( ({value, name}) => [value, new NestedObject(name)] )
-            .separate()
+            .unzip(2)
         )
         .init(tr);
     });
@@ -101,7 +94,7 @@ describe('Flattening connection', function() {
 
     specify('has default const value after initialization', function() {
       expect(this.serializedValue.get())
-      .to.deep.equal({name: null, value: null});
+      .to.deep.equal(null);
     });
 
 

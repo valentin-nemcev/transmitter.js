@@ -11,38 +11,38 @@ class FlatteningListChannel extends Transmitter.Channels.CompositeChannel {
 
   inBothDirections() {
     this.channelNodes = [
-      new Transmitter.ChannelNodes.DynamicChannelValue(
+      new Transmitter.ChannelNodes.DynamicListChannelValue(
         'targets', (targets) =>
           new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
-            .fromSource(this.flatList)
+            .fromSource(this.flatNode)
             .toDynamicTargets(targets)
             .withTransform( (flatPayload, nestedPayload) =>
               flatPayload.coerceSize(nestedPayload).unflatten()
             )
       ),
-      new Transmitter.ChannelNodes.DynamicChannelValue(
+      new Transmitter.ChannelNodes.DynamicListChannelValue(
         'sources', (sources) =>
           new Transmitter.Channels.SimpleChannel()
             .inForwardDirection()
             .fromDynamicSources(sources)
-            .toTarget(this.flatList)
+            .toTarget(this.flatNode)
             .withTransform( (payload) => payload.flatten() )
         ),
     ];
     return this;
   }
 
-  withNested(nestedList, mapNested) {
+  withNested(nestedNode, mapNested) {
     this.addChannel(new Transmitter.Channels.NestedSimpleChannel()
-      .fromSource(nestedList)
+      .fromSource(nestedNode)
       .toChannelTargets(...this.channelNodes)
       .withTransform( (payload) => payload.map(mapNested) ));
     return this;
   }
 
-  withFlat(flatList) {
-    this.flatList = flatList;
+  withFlat(flatNode) {
+    this.flatNode = flatNode;
     return this;
   }
 }
@@ -83,13 +83,10 @@ describe('Flattening list connection', function() {
         .fromSources(this.flatList, this.nestedList)
         .toTarget(this.serializedValue)
         .withTransform( ([flatPayload, nestedPayload]) =>
-          flatPayload.zip(nestedPayload)
-            .map( ([value, nestedObject]) => {
-              const name = (nestedObject || {}).name;
-              return {
-                name: name != null ? name : null,
-                value: value != null ? value : null,
-              };
+          nestedPayload.zipCoercingSize(flatPayload)
+            .map( ([nestedObject, value]) => {
+              const name = nestedObject.name;
+              return {name, value};
             })
             .toValue()
         )
@@ -100,7 +97,8 @@ describe('Flattening list connection', function() {
         .fromSource(this.serializedValue)
         .toTargets(this.flatList, this.nestedList)
         .withTransform( (serializedPayload) =>
-          serializedPayload.toList()
+          serializedPayload
+            .toList()
             .map( ({value, name}) => [value, new NestedObject(name)] )
             .unzip(2)
         )

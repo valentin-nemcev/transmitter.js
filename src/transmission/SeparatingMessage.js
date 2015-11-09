@@ -62,7 +62,8 @@ module.exports = class SeparatingMessage {
 
   *_zipPayloads(valuePayload, nodePayload) {
     const [nodes, values] = Array.isArray(nodePayload)
-      ? [nodePayload, valuePayload] : [nodePayload.get(), valuePayload.get()];
+      ? [nodePayload, valuePayload]
+      : [nodePayload.toList().get(), valuePayload.toList().get()];
 
     if (nodes.length !== values.length) {
       throw new Error(

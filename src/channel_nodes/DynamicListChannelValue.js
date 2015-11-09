@@ -2,13 +2,13 @@ import ChannelNode from './ChannelNode';
 import {createListPayloadFromConst} from '../payloads/ListPayload';
 
 
-export default class DynamicChannelValue extends ChannelNode {
+export default class DynamicListChannelValue extends ChannelNode {
 
   constructor(type, createChannel) {
     super();
 
     if (type !== 'sources' && type !== 'targets') {
-      throw new Error(`Unknown DynamicChannelValue type: ${type}`);
+      throw new Error(`Unknown DynamicListChannelValue type: ${type}`);
     }
 
     this.type = type;

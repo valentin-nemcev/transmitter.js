@@ -1,7 +1,8 @@
 import {inspect} from 'util';
 
 export ChannelNode            from './ChannelNode';
-export DynamicChannelValue from './DynamicChannelValue';
+export DynamicListChannelValue from './DynamicListChannelValue';
+export DynamicOptionalChannelValue from './DynamicOptionalChannelValue';
 
 import ChannelValue from './ChannelValue';
 import ChannelList     from './ChannelList';
