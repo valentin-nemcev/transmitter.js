@@ -10,7 +10,7 @@ class PrototypeBuilder {
     return Object.freeze(this.proto);
   }
 
-  defineDataProperty(prop, {value, writeable}) {
+  dataProperty(prop, {value, writeable}) {
     Object.defineProperty(this.proto, prop, {
       enumerable: true,
       writeable,
@@ -19,7 +19,7 @@ class PrototypeBuilder {
     return this;
   }
 
-  defineAccessorProperty(prop, {get, set}) {
+  accessorProperty(prop, {get, set}) {
     Object.defineProperty(this.proto, prop, {
       enumerable: true,
       get,
@@ -38,7 +38,7 @@ class PrototypeBuilder {
   }
 
   method(prop, method) {
-    return this.defineDataProperty(prop, {value: method});
+    return this.dataProperty(prop, {value: method});
   }
 
   methods(methods) {
@@ -48,12 +48,12 @@ class PrototypeBuilder {
   }
 
   readOnlyProperty(prop, value) {
-    return this.defineDataProperty(prop, {value});
+    return this.dataProperty(prop, {value});
   }
 
   setOnceMandatoryProperty(prop, {title}) {
     const hiddenProp = '_' + prop;
-    return this.defineAccessorProperty(prop, {
+    return this.accessorProperty(prop, {
       set(newValue) {
         if (this.hasOwnProperty(hiddenProp)) {
           throw new Error(title + ' already specified');
@@ -73,7 +73,7 @@ class PrototypeBuilder {
 
   setOnceLazyProperty(prop, getValue, {title}) {
     const hiddenProp = '_' + prop;
-    return this.defineAccessorProperty(prop, {
+    return this.accessorProperty(prop, {
       set(newValue) {
         if (this.hasOwnProperty(hiddenProp)) {
           throw new Error(title + ' already specified');
@@ -93,7 +93,7 @@ class PrototypeBuilder {
 
   lazyReadOnlyProperty(prop, getValue) {
     const hiddenProp = '_' + prop;
-    return this.defineAccessorProperty(prop, {
+    return this.accessorProperty(prop, {
       writeable: false,
 
       get() {

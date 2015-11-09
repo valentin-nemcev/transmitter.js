@@ -54,12 +54,12 @@ NestedBidirectionalChannel.prototype = buildPrototype()
 
 
 function getChannelNodeConstructorForPair(origin, derived) {
-  const originC = getChannelNodeConstructorFor(origin);
-  const derivedC = getChannelNodeConstructorFor(derived);
+  const originC = getChannelNodeConstructorFor(origin.constructor);
+  const derivedC = getChannelNodeConstructorFor(derived.constructor);
   if (originC !== derivedC) {
     throw new Error(
-      'Origin derived node type mismatch: ' +
-      [origin, derived].map(inspect).join(' ')
+      'Origin and derived node type mismatch: ' +
+      [origin.constructor, derived.constructor].map(inspect).join(' ')
     );
   }
   return originC;
