@@ -17,7 +17,8 @@ FlatteningChannel.prototype = buildPrototype()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
   // TODO: Implement directions
-  .setOnceMandatoryProperty('_directions', {title: 'Direction'})
+  .setOnceLazyProperty('_directions', () => new Set([forward, backward]),
+                       {title: 'Direction'})
   .methods({
     inForwardDirection() {
       this._directions = new Set([forward]);

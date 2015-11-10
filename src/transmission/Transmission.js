@@ -142,7 +142,7 @@ export default class Transmission {
 
 
   respond() {
-    for (const {queue} of this.comms) {
+    this.comms.forEach(({queue}) => {
       for (;;) {
         let didRespond = false;
         // Use for-i loop to handle comms pushed to queue in single iteration
@@ -155,7 +155,7 @@ export default class Transmission {
         }
         if (!didRespond) break;
       }
-    }
+    });
     return this;
   }
 }

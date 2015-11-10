@@ -7,7 +7,6 @@ import channelPrototype from './channelPrototype';
 export default buildPrototype()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
-  .setOnceMandatoryProperty('_transform', {title: 'Transform'})
   .method('withTransform', function(transform) {
     this._transform = transform;
     return this;

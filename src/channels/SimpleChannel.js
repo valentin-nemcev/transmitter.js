@@ -13,7 +13,7 @@ SimpleChannel.prototype = buildPrototype()
   .include(unidirectionalChannelPrototype)
   .include(nodeSourcePrototype)
   .include(nodeTargetPrototype)
-  .setOnceMandatoryProperty('_direction', 'Direction')
+  .setOnceMandatoryProperty('_direction', {title: 'Direction'})
   .methods({
     inForwardDirection() { return this.inDirection(Directions.forward); },
     inBackwardDirection() { return this.inDirection(Directions.backward); },
@@ -22,12 +22,9 @@ SimpleChannel.prototype = buildPrototype()
       this._direction = direction;
       return this;
     },
-
-    withoutTransform() {
-      this.withTransform(returnArg);
-      return this;
-    },
   })
+
+  .setOnceLazyProperty('_transform', () => returnArg, {title: 'Transform'})
   .freezeAndReturn();
 
 function returnArg(arg) { return arg; }

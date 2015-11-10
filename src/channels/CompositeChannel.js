@@ -1,10 +1,32 @@
 import buildPrototype from './buildPrototype';
 
-import SimpleChannel from './SimpleChannel';
 import channelPrototype from './channelPrototype';
 
+import SimpleChannel from './SimpleChannel';
+import NestedSimpleChannel from './NestedSimpleChannel';
+import BidirectionalChannel from './BidirectionalChannel';
+import NestedBidirectionalChannel from './NestedBidirectionalChannel';
+import FlatteningChannel from './FlatteningChannel';
 
 export default class CompositeChannel {}
+
+const channelConstructors = {
+  SimpleChannel,
+  NestedSimpleChannel,
+  BidirectionalChannel,
+  NestedBidirectionalChannel,
+  FlatteningChannel,
+};
+
+const channelDefinitionMethods = {};
+
+for (const [name, constructor] of Object.entries(channelConstructors)) {
+  channelDefinitionMethods['define' + name] = function() {
+    const channel = new constructor();
+    this.addChannel(channel);
+    return channel;
+  };
+}
 
 CompositeChannel.prototype = buildPrototype()
   .include(channelPrototype)
@@ -17,10 +39,7 @@ CompositeChannel.prototype = buildPrototype()
       return this;
     },
 
-    defineSimpleChannel() {
-      const channel = new SimpleChannel();
-      this.addChannel(channel);
-      return channel;
-    },
   })
+  .methods(channelDefinitionMethods)
+
   .freezeAndReturn();

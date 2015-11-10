@@ -51,7 +51,6 @@ describe('Multilevel merging 1', function() {
         .inBackwardDirection()
         .fromSource(this.c1)
         .toTarget(this.b1)
-        .withoutTransform()
         .init(tr);
 
       return new Transmitter.Channels.SimpleChannel()
@@ -112,7 +111,6 @@ describe('Multilevel merging 2', function() {
         .inBackwardDirection()
         .fromSource(this.b2)
         .toTarget(this.a)
-        .withoutTransform()
         .init(tr);
     };
   });

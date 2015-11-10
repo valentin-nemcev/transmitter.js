@@ -11,7 +11,8 @@ export default class BidirectionalChannel {}
 BidirectionalChannel.prototype = buildPrototype()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
-  .setOnceMandatoryProperty('_directions', {title: 'Direction'})
+  .setOnceLazyProperty('_directions', () => new Set([forward, backward]),
+                       {title: 'Direction'})
   .methods({
     inForwardDirection() {
       this._directions = new Set([forward]);
@@ -55,15 +56,26 @@ BidirectionalChannel.prototype = buildPrototype()
                        {title: 'MatchOriginDerived'})
 
   .methods({
+    withTransformOrigin(transform) {
+      this._forwardChannel.withTransform(transform);
+      return this;
+    },
+
+    withTransformDerived(transform) {
+      this._backwardChannel.withTransform(transform);
+      return this;
+    },
+  })
+
+  .methods({
     withMapOrigin(mapOrigin) {
-      this._forwardChannel.withTransform(
-        createTransform(mapOrigin, this._matchOriginDerived)
-      );
+      this.withTransformOrigin(createTransform(
+        mapOrigin, this._matchOriginDerived));
       return this;
     },
 
     withMapDerived(mapDerived) {
-      this._backwardChannel.withTransform(createTransform(
+      this.withTransformDerived(createTransform(
         mapDerived, this._matchOriginDerived, {swapMatch: true}));
       return this;
     },
