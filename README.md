@@ -30,11 +30,6 @@ yet**
 
 ### Development tasks
 
-* Refactor
-  * Don't use context in isolated tests, use context in scenarios.
-  * Refactor payload creation methods for regular nodes and dynamic channel
-    nodes
-
 * Implement
   * Better checks for message pass ordering in joint message
   * Update inner and outer nodes in separating channels
