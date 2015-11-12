@@ -11,21 +11,21 @@ export default class BidirectionalChannel {}
 BidirectionalChannel.prototype = buildPrototype()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
-  .setOnceLazyProperty('_directions', () => new Set([forward, backward]),
+  .setOnceLazyProperty('_directions', () => ({forward, backward}),
                        {title: 'Direction'})
   .methods({
     inForwardDirection() {
-      this._directions = new Set([forward]);
+      this._directions = {forward};
       return this;
     },
 
     inBackwardDirection() {
-      this._directions = new Set([backward]);
+      this._directions = {backward};
       return this;
     },
 
     inBothDirections() {
-      this._directions = new Set([forward, backward]);
+      this._directions = {forward, backward};
       return this;
     },
   })
@@ -36,12 +36,12 @@ BidirectionalChannel.prototype = buildPrototype()
   })
 
   .lazyReadOnlyProperty('_forwardChannel', function() {
-    return this._directions.has(forward)
+    return this._directions.forward
       ? new SimpleChannel().inForwardDirection()
       : getNullChannel();
   })
   .lazyReadOnlyProperty('_backwardChannel', function() {
-    return this._directions.has(backward)
+    return this._directions.backward
       ? new SimpleChannel().inBackwardDirection()
       : getNullChannel();
   })

@@ -16,22 +16,21 @@ export default class FlatteningChannel {}
 FlatteningChannel.prototype = buildPrototype()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
-  // TODO: Implement directions
-  .setOnceLazyProperty('_directions', () => new Set([forward, backward]),
+  .setOnceLazyProperty('_directions', () => ({forward, backward}),
                        {title: 'Direction'})
   .methods({
     inForwardDirection() {
-      this._directions = new Set([forward]);
+      this._directions = {forward};
       return this;
     },
 
     inBackwardDirection() {
-      this._directions = new Set([backward]);
+      this._directions = {backward};
       return this;
     },
 
     inBothDirections() {
-      this._directions = new Set([forward, backward]);
+      this._directions = {forward, backward};
       return this;
     },
   })
@@ -58,11 +57,22 @@ FlatteningChannel.prototype = buildPrototype()
     },
   })
 
-  .lazyReadOnlyProperty('_targetChannelNode', function() {
-    return new this._dynamicChannelNodeConstructor(
+  .lazyReadOnlyProperty('_flatToNestedDirection', function() {
+    return this._nestedIsOrigin ?
+      this._directions.backward : this._directions.forward;
+  })
+
+  .lazyReadOnlyProperty('_nestedToFlatDirection', function() {
+    return this._nestedIsOrigin ?
+      this._directions.forward : this._directions.backward;
+  })
+
+  .lazyReadOnlyProperty('_flatToNestedChannel', function() {
+    const direction = this._flatToNestedDirection;
+    return direction && new this._dynamicChannelNodeConstructor(
       'targets', (targets) =>
         new SimpleChannel()
-          .inBackwardDirection()
+          .inDirection(direction)
           .fromSource(this._flatNode)
           .toDynamicTargets(targets)
           .withTransform( (flatPayload, nestedPayload) =>
@@ -70,11 +80,12 @@ FlatteningChannel.prototype = buildPrototype()
           )
     );
   })
-  .lazyReadOnlyProperty('_sourceChannelNode', function() {
-    return new this._dynamicChannelNodeConstructor(
+  .lazyReadOnlyProperty('_nestedToFlatChannel', function() {
+    const direction = this._nestedToFlatDirection;
+    return direction && new this._dynamicChannelNodeConstructor(
       'sources', (sources) =>
         new SimpleChannel()
-          .inForwardDirection()
+          .inDirection(direction)
           .fromDynamicSources(sources)
           .toTarget(this._flatNode)
           .withTransform( (payload) => payload.flatten() )
@@ -82,11 +93,23 @@ FlatteningChannel.prototype = buildPrototype()
   })
 
   .lazyReadOnlyProperty('_nestedChannel', function() {
-    return new NestedSimpleChannel()
-      .toChannelTargets(this._sourceChannelNode, this._targetChannelNode);
+    const targets = [this._nestedToFlatChannel, this._flatToNestedChannel]
+      .filter( (c) => c );
+    return new NestedSimpleChannel().toChannelTargets(...targets);
   })
 
-  .method('withNested', function(nestedNode, mapNested) {
+  .method('withNestedAsOrigin', function(...args) {
+    this._nestedIsOrigin = true;
+    return this._withNested(...args);
+  })
+
+  .method('withNestedAsDerived', function(...args) {
+    this._nestedIsOrigin = false;
+    return this._withNested(...args);
+  })
+
+  .method('_withNested', function(nestedNode, mapNested) {
+    assertNode(nestedNode);
     this._nestedNode = nestedNode;
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(nestedNode.constructor);
@@ -98,6 +121,7 @@ FlatteningChannel.prototype = buildPrototype()
 
   .setOnceMandatoryProperty('_flatNode', 'Flat node')
   .method('withFlat', function(flatNode) {
+    assertNode(flatNode);
     this._flatNode = flatNode;
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(flatNode.constructor);
@@ -105,3 +129,10 @@ FlatteningChannel.prototype = buildPrototype()
   })
 
   .freezeAndReturn();
+
+function assertNode(node) {
+  if (node == null || node.constructor == null) {
+    throw new Error(`${inspect(node)} is not a valid node`);
+  }
+  return this;
+}

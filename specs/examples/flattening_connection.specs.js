@@ -18,7 +18,7 @@ describe('Flattening connection', function() {
     Transmitter.startTransmission( (tr) => {
       new Transmitter.Channels.FlatteningChannel()
         .inBothDirections()
-        .withNested(this.nestedValue, (nested) => nested.valueNode )
+        .withNestedAsOrigin(this.nestedValue, (nested) => nested.valueNode )
         .withFlat(this.flatValue)
         .init(tr);
 
