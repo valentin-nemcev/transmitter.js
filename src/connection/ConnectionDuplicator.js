@@ -7,7 +7,6 @@ export default class ConnectionDuplicator {
 
   constructor(targets) {
     this.targets = targets;
-    this.targets.forEach( (target) => target.setSource(this) );
   }
 
   setSource(source) {
@@ -16,12 +15,12 @@ export default class ConnectionDuplicator {
   }
 
   connect(message) {
-    this.targets.forEach( (target) => target.connect(message) );
+    this.targets.forEach( (target) => target.connectSource(message, this) );
     return this;
   }
 
   disconnect(message) {
-    this.targets.forEach( (target) => target.disconnect(message) );
+    this.targets.forEach( (target) => target.disconnectSource(message, this) );
     return this;
   }
 

@@ -4,11 +4,6 @@ export default class ChannelNode {
 
   isChannelTarget() { return true; }
 
-  setSource(source) {
-    this.source = source;
-    return this;
-  }
-
   getTargetPoints() {
     if (this.targetPoints == null) this.targetPoints = new Set();
     return this.targetPoints;
@@ -24,7 +19,10 @@ export default class ChannelNode {
     return this;
   }
 
-  connect(message) {
+  connectSource(message, source) {
+    if (this.source != null) throw new Error('Connect source mismatch');
+    this.source = source;
+
     message.addTargetPoint(this);
 
     const payload = this.getPlaceholderPayload();
@@ -36,6 +34,12 @@ export default class ChannelNode {
     return this;
   }
 
+  disconnectSource(message, source) {
+    if (this.source !== source) throw new Error('Disconnect source mismatch');
+    this.source = null;
+    return this;
+  }
+
   receiveConnectionMessage(connectionMessage) {
     connectionMessage.createNextQuery()
       .sendToChannelNode(this);
@@ -43,7 +47,7 @@ export default class ChannelNode {
   }
 
   receiveQuery(query) {
-    this.source.receiveQuery(query);
+    if (this.source != null) this.source.receiveQuery(query);
     return this;
   }
 
