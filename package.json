@@ -7,9 +7,10 @@
     "lint": "eslint .",
     "prebuild": "npm run clean",
     "build": "babel src --out-dir build",
-    "clean": "rm -rf build/*",
-    "test": "mocha --bail --colors --reporter spec specs/index.js",
-    "deps": "madge --config .madgerc --image build/deps.png src"
+    "clean": "rm -rf build/* coverage/*",
+    "test": "mocha --opts .mocharc specs/index.js",
+    "deps": "madge --config .madgerc --image build/deps.png src",
+    "cover": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- --reporter dot specs/index.js"
   },
   "author": "Valentin Nemcev <mail@valentin-nemcev.com>",
   "repository": {
@@ -26,6 +27,7 @@
     "dirty-chai": "^1.2.2",
     "eslint": "^1.7.2",
     "eslint-config-airbnb": "^0.1.0",
+    "isparta": "^3.5.3",
     "madge": "^0.5.2",
     "mocha": "^2.1.0",
     "mocha-sinon": "^1.1.4",
