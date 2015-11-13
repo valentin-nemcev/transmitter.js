@@ -6,7 +6,7 @@ class StatefulObject {
   }
 }
 
-describe('Value updates preserve identity', function() {
+describe('Value matching and updating preserves identity', function() {
 
   describe('for values', function() {
 
