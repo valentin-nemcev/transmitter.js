@@ -11,21 +11,21 @@ module.exports = class SeparatingMessage {
     ].join(' ');
   }
 
-  static getOrCreate(message, source) {
-    const {transmission, pass} = message;
+  static getOrCreate(prevMessage, connPoint) {
+    const {transmission, pass} = prevMessage;
 
-    let merged = transmission.getCommunicationFor(pass, source);
-    if (merged == null || !pass.equals(merged.pass)) {
-      merged = new this(transmission, pass, source);
-      transmission.addCommunicationFor(merged, source);
+    let message = transmission.getCommunicationFor(pass, connPoint);
+    if (message == null) {
+      message = new this(transmission, pass, connPoint);
+      transmission.addCommunicationFor(message, connPoint);
     }
-    return merged;
+    return message;
   }
 
-  constructor(transmission, pass, source) {
+  constructor(transmission, pass, connPoint) {
     this.transmission = transmission;
     this.pass = pass;
-    this.source = source;
+    this.connPoint = connPoint;
   }
 
   receiveConnectionMessage(channelNode) {
@@ -44,10 +44,10 @@ module.exports = class SeparatingMessage {
   receiveMessage(message) {
     this.sourceMessage = message;
 
-    const nodesToLines = this.source.getTargetNodesToLines();
+    const nodesToLines = this.connPoint.getTargetNodesToLines();
     const nodePayload = this._getNodePayload(nodesToLines);
 
-    const valuePayload = this.source.singleTarget
+    const valuePayload = this.connPoint.singleTarget
       ? [message.getPayload()]
       : message.getPayload(nodePayload);
 

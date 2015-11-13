@@ -22,24 +22,25 @@ export default class MergingMessage {
     return this;
   }
 
-  static getOrCreate(message, source) {
-    const {transmission, pass} = message;
-    let merged = transmission.getCommunicationFor(pass, source);
-    if (!(merged != null && pass.equals(merged.pass))) {
-      merged = new this(transmission, pass, source);
-      transmission.addCommunicationFor(merged, source);
+  static getOrCreate(prevMessage, connPoint) {
+    const {transmission, pass} = prevMessage;
+
+    let message = transmission.getCommunicationFor(pass, connPoint);
+    if (message == null) {
+      message = new this(transmission, pass, connPoint);
+      transmission.addCommunicationFor(message, connPoint);
     }
-    return merged;
+    return message;
   }
 
   createNextConnectionMessage(channelNode) {
     return ConnectionMessage.createNext(this, channelNode);
   }
 
-  constructor(transmission, pass, source) {
+  constructor(transmission, pass, connPoint) {
     this.transmission = transmission;
     this.pass = pass;
-    this.source = source;
+    this.connPoint = connPoint;
     this.nodesToMessages = new Map();
   }
 
@@ -51,36 +52,36 @@ export default class MergingMessage {
   receiveQuery(query) {
     if (this.query == null) {
       this.query = query;
-      if (this.source.getSourceNodesToLines().size === 0) {
+      if (this.connPoint.getSourceNodesToLines().size === 0) {
         [this.payload, this.priority] = this._getEmptyPayload();
-        this.source.sendMessage(this);
+        this.connPoint.sendMessage(this);
       } else {
-        this.source.sendQuery(this.query);
+        this.connPoint.sendQuery(this.query);
       }
     }
     return this;
   }
 
   receiveMessageFrom(message, node) {
-    if (!(this.query != null || this.source.singleSource)) {
+    if (!(this.query != null || this.connPoint.singleSource)) {
       this.query = Query.createNext(this);
-      this.source.sendQuery(this.query);
+      this.connPoint.sendQuery(this.query);
     }
 
     this.nodesToMessages.set(node, message);
 
     // TODO: Compare contents
     if (this.nodesToMessages.size !==
-        this.source.getSourceNodesToLines().size) {
+        this.connPoint.getSourceNodesToLines().size) {
       return this;
     }
 
     [this.payload, this.priority] =
-        this.source.prioritiesShouldMatch && !this._prioritiesMatch()
+        this.connPoint.prioritiesShouldMatch && !this._prioritiesMatch()
           ? this._getNoopPayload()
           : this._getMergedPayload();
 
-    return this.source.sendMessage(this);
+    return this.connPoint.sendMessage(this);
   }
 
   _prioritiesMatch() {
@@ -147,7 +148,7 @@ export default class MergingMessage {
   _getMergedPayload() {
     this.transmission.log(this);
 
-    const nodesToLines = this.source.getSourceNodesToLines();
+    const nodesToLines = this.connPoint.getSourceNodesToLines();
     const nodePayload = this._getNodePayload(nodesToLines);
 
     let priority = null;
@@ -159,7 +160,7 @@ export default class MergingMessage {
       return this.nodesToMessages.get(node).getPayload();
     });
 
-    if (this.source.singleSource) { payload = payload[0]; }
+    if (this.connPoint.singleSource) { payload = payload[0]; }
 
     return [payload, priority];
   }

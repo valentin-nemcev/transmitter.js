@@ -19,18 +19,18 @@ export default class JointMessage {
     ].join(' ');
   }
 
-  static getOrCreate(comm, opts) {
-    const {transmission, pass} = comm;
+  static getOrCreate(prevComm, opts) {
+    const {transmission, pass} = prevComm;
     const node = opts.node
        || (opts.nodeTarget || {}).node
        || (opts.nodeSource || {}).node;
 
-    let selected = transmission.getCommunicationFor(pass, node);
-    if (selected == null) {
-      selected = new this(transmission, pass, node);
-      transmission.addCommunicationForAndEnqueue(selected, node);
+    let message = transmission.getCommunicationFor(pass, node);
+    if (message == null) {
+      message = new this(transmission, pass, node);
+      transmission.addCommunicationForAndEnqueue(message, node);
     }
-    return selected;
+    return message;
   }
 
   constructor(transmission, pass, node) {
