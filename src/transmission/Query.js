@@ -60,12 +60,6 @@ export default class Query {
     return this;
   }
 
-  sendToChannelNode(node) {
-    this.log(node);
-    node.receiveQuery(this);
-    return this;
-  }
-
   wasDelivered() {
     return this.passedLines.size > 0;
   }

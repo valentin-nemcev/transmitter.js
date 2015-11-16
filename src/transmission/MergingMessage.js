@@ -5,6 +5,7 @@ import noop from '../payloads/noop';
 import Query from './Query';
 import SeparatingMessage from './SeparatingMessage';
 import ConnectionMessage from './ConnectionMessage';
+import JointChannelMessage from './JointChannelMessage';
 
 
 export default class MergingMessage {
@@ -112,22 +113,12 @@ export default class MergingMessage {
     return this;
   }
 
-  sendToChannelNode(node) {
-    this.log(node);
-    let existing = this.transmission
-      .getCommunicationFor(this.pass, node);
-    if (existing == null) {
-      existing = this.transmission
-        .getCommunicationFor(this.pass.getNext(), node);
-    }
-    if (existing != null) {
-      throw new Error(
-          `Message already sent to ${inspect(node)}. ` +
-          `Previous: ${inspect(existing)}, current: ${inspect(this)}`
-        );
-    }
-    this.transmission.addCommunicationFor(this, node);
-    node.routeMessage(this, this.getPayload());
+  sendToChannelNode(channelNode) {
+    this.log(channelNode);
+    JointChannelMessage
+      .getOrCreate(this, channelNode)
+      .receiveMessage(this);
+
     return this;
   }
 

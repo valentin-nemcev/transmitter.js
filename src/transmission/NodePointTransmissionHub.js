@@ -1,4 +1,4 @@
-import Query from './Query';
+import JointChannelMessage from './JointChannelMessage';
 
 
 export default class NodePointTransmissionHub {
@@ -37,7 +37,9 @@ export default class NodePointTransmissionHub {
 
   _tryQueryChannelNode(channelNode) {
     if (!this._channelNodeUpdated(channelNode)) {
-      Query.createNextConnection(this.comm).sendToChannelNode(channelNode);
+      JointChannelMessage
+        .getOrCreate(this, channelNode)
+        .receiveNestedCommunication(this.comm);
       return false;
     } else {
       return true;
@@ -46,6 +48,8 @@ export default class NodePointTransmissionHub {
 
   _channelNodeUpdated(channelNode) {
     return channelNode === null ||
-      this.transmission.getCommunicationFor(this.pass, channelNode);
+      JointChannelMessage
+        .getOrCreate(this, channelNode)
+        .isUpdated();
   }
 }

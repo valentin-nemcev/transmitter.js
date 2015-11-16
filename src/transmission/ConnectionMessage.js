@@ -4,6 +4,7 @@ import Passes from './Passes';
 
 import Query from './Query';
 import JointMessage from './JointMessage';
+import JointChannelMessage from './JointChannelMessage';
 import MergingMessage from './MergingMessage';
 import SeparatingMessage from './SeparatingMessage';
 
@@ -96,6 +97,13 @@ export default class ConnectionMessage {
     JointMessage
       .getOrCreate(this, {node})
       .receiveTargetConnectionMessage(this.sourceChannelNode);
+    return this;
+  }
+
+  sendToJointChannelMessage(channelNode) {
+    JointChannelMessage
+      .getOrCreate(this, channelNode)
+      .receiveConnectionMessage(this.sourceChannelNode);
     return this;
   }
 

@@ -41,18 +41,12 @@ export default class ChannelNode {
   }
 
   receiveConnectionMessage(connectionMessage) {
-    connectionMessage.createNextQuery()
-      .sendToChannelNode(this);
+    connectionMessage.sendToJointChannelMessage(this);
     return this;
   }
 
   receiveQuery(query) {
     if (this.source != null) this.source.receiveQuery(query);
-    return this;
-  }
-
-  receiveMessage(message) {
-    message.sendToChannelNode(this);
     return this;
   }
 

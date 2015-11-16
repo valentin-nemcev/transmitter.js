@@ -11,7 +11,7 @@ export default class JointMessage {
 
   inspect() {
     return [
-      'SM',
+      '×M',
       inspect(this.pass),
       inspect(this.query),
       ',',
