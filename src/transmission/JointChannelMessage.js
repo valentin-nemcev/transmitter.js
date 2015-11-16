@@ -12,8 +12,10 @@ export default class JointChannelMessage {
   }
 
 
-  static getOrCreate(prevComm, channelNode) {
+  static getOrCreate(prevComm, opts) {
     const {transmission, pass} = prevComm;
+    const channelNode = opts.channelNode
+      || (opts.channelNodeTarget || {}).channelNode;
 
     let message = transmission.getCommunicationFor(pass, channelNode);
     if (message == null) {
@@ -42,7 +44,7 @@ export default class JointChannelMessage {
   _ensureQuerySent() {
     if (this.query != null) return this;
     this.query = Query.createNextConnection(this);
-    this.channelNode.receiveQuery(this.query);
+    this.channelNode.getChannelNodeTarget().receiveQuery(this.query);
     return this;
   }
 

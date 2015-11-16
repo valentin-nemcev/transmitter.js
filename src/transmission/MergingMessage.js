@@ -113,10 +113,10 @@ export default class MergingMessage {
     return this;
   }
 
-  sendToChannelNode(channelNode) {
-    this.log(channelNode);
+  sendToChannelNodeTarget(channelNodeTarget) {
+    this.log(channelNodeTarget);
     JointChannelMessage
-      .getOrCreate(this, channelNode)
+      .getOrCreate(this, {channelNodeTarget})
       .receiveMessage(this);
 
     return this;

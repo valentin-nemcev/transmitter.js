@@ -38,7 +38,7 @@ export default class NodePointTransmissionHub {
   _tryQueryChannelNode(channelNode) {
     if (!this._channelNodeUpdated(channelNode)) {
       JointChannelMessage
-        .getOrCreate(this, channelNode)
+        .getOrCreate(this, {channelNode})
         .receiveNestedCommunication(this.comm);
       return false;
     } else {
@@ -49,7 +49,7 @@ export default class NodePointTransmissionHub {
   _channelNodeUpdated(channelNode) {
     return channelNode === null ||
       JointChannelMessage
-        .getOrCreate(this, channelNode)
+        .getOrCreate(this, {channelNode})
         .isUpdated();
   }
 }

@@ -102,7 +102,7 @@ export default class ConnectionMessage {
 
   sendToJointChannelMessage(channelNode) {
     JointChannelMessage
-      .getOrCreate(this, channelNode)
+      .getOrCreate(this, {channelNode})
       .receiveConnectionMessage(this.sourceChannelNode);
     return this;
   }

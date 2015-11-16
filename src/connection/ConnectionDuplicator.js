@@ -25,7 +25,9 @@ export default class ConnectionDuplicator {
   }
 
   receiveMessage(message) {
-    this.targets.forEach( (target) => message.sendToChannelNode(target) );
+    this.targets.forEach(
+      (target) => message.sendToChannelNodeTarget(target)
+    );
     return this;
   }
 

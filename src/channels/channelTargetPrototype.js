@@ -6,7 +6,7 @@ import ConnectionDuplicator from '../connection/ConnectionDuplicator';
 import assertSingleArgument from './assertSingleArgument';
 
 function assertChannelTarget(channelTarget) {
-  if (!(channelTarget || {}).isChannelTarget) {
+  if ((channelTarget || {}).getChannelNodeTarget == null) {
     throw new Error(
       `${inspect(channelTarget)} is not a valid target node`);
   }
@@ -28,10 +28,11 @@ export default buildPrototype()
     },
 
     _createDuplicator(channelTargets) {
-      for (const channelTarget of channelTargets) {
+      const targets = channelTargets.map( (channelTarget) => {
         assertChannelTarget(channelTarget);
-      }
-      return new ConnectionDuplicator(channelTargets);
+        return channelTarget.getChannelNodeTarget();
+      });
+      return new ConnectionDuplicator(targets);
     },
   })
   .freezeAndReturn();
