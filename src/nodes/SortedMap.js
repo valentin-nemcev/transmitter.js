@@ -55,4 +55,8 @@ export default class SortedMap extends SourceTargetNode {
     return this.entries.slice();
   }
 
+  getSize() {
+    return this.entries.length;
+  }
+
 }

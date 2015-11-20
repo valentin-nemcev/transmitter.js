@@ -25,4 +25,5 @@ describe('Functional', function() {
   require('./functional/flattening_with_nested_list_connections.specs');
   require('./functional/reversing_messages_in_the_middle_of_the_chain.specs');
   require('./functional/merging_after_splitting.specs');
+  require('./functional/grouping_and_sorting.specs');
 });
