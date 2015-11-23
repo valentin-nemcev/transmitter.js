@@ -1,7 +1,18 @@
 import SourceTargetNode from './SourceTargetNode';
-
+import {
+  createMapPayload, createMapPayloadFromConst,
+} from '../payloads/MapPayload';
 
 export default class SortedMap extends SourceTargetNode {
+
+  processPayload(payload) {
+    payload.deliver(this);
+    return createMapPayload(this);
+  }
+
+  createPlaceholderPayload() {
+    return createMapPayloadFromConst([]);
+  }
 
   constructor() {
     super();

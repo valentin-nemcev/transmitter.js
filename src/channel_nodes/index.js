@@ -4,8 +4,13 @@ export ChannelNode            from './ChannelNode';
 
 import DynamicListChannelValue from './DynamicListChannelValue';
 import DynamicOptionalChannelValue from './DynamicOptionalChannelValue';
+import DynamicMapChannelValue from './DynamicMapChannelValue';
 
-export {DynamicListChannelValue, DynamicOptionalChannelValue};
+export {
+  DynamicListChannelValue,
+  DynamicOptionalChannelValue,
+  DynamicMapChannelValue,
+};
 
 import ChannelValue from './ChannelValue';
 import ChannelList     from './ChannelList';

@@ -8,7 +8,7 @@ import assertSingleArgument from './assertSingleArgument';
 function assertChannelTarget(channelTarget) {
   if ((channelTarget || {}).getChannelNodeTarget == null) {
     throw new Error(
-      `${inspect(channelTarget)} is not a valid target node`);
+      `${inspect(channelTarget)} is not a valid channel target node`);
   }
   return this;
 }

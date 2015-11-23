@@ -67,7 +67,7 @@ FlatteningChannel.prototype = buildPrototype()
       this._directions.forward : this._directions.backward;
   })
 
-  .lazyReadOnlyProperty('_flatToNestedChannel', function() {
+  .lazyReadOnlyProperty('_flatToNestedChannelNode', function() {
     const direction = this._flatToNestedDirection;
     return direction && new this._dynamicChannelNodeConstructor(
       'targets', (targets) =>
@@ -80,7 +80,7 @@ FlatteningChannel.prototype = buildPrototype()
           )
     );
   })
-  .lazyReadOnlyProperty('_nestedToFlatChannel', function() {
+  .lazyReadOnlyProperty('_nestedToFlatChannelNode', function() {
     const direction = this._nestedToFlatDirection;
     return direction && new this._dynamicChannelNodeConstructor(
       'sources', (sources) =>
@@ -93,8 +93,10 @@ FlatteningChannel.prototype = buildPrototype()
   })
 
   .lazyReadOnlyProperty('_nestedChannel', function() {
-    const targets = [this._nestedToFlatChannel, this._flatToNestedChannel]
-      .filter( (c) => c );
+    const targets = [
+      this._nestedToFlatChannelNode,
+      this._flatToNestedChannelNode,
+    ].filter( (c) => c );
     return new NestedSimpleChannel().toChannelTargets(...targets);
   })
 
