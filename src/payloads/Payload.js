@@ -1,8 +1,8 @@
 export default class Payload {
 
-  isNoop() { return false; }
+  isNoOp() { return false; }
 
-  replaceByNoop(payload) { return payload.isNoop() ? payload : this; }
+  replaceByNoOp(payload) { return payload.isNoOp() ? payload : this; }
 
-  replaceNoopBy() { return this; }
+  replaceNoOpBy() { return this; }
 }

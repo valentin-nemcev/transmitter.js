@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 import Payload from './Payload';
-import noop from './noop';
+import getNoOpPayload from './NoOpPayload';
 import {createValuePayloadFromConst} from './ValuePayload';
 import {createListPayload} from './ListPayload';
 
@@ -146,10 +146,6 @@ class OptionalPayload extends AbstractOptionalPayload {
     value.set(this.get());
     return this;
   }
-
-  noopIf(conditionCb) {
-    if (conditionCb(this.get())) { return noop(); } else { return this; }
-  }
 }
 
 
@@ -165,13 +161,13 @@ class ToOptionalSource {
 }
 
 
-const NoopPayload = noop().constructor;
+const NoOpPayload = getNoOpPayload().constructor;
 
 Payload.prototype.toOptional = function() {
   return create(new ToOptionalSource(this));
 };
 OptionalPayload.prototype.toOptional = function() { return this; };
-NoopPayload.prototype.toOptional = function() { return this; };
+NoOpPayload.prototype.toOptional = function() { return this; };
 
 OptionalPayload.prototype.toList = function() {
   return createListPayload(this);

@@ -1,4 +1,4 @@
-import noop from './noop';
+import getNoOpPayload from './NoOpPayload';
 
 import {
   createValuePayload, createValuePayloadFromConst, mergeValuePayloads,
@@ -13,7 +13,7 @@ import {
 } from '../payloads/ListPayload';
 
 export {
-  noop,
+  getNoOpPayload,
 
   createValuePayload,
   createValuePayloadFromConst,

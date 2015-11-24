@@ -1,7 +1,7 @@
 import BlindNodeSource from '../connection/BlindNodeSource';
 import NodeTarget from '../connection/NodeTarget';
 
-import {noop} from '../payloads';
+import {getNoOpPayload} from '../payloads';
 
 
 export default class TargetNode {
@@ -18,6 +18,6 @@ export default class TargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return noop();
+    return getNoOpPayload();
   }
 }

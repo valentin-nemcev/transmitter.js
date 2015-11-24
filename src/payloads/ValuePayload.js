@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 import Payload from './Payload';
-import noop from './noop';
+import getNoOpPayload from './NoOpPayload';
 
 function id(a) { return a; }
 
@@ -107,8 +107,8 @@ class ValuePayload extends Payload {
     return this;
   }
 
-  noopIf(conditionCb) {
-    if (conditionCb(this.get())) { return noop(); } else { return this; }
+  noOpIf(conditionCb) {
+    return conditionCb(this.get()) ? getNoOpPayload() : this;
   }
 
   merge(...otherPayloads) { return merge([this, ...otherPayloads]); }
@@ -126,12 +126,12 @@ class ConvertedValuePayload {
   }
 }
 
-const NoopPayload = noop().constructor;
+const NoOpPayload = getNoOpPayload().constructor;
 
 Payload.prototype.toValue = function() {
   return create(new ConvertedValuePayload(this));
 };
-NoopPayload.prototype.toValue = function() { return this; };
+NoOpPayload.prototype.toValue = function() { return this; };
 
 Payload.prototype.fromListToOptional = function() {
   return create(this).map( (v) => v[0] );

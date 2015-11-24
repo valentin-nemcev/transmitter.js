@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import {noop} from '../payloads';
+import {getNoOpPayload} from '../payloads';
 
 import NodePointTransmissionHub from './NodePointTransmissionHub';
 import Query from './Query';
@@ -195,7 +195,8 @@ export default class JointMessage {
       ? this.precedingMessage.getPriority()
       : 0;
 
-    const nextPayload = prevPayload || this.node.processPayload(noop());
+    const nextPayload =
+      prevPayload || this.node.processPayload(getNoOpPayload());
     const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
 
     return this._sendMessage(nextMessage);

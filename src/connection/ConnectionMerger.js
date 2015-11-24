@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import {noop} from '../payloads';
+import {getNoOpPayload} from '../payloads';
 
 
 export default class ConnectionMerger {
@@ -34,7 +34,7 @@ export default class ConnectionMerger {
     return this;
   }
 
-  getPlaceholderPayload() { return noop(); }
+  getPlaceholderPayload() { return getNoOpPayload(); }
 
   receiveMessage(message) {
     message.sendToConnectionMerger(this);

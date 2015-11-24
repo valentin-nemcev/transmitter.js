@@ -1,6 +1,5 @@
 import {inspect} from 'util';
 
-// import noop from './noop';
 import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
 

@@ -1,6 +1,6 @@
 import NodeSource from '../connection/NodeSource';
 import NodeTarget from '../connection/NodeTarget';
-import {noop} from '../payloads';
+import {getNoOpPayload} from '../payloads';
 
 
 export default class SourceTargetNode {
@@ -16,7 +16,8 @@ export default class SourceTargetNode {
   getNodeTarget() { return this.nodeTarget; }
 
   originate(tr, payload = null) {
-    tr.originateMessage(this, payload || this.processPayload(noop()));
+    tr.originateMessage(
+      this, payload || this.processPayload(getNoOpPayload()));
     return this;
   }
 

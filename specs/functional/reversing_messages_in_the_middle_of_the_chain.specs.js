@@ -13,7 +13,7 @@ describe('Reversing messages in the middle of the chain', function() {
         .fromSources(this.button, this.textInput)
         .toTarget(this.tagList)
         .withTransform( ([buttonWasClickedPayload, textValuePayload]) =>
-          textValuePayload.replaceByNoop(buttonWasClickedPayload)
+          textValuePayload.replaceByNoOp(buttonWasClickedPayload)
             .toAppendElementAction()
         )
         .init(tr);

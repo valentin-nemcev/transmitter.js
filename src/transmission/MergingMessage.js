@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import {noop} from '../payloads';
+import {getNoOpPayload} from '../payloads';
 
 import Query from './Query';
 import SeparatingMessage from './SeparatingMessage';
@@ -79,7 +79,7 @@ export default class MergingMessage {
 
     [this.payload, this.priority] =
         this.connPoint.prioritiesShouldMatch && !this._prioritiesMatch()
-          ? this._getNoopPayload()
+          ? this._getNoOpPayload()
           : this._getMergedPayload();
 
     return this.connPoint.sendMessage(this);
@@ -122,7 +122,7 @@ export default class MergingMessage {
     return this;
   }
 
-  _getNoopPayload() { return [noop(), null]; }
+  _getNoOpPayload() { return [getNoOpPayload(), null]; }
 
   _getEmptyPayload() {
     const payload = this.channelNode != null

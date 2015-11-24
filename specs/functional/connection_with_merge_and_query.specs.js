@@ -25,7 +25,7 @@ describe('Connection with merge and query', function() {
         .fromSources(this.button, this.textInput)
         .toTarget(this.alertEmitter)
         .withTransform( ([buttonWasClickedPayload, textValuePayload]) =>
-          textValuePayload.replaceByNoop(buttonWasClickedPayload)
+          textValuePayload.replaceByNoOp(buttonWasClickedPayload)
         )
         .init(tr)
     );

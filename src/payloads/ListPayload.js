@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import noop from './noop';
+import getNoOpPayload from './NoOpPayload';
 import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
 
@@ -282,22 +282,22 @@ class ConvertedListPayload extends AbstractListPayload {
 }
 
 
-const NoopPayload = noop().constructor;
+const NoOpPayload = getNoOpPayload().constructor;
 
 Payload.prototype.toList = function() {
   return ListPayload.create(new ConvertedListPayload(this));
 };
-NoopPayload.prototype.toList = function() { return this; };
+NoOpPayload.prototype.toList = function() { return this; };
 
 Payload.prototype.toAppendElementAction = function() {
   return AddAtAction.create(this.map( (el) => [el] ));
 };
-NoopPayload.prototype.toAppendElementAction = function() { return this; };
+NoOpPayload.prototype.toAppendElementAction = function() { return this; };
 
 Payload.prototype.toRemoveElementAction = function() {
   return RemoveAction.create(this);
 };
-NoopPayload.prototype.toRemoveElementAction = function() { return this; };
+NoOpPayload.prototype.toRemoveElementAction = function() { return this; };
 
 export {
   zip,

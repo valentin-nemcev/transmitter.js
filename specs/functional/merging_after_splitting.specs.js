@@ -15,7 +15,7 @@ describe('Merging after splitting', function() {
         .fromSource(this.keypressValue)
         .toTarget(this.stateValue)
         .withTransform( (keypress) =>
-          keypress.noopIf( (key) => key !== 'enter' ).map( () => true )
+          keypress.noOpIf( (key) => key !== 'enter' ).map( () => true )
         )
         .init(tr);
 
@@ -24,7 +24,7 @@ describe('Merging after splitting', function() {
         .fromSource(this.keypressValue)
         .toTarget(this.stateValue)
         .withTransform( (keypress) =>
-          keypress.noopIf( (key) => key !== 'esc' ).map( () => false )
+          keypress.noOpIf( (key) => key !== 'esc' ).map( () => false )
         )
         .init(tr);
     });
