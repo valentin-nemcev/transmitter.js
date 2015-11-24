@@ -1,6 +1,6 @@
 import NodeSource from '../connection/NodeSource';
 import NodeTarget from '../connection/NodeTarget';
-import noop from '../payloads/noop';
+import {noop} from '../payloads';
 
 
 export default class SourceTargetNode {

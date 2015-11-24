@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import noop from '../payloads/noop';
+import {noop} from '../payloads';
 
 import Query from './Query';
 import SeparatingMessage from './SeparatingMessage';

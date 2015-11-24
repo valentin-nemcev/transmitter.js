@@ -1,5 +1,5 @@
 import ChannelNode from './ChannelNode';
-import {createListPayloadFromConst} from '../payloads/ListPayload';
+import {createListPayloadFromConst} from '../payloads';
 
 
 export default class DynamicListChannelValue extends ChannelNode {

@@ -1,5 +1,5 @@
 import SourceNode from './SourceNode';
-import {createValuePayloadFromConst} from '../payloads/ValuePayload';
+import {createValuePayloadFromConst} from '../payloads';
 
 export default class ValueSource extends SourceNode {
 

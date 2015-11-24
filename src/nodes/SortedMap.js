@@ -1,7 +1,7 @@
 import SourceTargetNode from './SourceTargetNode';
 import {
   createMapPayload, createMapPayloadFromConst,
-} from '../payloads/MapPayload';
+} from '../payloads';
 
 export default class SortedMap extends SourceTargetNode {
 

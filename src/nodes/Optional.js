@@ -2,7 +2,7 @@ import SourceTargetNode from './SourceTargetNode';
 
 import {
   createOptionalPayload, createOptionalPayloadFromConst,
-} from '../payloads/OptionalPayload';
+} from '../payloads';
 
 export default class Optional extends SourceTargetNode {
 

@@ -2,7 +2,6 @@ require('./common');
 
 describe('Unit', function() {
   require('./unit/query_queue.specs');
-  require('./unit/list_update.specs');
   require('./unit/sorted_map.specs');
 });
 

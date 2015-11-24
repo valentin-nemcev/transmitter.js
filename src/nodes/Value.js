@@ -1,7 +1,7 @@
 import SourceTargetNode from './SourceTargetNode';
 import {
   createValuePayload, createValuePayloadFromConst,
-} from '../payloads/ValuePayload';
+} from '../payloads';
 
 
 export default class Value extends SourceTargetNode {

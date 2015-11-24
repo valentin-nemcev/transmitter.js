@@ -1,5 +1,5 @@
 import ChannelNode from './ChannelNode';
-import {createMapPayloadFromConst} from '../payloads/MapPayload';
+import {createMapPayloadFromConst} from '../payloads';
 
 
 export default class DynamicMapChannelValue extends ChannelNode {

@@ -1,5 +1,5 @@
 import ChannelNode from './ChannelNode';
-import {createOptionalPayloadFromConst} from '../payloads/OptionalPayload';
+import {createOptionalPayloadFromConst} from '../payloads';
 
 
 export default class DynamicOptionalChannelValue extends ChannelNode {

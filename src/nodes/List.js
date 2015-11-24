@@ -1,7 +1,7 @@
 import SourceTargetNode from './SourceTargetNode';
 import {
   createListPayload, createListPayloadFromConst,
-} from '../payloads/ListPayload';
+} from '../payloads';
 
 
 export default class List extends SourceTargetNode {

@@ -1,7 +1,7 @@
 import BlindNodeSource from '../connection/BlindNodeSource';
 import NodeTarget from '../connection/NodeTarget';
 
-import noop from '../payloads/noop';
+import {noop} from '../payloads';
 
 
 export default class TargetNode {
