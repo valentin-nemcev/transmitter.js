@@ -15,10 +15,14 @@ export default class Value extends SourceTargetNode {
     return createValuePayloadFromConst(null);
   }
 
+  get() { return this.value; }
+
+  *[Symbol.iterator]() {
+    yield this.value;
+  }
+
   set(value) {
     this.value = value;
     return this;
   }
-
-  get() { return this.value; }
 }

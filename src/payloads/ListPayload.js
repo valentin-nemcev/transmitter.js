@@ -115,6 +115,15 @@ function zip(payloads, coerceSize = false) {
 }
 
 class AbstractListPayload extends Payload {
+  getEmptyElement() {
+    return this.emptyElement;
+  }
+
+  setEmptyElement(emptyElement) {
+    this.emptyElement = emptyElement;
+    return this;
+  }
+
   map(map) {
     return new ListPayload(this, {map});
   }
@@ -122,8 +131,32 @@ class AbstractListPayload extends Payload {
   filter(filter) {
     return new ListPayload(this, {filter});
   }
+
   updateMatching(map, match) {
     return new UpdateMatchingPayload(this, {map, match});
+  }
+
+
+  flatten() {
+    return this.map( (nested) => nested.get() );
+  }
+
+  unflatten() {
+    return this
+      .map( (value) => createValuePayloadFromConst(value) )
+      .setEmptyElement(createValuePayloadFromConst(undefined));
+  }
+
+  zipCoercingSize(...otherPayloads) {
+    return zip([this, ...otherPayloads], true);
+  }
+
+  zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
+
+  unzip(size) {
+    return Array.from(Array(size).keys()).map( (i) =>
+      this.map( (values) => values[i] )
+    );
   }
 
   deliver(list) {
@@ -140,15 +173,16 @@ class ZippedPayload extends AbstractListPayload {
   }
 
   *[Symbol.iterator]() {
-    const iters = this.payloads.map( (p) => p[Symbol.iterator]() );
-    if (iters.length === 0) return;
+    const payloadsWithIters = this.payloads
+      .map( (p) => [p, p[Symbol.iterator]()] );
 
     for (;;) {
       const zippedEl = [];
       let firstDone;
       let allDone = true;
-      for (const it of iters) {
-        const {value: el, done} = it.next();
+      for (const [payload, it] of payloadsWithIters) {
+        const {value, done} = it.next();
+        const el = done ? payload.getEmptyElement() : value;
         if (firstDone == null) firstDone = done;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
@@ -228,52 +262,11 @@ class ListPayload extends AbstractListPayload {
     return this.get().length;
   }
 
-
-  flatten() {
-    return this.map( (nested) => nested.get() );
-  }
-
-  unflatten() {
-    return this.map( (value) => createValuePayloadFromConst(value) );
-  }
-
-  zipCoercingSize(...otherPayloads) {
-    return zip([this, ...otherPayloads], true);
-  }
-
-  zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
-
-  unzip(size) {
-    return Array.from(Array(size).keys()).map( (i) =>
-      this.map( (values) => values[i] )
-    );
-  }
-
-  coerceSize(otherPayload) {
-    return ListPayload.create(new CoerseSizeSource(this, otherPayload));
-  }
-
 }
 
-class CoerseSizeSource {
-  constructor(payload, sizePayload) {
-    this.payload = payload;
-    this.sizePayload = sizePayload;
-  }
-
-  *[Symbol.iterator]() {
-    const size = this.sizePayload.getSize();
-    const it = this.payload[Symbol.iterator]();
-    for (let i = 0; i < size; i++) {
-      const {value: el} = it.next();
-      yield el;
-    }
-  }
-}
-
-
-class ToListSource {
+class ConvertedListPayload extends AbstractListPayload {
   constructor(source) {
+    super();
     this.source = source;
   }
 
@@ -291,13 +284,8 @@ class ToListSource {
 
 const NoopPayload = noop().constructor;
 
-Payload.prototype.fromOptionalToList = function() {
-  return ListPayload.create(this.map( (v) => v != null ? [v] : [] ));
-};
-NoopPayload.prototype.fromOptionalToList = function() { return this; };
-
 Payload.prototype.toList = function() {
-  return ListPayload.create(new ToListSource(this));
+  return ListPayload.create(new ConvertedListPayload(this));
 };
 NoopPayload.prototype.toList = function() { return this; };
 

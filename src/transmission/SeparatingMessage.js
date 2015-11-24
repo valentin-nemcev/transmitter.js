@@ -66,7 +66,7 @@ module.exports = class SeparatingMessage {
         yield [nodePayload[i], valuePayload[i]];
       }
     } else {
-      yield* nodePayload.zip(valuePayload);
+      yield* nodePayload.zipCoercingSize(valuePayload);
     }
   }
 

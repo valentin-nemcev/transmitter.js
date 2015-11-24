@@ -75,8 +75,8 @@ FlatteningChannel.prototype = buildPrototype()
           .inDirection(direction)
           .fromSource(this._flatNode)
           .toDynamicTargets(targets)
-          .withTransform( (flatPayload, nestedPayload) =>
-            flatPayload.coerceSize(nestedPayload).unflatten()
+          .withTransform( (flatPayload) =>
+            flatPayload.unflatten()
           )
     );
   })

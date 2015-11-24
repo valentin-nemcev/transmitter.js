@@ -9,26 +9,17 @@ function id(a) { return a; }
 
 function zip(payloads, coerceSize = false) {
   return new ZippedPayload(payloads, coerceSize);
-  // return create({
-  //   get() {
-  //     const size = payloads[0] != null ? payloads[0].getSize() : 0;
-  //     if (!coerceSize) {
-  //       for (const p of payloads) {
-  //         if (p.getSize() !== size) {
-  //           throw new Error(
-  //             "Can't zip lists with different sizes: "
-  //             + payloads.map(inspect).join(', ')
-  //           );
-  //         }
-  //       }
-  //     }
-
-  //     return size > 0 ? payloads.map( (p) => p.get() ) : null;
-  //   },
-  // });
 }
 
 class AbstractOptionalPayload extends Payload {
+  getEmptyElement() {
+    return this.emptyElement;
+  }
+
+  setEmptyElement(emptyElement) {
+    this.emptyElement = emptyElement;
+    return this;
+  }
   map(map) {
     return new OptionalPayload(this, {map});
   }
@@ -47,15 +38,16 @@ class ZippedPayload extends AbstractOptionalPayload {
   }
 
   *[Symbol.iterator]() {
-    const iters = this.payloads.map( (p) => p[Symbol.iterator]() );
-    if (iters.length === 0) return;
+    const payloadsWithIters = this.payloads
+      .map( (p) => [p, p[Symbol.iterator]()] );
 
     for (;;) {
       const zippedEl = [];
       let firstDone;
       let allDone = true;
-      for (const it of iters) {
-        const {value: el, done} = it.next();
+      for (const [payload, it] of payloadsWithIters) {
+        const {value, done} = it.next();
+        const el = done ? payload.getEmptyElement() : value;
         if (firstDone == null) firstDone = done;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
@@ -79,9 +71,6 @@ function create(source) {
   return new OptionalPayload(source);
 }
 
-// function createFromConst(value) {
-//   return create({createFromConst: true, get() { return value; }});
-// }
 
 function createFromConst(value) {
   return new OptionalPayload(new ConstOptionalSource(value));
@@ -100,7 +89,7 @@ class ConstOptionalSource {
 }
 
 
-class OptionalPayload extends Payload {
+class OptionalPayload extends AbstractOptionalPayload {
 
   constructor(source, {map} = {}) {
     super();
@@ -136,7 +125,9 @@ class OptionalPayload extends Payload {
   }
 
   unflatten() {
-    return this.map( (value) => createValuePayloadFromConst(value) );
+    return this
+      .map( (value) => createValuePayloadFromConst(value) )
+      .setEmptyElement(createValuePayloadFromConst(undefined));
   }
 
   zipCoercingSize(...otherPayloads) {
@@ -149,11 +140,6 @@ class OptionalPayload extends Payload {
     return Array.from(Array(size).keys()).map( (i) =>
       this.map( (values) => values[i] )
     );
-  }
-
-  coerceSize(otherPayload) {
-    // TODO: ↓
-    return this.toList().coerceSize(otherPayload.toList());
   }
 
   deliver(value) {

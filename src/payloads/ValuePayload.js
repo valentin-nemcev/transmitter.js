@@ -39,15 +39,33 @@ function create(source) {
 }
 
 function createFromConst(value) {
-  return create({get() { return value; }});
+  return create(new ConstValueSource(value));
+}
+
+class ConstValueSource {
+  constructor(value) {
+    this.value = value;
+  }
+
+  *[Symbol.iterator]() {
+    yield this.value;
+  }
+
 }
 
 function merge(payloads) {
-  return create({
-    get() {
-      return payloads.map( (p) => p.get() );
-    },
-  });
+  return create(new MergedPayload(payloads));
+}
+
+
+class MergedPayload {
+  constructor(payloads) {
+    this.payloads = payloads;
+  }
+
+  *[Symbol.iterator]() {
+    yield this.payloads.map( (p) => p[Symbol.iterator]().next().value );
+  }
 }
 
 
@@ -64,11 +82,13 @@ class ValuePayload extends Payload {
 
 
   get() {
-    return this.mapFn.call(null, this.source.get());
+    const {value} = this[Symbol.iterator]().next();
+    return value;
   }
 
   *[Symbol.iterator]() {
-    yield this.get();
+    const {value} = this.source[Symbol.iterator]().next();
+    yield this.mapFn.call(null, value);
   }
 
 
@@ -93,17 +113,23 @@ class ValuePayload extends Payload {
 
   merge(...otherPayloads) { return merge([this, ...otherPayloads]); }
 
-  separate() {
-    return this.get().map( (value) => create({get() { return value; }})
-    );
-  }
 }
 
+
+class ConvertedValuePayload {
+  constructor(source) {
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    yield Array.from(this.source);
+  }
+}
 
 const NoopPayload = noop().constructor;
 
 Payload.prototype.toValue = function() {
-  return create(this);
+  return create(new ConvertedValuePayload(this));
 };
 NoopPayload.prototype.toValue = function() { return this; };
 
