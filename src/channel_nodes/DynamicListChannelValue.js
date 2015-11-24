@@ -30,6 +30,10 @@ export default class DynamicListChannelValue extends ChannelNode {
     return this;
   }
 
+  setIterator(newNodes) {
+    return this.set(Array.from(newNodes));
+  }
+
   getPlaceholderPayload() {
     return createListPayloadFromConst([]);
   }

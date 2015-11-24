@@ -7,7 +7,7 @@ class Item {
   }
 }
 
-describe('Grouping and sorting', function() {
+describe.skip('Grouping and sorting', function() {
 
   beforeEach(function() {
     this.define('itemList', new Transmitter.Nodes.List());

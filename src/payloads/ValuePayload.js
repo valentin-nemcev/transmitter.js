@@ -67,6 +67,10 @@ class ValuePayload extends Payload {
     return this.mapFn.call(null, this.source.get());
   }
 
+  *[Symbol.iterator]() {
+    yield this.get();
+  }
+
 
   map(map) {
     return new ValuePayload(this, {map});

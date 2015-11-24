@@ -4,31 +4,6 @@ import noop from './noop';
 import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
 
-function zip(payloads, coerceSize = false) {
-  return ListPayload.create({
-    get() {
-      const length = payloads[0] != null ? payloads[0].getSize() : 0;
-      if (!coerceSize) {
-        for (const p of payloads) {
-          if (p.getSize() !== length) {
-            throw new Error(
-              "Can't zip lists with different sizes: "
-              + payloads.map(inspect).join(', ')
-            );
-          }
-        }
-      }
-
-      const result = [];
-      for (let i = 0; i < length; i++) {
-        result.push(payloads.map( (p) => p.getAt(i) ));
-      }
-      return result;
-    },
-  });
-}
-
-
 class RemoveAction extends Payload {
 
   static create(source) {
@@ -88,13 +63,14 @@ class UpdateMatchingPayload extends Payload {
 
   deliver(target) {
     let targetLength = target.getSize();
-    const sourceLength = this.source.getSize();
+    const source = Array.from(this.source);
+    const sourceLength = source.length;
 
     let targetPos = 0;
     let sourcePos = 0;
     for (;;) {
       if (sourcePos < sourceLength) {
-        const sourceEl = this.source.getAt(sourcePos);
+        const sourceEl = source[sourcePos];
 
         let sourcePosInTarget = targetPos;
         while (sourcePosInTarget < targetLength) {
@@ -133,19 +109,90 @@ class UpdateMatchingPayload extends Payload {
   }
 }
 
+
+function zip(payloads, coerceSize = false) {
+  return new ZippedPayload(payloads, coerceSize);
+}
+
+class AbstractListPayload extends Payload {
+  map(map) {
+    return new ListPayload(this, {map});
+  }
+
+  filter(filter) {
+    return new ListPayload(this, {filter});
+  }
+  updateMatching(map, match) {
+    return new UpdateMatchingPayload(this, {map, match});
+  }
+
+  deliver(list) {
+    list.setIterator(this);
+    return this;
+  }
+}
+
+class ZippedPayload extends AbstractListPayload {
+  constructor(payloads, coerceSize) {
+    super();
+    this.payloads = payloads;
+    this.coerceSize = coerceSize;
+  }
+
+  *[Symbol.iterator]() {
+    const iters = this.payloads.map( (p) => p[Symbol.iterator]() );
+    if (iters.length === 0) return;
+
+    for (;;) {
+      const zippedEl = [];
+      let firstDone;
+      let allDone = true;
+      for (const it of iters) {
+        const {value: el, done} = it.next();
+        if (firstDone == null) firstDone = done;
+        if (this.coerceSize && firstDone) return;
+        if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
+        allDone = allDone && done;
+        zippedEl.push(el);
+      }
+      if (allDone) return;
+      else yield zippedEl;
+    }
+  }
+
+  _throwSizeMismatch() {
+    throw new Error(
+      "Can't zip lists with different sizes: "
+      + this.payloads.map(inspect).join(', ')
+    );
+  }
+}
+
+
 function create(source) {
   return new ListPayload(source);
 }
 
 function createFromConst(value) {
-  return create({get() { return value; }});
+  return new ListPayload(new ConstListSource(value));
 }
 
+
+class ConstListSource {
+  constructor(value) {
+    this.value = value;
+  }
+
+  [Symbol.iterator]() {
+    return this.value.values();
+  }
+
+}
 
 function id(a) { return a; }
 function getTrue() { return true; }
 
-class ListPayload extends Payload {
+class ListPayload extends AbstractListPayload {
 
   static create(source) {
     return new ListPayload(source);
@@ -163,32 +210,24 @@ class ListPayload extends Payload {
 
 
   get() {
-    if (!this.gotValue) {
-      this.value = this.source.get().filter(this.filterFn).map(this.mapFn);
-      this.gotValue = true;
-    }
-    return this.value;
+    return Array.from(this);
   }
 
+  *[Symbol.iterator]() {
+    const {filterFn: filter, mapFn: map} = this;
+    for (const el of this.source) {
+      if (filter(el)) yield map(el);
+    }
+  }
 
   getAt(pos) {
     return this.get()[pos];
   }
 
-
   getSize() {
     return this.get().length;
   }
 
-
-  map(map) {
-    return new ListPayload(this, {map});
-  }
-
-
-  filter(filter) {
-    return new ListPayload(this, {filter});
-  }
 
   flatten() {
     return this.map( (nested) => nested.get() );
@@ -211,22 +250,41 @@ class ListPayload extends Payload {
   }
 
   coerceSize(otherPayload) {
-    return ListPayload.create({get: () => {
-      const result = [];
-      for (let i = 0; i < otherPayload.getSize(); i++) {
-        result.push(this.getAt(i));
+    return ListPayload.create(new CoerseSizeSource(this, otherPayload));
+  }
+
+}
+
+class CoerseSizeSource {
+  constructor(payload, sizePayload) {
+    this.payload = payload;
+    this.sizePayload = sizePayload;
+  }
+
+  *[Symbol.iterator]() {
+    const size = this.sizePayload.getSize();
+    const it = this.payload[Symbol.iterator]();
+    for (let i = 0; i < size; i++) {
+      const {value: el} = it.next();
+      yield el;
+    }
+  }
+}
+
+
+class ToListSource {
+  constructor(source) {
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    for (const el of this.source) {
+      if (el[Symbol.iterator] != null) {
+        yield* el;
+      } else {
+        yield el;
       }
-      return result;
-    }});
-  }
-
-  updateMatching(map, match) {
-    return new UpdateMatchingPayload(this, {map, match});
-  }
-
-  deliver(list) {
-    list.set(this.get());
-    return this;
+    }
   }
 }
 
@@ -239,12 +297,8 @@ Payload.prototype.fromOptionalToList = function() {
 NoopPayload.prototype.fromOptionalToList = function() { return this; };
 
 Payload.prototype.toList = function() {
-  return create({get: () => {
-    const v = this.get();
-    return v != null ? Array.from(v) : [];
-  }});
+  return ListPayload.create(new ToListSource(this));
 };
-ListPayload.prototype.toList = function() { return this; };
 NoopPayload.prototype.toList = function() { return this; };
 
 Payload.prototype.toAppendElementAction = function() {

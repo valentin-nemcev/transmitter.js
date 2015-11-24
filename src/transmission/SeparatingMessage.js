@@ -61,17 +61,13 @@ module.exports = class SeparatingMessage {
   }
 
   *_zipPayloads(valuePayload, nodePayload) {
-    const [nodes, values] = Array.isArray(nodePayload)
-      ? [nodePayload, valuePayload]
-      : [nodePayload.toList().get(), valuePayload.toList().get()];
-
-    if (nodes.length !== values.length) {
-      throw new Error(
-          `Payload element count mismatch, ` +
-          `expected ${nodes.length}, got ${values.length}`
-        );
+    if (Array.isArray(nodePayload)) {
+      for (let i = 0; i < nodePayload.length; i++) {
+        yield [nodePayload[i], valuePayload[i]];
+      }
+    } else {
+      yield* nodePayload.zip(valuePayload);
     }
-    for (let i = 0; i < nodes.length; i++) yield [nodes[i], values[i]];
   }
 
   _getNodesToValuePayloads(valuePayload, nodePayload) {
@@ -81,7 +77,7 @@ module.exports = class SeparatingMessage {
     for (const [node, payload] of nodesWithValues) {
       if (payload == null) {
         throw new Error(
-            `Got null payload for ${inspect(node)}. `
+            `Got null payload for ${inspect(node)}`
           );
       }
 

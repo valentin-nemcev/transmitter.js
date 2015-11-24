@@ -15,10 +15,14 @@ export default class Optional extends SourceTargetNode {
     return createOptionalPayloadFromConst(null);
   }
 
+  get() { return this.value; }
+
+  *[Symbol.iterator]() {
+    if (this.value != null) yield this.value;
+  }
+
   set(value) {
     this.value = value;
     return this;
   }
-
-  get() { return this.value; }
 }

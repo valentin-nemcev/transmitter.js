@@ -20,9 +20,31 @@ export default class List extends SourceTargetNode {
     this.list = [];
   }
 
+  get() {
+    return this.list.slice();
+  }
+
+  [Symbol.iterator]() {
+    return this.list.values();
+  }
+
+  getAt(pos) {
+    return this.list[pos];
+  }
+
+  getSize() {
+    return this.list.length;
+  }
+
   set(list) {
     this.list.length = 0;
     this.list.push(...list);
+    return this;
+  }
+
+  setIterator(iter) {
+    this.list.length = 0;
+    for (const el of iter) this.list.push(el);
     return this;
   }
 
@@ -50,15 +72,4 @@ export default class List extends SourceTargetNode {
     return this;
   }
 
-  get() {
-    return this.list.slice();
-  }
-
-  getAt(pos) {
-    return this.list[pos];
-  }
-
-  getSize() {
-    return this.list.length;
-  }
 }
