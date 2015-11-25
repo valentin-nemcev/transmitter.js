@@ -1,58 +1,11 @@
 import {inspect} from 'util';
 
-import getNoOpPayload from './NoOpPayload';
 import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
 
-class RemoveAction extends Payload {
-
-  static create(source) {
-    return new RemoveAction(source);
-  }
-
-  constructor(source) {
-    super();
-    this.source = source;
-  }
-
-  inspect() { return `listRemove(${inspect(this.source)})`; }
-
-  deliver(target) {
-    const element = this.source.get();
-    const iterable = target.get();
-    for (let pos = 0; pos < iterable.length; pos++) {
-      const el = iterable[pos];
-      if (el === element) target.removeAt(pos);
-    }
-    return this;
-  }
-}
-
-
-class AddAtAction extends Payload {
-
-  static create(source) {
-    return new AddAtAction(source);
-  }
-
-  constructor(source) {
-    super();
-    this.source = source;
-  }
-
-  inspect() { return `listAddAt(${inspect(this.source.get())})`; }
-
-  deliver(target) {
-    target.addAt(...this.source.get());
-    return this;
-  }
-}
-
-
-class UpdateMatchingPayload extends Payload {
+class UpdateMatchingPayload {
 
   constructor(source, opts = {}) {
-    super();
     this.source = source;
     this.mapFn = opts.map;
     this.matchFn = opts.match;
@@ -110,32 +63,31 @@ class UpdateMatchingPayload extends Payload {
 }
 
 
-function zip(payloads, coerceSize = false) {
-  return new ZippedPayload(payloads, coerceSize);
-}
+class ListPayload extends Payload {
+  inspect() { return `list(${inspect(this.get())})`; }
 
-class AbstractListPayload extends Payload {
-  getEmptyElement() {
-    return this.emptyElement;
-  }
-
-  setEmptyElement(emptyElement) {
-    this.emptyElement = emptyElement;
+  deliver(list) {
+    list.setIterator(this);
     return this;
   }
 
+  withEmpty(emptyEl) {
+    return new WithEmptyPayload(this, emptyEl);
+  }
+
+  getEmpty() { return undefined; }
+
   map(map) {
-    return new ListPayload(this, {map});
+    return new MappedPayload(this, map);
   }
 
   filter(filter) {
-    return new ListPayload(this, {filter});
+    return new FilteredPayload(this, filter);
   }
 
   updateMatching(map, match) {
     return new UpdateMatchingPayload(this, {map, match});
   }
-
 
   flatten() {
     return this.map( (nested) => nested.get() );
@@ -144,28 +96,50 @@ class AbstractListPayload extends Payload {
   unflatten() {
     return this
       .map( (value) => createValuePayloadFromConst(value) )
-      .setEmptyElement(createValuePayloadFromConst(undefined));
+      .withEmpty(createValuePayloadFromConst(undefined));
   }
 
   zipCoercingSize(...otherPayloads) {
-    return zip([this, ...otherPayloads], true);
+    return new ZippedPayload([this, ...otherPayloads], true);
   }
 
-  zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
+  zip(...otherPayloads) {
+    return new ZippedPayload([this, ...otherPayloads]);
+  }
 
   unzip(size) {
     return Array.from(Array(size).keys()).map( (i) =>
       this.map( (values) => values[i] )
     );
   }
+}
 
-  deliver(list) {
-    list.setIterator(this);
-    return this;
+
+class SimplePayload extends ListPayload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  [Symbol.iterator]() {
+    return this.source[Symbol.iterator]();
   }
 }
 
-class ZippedPayload extends AbstractListPayload {
+
+class WithEmptyPayload extends SimplePayload {
+  constructor(source, emptyEl) {
+    super(source);
+    this.emptyEl = emptyEl;
+  }
+
+  getEmpty() {
+    return this.emptyEl;
+  }
+}
+
+
+class ZippedPayload extends ListPayload {
   constructor(payloads, coerceSize) {
     super();
     this.payloads = payloads;
@@ -182,7 +156,7 @@ class ZippedPayload extends AbstractListPayload {
       let allDone = true;
       for (const [payload, it] of payloadsWithIters) {
         const {value, done} = it.next();
-        const el = done ? payload.getEmptyElement() : value;
+        const el = done ? payload.getEmpty() : value;
         if (firstDone == null) firstDone = done;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
@@ -203,68 +177,52 @@ class ZippedPayload extends AbstractListPayload {
 }
 
 
-function create(source) {
-  return new ListPayload(source);
-}
-
-function createFromConst(value) {
-  return new ListPayload(new ConstListSource(value));
-}
-
-
-class ConstListSource {
+class ConstPayload extends ListPayload {
   constructor(value) {
+    super();
     this.value = value;
   }
 
   [Symbol.iterator]() {
     return this.value.values();
   }
-
 }
 
-function id(a) { return a; }
-function getTrue() { return true; }
 
-class ListPayload extends AbstractListPayload {
+class FilteredPayload extends ListPayload {
 
-  static create(source) {
-    return new ListPayload(source);
-  }
-
-  constructor(source, {map, filter} = {}) {
+  constructor(source, filter) {
     super();
     this.source = source;
-    this.mapFn = map || id;
-    this.filterFn = filter || getTrue;
-  }
-
-
-  inspect() { return `list(${inspect(this.get())})`; }
-
-
-  get() {
-    return Array.from(this);
+    this.filterFn = filter;
   }
 
   *[Symbol.iterator]() {
-    const {filterFn: filter, mapFn: map} = this;
+    const filter = this.filterFn;
     for (const el of this.source) {
-      if (filter(el)) yield map(el);
+      if (filter(el)) yield el;
     }
   }
-
-  getAt(pos) {
-    return this.get()[pos];
-  }
-
-  getSize() {
-    return this.get().length;
-  }
-
 }
 
-class ConvertedListPayload extends AbstractListPayload {
+
+class MappedPayload extends ListPayload {
+  constructor(source, map) {
+    super();
+    this.source = source;
+    this.mapFn = map;
+  }
+
+  *[Symbol.iterator]() {
+    const map = this.mapFn;
+    for (const el of this.source) {
+      yield map(el);
+    }
+  }
+}
+
+
+class ConvertedPayload extends ListPayload {
   constructor(source) {
     super();
     this.source = source;
@@ -282,25 +240,14 @@ class ConvertedListPayload extends AbstractListPayload {
 }
 
 
-const NoOpPayload = getNoOpPayload().constructor;
+export function convertToListPayload(source) {
+  return new ConvertedPayload(source);
+}
 
-Payload.prototype.toList = function() {
-  return ListPayload.create(new ConvertedListPayload(this));
-};
-NoOpPayload.prototype.toList = function() { return this; };
+export function createListPayload(source) {
+  return new SimplePayload(source);
+}
 
-Payload.prototype.toAppendElementAction = function() {
-  return AddAtAction.create(this.map( (el) => [el] ));
-};
-NoOpPayload.prototype.toAppendElementAction = function() { return this; };
-
-Payload.prototype.toRemoveElementAction = function() {
-  return RemoveAction.create(this);
-};
-NoOpPayload.prototype.toRemoveElementAction = function() { return this; };
-
-export {
-  zip,
-  create as createListPayload,
-  createFromConst as createListPayloadFromConst,
-};
+export function createListPayloadFromConst(value) {
+  return new ConstPayload(value);
+}

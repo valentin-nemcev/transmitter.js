@@ -5,7 +5,7 @@ import * as ChannelNodes from './channel_nodes';
 import * as DOMElement   from './dom_element';
 import * as Browser      from './browser';
 
-export {mergeValuePayloads, zipListPayloads} from './payloads';
+export {mergeValuePayloads} from './payloads';
 
 export {
 

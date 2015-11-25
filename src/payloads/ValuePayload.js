@@ -6,10 +6,9 @@ import getNoOpPayload from './NoOpPayload';
 function id(a) { return a; }
 
 
-class UpdateMatchingPayload extends Payload {
+class UpdateMatchingPayload {
 
   constructor(source, {map, match} = {}) {
-    super();
     this.source = source;
     this.mapFn = map != null ? map : id;
     this.matchFn = match;
