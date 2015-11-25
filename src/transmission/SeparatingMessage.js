@@ -63,7 +63,7 @@ module.exports = class SeparatingMessage {
   *_zipPayloads(valuePayload, nodePayload) {
     if (Array.isArray(nodePayload)) {
       for (let i = 0; i < nodePayload.length; i++) {
-        yield [nodePayload[i], valuePayload[i]];
+        yield [i, [nodePayload[i], valuePayload[i]]];
       }
     } else {
       yield* nodePayload.zipCoercingSize(valuePayload);
@@ -74,7 +74,7 @@ module.exports = class SeparatingMessage {
     const nodesToValuePayloads = new Map();
 
     const nodesWithValues = this._zipPayloads(valuePayload, nodePayload);
-    for (const [node, payload] of nodesWithValues) {
+    for (const [, [node, payload]] of nodesWithValues) {
       if (payload == null) {
         throw new Error(
             `Got null payload for ${inspect(node)}`

@@ -17,7 +17,7 @@ export default class ChannelList extends ChannelNode {
   }
 
   [Symbol.iterator]() {
-    return this.channels[Symbol.iterator];
+    return this.channels.entries();
   }
 
   getSize() {
@@ -29,7 +29,7 @@ export default class ChannelList extends ChannelNode {
     return this;
   }
 
-  setIterator(newChannels) {
+  setIterator(newChannelEntries) {
     const oldChannels = this.channels;
 
     for (const oldChannel of oldChannels) {
@@ -37,7 +37,7 @@ export default class ChannelList extends ChannelNode {
     }
 
     this.channels.length = 0;
-    for (const newChannel of newChannels) {
+    for (const [, newChannel] of newChannelEntries) {
       this.channels.push(newChannel);
       newChannel.connect(this.message);
     }

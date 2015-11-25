@@ -46,16 +46,16 @@ class ZippedPayload extends AbstractOptionalPayload {
       let firstDone;
       let allDone = true;
       for (const [payload, it] of payloadsWithIters) {
-        const {value, done} = it.next();
-        const el = done ? payload.getEmptyElement() : value;
+        const {value: entry, done} = it.next();
+        const value = done ? payload.getEmptyElement() : entry[1];
         if (firstDone == null) firstDone = done;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
         allDone = allDone && done;
-        zippedEl.push(el);
+        zippedEl.push(value);
       }
       if (allDone) return;
-      else yield zippedEl;
+      else yield [null, zippedEl];
     }
   }
 
@@ -83,7 +83,7 @@ class ConstOptionalSource {
   }
 
   *[Symbol.iterator]() {
-    if (this.value != null) yield this.value;
+    if (this.value != null) yield [null, this.value];
   }
 
 }
@@ -102,13 +102,13 @@ class OptionalPayload extends AbstractOptionalPayload {
 
 
   get() {
-    const {value, done} = this[Symbol.iterator]().next();
-    return done ? null : value;
+    const {value: entry, done} = this[Symbol.iterator]().next();
+    return done ? null : entry[1];
   }
 
   *[Symbol.iterator]() {
-    const {value, done} = this.source[Symbol.iterator]().next();
-    if (!done) yield this.mapFn.call(null, value);
+    const {value: entry, done} = this.source[Symbol.iterator]().next();
+    if (!done) yield [null, this.mapFn.call(null, entry[1])];
   }
 
   getSize() {
@@ -155,8 +155,8 @@ class ToOptionalSource {
   }
 
   *[Symbol.iterator]() {
-    const {value} = this.source[Symbol.iterator]().next();
-    if (value != null) yield value;
+    const {value: entry, done} = this.source[Symbol.iterator]().next();
+    if (!done && entry[1] != null) yield [null, entry[1]];
   }
 }
 

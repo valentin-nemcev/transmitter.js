@@ -47,7 +47,7 @@ class ConstValueSource {
   }
 
   *[Symbol.iterator]() {
-    yield this.value;
+    yield [null, this.value];
   }
 
 }
@@ -63,7 +63,15 @@ class MergedPayload {
   }
 
   *[Symbol.iterator]() {
-    yield this.payloads.map( (p) => p[Symbol.iterator]().next().value );
+    yield [
+      null,
+      this.payloads.map(
+        (p) => {
+          const {value: entry, done} = p[Symbol.iterator]().next();
+          return done ? null : entry[1];
+        }
+      ),
+    ];
   }
 }
 
@@ -81,13 +89,13 @@ class ValuePayload extends Payload {
 
 
   get() {
-    const {value} = this[Symbol.iterator]().next();
-    return value;
+    const {value: entry} = this[Symbol.iterator]().next();
+    return entry[1];
   }
 
   *[Symbol.iterator]() {
-    const {value} = this.source[Symbol.iterator]().next();
-    yield this.mapFn.call(null, value);
+    const {value: entry} = this.source[Symbol.iterator]().next();
+    yield [null, this.mapFn.call(null, entry[1], entry[0])];
   }
 
 
@@ -121,7 +129,9 @@ class ConvertedValuePayload {
   }
 
   *[Symbol.iterator]() {
-    yield Array.from(this.source);
+    const array = [];
+    for (const [, value] of this.source) array.push(value);
+    yield [null, array];
   }
 }
 

@@ -16,7 +16,7 @@ class UpdateMatchingPayload {
 
   deliver(target) {
     let targetLength = target.getSize();
-    const source = Array.from(this.source);
+    const source = Array.from(this.source).map( ([, value]) => value );
     const sourceLength = source.length;
 
     let targetPos = 0;
@@ -90,7 +90,7 @@ class ListPayload extends Payload {
   }
 
   flatten() {
-    return this.map( (nested) => nested.get() );
+    return new FlatteningPayload(this);
   }
 
   unflatten() {
@@ -150,13 +150,13 @@ class ZippedPayload extends ListPayload {
     const payloadsWithIters = this.payloads
       .map( (p) => [p, p[Symbol.iterator]()] );
 
-    for (;;) {
+    for (let i = 0; ; i++) {
       const zippedEl = [];
       let firstDone;
       let allDone = true;
       for (const [payload, it] of payloadsWithIters) {
-        const {value, done} = it.next();
-        const el = done ? payload.getEmpty() : value;
+        const {value: entry, done} = it.next();
+        const el = done ? payload.getEmpty() : entry[1];
         if (firstDone == null) firstDone = done;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
@@ -164,7 +164,7 @@ class ZippedPayload extends ListPayload {
         zippedEl.push(el);
       }
       if (allDone) return;
-      else yield zippedEl;
+      else yield [i, zippedEl];
     }
   }
 
@@ -177,6 +177,21 @@ class ZippedPayload extends ListPayload {
 }
 
 
+class FlatteningPayload extends ListPayload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    let i = 0;
+    for (const [, payload] of this.source) {
+      for (const [, value] of payload) yield [i++, value];
+    }
+  }
+}
+
+
 class ConstPayload extends ListPayload {
   constructor(value) {
     super();
@@ -184,7 +199,7 @@ class ConstPayload extends ListPayload {
   }
 
   [Symbol.iterator]() {
-    return this.value.values();
+    return this.value.entries();
   }
 }
 
@@ -199,8 +214,9 @@ class FilteredPayload extends ListPayload {
 
   *[Symbol.iterator]() {
     const filter = this.filterFn;
-    for (const el of this.source) {
-      if (filter(el)) yield el;
+    let i = 0;
+    for (const [key, value] of this.source) {
+      if (filter(value, key)) yield [i++, value];
     }
   }
 }
@@ -215,8 +231,8 @@ class MappedPayload extends ListPayload {
 
   *[Symbol.iterator]() {
     const map = this.mapFn;
-    for (const el of this.source) {
-      yield map(el);
+    for (const [key, value] of this.source) {
+      yield [key, map(value, key)];
     }
   }
 }
@@ -229,11 +245,12 @@ class ConvertedPayload extends ListPayload {
   }
 
   *[Symbol.iterator]() {
-    for (const el of this.source) {
-      if (el[Symbol.iterator] != null) {
-        yield* el;
+    let i = 0;
+    for (const [, value] of this.source) {
+      if (value[Symbol.iterator] != null) {
+        for (const nestedValue of value) yield [i++, nestedValue];
       } else {
-        yield el;
+        yield [i++, value];
       }
     }
   }

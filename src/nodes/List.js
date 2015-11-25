@@ -25,7 +25,7 @@ export default class List extends SourceTargetNode {
   }
 
   [Symbol.iterator]() {
-    return this.list.values();
+    return this.list.entries();
   }
 
   getAt(pos) {
@@ -44,7 +44,7 @@ export default class List extends SourceTargetNode {
 
   setIterator(iter) {
     this.list.length = 0;
-    for (const el of iter) this.list.push(el);
+    for (const [, el] of iter) this.list.push(el);
     return this;
   }
 

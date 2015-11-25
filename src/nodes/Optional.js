@@ -18,7 +18,7 @@ export default class Optional extends SourceTargetNode {
   get() { return this.value; }
 
   *[Symbol.iterator]() {
-    if (this.value != null) yield this.value;
+    if (this.value != null) yield [null, this.value];
   }
 
   set(value) {
