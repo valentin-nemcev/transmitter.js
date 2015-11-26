@@ -14,7 +14,7 @@ export default class MergingMessage {
     return [
       '>M',
       inspect(this.pass),
-      Array.from(this.nodesToMessages.values()).map(inspect).join(', '),
+      Array.from(this.linesToMessages.values()).map(inspect).join(', '),
     ].join(' ');
   }
 
@@ -42,7 +42,7 @@ export default class MergingMessage {
     this.transmission = transmission;
     this.pass = pass;
     this.connPoint = connPoint;
-    this.nodesToMessages = new Map();
+    this.linesToMessages = new Map();
   }
 
   receiveConnectionMessage(channelNode) {
@@ -63,16 +63,16 @@ export default class MergingMessage {
     return this;
   }
 
-  receiveMessageFrom(message, node) {
+  receiveMessageFrom(message, line) {
     if (!(this.query != null || this.connPoint.singleSource)) {
       this.query = Query.createNext(this);
       this.connPoint.sendQuery(this.query);
     }
 
-    this.nodesToMessages.set(node, message);
+    this.linesToMessages.set(line, message);
 
     // TODO: Compare contents
-    if (this.nodesToMessages.size !==
+    if (this.linesToMessages.size !==
         this.connPoint.getSourceNodesToLines().size) {
       return this;
     }
@@ -87,7 +87,7 @@ export default class MergingMessage {
 
   _prioritiesMatch() {
     const priorities =
-      Array.from(this.nodesToMessages.values(), (msg) => msg.getPriority() );
+      Array.from(this.linesToMessages.values(), (msg) => msg.getPriority() );
     return priorities.every( (p) => p === priorities[0] );
   }
 
@@ -130,25 +130,29 @@ export default class MergingMessage {
     return [payload || [], 0];
   }
 
-  _getNodePayload(nodesToLines) {
-    const payload = this.channelNode != null
-      ? this.channelNode.getSourcePayload() : null;
-    return payload || Array.from(nodesToLines.keys());
+  _getLinePayload(nodesToLines) {
+    if (this.channelNode != null) {
+      const payload = this.channelNode.getSourcePayload();
+      if (payload != null) {
+        return payload.map( (node) => nodesToLines.get(node) );
+      }
+    }
+    return Array.from(nodesToLines.values());
   }
 
   _getMergedPayload() {
     this.transmission.log(this);
 
     const nodesToLines = this.connPoint.getSourceNodesToLines();
-    const nodePayload = this._getNodePayload(nodesToLines);
+    const linePayload = this._getLinePayload(nodesToLines);
 
     let priority = null;
-    this.nodesToMessages.forEach( (message) =>
+    this.linesToMessages.forEach( (message) =>
       priority = Math.max(priority, message.getPriority())
     );
 
-    let payload = nodePayload.map((node) => {
-      return this.nodesToMessages.get(node).getPayload();
+    let payload = linePayload.map((line) => {
+      return this.linesToMessages.get(line).getPayload();
     });
 
     if (this.connPoint.singleSource) { payload = payload[0]; }

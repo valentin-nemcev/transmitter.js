@@ -31,7 +31,7 @@ export default class NodeConnectionLine {
   }
 
   receiveMessage(message) {
-    this.target.receiveMessage(message);
+    message.sendToConnectionMerger(this, this.target);
     return this;
   }
 

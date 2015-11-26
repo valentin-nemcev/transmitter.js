@@ -209,7 +209,6 @@ export default class JointMessage {
     this.message = message;
     this.transmission.log(this.message, this.node.getNodeSource());
 
-    this.message.sourceNode = this.node;
     this._sendMessageToSucceeding();
     this.messageHub =
       new NodePointTransmissionHub(this.message, this.node.getNodeSource());

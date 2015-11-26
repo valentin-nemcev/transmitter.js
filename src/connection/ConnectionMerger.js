@@ -36,11 +36,6 @@ export default class ConnectionMerger {
 
   getPlaceholderPayload() { return getNoOpPayload(); }
 
-  receiveMessage(message) {
-    message.sendToConnectionMerger(this);
-    return this;
-  }
-
   sendMessage(message) {
     this.target.receiveMessage(message);
     return this;

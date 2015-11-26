@@ -40,10 +40,10 @@ export default class SourceMessage {
     return this;
   }
 
-  sendToConnectionMerger(connectionMerger) {
+  sendToConnectionMerger(line, connectionMerger) {
     MergingMessage
       .getOrCreate(this, connectionMerger)
-      .receiveMessageFrom(this, this.sourceNode);
+      .receiveMessageFrom(this, line);
     return this;
   }
 
