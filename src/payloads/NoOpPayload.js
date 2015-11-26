@@ -1,4 +1,4 @@
-class NoOpPayload {
+export class NoOpPayload {
 
   constructor() {}
 
@@ -26,4 +26,4 @@ class NoOpPayload {
 
 const noOpPayload = new NoOpPayload();
 
-export default function getNoOpPayload() { return noOpPayload; }
+export function getNoOpPayload() { return noOpPayload; }

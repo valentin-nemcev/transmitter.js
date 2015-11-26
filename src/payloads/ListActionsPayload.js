@@ -1,20 +1,15 @@
 import {inspect} from 'util';
 
-import getNoOpPayload from './NoOpPayload';
 import Payload from './Payload';
 
 class RemoveAction extends Payload {
-
-  static create(source) {
-    return new RemoveAction(source);
-  }
 
   constructor(source) {
     super();
     this.source = source;
   }
 
-  inspect() { return `listRemove(${inspect(this.source)})`; }
+  inspect() { return `listRemove(${inspect(Array.from(this.source))})`; }
 
   deliver(target) {
     const element = this.source[Symbol.iterator]().next().value[1];
@@ -30,16 +25,12 @@ class RemoveAction extends Payload {
 
 class AddAtAction extends Payload {
 
-  static create(source) {
-    return new AddAtAction(source);
-  }
-
   constructor(source) {
     super();
     this.source = source;
   }
 
-  inspect() { return `listAddAt(${inspect(this.source.get())})`; }
+  inspect() { return `listAddAt(${inspect(Array.from(this.source))})`; }
 
   deliver(target) {
     const value = this.source[Symbol.iterator]().next().value[1];
@@ -49,14 +40,10 @@ class AddAtAction extends Payload {
 }
 
 
-const NoOpPayload = getNoOpPayload().constructor;
+export function convertToAppendElementAction(source) {
+  return new AddAtAction(source.map( (el) => [el] ));
+}
 
-Payload.prototype.toAppendElementAction = function() {
-  return AddAtAction.create(this.map( (el) => [el] ));
-};
-NoOpPayload.prototype.toAppendElementAction = function() { return this; };
-
-Payload.prototype.toRemoveElementAction = function() {
-  return RemoveAction.create(this);
-};
-NoOpPayload.prototype.toRemoveElementAction = function() { return this; };
+export function convertToRemoveElementAction(source) {
+  return new RemoveAction(source);
+}
