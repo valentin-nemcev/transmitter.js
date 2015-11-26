@@ -1,5 +1,5 @@
 import ChannelNode from './ChannelNode';
-import {createOptionalPayloadFromConst} from '../payloads';
+import {createListPayloadFromConst} from '../payloads';
 
 
 export default class DynamicOptionalChannelValue extends ChannelNode {
@@ -21,18 +21,23 @@ export default class DynamicOptionalChannelValue extends ChannelNode {
     const oldChannel = this.channel;
     if (oldChannel != null) oldChannel.disconnect(this.message);
 
-    const newChannel =
-      this.createChannel.call(null, newNode != null ? [newNode] : []);
+    const newNodes = newNode != null ? [newNode] : [];
+    const newChannel = this.createChannel.call(null, newNodes);
     this.channel = newChannel;
 
-    this.payload = createOptionalPayloadFromConst(newNode);
+    this.payload = createListPayloadFromConst(newNodes);
 
     if (newChannel != null) newChannel.connect(this.message);
     return this;
   }
 
+  setIterator(newNodes) {
+    return this.set(Array.from(newNodes).map( ([, value]) => value )[0]);
+  }
+
+
   getPlaceholderPayload() {
-    return createOptionalPayloadFromConst(null);
+    return createListPayloadFromConst([]);
   }
 
   getSourcePayload() { return this.type === 'sources' ? this.payload : null; }

@@ -1,16 +1,13 @@
 import {inspect} from 'util';
 
 import Payload from './Payload';
-import getNoOpPayload from './NoOpPayload';
-
-function id(a) { return a; }
 
 
 class UpdateMatchingPayload {
 
   constructor(source, {map, match} = {}) {
     this.source = source;
-    this.mapFn = map != null ? map : id;
+    this.mapFn = map != null ? map : (a) => a;
     this.matchFn = match;
   }
 
@@ -19,7 +16,7 @@ class UpdateMatchingPayload {
 
 
   deliver(target) {
-    const sourceValue = this.source.get();
+    const sourceValue = this.source[Symbol.iterator]().next().value[1];
     const targetValue = target.get();
     if (sourceValue != null && targetValue != null
         && this.matchFn.call(null, sourceValue, targetValue)) return this;
@@ -33,32 +30,61 @@ class UpdateMatchingPayload {
   }
 }
 
-function create(source) {
-  return new ValuePayload(source);
+
+class ValuePayload extends Payload {
+  inspect() { return `value(${inspect(Array.from(this))})`; }
+
+  map(map) {
+    return new MappedPayload(this, map);
+  }
+
+  updateMatching(map, match) {
+    return new UpdateMatchingPayload(this, {map, match});
+  }
+
+  deliver(value) {
+    value.setIterator(this);
+    return this;
+  }
+
+  noOpIf(conditionCb) {
+    const {value: entry} = this[Symbol.iterator]().next();
+    return conditionCb(entry[1], entry[0]) ? this.toNoOp() : this;
+  }
+
+  merge(...otherPayloads) {
+    return new MergedPayload([this, ...otherPayloads]);
+  }
 }
 
-function createFromConst(value) {
-  return create(new ConstValueSource(value));
+
+class SimplePayload extends ValuePayload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  [Symbol.iterator]() {
+    return this.source[Symbol.iterator]();
+  }
 }
 
-class ConstValueSource {
+
+class ConstValueSource extends ValuePayload {
   constructor(value) {
+    super();
     this.value = value;
   }
 
   *[Symbol.iterator]() {
     yield [null, this.value];
   }
-
-}
-
-function merge(payloads) {
-  return create(new MergedPayload(payloads));
 }
 
 
-class MergedPayload {
+class MergedPayload extends ValuePayload {
   constructor(payloads) {
+    super();
     this.payloads = payloads;
   }
 
@@ -76,55 +102,24 @@ class MergedPayload {
 }
 
 
-class ValuePayload extends Payload {
-
-  constructor(source, {map} = {}) {
+class MappedPayload extends ValuePayload {
+  constructor(source, map) {
     super();
     this.source = source;
-    this.mapFn = map != null ? map : id;
-  }
-
-
-  inspect() { return `value(${inspect(this.get())})`; }
-
-
-  get() {
-    const {value: entry} = this[Symbol.iterator]().next();
-    return entry[1];
+    this.mapFn = map;
   }
 
   *[Symbol.iterator]() {
+    const map = this.mapFn;
     const {value: entry} = this.source[Symbol.iterator]().next();
-    yield [null, this.mapFn.call(null, entry[1], entry[0])];
+    yield [null, map(entry[1], entry[0])];
   }
-
-
-  map(map) {
-    return new ValuePayload(this, {map});
-  }
-
-
-  updateMatching(map, match) {
-    return new UpdateMatchingPayload(this, {map, match});
-  }
-
-
-  deliver(value) {
-    value.set(this.get());
-    return this;
-  }
-
-  noOpIf(conditionCb) {
-    return conditionCb(this.get()) ? getNoOpPayload() : this;
-  }
-
-  merge(...otherPayloads) { return merge([this, ...otherPayloads]); }
-
 }
 
 
-class ConvertedValuePayload {
+class ConvertedValuePayload extends ValuePayload {
   constructor(source) {
+    super();
     this.source = source;
   }
 
@@ -135,20 +130,40 @@ class ConvertedValuePayload {
   }
 }
 
-const NoOpPayload = getNoOpPayload().constructor;
 
-Payload.prototype.toValue = function() {
-  return create(new ConvertedValuePayload(this));
-};
-NoOpPayload.prototype.toValue = function() { return this; };
+class ValueAtKeyPayload extends ValuePayload {
+  constructor(source, key) {
+    super();
+    this.source = source;
+    this.key = key;
+  }
 
-Payload.prototype.fromListToOptional = function() {
-  return create(this).map( (v) => v[0] );
-};
+  *[Symbol.iterator]() {
+    yield [null, this.source.getAt(this.key)];
+  }
+}
 
 
-export {
-  merge as mergeValuePayloads,
-  create as createValuePayload,
-  createFromConst as createValuePayloadFromConst,
-};
+export function convertToValuePayload(source) {
+  return new ConvertedValuePayload(source);
+}
+
+export function createValuePayloadAtKey(source, key) {
+  return new ValueAtKeyPayload(source, key);
+}
+
+export function createEmptyValuePayload() {
+  return new ConstValueSource(null);
+}
+
+export function createValuePayload(source) {
+  return new SimplePayload(source);
+}
+
+export function createValuePayloadFromConst(value) {
+  return new ConstValueSource(value);
+}
+
+export function mergeValuePayloads(payloads) {
+  return new MergedPayload(payloads);
+}

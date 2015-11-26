@@ -14,4 +14,8 @@ export default class ChannelValue extends ChannelNode {
 
     return this;
   }
+
+  setIterator(newChannels) {
+    return this.set(Array.from(newChannels).map( ([, value]) => value )[0]);
+  }
 }

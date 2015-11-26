@@ -17,7 +17,7 @@ class RemoveAction extends Payload {
   inspect() { return `listRemove(${inspect(this.source)})`; }
 
   deliver(target) {
-    const element = this.source.get();
+    const element = this.source[Symbol.iterator]().next().value[1];
     const iterable = target.get();
     for (let pos = 0; pos < iterable.length; pos++) {
       const el = iterable[pos];
@@ -42,7 +42,8 @@ class AddAtAction extends Payload {
   inspect() { return `listAddAt(${inspect(this.source.get())})`; }
 
   deliver(target) {
-    target.addAt(...this.source.get());
+    const value = this.source[Symbol.iterator]().next().value[1];
+    target.addAt(...value);
     return this;
   }
 }

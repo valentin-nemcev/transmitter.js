@@ -1,21 +1,25 @@
 import SourceTargetNode from './SourceTargetNode';
 
 import {
-  createOptionalPayload, createOptionalPayloadFromConst,
+  createListPayload, createListPayloadFromConst,
 } from '../payloads';
 
 export default class Optional extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
-    return createOptionalPayload(this);
+    return createListPayload(this);
   }
 
   createPlaceholderPayload() {
-    return createOptionalPayloadFromConst(null);
+    return createListPayloadFromConst(null);
   }
 
   get() { return this.value; }
+
+  getAt(key) {
+    return key == null ? this.value : null;
+  }
 
   *[Symbol.iterator]() {
     if (this.value != null) yield [null, this.value];
@@ -23,6 +27,12 @@ export default class Optional extends SourceTargetNode {
 
   set(value) {
     this.value = value;
+    return this;
+  }
+
+  setIterator(it) {
+    const {value: entry, done} = it[Symbol.iterator]().next();
+    this.value = done ? null : entry[1];
     return this;
   }
 }

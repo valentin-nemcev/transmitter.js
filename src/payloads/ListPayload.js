@@ -1,7 +1,12 @@
 import {inspect} from 'util';
 
-import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
+
+import {
+  createEmptyValuePayload,
+  createValuePayloadAtKey,
+} from './ValuePayload';
+
 
 class UpdateMatchingPayload {
 
@@ -64,7 +69,7 @@ class UpdateMatchingPayload {
 
 
 class ListPayload extends Payload {
-  inspect() { return `list(${inspect(this.get())})`; }
+  inspect() { return `list(${inspect(Array.from(this))})`; }
 
   deliver(list) {
     list.setIterator(this);
@@ -95,8 +100,8 @@ class ListPayload extends Payload {
 
   unflatten() {
     return this
-      .map( (value) => createValuePayloadFromConst(value) )
-      .withEmpty(createValuePayloadFromConst(undefined));
+      .map( (value, index) => createValuePayloadAtKey(this, index) )
+      .withEmpty(createEmptyValuePayload());
   }
 
   zipCoercingSize(...otherPayloads) {
@@ -123,6 +128,10 @@ class SimplePayload extends ListPayload {
 
   [Symbol.iterator]() {
     return this.source[Symbol.iterator]();
+  }
+
+  getAt(key) {
+    return this.source.getAt(key);
   }
 }
 
@@ -247,7 +256,7 @@ class ConvertedPayload extends ListPayload {
   *[Symbol.iterator]() {
     let i = 0;
     for (const [, value] of this.source) {
-      if (value[Symbol.iterator] != null) {
+      if (value != null && value[Symbol.iterator] != null) {
         for (const nestedValue of value) yield [i++, nestedValue];
       } else {
         yield [i++, value];

@@ -3,12 +3,12 @@ import getNoOpPayload from './NoOpPayload';
 import Payload from './Payload';
 
 import {
-  createValuePayload, createValuePayloadFromConst, mergeValuePayloads,
+  convertToValuePayload,
+  createValuePayload,
+  createValuePayloadFromConst,
+  createEmptyValuePayload,
+  mergeValuePayloads,
 } from './ValuePayload';
-
-import {
-  createOptionalPayload, createOptionalPayloadFromConst,
-} from './OptionalPayload';
 
 import {
   convertToListPayload, createListPayload, createListPayloadFromConst,
@@ -19,9 +19,25 @@ import './ListActionsPayload';
 
 const NoOpPayload = getNoOpPayload().constructor;
 
+
+Payload.prototype.toNoOp = function() {
+  return getNoOpPayload();
+};
+
+NoOpPayload.prototype.toNoOp = function() { return this; };
+
+
 Payload.prototype.toList = function() {
   return convertToListPayload(this);
 };
+
+NoOpPayload.prototype.toList = function() { return this; };
+
+
+Payload.prototype.toValue = function() {
+  return convertToValuePayload(this);
+};
+
 NoOpPayload.prototype.toList = function() { return this; };
 
 
@@ -30,10 +46,8 @@ export {
 
   createValuePayload,
   createValuePayloadFromConst,
+  createEmptyValuePayload,
   mergeValuePayloads,
-
-  createOptionalPayload,
-  createOptionalPayloadFromConst,
 
   createListPayload,
   createListPayloadFromConst,

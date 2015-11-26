@@ -41,7 +41,8 @@ describe('Flattening connection', function() {
         .toTargets(this.flatValue, this.nestedValue)
         .withTransform( (serializedPayload) =>
           serializedPayload
-            .toOptional()
+            .map( (value) => value != null ? value : [] )
+            .toList()
             .map( ({value, name}) => [value, new NestedObject(name)] )
             .unzip(2)
         )

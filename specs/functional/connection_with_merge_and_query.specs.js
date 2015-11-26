@@ -8,6 +8,12 @@ class AlertEmitter extends Transmitter.Nodes.TargetNode {
       return this.alert(messageStr);
     }
   }
+
+  setIterator(it) {
+    const {value: entry} = it[Symbol.iterator]().next();
+    this.set(entry[1]);
+    return this;
+  }
 }
 
 

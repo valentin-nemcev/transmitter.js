@@ -1,6 +1,6 @@
 import SourceTargetNode from './SourceTargetNode';
 import {
-  createValuePayload, createValuePayloadFromConst,
+  createValuePayload, createEmptyValuePayload,
 } from '../payloads';
 
 
@@ -12,7 +12,7 @@ export default class Value extends SourceTargetNode {
   }
 
   createPlaceholderPayload() {
-    return createValuePayloadFromConst(null);
+    return createEmptyValuePayload();
   }
 
   get() { return this.value; }
@@ -23,6 +23,12 @@ export default class Value extends SourceTargetNode {
 
   set(value) {
     this.value = value;
+    return this;
+  }
+
+  setIterator(it) {
+    const {value: entry, done} = it[Symbol.iterator]().next();
+    this.value = done ? null : entry[1];
     return this;
   }
 }

@@ -42,9 +42,9 @@ export default class List extends SourceTargetNode {
     return this;
   }
 
-  setIterator(iter) {
+  setIterator(it) {
     this.list.length = 0;
-    for (const [, el] of iter) this.list.push(el);
+    for (const [, el] of it) this.list.push(el);
     return this;
   }
 
