@@ -115,9 +115,12 @@ FlatteningChannel.prototype = buildPrototype()
     this._nestedNode = nestedNode;
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(nestedNode.constructor);
-    this._nestedChannel
-      .fromSource(nestedNode)
-      .withTransform( (payload) => payload.map(mapNested) );
+
+    this._nestedChannel.fromSource(nestedNode);
+
+    if (mapNested != null) {
+      this._nestedChannel.withTransform( (payload) => payload.map(mapNested) );
+    }
     return this;
   })
 

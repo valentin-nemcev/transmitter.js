@@ -18,7 +18,7 @@ export default class Value extends SourceTargetNode {
   get() { return this.value; }
 
   *[Symbol.iterator]() {
-    yield [null, this.value];
+    yield [null, this.get()];
   }
 
   set(value) {
@@ -28,7 +28,7 @@ export default class Value extends SourceTargetNode {
 
   setIterator(it) {
     const {value: entry, done} = it[Symbol.iterator]().next();
-    this.value = done ? null : entry[1];
+    this.set(done ? null : entry[1]);
     return this;
   }
 }

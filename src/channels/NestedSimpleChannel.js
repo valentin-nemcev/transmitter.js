@@ -14,5 +14,7 @@ NestedSimpleChannel.prototype = buildPrototype()
   .include(nodeSourcePrototype)
   .include(channelTargetPrototype)
   .readOnlyProperty('_direction', Directions.omni)
-  .setOnceMandatoryProperty('_transform', {title: 'Transform'})
+  .setOnceLazyProperty('_transform', () => returnArg, {title: 'Transform'})
   .freezeAndReturn();
+
+function returnArg(arg) { return arg; }

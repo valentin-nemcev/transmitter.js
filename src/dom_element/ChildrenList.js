@@ -8,13 +8,24 @@ export default class ChildrenList extends List {
     this.element = element;
   }
 
+  _clear() {
+    let el;
+    while ((el = this.element.lastChild)) this.element.removeChild(el);
+    return this;
+  }
+
   set(elementList) {
-    {
-      let el;
-      while ((el = this.element.lastChild)) this.element.removeChild(el);
-    }
+    this._clear();
 
     for (const el of elementList) this.element.appendChild(el);
+
+    return this;
+  }
+
+  setIterator(it) {
+    this._clear();
+
+    for (const [, el] of it) this.element.appendChild(el);
 
     return this;
   }
@@ -47,6 +58,11 @@ export default class ChildrenList extends List {
 
   get() {
     return this.element.children;
+  }
+
+  [Symbol.iterator]() {
+    // TODO: Use real DOM iterator
+    return Array.from(this.element.children).entries();
   }
 
   getAt(pos) {

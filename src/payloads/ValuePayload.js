@@ -55,6 +55,12 @@ class ValuePayload extends Payload {
   merge(...otherPayloads) {
     return new MergedPayload([this, ...otherPayloads]);
   }
+
+  separate(size) {
+    return Array.from(Array(size).keys()).map( (i) =>
+      this.map( (values) => values[i] )
+    );
+  }
 }
 
 
