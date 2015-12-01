@@ -1,5 +1,11 @@
 export class NoOpPayload {
 
+  log() {
+    /* eslint-disable no-console */
+    console.log('NoOpPayload');
+    return this;
+  }
+
   constructor() {}
 
   inspect() { return 'noOp()'; }

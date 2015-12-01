@@ -17,6 +17,11 @@ export {
   Browser,
 };
 
+export function log(first, ...rest) {
+  console.log(first, ...rest); // eslint-disable-line no-console
+  return first;
+}
+
 export function setLogging(state) {
   Transmission.prototype.loggingIsEnabled = state;
   return this;

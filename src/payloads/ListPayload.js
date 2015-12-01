@@ -71,6 +71,14 @@ class UpdateMatchingPayload {
 class ListPayload extends Payload {
   inspect() { return `list(${inspect(Array.from(this))})`; }
 
+  [Symbol.iterator]() {
+    throw new Error('No iterator for ' + this.constructor.name);
+  }
+
+  getAt() {
+    throw new Error('No getAt for ' + this.constructor.name);
+  }
+
   deliver(list) {
     list.setIterator(this);
     return this;

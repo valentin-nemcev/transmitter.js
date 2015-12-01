@@ -54,7 +54,7 @@ Payload.prototype.toValue = function() {
   return convertToValuePayload(this);
 };
 
-NoOpPayload.prototype.toList = function() { return this; };
+NoOpPayload.prototype.toValue = function() { return this; };
 
 
 export {
