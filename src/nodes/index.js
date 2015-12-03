@@ -7,6 +7,8 @@ export ValueSource from './ValueSource';
 export Value       from './Value';
 export Optional    from './Optional';
 export List        from './List';
+export OrderedMap  from './OrderedMap';
 export SortedMap   from './SortedMap';
+export OrderedSet  from './OrderedSet';
 
 export PropertyValue from './PropertyValue';

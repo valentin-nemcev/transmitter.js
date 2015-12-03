@@ -7,14 +7,17 @@ describe('Unit', function() {
   require('./unit/ordered_map.specs');
 });
 
+
+require('./define');
+
 describe('Functional', function() {
+  // Functional specs focus on framework features and their interaction
 
   before(function() {
     const Transmitter = require('transmitter');
     Transmitter.Transmission.prototype.reverseOrder = false;
   });
 
-  require('./functional/define');
   require('./functional/connection_with_merge_and_query.specs');
   require('./functional/bidirectional_state_message_routing.specs');
   require('./functional/multilevel_merging.specs');
@@ -27,4 +30,11 @@ describe('Functional', function() {
   require('./functional/reversing_messages_in_the_middle_of_the_chain.specs');
   require('./functional/merging_after_splitting.specs');
   require('./functional/grouping_and_sorting.specs');
+});
+
+
+describe('Examples', function() {
+  // Example specs focus on typical framework usecases
+
+  require('./examples/model_view.specs');
 });

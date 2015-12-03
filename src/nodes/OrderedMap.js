@@ -64,6 +64,4 @@ export default class OrderedMap extends SourceTargetNode {
   getSize() {
     return this.entries.length;
   }
-
 }
-
