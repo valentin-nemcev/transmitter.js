@@ -3,7 +3,7 @@ import {
   createMapPayload, createMapPayloadFromConst,
 } from '../payloads';
 
-export default class SortedMap extends SourceTargetNode {
+export default class OrderedMap extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
@@ -31,13 +31,8 @@ export default class SortedMap extends SourceTargetNode {
       const entry = this.entries[i];
       const [key] = entry;
 
-      if (keyArg > key) {
-        continue;
-      } else if (keyArg === key) {
+      if (keyArg === key) {
         entry[1] = valueArg;
-        return this;
-      } else if (keyArg < key) {
-        this.entries.splice(i, 0, [keyArg, valueArg]);
         return this;
       }
     }
@@ -69,4 +64,6 @@ export default class SortedMap extends SourceTargetNode {
   getSize() {
     return this.entries.length;
   }
+
 }
+

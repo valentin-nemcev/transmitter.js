@@ -2,8 +2,9 @@ require('./common');
 
 describe('Unit', function() {
   require('./unit/query_queue.specs');
-  require('./unit/sorted_map.specs');
   require('./unit/compare_keys.specs');
+  require('./unit/sorted_map.specs');
+  require('./unit/ordered_map.specs');
 });
 
 describe('Functional', function() {

@@ -1,10 +1,10 @@
-import SortedMap from 'transmitter/nodes/SortedMap';
+import OrderedMap from 'transmitter/nodes/OrderedMap';
 import mapSpecs from './map.specs.js';
 
-describe('Sorted map', function() {
+describe('Ordered map', function() {
 
   beforeEach(function() {
-    this.map = new SortedMap();
+    this.map = new OrderedMap();
   });
 
   mapSpecs();
@@ -20,9 +20,10 @@ describe('Sorted map', function() {
 
     expect(this.map.get()).to.deep.equal([
       ['key1', 'value1b'],
-      ['key2', 'value2'],
-      ['key3', 'value3'],
       ['key4', 'value4'],
+      ['key3', 'value3'],
+      ['key2', 'value2'],
     ]);
   });
 });
+
