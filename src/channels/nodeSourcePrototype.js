@@ -15,7 +15,7 @@ function assertSource(source) {
 }
 
 export default buildPrototype()
-  .setOnceMandatoryProperty('_connectionSource', 'Source')
+  .setOnceMandatoryProperty('_connectionSource', {title: 'Source'})
   .methods({
     fromSource(source) {
       assertSingleArgument(arguments.length);

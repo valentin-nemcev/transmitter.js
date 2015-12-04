@@ -14,7 +14,7 @@ function assertChannelTarget(channelTarget) {
 }
 
 export default buildPrototype()
-  .setOnceMandatoryProperty('_connectionTarget', 'Target')
+  .setOnceMandatoryProperty('_connectionTarget', {title: 'Target'})
   .methods({
     toChannelTarget(channelTarget) {
       assertSingleArgument(arguments.length);

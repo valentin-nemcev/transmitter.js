@@ -17,6 +17,11 @@ import {
 } from './ListPayload';
 
 import {
+  createSetPayload,
+  createSetPayloadFromConst,
+} from './SetPayload';
+
+import {
   convertToAppendElementAction,
   convertToRemoveElementAction,
 } from './ListActionsPayload';
@@ -67,4 +72,7 @@ export {
 
   createListPayload,
   createListPayloadFromConst,
+
+  createSetPayload,
+  createSetPayloadFromConst,
 };

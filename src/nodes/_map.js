@@ -4,6 +4,11 @@ class OrderedMap {
     this.entries = [];
   }
 
+  clear() {
+    this.entries.length = 0;
+    return this;
+  }
+
   set(keyArg, valueArg) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
@@ -43,8 +48,8 @@ class OrderedMap {
     return false;
   }
 
-  getEntries() {
-    return this.entries.slice();
+  [Symbol.iterator]() {
+    return this.entries.values();
   }
 }
 

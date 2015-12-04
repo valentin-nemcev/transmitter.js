@@ -22,7 +22,13 @@ export default class OrderedMap extends SourceTargetNode {
   }
 
   set(entries) {
-    for (const [key, value] of entries) {
+    this.setIterator(entries);
+    return this;
+  }
+
+  setIterator(it) {
+    this.map.clear();
+    for (const [key, value] of it) {
       this.setAt(key, value);
     }
     return this;
@@ -42,8 +48,12 @@ export default class OrderedMap extends SourceTargetNode {
     return this.map.get(key);
   }
 
+  [Symbol.iterator]() {
+    return this.map[Symbol.iterator]();
+  }
+
   get() {
-    return this.map.getEntries();
+    return Array.from(this);
   }
 
   getSize() {

@@ -1,7 +1,24 @@
+import SourceTargetNode from './SourceTargetNode';
+
+import {
+  createSetPayload, createSetPayloadFromConst,
+} from '../payloads';
+
 import {createOrderedMap} from './_map';
 
-export default class OrderedSet {
+export default class OrderedSet extends SourceTargetNode {
+
+  processPayload(payload) {
+    payload.deliver(this);
+    return createSetPayload(this);
+  }
+
+  createPlaceholderPayload() {
+    return createSetPayloadFromConst([]);
+  }
+
   constructor() {
+    super();
     this.map = createOrderedMap();
   }
 
@@ -24,7 +41,11 @@ export default class OrderedSet {
     return this.map.has(value);
   }
 
+  *[Symbol.iterator]() {
+    for (const [key] of this.map) yield [key];
+  }
+
   get() {
-    return this.map.getEntries().map( ([value]) => value);
+    return Array.from(this).map( ([value]) => value);
   }
 }

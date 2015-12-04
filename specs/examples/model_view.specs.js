@@ -14,8 +14,15 @@ describe('Model with view', function() {
     this.define('elementSet', new Transmitter.Nodes.OrderedSet());
 
     Transmitter.startTransmission(
-      (tr) =>
-        this.modelSet.set(new Model(tr), new Model(tr))
+      (tr) => {
+        this.modelSet.set([new Model(tr), new Model(tr)]);
+
+        new Transmitter.Channels.SimpleChannel()
+        .inForwardDirection()
+        .fromSource(this.modelSet)
+        .toTarget(this.viewMap)
+        .init(tr);
+      }
     );
   });
 

@@ -17,7 +17,7 @@ function assertTarget(target) {
 
 
 export default buildPrototype()
-  .setOnceMandatoryProperty('_connectionTarget', 'Target')
+  .setOnceMandatoryProperty('_connectionTarget', {title: 'Target'})
   .methods({
     toTarget(target) {
       assertSingleArgument(arguments.length);
