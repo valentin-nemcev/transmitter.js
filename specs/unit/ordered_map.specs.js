@@ -26,4 +26,3 @@ describe('Ordered map', function() {
     ]);
   });
 });
-

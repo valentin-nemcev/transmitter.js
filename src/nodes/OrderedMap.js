@@ -3,6 +3,8 @@ import {
   createMapPayload, createMapPayloadFromConst,
 } from '../payloads';
 
+import {createOrderedMap} from './_map';
+
 export default class OrderedMap extends SourceTargetNode {
 
   processPayload(payload) {
@@ -16,7 +18,7 @@ export default class OrderedMap extends SourceTargetNode {
 
   constructor() {
     super();
-    this.entries = [];
+    this.map = createOrderedMap();
   }
 
   set(entries) {
@@ -26,42 +28,25 @@ export default class OrderedMap extends SourceTargetNode {
     return this;
   }
 
-  setAt(keyArg, valueArg) {
-    for (let i = 0; i < this.entries.length; i++) {
-      const entry = this.entries[i];
-      const [key] = entry;
-
-      if (keyArg === key) {
-        entry[1] = valueArg;
-        return this;
-      }
-    }
-    this.entries.push([keyArg, valueArg]);
+  setAt(key, value) {
+    this.map.set(key, value);
     return this;
   }
 
-  removeAt(keyArg) {
-    for (const entry of this.entries) {
-      const [key] = entry;
-      if (keyArg === key) {
-        entry[1] = undefined;
-        return this;
-      }
-    }
+  removeAt(key) {
+    this.map.remove(key);
     return this;
   }
 
-  getAt(keyArg) {
-    for (const [key, value] of this.entries) {
-      if (keyArg === key) return value;
-    }
+  getAt(key) {
+    return this.map.get(key);
   }
 
   get() {
-    return this.entries.slice();
+    return this.map.getEntries();
   }
 
   getSize() {
-    return this.entries.length;
+    return this.map.getSize();
   }
 }
