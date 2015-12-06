@@ -42,8 +42,12 @@ export default class SortedMap extends SourceTargetNode {
     return this.map.get(key);
   }
 
+  [Symbol.iterator]() {
+    return this.map[Symbol.iterator]();
+  }
+
   get() {
-    return this.map.getEntries();
+    return Array.from(this);
   }
 
   getSize() {

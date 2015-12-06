@@ -23,7 +23,16 @@ export default class OrderedSet extends SourceTargetNode {
   }
 
   set(values) {
+    this.map.clear();
     for (const value of values) {
+      this.add(value);
+    }
+    return this;
+  }
+
+  setIterator(it) {
+    this.map.clear();
+    for (const [, value] of it) {
       this.add(value);
     }
     return this;
@@ -42,10 +51,14 @@ export default class OrderedSet extends SourceTargetNode {
   }
 
   *[Symbol.iterator]() {
-    for (const [key] of this.map) yield [key];
+    for (const [key] of this.map) yield [null, key];
   }
 
   get() {
-    return Array.from(this).map( ([value]) => value);
+    return Array.from(this).map( ([, value]) => value);
+  }
+
+  getSize() {
+    return this.map.getSize();
   }
 }

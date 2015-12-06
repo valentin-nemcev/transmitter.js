@@ -5,9 +5,7 @@ export default class Payload {
 
   log() {
     /* eslint-disable no-console */
-    console.table(Array.from(this).map(
-      ([key, value]) => ({key: inspect(key), value: inspect(value)})
-    ));
+    console.log(Array.from(this).map( (entry) => entry.map(inspect) ));
     return this;
   }
 

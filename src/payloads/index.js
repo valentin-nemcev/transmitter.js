@@ -17,14 +17,21 @@ import {
 } from './ListPayload';
 
 import {
+  convertToAppendElementAction,
+  convertToRemoveElementAction,
+} from './ListActionsPayload';
+
+import {
+  convertToSetPayload,
   createSetPayload,
   createSetPayloadFromConst,
 } from './SetPayload';
 
 import {
-  convertToAppendElementAction,
-  convertToRemoveElementAction,
-} from './ListActionsPayload';
+  convertToMapPayload,
+  createMapPayload,
+  createMapPayloadFromConst,
+} from './MapPayload';
 
 
 Payload.prototype.toNoOp = function() {
@@ -32,6 +39,13 @@ Payload.prototype.toNoOp = function() {
 };
 
 NoOpPayload.prototype.toNoOp = function() { return this; };
+
+
+Payload.prototype.toValue = function() {
+  return convertToValuePayload(this);
+};
+
+NoOpPayload.prototype.toValue = function() { return this; };
 
 
 Payload.prototype.toList = function() {
@@ -55,11 +69,18 @@ Payload.prototype.toRemoveElementAction = function() {
 NoOpPayload.prototype.toRemoveElementAction = function() { return this; };
 
 
-Payload.prototype.toValue = function() {
-  return convertToValuePayload(this);
+Payload.prototype.toSet = function() {
+  return convertToSetPayload(this);
 };
 
-NoOpPayload.prototype.toValue = function() { return this; };
+NoOpPayload.prototype.toSet = function() { return this; };
+
+
+Payload.prototype.toMap = function() {
+  return convertToMapPayload(this);
+};
+
+NoOpPayload.prototype.toMap = function() { return this; };
 
 
 export {
@@ -75,4 +96,7 @@ export {
 
   createSetPayload,
   createSetPayloadFromConst,
+
+  createMapPayload,
+  createMapPayloadFromConst,
 };

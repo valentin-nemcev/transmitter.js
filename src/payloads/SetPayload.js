@@ -18,6 +18,9 @@ class SetPayload extends Payload {
     return this;
   }
 
+  map(map) {
+    return new MappedPayload(this, map);
+  }
 }
 
 
@@ -30,10 +33,6 @@ class SimplePayload extends SetPayload {
   [Symbol.iterator]() {
     return this.source[Symbol.iterator]();
   }
-
-  // getAt(key) {
-  //   return this.source.getAt(key);
-  // }
 }
 
 
@@ -48,6 +47,40 @@ class ConstPayload extends SetPayload {
   }
 }
 
+
+class MappedPayload extends SetPayload {
+  constructor(source, map) {
+    super();
+    this.source = source;
+    this.mapFn = map;
+  }
+
+  *[Symbol.iterator]() {
+    const map = this.mapFn;
+    for (const [, value] of this.source) {
+      yield [null, map(value)];
+    }
+  }
+}
+
+
+class ConvertedPayload extends SetPayload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    for (const [, value] of this.source) {
+      yield [null, value];
+    }
+  }
+}
+
+
+export function convertToSetPayload(source) {
+  return new ConvertedPayload(source);
+}
 
 export function createSetPayload(source) {
   return new SimplePayload(source);

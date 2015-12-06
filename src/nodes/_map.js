@@ -51,6 +51,10 @@ class OrderedMap {
   [Symbol.iterator]() {
     return this.entries.values();
   }
+
+  getSize() {
+    return this.entries.length;
+  }
 }
 
 
@@ -104,8 +108,12 @@ class SortedMap {
     return false;
   }
 
-  getEntries() {
-    return this.entries.slice();
+  [Symbol.iterator]() {
+    return this.entries.values();
+  }
+
+  getSize() {
+    return this.entries.length;
   }
 }
 

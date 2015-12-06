@@ -1,102 +1,83 @@
 import {inspect} from 'util';
 
-import {createValuePayloadFromConst} from './ValuePayload';
 import Payload from './Payload';
 
-function id(a) { return a; }
-function getTrue() { return true; }
 
 class MapPayload extends Payload {
 
-  static create(source) {
-    return new MapPayload(source);
+  inspect() { return `set(${inspect(Array.from(this))})`; }
+
+
+  [Symbol.iterator]() {
+    throw new Error('No iterator for ' + this.constructor.name);
   }
 
-  constructor(source, {map, filter} = {}) {
-    super();
-    this.source = source;
-    this.mapFn = map || id;
-    this.filterFn = filter || getTrue;
+  getAt() {
+    throw new Error('No getAt for ' + this.constructor.name);
   }
 
-
-  inspect() { return `map(${inspect(this.get())})`; }
-
-
-  get() {
-    if (!this.gotValue) {
-      // this.value = this.source.get().filter(this.filterFn).map(this.mapFn);
-      this.gotValue = true;
-    }
-    return this.value;
+  deliver(map) {
+    map.setIterator(this);
+    return this;
   }
-
-
-  getAt(pos) {
-    return this.get()[pos];
-  }
-
-
-  getSize() {
-    return this.get().length;
-  }
-
 
   map(map) {
     return new MapPayload(this, {map});
   }
-
-
-  filter(filter) {
-    return new MapPayload(this, {filter});
-  }
-
-  flatten() {
-    return this.map( (nested) => nested.get() );
-  }
-
-  unflatten() {
-    return this.map( (value) => createValuePayloadFromConst(value) );
-  }
-
-  // zipCoercingSize(...otherPayloads) {
-  //   return zip([this, ...otherPayloads], true);
-  // }
-
-  // zip(...otherPayloads) { return zip([this, ...otherPayloads]); }
-
-  // unzip(size) {
-  //   return Array.from(Array(size).keys()).map( (i) =>
-  //     this.map( (values) => values[i] )
-  //   );
-  // }
-
-  // coerceSize(otherPayload) {
-  //   return MapPayload.create({get: () => {
-  //     const result = [];
-  //     for (let i = 0; i < otherPayload.getSize(); i++) {
-  //       result.push(this.getAt(i));
-  //     }
-  //     return result;
-  //   }});
-  // }
-
-  deliver(map) {
-    map.set(this.get());
-    return this;
-  }
-}
-
-function create(source) {
-  return new MapPayload(source);
-}
-
-function createFromConst(value) {
-  return create({get() { return value; }});
 }
 
 
-export {
-  create as createMapPayload,
-  createFromConst as createMapPayloadFromConst,
-};
+class SimplePayload extends MapPayload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  [Symbol.iterator]() {
+    return this.source[Symbol.iterator]();
+  }
+
+  getAt(key) {
+    return this.source.getAt(key);
+  }
+}
+
+
+class ConstPayload extends MapPayload {
+  constructor(value) {
+    super();
+    this.value = value;
+  }
+
+  [Symbol.iterator]() {
+    return this.value.entries();
+  }
+}
+
+
+class ConvertedPayload extends MapPayload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    for (const [, value] of this.source) {
+      const [key, nestedValue] = Array.from(value || []);
+      yield [key, nestedValue];
+    }
+  }
+}
+
+
+export function convertToMapPayload(source) {
+  return new ConvertedPayload(source);
+}
+
+export function createMapPayload(source) {
+  return new SimplePayload(source);
+}
+
+export function createMapPayloadFromConst(value) {
+  return new ConstPayload(value);
+}
