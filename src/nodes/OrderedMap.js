@@ -35,7 +35,9 @@ export default class OrderedMap extends SourceTargetNode {
   }
 
   setAt(key, value) {
-    this.map.set(key, value);
+    const entry = this.map.get(key);
+    if (entry != null) entry.value = value;
+    else this.map.set(key, {value, visited: false});
     return this;
   }
 
@@ -45,11 +47,38 @@ export default class OrderedMap extends SourceTargetNode {
   }
 
   getAt(key) {
-    return this.map.get(key);
+    const entry = this.map.get(key);
+    if (entry != null) return entry.value;
   }
 
-  [Symbol.iterator]() {
-    return this.map[Symbol.iterator]();
+  hasAt(key) {
+    return this.map.has(key);
+  }
+
+  visitKey(key) {
+    const entry = this.map.get(key);
+    if (entry != null) entry.visited = true;
+    return this;
+  }
+
+  removeUnvisitedKeys() {
+    // Make a temp array to avoid modifying this.map during iteration
+    const keysToRemove = Array.from(this.iterateAndClearUnvisitedKeys());
+    for (const key of keysToRemove) this.removeAt(key);
+    return this;
+  }
+
+  *iterateAndClearUnvisitedKeys() {
+    for (const [key, entry] of this.map) {
+      if (!entry.visited) yield key;
+      entry.visited = false;
+    }
+  }
+
+  *[Symbol.iterator]() {
+    for (const [key, {value}] of this.map) {
+      yield [key, value];
+    }
   }
 
   get() {

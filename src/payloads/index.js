@@ -29,6 +29,7 @@ import {
 
 import {
   convertToMapPayload,
+  convertToMapUpdatePayload,
   createMapPayload,
   createMapPayloadFromConst,
 } from './MapPayload';
@@ -81,6 +82,13 @@ Payload.prototype.toMap = function() {
 };
 
 NoOpPayload.prototype.toMap = function() { return this; };
+
+
+Payload.prototype.toMapUpdate = function(map) {
+  return convertToMapUpdatePayload(this, map);
+};
+
+NoOpPayload.prototype.toMapUpdate = function() { return this; };
 
 
 export {

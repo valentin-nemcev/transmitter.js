@@ -3,6 +3,24 @@ import {inspect} from 'util';
 import Payload from './Payload';
 
 
+class UpdatePayload {
+  constructor(source, map) {
+    this.source = source;
+    this.map = map;
+  }
+
+  deliver(map) {
+    for (const [, value] of this.source) {
+      const key = value;
+      if (!map.hasAt(key)) map.setAt(key, this.map.call(null, value));
+      map.visitKey(key);
+    }
+    map.removeUnvisitedKeys();
+    return this;
+  }
+}
+
+
 class MapPayload extends Payload {
 
   inspect() { return `set(${inspect(Array.from(this))})`; }
@@ -72,6 +90,10 @@ class ConvertedPayload extends MapPayload {
 
 export function convertToMapPayload(source) {
   return new ConvertedPayload(source);
+}
+
+export function convertToMapUpdatePayload(source, map) {
+  return new UpdatePayload(source, map);
 }
 
 export function createMapPayload(source) {
