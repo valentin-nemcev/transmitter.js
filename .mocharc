@@ -1,1 +1,1 @@
---bail --colors --reporter spec
+--no-bail --colors --reporter spec

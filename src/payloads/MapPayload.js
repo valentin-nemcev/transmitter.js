@@ -30,6 +30,8 @@ class MapPayload extends Payload {
     throw new Error('No iterator for ' + this.constructor.name);
   }
 
+  getEmpty() { return undefined; }
+
   getAt() {
     throw new Error('No getAt for ' + this.constructor.name);
   }

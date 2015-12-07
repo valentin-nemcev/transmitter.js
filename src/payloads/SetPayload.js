@@ -9,6 +9,8 @@ class SetPayload extends Payload {
     throw new Error('No iterator for ' + this.constructor.name);
   }
 
+  getEmpty() { return undefined; }
+
   getAt() {
     throw new Error('No getAt for ' + this.constructor.name);
   }
@@ -20,6 +22,40 @@ class SetPayload extends Payload {
 
   map(map) {
     return new MappedPayload(this, map);
+  }
+
+  zipWithMap(map) {
+    return new ZippedWithMapPayload(this, map);
+  }
+}
+
+
+class ZippedWithMapPayload extends SetPayload {
+  constructor(set, ...maps) {
+    super();
+    this.payloads = [set, ...maps];
+  }
+
+  *[Symbol.iterator]() {
+    const payloadsWithIters = this.payloads
+      .map( (p) => [p, p[Symbol.iterator]()] );
+
+    for (let i = 0; ; i++) {
+      const zippedEl = [];
+      let firstDone;
+      let allDone = true;
+      for (const [payload, it] of payloadsWithIters) {
+        const {value: entry, done} = it.next();
+        const el = done ? payload.getEmpty() : entry[1];
+        if (firstDone == null) firstDone = done;
+        if (this.coerceSize && firstDone) return;
+        if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
+        allDone = allDone && done;
+        zippedEl.push(el);
+      }
+      if (allDone) return;
+      else yield [i, zippedEl];
+    }
   }
 }
 

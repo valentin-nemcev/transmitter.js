@@ -13,9 +13,10 @@ export {
 };
 
 import ChannelValue from './ChannelValue';
-import ChannelList     from './ChannelList';
+import ChannelList  from './ChannelList';
+import ChannelMap   from './ChannelMap';
 
-export {ChannelValue, ChannelList};
+export {ChannelValue, ChannelList, ChannelMap};
 
 import Value from '../nodes/Value';
 import Optional from '../nodes/Optional';

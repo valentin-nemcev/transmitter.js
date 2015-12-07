@@ -5,29 +5,34 @@ describe('Model with view', function() {
   let modelId = 0;
 
   class Model {
-    constructor() {
+    constructor(tr, value) {
       this.id = modelId++;
+
+      this.valueNode = new Transmitter.Nodes.Value();
+      this.valueNode.set(value).init(tr);
     }
   }
 
   class View {
     constructor() {
       this.element = new ViewElement();
+      this.valueProp =
+        new Transmitter.Nodes.PropertyValue(this.element, 'value');
     }
   }
 
-  class ViewElement {
-  }
+  class ViewElement { }
 
 
   beforeEach(function() {
     this.define('modelSet', new Transmitter.Nodes.OrderedSet());
     this.define('viewMap', new Transmitter.Nodes.OrderedMap());
     this.define('elementSet', new Transmitter.Nodes.OrderedSet());
+    this.define('channelMap', new Transmitter.ChannelNodes.ChannelMap());
 
     Transmitter.startTransmission(
       (tr) => {
-        this.modelSet.set([new Model(tr), new Model(tr)]);
+        this.modelSet.set([new Model(tr, 'value1'), new Model(tr, 'value2')]);
 
         new Transmitter.Channels.SimpleChannel()
           .inForwardDirection()
@@ -36,6 +41,25 @@ describe('Model with view', function() {
           .withTransform(
             (payload) =>
               payload.toMapUpdate( () => new View() )
+          )
+          .init(tr);
+
+        new Transmitter.Channels.NestedSimpleChannel()
+          .fromSourcesWithMatchingPriorities(this.modelSet, this.viewMap)
+          .toChannelTarget(this.channelMap)
+          .withTransform(
+            (payloads) => {
+              if (payloads.length == null) return payloads;
+              const [models, views] = payloads;
+              return models.zipWithMap(views).toMapUpdate(
+                ([model, view]) =>
+                  new Transmitter.Channels.SimpleChannel()
+                    .inForwardDirection()
+                    .fromSource(model.valueNode)
+                    .toTarget(view.valueProp)
+              );
+
+            }
           )
           .init(tr);
 
@@ -62,14 +86,22 @@ describe('Model with view', function() {
   });
 
 
+  specify('Updates nested nodes', function() {
+    const [element1, element2] = this.elementSet.get();
+    expect(element1).to.deep.equal({value: 'value1'});
+    expect(element2).to.deep.equal({value: 'value2'});
+  });
+
+
   specify('Updates views by key', function() {
     const [, model2] = this.modelSet.get();
-    const model3 = new Model();
     const [, element2] = this.elementSet.get();
 
     Transmitter.startTransmission(
-      (tr) =>
-        this.modelSet.set([model2, model3]).originate(tr)
+      (tr) => {
+        const model3 = new Model(tr, 'value3');
+        this.modelSet.set([model2, model3]).originate(tr);
+      }
     );
 
     expect(this.elementSet.getSize()).to.equal(2);

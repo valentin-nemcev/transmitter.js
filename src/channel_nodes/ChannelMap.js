@@ -1,21 +1,9 @@
-import SourceTargetNode from './SourceTargetNode';
-import {
-  createMapPayload, createMapPayloadFromConst,
-} from '../payloads';
+import ChannelNode from './ChannelNode';
 
-import {createOrderedMap} from './_map';
 
-export default class OrderedMap extends SourceTargetNode {
+import {createOrderedMap} from '../nodes/_map';
 
-  processPayload(payload) {
-    payload.deliver(this);
-    return createMapPayload(this);
-  }
-
-  createPlaceholderPayload() {
-    return createMapPayloadFromConst([]);
-  }
-
+export default class ChannelMap extends ChannelNode {
   constructor() {
     super();
     this.map = createOrderedMap();
@@ -36,13 +24,23 @@ export default class OrderedMap extends SourceTargetNode {
 
   setAt(key, value) {
     const entry = this.map.get(key);
-    if (entry != null) entry.value = value;
-    else this.map.set(key, {value, visited: false});
+    if (entry != null) {
+      if (entry.value !== value) {
+        entry.value.disconnect(this.message);
+      }
+      entry.value = value;
+    } else {
+      this.map.set(key, {value, visited: false});
+    }
+    value.connect(this.message);
     return this;
   }
 
   removeAt(key) {
-    this.map.remove(key);
+    const entry = this.map.remove(key);
+    if (entry != null) {
+      entry.value.disconnect(this.message);
+    }
     return this;
   }
 

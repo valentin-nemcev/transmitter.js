@@ -29,10 +29,9 @@ class OrderedMap {
       const [key] = entry;
       if (keyArg === key) {
         this.entries.splice(i, 1);
-        return this;
+        return entry[1];
       }
     }
-    return this;
   }
 
   get(keyArg) {
