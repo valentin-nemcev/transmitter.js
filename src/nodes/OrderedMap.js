@@ -1,6 +1,6 @@
 import SourceTargetNode from './SourceTargetNode';
 import {
-  createMapPayload, createMapPayloadFromConst,
+  createMapPayload, createEmptyMapPayload,
 } from '../payloads';
 
 import {createOrderedMap} from './_map';
@@ -13,7 +13,7 @@ export default class OrderedMap extends SourceTargetNode {
   }
 
   createPlaceholderPayload() {
-    return createMapPayloadFromConst([]);
+    return createEmptyMapPayload();
   }
 
   constructor() {

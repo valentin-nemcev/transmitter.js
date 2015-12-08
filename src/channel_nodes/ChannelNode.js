@@ -32,6 +32,7 @@ export default class ChannelNode {
 
   routePlaceholderMessage(tr, payload) {
     this.message = tr.createPlaceholderConnectionMessage(this);
+    this.payload = payload;
     payload.deliver(this);
     this.message = null;
     return this;
@@ -39,6 +40,7 @@ export default class ChannelNode {
 
   routeMessage(tr, payload) {
     this.message = tr.createNextConnectionMessage(this);
+    this.payload = payload;
     payload.deliver(this);
     this.message.sendToTargetPoints();
     this.message = null;

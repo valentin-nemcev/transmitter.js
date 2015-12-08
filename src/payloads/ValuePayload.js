@@ -34,17 +34,8 @@ class UpdateMatchingPayload {
 class ValuePayload extends Payload {
   inspect() { return `value(${inspect(Array.from(this))})`; }
 
-  map(map) {
-    return new MappedPayload(this, map);
-  }
-
   updateMatching(map, match) {
     return new UpdateMatchingPayload(this, {map, match});
-  }
-
-  deliver(value) {
-    value.setIterator(this);
-    return this;
   }
 
   noOpIf(conditionCb) {
@@ -76,7 +67,7 @@ class SimplePayload extends ValuePayload {
 }
 
 
-class ConstValueSource extends ValuePayload {
+class ConstPayload extends ValuePayload {
   constructor(value) {
     super();
     this.value = value;
@@ -104,21 +95,6 @@ class MergedPayload extends ValuePayload {
         }
       ),
     ];
-  }
-}
-
-
-class MappedPayload extends ValuePayload {
-  constructor(source, map) {
-    super();
-    this.source = source;
-    this.mapFn = map;
-  }
-
-  *[Symbol.iterator]() {
-    const map = this.mapFn;
-    const {value: entry} = this.source[Symbol.iterator]().next();
-    yield [null, map(entry[1], entry[0])];
   }
 }
 
@@ -159,7 +135,7 @@ export function createValuePayloadAtKey(source, key) {
 }
 
 export function createEmptyValuePayload() {
-  return new ConstValueSource(null);
+  return new ConstPayload(null);
 }
 
 export function createValuePayload(source) {
@@ -167,7 +143,7 @@ export function createValuePayload(source) {
 }
 
 export function createValuePayloadFromConst(value) {
-  return new ConstValueSource(value);
+  return new ConstPayload(value);
 }
 
 export function mergeValuePayloads(payloads) {

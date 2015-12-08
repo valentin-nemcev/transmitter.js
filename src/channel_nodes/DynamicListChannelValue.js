@@ -1,5 +1,5 @@
 import ChannelNode from './ChannelNode';
-import {createListPayloadFromConst} from '../payloads';
+import {createEmptyListPayload} from '../payloads';
 
 
 export default class DynamicListChannelValue extends ChannelNode {
@@ -24,8 +24,6 @@ export default class DynamicListChannelValue extends ChannelNode {
     const newChannel = this.createChannel.call(null, newNodes);
     this.channel = newChannel;
 
-    this.payload = createListPayloadFromConst(newNodes);
-
     if (newChannel != null) newChannel.connect(this.message);
     return this;
   }
@@ -35,7 +33,7 @@ export default class DynamicListChannelValue extends ChannelNode {
   }
 
   getPlaceholderPayload() {
-    return createListPayloadFromConst([]);
+    return createEmptyListPayload();
   }
 
   getSourcePayload() { return this.type === 'sources' ? this.payload : null; }

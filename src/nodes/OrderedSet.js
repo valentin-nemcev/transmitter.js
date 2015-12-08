@@ -1,7 +1,7 @@
 import SourceTargetNode from './SourceTargetNode';
 
 import {
-  createSetPayload, createSetPayloadFromConst,
+  createSetPayload, createEmptySetPayload,
 } from '../payloads';
 
 import {createOrderedMap} from './_map';
@@ -14,7 +14,7 @@ export default class OrderedSet extends SourceTargetNode {
   }
 
   createPlaceholderPayload() {
-    return createSetPayloadFromConst([]);
+    return createEmptySetPayload();
   }
 
   constructor() {

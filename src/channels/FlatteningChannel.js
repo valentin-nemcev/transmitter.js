@@ -76,7 +76,7 @@ FlatteningChannel.prototype = buildPrototype()
           .fromSource(this._flatNode)
           .toDynamicTargets(targets)
           .withTransform( (flatPayload) =>
-            flatPayload.unflatten()
+            flatPayload.unflattenToValues()
           )
     );
   })

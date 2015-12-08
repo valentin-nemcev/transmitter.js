@@ -22,28 +22,7 @@ class UpdatePayload {
 
 
 class MapPayload extends Payload {
-
   inspect() { return `set(${inspect(Array.from(this))})`; }
-
-
-  [Symbol.iterator]() {
-    throw new Error('No iterator for ' + this.constructor.name);
-  }
-
-  getEmpty() { return undefined; }
-
-  getAt() {
-    throw new Error('No getAt for ' + this.constructor.name);
-  }
-
-  deliver(map) {
-    map.setIterator(this);
-    return this;
-  }
-
-  map(map) {
-    return new MapPayload(this, {map});
-  }
 }
 
 
@@ -63,15 +42,8 @@ class SimplePayload extends MapPayload {
 }
 
 
-class ConstPayload extends MapPayload {
-  constructor(value) {
-    super();
-    this.value = value;
-  }
-
-  [Symbol.iterator]() {
-    return this.value.entries();
-  }
+class EmptyPayload extends MapPayload {
+  *[Symbol.iterator]() { }
 }
 
 
@@ -102,6 +74,6 @@ export function createMapPayload(source) {
   return new SimplePayload(source);
 }
 
-export function createMapPayloadFromConst(value) {
-  return new ConstPayload(value);
+export function createEmptyMapPayload() {
+  return new EmptyPayload();
 }

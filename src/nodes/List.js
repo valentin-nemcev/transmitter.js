@@ -1,6 +1,6 @@
 import SourceTargetNode from './SourceTargetNode';
 import {
-  createListPayload, createListPayloadFromConst,
+  createListPayload, createEmptyListPayload,
 } from '../payloads';
 
 
@@ -12,7 +12,7 @@ export default class List extends SourceTargetNode {
   }
 
   createPlaceholderPayload() {
-    return createListPayloadFromConst([]);
+    return createEmptyListPayload();
   }
 
   constructor() {

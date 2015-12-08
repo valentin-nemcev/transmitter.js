@@ -7,13 +7,14 @@ import {
   createValuePayload,
   createValuePayloadFromConst,
   createEmptyValuePayload,
+  createValuePayloadAtKey,
   mergeValuePayloads,
 } from './ValuePayload';
 
 import {
   convertToListPayload,
   createListPayload,
-  createListPayloadFromConst,
+  createEmptyListPayload,
 } from './ListPayload';
 
 import {
@@ -24,15 +25,25 @@ import {
 import {
   convertToSetPayload,
   createSetPayload,
-  createSetPayloadFromConst,
+  createEmptySetPayload,
 } from './SetPayload';
 
 import {
   convertToMapPayload,
   convertToMapUpdatePayload,
   createMapPayload,
-  createMapPayloadFromConst,
+  createEmptyMapPayload,
 } from './MapPayload';
+
+
+Payload.prototype.unflattenToValues = function() {
+  return this.unflattenTo({
+    createEmptyPayload: createEmptyValuePayload,
+    createPayloadAtKey: createValuePayloadAtKey,
+  });
+};
+
+NoOpPayload.prototype.unflattenToValues = function() { return this; };
 
 
 Payload.prototype.toNoOp = function() {
@@ -100,11 +111,11 @@ export {
   mergeValuePayloads,
 
   createListPayload,
-  createListPayloadFromConst,
+  createEmptyListPayload,
 
   createSetPayload,
-  createSetPayloadFromConst,
+  createEmptySetPayload,
 
   createMapPayload,
-  createMapPayloadFromConst,
+  createEmptyMapPayload,
 };

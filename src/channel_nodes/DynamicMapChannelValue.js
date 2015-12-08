@@ -1,5 +1,5 @@
 import ChannelNode from './ChannelNode';
-import {createMapPayloadFromConst} from '../payloads';
+import {createEmptyMapPayload} from '../payloads';
 
 
 export default class DynamicMapChannelValue extends ChannelNode {
@@ -24,14 +24,12 @@ export default class DynamicMapChannelValue extends ChannelNode {
     const newChannel = this.createChannel.call(null, newNodes);
     this.channel = newChannel;
 
-    this.payload = createMapPayloadFromConst(newNodes);
-
     if (newChannel != null) newChannel.connect(this.message);
     return this;
   }
 
   getPlaceholderPayload() {
-    return createMapPayloadFromConst([]);
+    return createEmptyMapPayload();
   }
 
   getSourcePayload() { return this.type === 'sources' ? this.payload : null; }

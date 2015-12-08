@@ -1,7 +1,7 @@
 import SourceTargetNode from './SourceTargetNode';
 
 import {
-  createListPayload, createListPayloadFromConst,
+  createListPayload, createEmptyListPayload,
 } from '../payloads';
 
 export default class Optional extends SourceTargetNode {
@@ -12,7 +12,7 @@ export default class Optional extends SourceTargetNode {
   }
 
   createPlaceholderPayload() {
-    return createListPayloadFromConst(null);
+    return createEmptyListPayload();
   }
 
   get() { return this.value; }

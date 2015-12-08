@@ -17,6 +17,10 @@ export default class Value extends SourceTargetNode {
 
   get() { return this.value; }
 
+  getSize() { return 1; }
+
+  getAt(key) { return key === 0 ? this.get() : undefined; }
+
   *[Symbol.iterator]() {
     yield [null, this.get()];
   }
