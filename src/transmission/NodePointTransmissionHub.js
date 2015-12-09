@@ -30,8 +30,9 @@ export default class NodePointTransmissionHub {
   }
 
   areAllChannelNodesUpdated() {
-    for (const node of this.nodePoint.getChannelNodesFor(this.comm))
+    for (const node of this.nodePoint.getChannelNodesFor(this.comm)) {
       if (!this._channelNodeUpdated(node)) return false;
+    }
     return true;
   }
 

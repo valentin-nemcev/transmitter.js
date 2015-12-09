@@ -42,8 +42,9 @@ class PrototypeBuilder {
   }
 
   methods(methods) {
-    for (const [prop, method] of Object.entries(methods))
+    for (const [prop, method] of Object.entries(methods)) {
       this.method(prop, method);
+    }
     return this;
   }
 
