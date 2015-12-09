@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import Payload from './Payload';
+import {Payload} from './Payload';
 
 class RemoveAction extends Payload {
 

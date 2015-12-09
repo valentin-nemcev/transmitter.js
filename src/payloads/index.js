@@ -1,20 +1,21 @@
 import {NoOpPayload, getNoOpPayload} from './NoOpPayload';
 
-import Payload from './Payload';
+import {
+  Payload,
+  createSimplePayload,
+  createEmptyPayload,
+  zipPayloads,
+} from './Payload';
 
 import {
   convertToValuePayload,
-  createValuePayload,
   createValuePayloadFromConst,
   createEmptyValuePayload,
   createValuePayloadAtKey,
-  mergeValuePayloads,
 } from './ValuePayload';
 
 import {
   convertToListPayload,
-  createListPayload,
-  createEmptyListPayload,
 } from './ListPayload';
 
 import {
@@ -31,8 +32,6 @@ import {
 import {
   convertToMapPayload,
   convertToMapUpdatePayload,
-  createMapPayload,
-  createEmptyMapPayload,
 } from './MapPayload';
 
 
@@ -104,18 +103,18 @@ NoOpPayload.prototype.toMapUpdate = function() { return this; };
 
 export {
   getNoOpPayload,
+  zipPayloads,
 
-  createValuePayload,
+  createSimplePayload as createValuePayload,
   createValuePayloadFromConst,
   createEmptyValuePayload,
-  mergeValuePayloads,
 
-  createListPayload,
-  createEmptyListPayload,
+  createSimplePayload as createListPayload,
+  createEmptyPayload as createEmptyListPayload,
 
   createSetPayload,
   createEmptySetPayload,
 
-  createMapPayload,
-  createEmptyMapPayload,
+  createSimplePayload as createMapPayload,
+  createEmptyPayload as createEmptyMapPayload,
 };

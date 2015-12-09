@@ -1,18 +1,9 @@
 import {inspect} from 'util';
 
-import Payload from './Payload';
+import {Payload} from './Payload';
 
 class SetPayload extends Payload {
   inspect() { return `set(${inspect(Array.from(this))})`; }
-
-  deliver(set) {
-    set.setIterator(this);
-    return this;
-  }
-
-  map(map) {
-    return new MappedPayload(this, map);
-  }
 
   zipWithMap(map) {
     return new ZippedWithMapPayload(this, map);
@@ -64,22 +55,6 @@ class SimplePayload extends SetPayload {
 
 class EmptyPayload extends SetPayload {
   *[Symbol.iterator]() { }
-}
-
-
-class MappedPayload extends SetPayload {
-  constructor(source, map) {
-    super();
-    this.source = source;
-    this.mapFn = map;
-  }
-
-  *[Symbol.iterator]() {
-    const map = this.mapFn;
-    for (const [, value] of this.source) {
-      yield [null, map(value)];
-    }
-  }
 }
 
 

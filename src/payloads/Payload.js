@@ -2,7 +2,7 @@ import {inspect} from 'util';
 import UpdateMatchingPayload from './UpdateMatchingPayload';
 
 
-export default class Payload {
+export class Payload {
 
   inspect() { return `payload(${inspect(Array.from(this))})`; }
 
@@ -46,6 +46,13 @@ export default class Payload {
 
   replaceNoOpBy() { return this; }
 
+  noOpIf(conditionCb) {
+    for (const [key, value] of this) {
+      if (conditionCb(value, key)) return this.toNoOp();
+    }
+    return this;
+  }
+
 
   map(mapFn) {
     return new MappedPayload(this, mapFn);
@@ -82,6 +89,10 @@ export default class Payload {
   }
 }
 
+export function zipPayloads(payloads) {
+  return new ZippedPayload(payloads);
+}
+
 
 class SimplePayload extends Payload {
   constructor(source) {
@@ -96,6 +107,19 @@ class SimplePayload extends Payload {
   getAt(key) {
     return this.source.getAt(key);
   }
+}
+
+export function createSimplePayload(source) {
+  return new SimplePayload(source);
+}
+
+
+class EmptyPayload extends Payload {
+  *[Symbol.iterator]() { }
+}
+
+export function createEmptyPayload() {
+  return new EmptyPayload();
 }
 
 

@@ -4,7 +4,7 @@ const Value = Transmitter.Nodes.Value;
 
 function reduceMergedPayload(...nodes) {
   return function(payloads) {
-    return Transmitter.mergeValuePayloads(payloads).map( (values) => {
+    return Transmitter.zipPayloads(payloads).map( (values) => {
       const result = {};
       values.forEach( (value, i) => result[nodes[i].inspect()] = value );
       return result;

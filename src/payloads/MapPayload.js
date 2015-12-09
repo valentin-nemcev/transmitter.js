@@ -1,6 +1,4 @@
-import {inspect} from 'util';
-
-import Payload from './Payload';
+import {Payload} from './Payload';
 
 
 class UpdatePayload {
@@ -21,33 +19,7 @@ class UpdatePayload {
 }
 
 
-class MapPayload extends Payload {
-  inspect() { return `set(${inspect(Array.from(this))})`; }
-}
-
-
-class SimplePayload extends MapPayload {
-  constructor(source) {
-    super();
-    this.source = source;
-  }
-
-  [Symbol.iterator]() {
-    return this.source[Symbol.iterator]();
-  }
-
-  getAt(key) {
-    return this.source.getAt(key);
-  }
-}
-
-
-class EmptyPayload extends MapPayload {
-  *[Symbol.iterator]() { }
-}
-
-
-class ConvertedPayload extends MapPayload {
+class ConvertedPayload extends Payload {
   constructor(source) {
     super();
     this.source = source;
@@ -68,12 +40,4 @@ export function convertToMapPayload(source) {
 
 export function convertToMapUpdatePayload(source, map) {
   return new UpdatePayload(source, map);
-}
-
-export function createMapPayload(source) {
-  return new SimplePayload(source);
-}
-
-export function createEmptyMapPayload() {
-  return new EmptyPayload();
 }
