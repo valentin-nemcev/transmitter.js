@@ -25,8 +25,6 @@ import {
 
 import {
   convertToSetPayload,
-  createSetPayload,
-  createEmptySetPayload,
 } from './SetPayload';
 
 import {
@@ -112,8 +110,8 @@ export {
   createSimplePayload as createListPayload,
   createEmptyPayload as createEmptyListPayload,
 
-  createSetPayload,
-  createEmptySetPayload,
+  createSimplePayload as createSetPayload,
+  createEmptyPayload as createEmptySetPayload,
 
   createSimplePayload as createMapPayload,
   createEmptyPayload as createEmptyMapPayload,

@@ -51,7 +51,7 @@ describe('Model with view', function() {
             (payloads) => {
               if (payloads.length == null) return payloads;
               const [models, views] = payloads;
-              return models.zipWithMap(views).toMapUpdate(
+              return models.zip(views).toMapUpdate(
                 ([model, view]) =>
                   new Transmitter.Channels.SimpleChannel()
                     .inForwardDirection()
