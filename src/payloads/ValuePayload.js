@@ -3,40 +3,8 @@ import {inspect} from 'util';
 import Payload from './Payload';
 
 
-class UpdateMatchingPayload {
-
-  constructor(source, {map, match} = {}) {
-    this.source = source;
-    this.mapFn = map != null ? map : (a) => a;
-    this.matchFn = match;
-  }
-
-
-  inspect() { return `valueUpdate(${inspect(this.source)})`; }
-
-
-  deliver(target) {
-    const sourceValue = this.source[Symbol.iterator]().next().value[1];
-    const targetValue = target.get();
-    if (sourceValue != null && targetValue != null
-        && this.matchFn.call(null, sourceValue, targetValue)) return this;
-
-    const newTargetValue = sourceValue != null
-      ? this.mapFn.call(null, sourceValue)
-      : null;
-    target.set(newTargetValue);
-
-    return this;
-  }
-}
-
-
 class ValuePayload extends Payload {
   inspect() { return `value(${inspect(Array.from(this))})`; }
-
-  updateMatching(map, match) {
-    return new UpdateMatchingPayload(this, {map, match});
-  }
 
   noOpIf(conditionCb) {
     const {value: entry} = this[Symbol.iterator]().next();

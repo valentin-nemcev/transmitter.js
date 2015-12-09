@@ -23,7 +23,6 @@ describe('Functional', function() {
   require('./functional/connection_with_merge_and_query.specs');
   require('./functional/bidirectional_state_message_routing.specs');
   require('./functional/multilevel_merging.specs');
-  require('./functional/value_matching_and_updating.specs');
   require('./functional/flattening_connection.specs');
   require('./functional/flattening_list_connection.specs');
   require('./functional/nested_list_connection.specs');

@@ -17,8 +17,8 @@ class View {
 describe('Flattening with nested connections', function() {
 
   before(function() {
-    this.define('derivedValue', new Transmitter.Nodes.Value());
-    this.define('originValue', new Transmitter.Nodes.Value());
+    this.define('derivedValue', new Transmitter.Nodes.Optional());
+    this.define('originValue', new Transmitter.Nodes.Optional());
 
     const originDerivedChannel =
       new Transmitter.Channels.BidirectionalChannel()
@@ -41,15 +41,11 @@ describe('Flattening with nested connections', function() {
       .toChannelTarget(this.flatteningChannelValue)
       .withTransform( (viewVal) =>
         viewVal.map( (view) => {
-          if (view != null) {
-            return new Transmitter.Channels.SimpleChannel()
-              .inBackwardDirection()
-              .fromSource(view.removeEvt)
-              .toTarget(this.originValue)
-              .withTransform( (ev) => ev.map( () => null ) );
-          } else {
-            return Transmitter.Channels.getNullChannel();
-          }
+          return new Transmitter.Channels.SimpleChannel()
+            .inBackwardDirection()
+            .fromSource(view.removeEvt)
+            .toTarget(this.originValue)
+            .withTransform( (ev) => ev.map( () => null ) );
         })
       );
 

@@ -28,6 +28,7 @@ export default class SortedMap extends SourceTargetNode {
     return this;
   }
 
+  // TODO: Settle the order of arguments (should be consistent with lists)
   setAt(key, value) {
     this.map.set(key, value);
     return this;
