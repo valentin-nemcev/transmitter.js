@@ -5,7 +5,7 @@ class ListItem {
 
   constructor(name) {
     this.name = name;
-    this.valueNode = new Transmitter.Nodes.Value();
+    this.valueNode = new Transmitter.Nodes.ValueNode();
   }
 }
 
@@ -20,8 +20,8 @@ describe('Nested list connection', function() {
   }
 
   before(function() {
-    this.define('originList', new Transmitter.Nodes.List());
-    this.define('derivedList', new Transmitter.Nodes.List());
+    this.define('originList', new Transmitter.Nodes.ListNode());
+    this.define('derivedList', new Transmitter.Nodes.ListNode());
 
     const listChannel = new Transmitter.Channels.NestedBidirectionalChannel()
       .inBothDirections()

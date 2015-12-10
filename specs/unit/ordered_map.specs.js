@@ -1,10 +1,10 @@
-import OrderedMap from 'transmitter/nodes/OrderedMap';
+import OrderedMapNode from 'transmitter/nodes/OrderedMapNode';
 import mapSpecs from './map.specs.js';
 
 describe('Ordered map', function() {
 
   beforeEach(function() {
-    this.map = new OrderedMap();
+    this.map = new OrderedMapNode();
   });
 
   mapSpecs();

@@ -4,8 +4,8 @@ import * as Transmitter from 'transmitter';
 describe('Merging after splitting', function() {
 
   before(function() {
-    this.define('keypressValue', new Transmitter.Nodes.ValueSource());
-    this.define('stateValue', new Transmitter.Nodes.Value());
+    this.define('keypressValue', new Transmitter.Nodes.ValueSourceNode());
+    this.define('stateValue', new Transmitter.Nodes.ValueNode());
 
     this.stateValue.set(false);
 

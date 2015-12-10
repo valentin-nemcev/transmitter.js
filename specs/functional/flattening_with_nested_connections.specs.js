@@ -9,7 +9,7 @@ class View {
 
   constructor(model) {
     this.model = model;
-    this.removeEvt = new Transmitter.Nodes.ValueSource();
+    this.removeEvt = new Transmitter.Nodes.ValueSourceNode();
   }
 }
 
@@ -17,8 +17,8 @@ class View {
 describe('Flattening with nested connections', function() {
 
   before(function() {
-    this.define('derivedValue', new Transmitter.Nodes.Optional());
-    this.define('originValue', new Transmitter.Nodes.Optional());
+    this.define('derivedValue', new Transmitter.Nodes.OptionalNode());
+    this.define('originValue', new Transmitter.Nodes.OptionalNode());
 
     const originDerivedChannel =
       new Transmitter.Channels.BidirectionalChannel()
@@ -79,7 +79,7 @@ describe('Flattening with nested connections', function() {
     function id(arg) { return arg; }
 
     before(function() {
-      this.define('supOriginValue', new Transmitter.Nodes.Value());
+      this.define('supOriginValue', new Transmitter.Nodes.ValueNode());
 
       const supOriginChannel = new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()

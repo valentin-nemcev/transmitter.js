@@ -1,10 +1,10 @@
-import SortedMap from 'transmitter/nodes/SortedMap';
+import SortedMapNode from 'transmitter/nodes/SortedMapNode';
 import mapSpecs from './map.specs.js';
 
 describe('Sorted map', function() {
 
   beforeEach(function() {
-    this.map = new SortedMap();
+    this.map = new SortedMapNode();
   });
 
   mapSpecs();

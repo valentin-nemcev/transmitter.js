@@ -1,9 +1,9 @@
-import OrderedSet from 'transmitter/nodes/OrderedSet';
+import OrderedSetNode from 'transmitter/nodes/OrderedSetNode';
 
 describe('Ordered set', function() {
 
   beforeEach(function() {
-    this.set = new OrderedSet();
+    this.set = new OrderedSetNode();
   });
 
   specify('adding and checking value', function() {

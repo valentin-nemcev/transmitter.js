@@ -1,7 +1,7 @@
-import List from '../nodes/List';
+import ListNode from '../nodes/ListNode';
 
 
-export default class ChildrenList extends List {
+export default class ChildrenList extends ListNode {
 
   constructor(element) {
     super();

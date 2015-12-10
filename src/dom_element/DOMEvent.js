@@ -1,8 +1,8 @@
-import ValueSource from '../nodes/ValueSource';
+import ValueSourceNode from '../nodes/ValueSourceNode';
 import Transmission from '../transmission/Transmission';
 
 
-export default class DOMEvent extends ValueSource {
+export default class DOMEvent extends ValueSourceNode {
 
   constructor(element, type) {
     super();

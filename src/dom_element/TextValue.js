@@ -1,7 +1,7 @@
-import Value from '../nodes/Value';
+import ValueNode from '../nodes/ValueNode';
 
 
-export default class TextValue extends Value {
+export default class TextValue extends ValueNode {
 
   constructor(element) {
     super();

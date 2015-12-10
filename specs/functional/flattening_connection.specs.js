@@ -3,17 +3,17 @@ import * as Transmitter from 'transmitter';
 class NestedObject {
   constructor(name) {
     this.name = name;
-    this.valueNode = new Transmitter.Nodes.Value();
+    this.valueNode = new Transmitter.Nodes.ValueNode();
   }
 }
 
 
 describe('Flattening connection', function() {
   beforeEach(function() {
-    this.define('serializedValue', new Transmitter.Nodes.Value());
-    this.define('nestedValue', new Transmitter.Nodes.Optional());
+    this.define('serializedValue', new Transmitter.Nodes.ValueNode());
+    this.define('nestedValue', new Transmitter.Nodes.OptionalNode());
 
-    this.define('flatValue', new Transmitter.Nodes.Optional());
+    this.define('flatValue', new Transmitter.Nodes.OptionalNode());
 
     Transmitter.startTransmission( (tr) => {
       new Transmitter.Channels.FlatteningChannel()
@@ -119,7 +119,7 @@ describe('Flattening connection', function() {
     function id(arg) { return arg; }
 
     beforeEach(function() {
-      this.define('serializedDerivedValue', new Transmitter.Nodes.Value());
+      this.define('serializedDerivedValue', new Transmitter.Nodes.ValueNode());
       Transmitter.startTransmission( (tr) =>
         new Transmitter.Channels.BidirectionalChannel()
           .inBothDirections()

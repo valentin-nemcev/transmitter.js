@@ -3,9 +3,9 @@ import * as Transmitter from 'transmitter';
 describe('Reversing messages in the middle of the chain', function() {
 
   before(function() {
-    this.define('button', new Transmitter.Nodes.ValueSource());
-    this.define('textInput', new Transmitter.Nodes.Value());
-    this.define('tagList', new Transmitter.Nodes.List());
+    this.define('button', new Transmitter.Nodes.ValueSourceNode());
+    this.define('textInput', new Transmitter.Nodes.ValueNode());
+    this.define('tagList', new Transmitter.Nodes.ListNode());
 
     Transmitter.startTransmission( (tr) => {
       new Transmitter.Channels.SimpleChannel()

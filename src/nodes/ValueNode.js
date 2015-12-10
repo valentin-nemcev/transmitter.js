@@ -4,7 +4,7 @@ import {
 } from '../payloads';
 
 
-export default class Value extends SourceTargetNode {
+export default class ValueNode extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);

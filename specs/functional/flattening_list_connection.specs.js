@@ -3,7 +3,7 @@ import * as Transmitter from 'transmitter';
 class NestedObject {
   constructor(name) {
     this.name = name;
-    this.valueNode = new Transmitter.Nodes.Value();
+    this.valueNode = new Transmitter.Nodes.ValueNode();
   }
 }
 
@@ -26,10 +26,10 @@ describe('Flattening list connection', function() {
    */
 
   beforeEach(function() {
-    this.define('serializedValue', new Transmitter.Nodes.Value());
-    this.define('nestedList', new Transmitter.Nodes.List());
+    this.define('serializedValue', new Transmitter.Nodes.ValueNode());
+    this.define('nestedList', new Transmitter.Nodes.ListNode());
 
-    this.define('flatList', new Transmitter.Nodes.List());
+    this.define('flatList', new Transmitter.Nodes.ListNode());
 
     Transmitter.startTransmission( (tr) => {
       new Transmitter.Channels.FlatteningChannel()

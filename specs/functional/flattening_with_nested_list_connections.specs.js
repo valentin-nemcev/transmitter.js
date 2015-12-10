@@ -5,7 +5,7 @@ class Model {
 
   constructor(name) {
     this.name = name;
-    this.valueNode = new Transmitter.Nodes.Value();
+    this.valueNode = new Transmitter.Nodes.ValueNode();
   }
 }
 
@@ -14,8 +14,8 @@ class View {
 
   constructor(model) {
     this.model = model;
-    this.removeEvt = new Transmitter.Nodes.ValueSource();
-    this.valueNode = new Transmitter.Nodes.Value();
+    this.removeEvt = new Transmitter.Nodes.ValueSourceNode();
+    this.valueNode = new Transmitter.Nodes.ValueNode();
   }
 }
 
@@ -25,8 +25,8 @@ describe('Flattening with nested list connections', function() {
   function id(arg) { return arg; }
 
   before(function() {
-    this.define('originList', new Transmitter.Nodes.List());
-    this.define('derivedList', new Transmitter.Nodes.List());
+    this.define('originList', new Transmitter.Nodes.ListNode());
+    this.define('derivedList', new Transmitter.Nodes.ListNode());
 
     const originDerivedChannel =
       new Transmitter.Channels.NestedBidirectionalChannel()

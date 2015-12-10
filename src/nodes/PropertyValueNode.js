@@ -1,7 +1,7 @@
-import Value from './Value';
+import ValueNode from './ValueNode';
 
 
-export default class PropertyValue extends Value {
+export default class PropertyValueNode extends ValueNode {
 
   constructor(object, key) {
     super();

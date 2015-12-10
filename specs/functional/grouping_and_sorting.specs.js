@@ -2,19 +2,19 @@ import * as Transmitter from 'transmitter';
 
 class Item {
   constructor(tr, {tag, value} = {}) {
-    this.tag = new Transmitter.Nodes.Value().set(tag).init(tr);
-    this.value = new Transmitter.Nodes.Value().set(value).init(tr);
+    this.tag = new Transmitter.Nodes.ValueNode().set(tag).init(tr);
+    this.value = new Transmitter.Nodes.ValueNode().set(value).init(tr);
   }
 }
 
 describe.skip('Grouping and sorting', function() {
 
   beforeEach(function() {
-    this.define('itemList', new Transmitter.Nodes.List());
-    this.define('itemWithTagList', new Transmitter.Nodes.List());
+    this.define('itemList', new Transmitter.Nodes.ListNode());
+    this.define('itemWithTagList', new Transmitter.Nodes.ListNode());
 
     Transmitter.startTransmission( (tr) => {
-      const itemTags = new Transmitter.Nodes.List();
+      const itemTags = new Transmitter.Nodes.ListNode();
       new Transmitter.Channels.FlatteningChannel()
         .inForwardDirection()
         .withNestedAsOrigin(this.itemList, (item) => item.tag )
@@ -54,7 +54,7 @@ describe.skip('Grouping and sorting', function() {
         .toTarget(this.itemListsByTag)
         .withTransform(
           (itemsWithTags) =>
-            itemsWithTags.group().map( () => new Transmitter.Nodes.List() )
+            itemsWithTags.group().map( () => new Transmitter.Nodes.ListNode() )
         )
         .init(tr);
 

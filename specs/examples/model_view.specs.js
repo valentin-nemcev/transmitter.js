@@ -8,7 +8,7 @@ describe('Model with view', function() {
     constructor(tr, value) {
       this.id = modelId++;
 
-      this.valueNode = new Transmitter.Nodes.Value();
+      this.valueNode = new Transmitter.Nodes.ValueNode();
       this.valueNode.set(value).init(tr);
     }
   }
@@ -17,7 +17,7 @@ describe('Model with view', function() {
     constructor() {
       this.element = new ViewElement();
       this.valueProp =
-        new Transmitter.Nodes.PropertyValue(this.element, 'value');
+        new Transmitter.Nodes.PropertyValueNode(this.element, 'value');
     }
   }
 
@@ -25,9 +25,9 @@ describe('Model with view', function() {
 
 
   beforeEach(function() {
-    this.define('modelSet', new Transmitter.Nodes.OrderedSet());
-    this.define('viewMap', new Transmitter.Nodes.OrderedMap());
-    this.define('elementSet', new Transmitter.Nodes.OrderedSet());
+    this.define('modelSet', new Transmitter.Nodes.OrderedSetNode());
+    this.define('viewMap', new Transmitter.Nodes.OrderedMapNode());
+    this.define('elementSet', new Transmitter.Nodes.OrderedSetNode());
     this.define('channelMap', new Transmitter.ChannelNodes.ChannelMap());
 
     Transmitter.startTransmission(

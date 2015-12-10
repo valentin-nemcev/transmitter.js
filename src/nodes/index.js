@@ -2,13 +2,13 @@ export SourceNode  from './SourceNode';
 export TargetNode  from './TargetNode';
 export SourceTargetNode   from './SourceTargetNode';
 
-export RelayNode   from './RelayNode';
-export ValueSource from './ValueSource';
-export Value       from './Value';
-export Optional    from './Optional';
-export List        from './List';
-export OrderedMap  from './OrderedMap';
-export SortedMap   from './SortedMap';
-export OrderedSet  from './OrderedSet';
+export RelayNode       from './RelayNode';
+export ValueSourceNode from './ValueSourceNode';
+export ValueNode       from './ValueNode';
+export OptionalNode    from './OptionalNode';
+export ListNode        from './ListNode';
+export OrderedMapNode  from './OrderedMapNode';
+export SortedMapNode   from './SortedMapNode';
+export OrderedSetNode  from './OrderedSetNode';
 
-export PropertyValue from './PropertyValue';
+export PropertyValueNode from './PropertyValueNode';

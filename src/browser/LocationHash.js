@@ -1,8 +1,8 @@
-import Value from '../nodes/Value';
+import ValueNode from '../nodes/ValueNode';
 import Transmission from '../transmission/Transmission';
 
 
-export default class LocationHash extends Value {
+export default class LocationHash extends ValueNode {
 
   constructor() {
     super();
