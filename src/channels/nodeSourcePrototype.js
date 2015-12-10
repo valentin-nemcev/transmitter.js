@@ -3,7 +3,7 @@ import {inspect} from 'util';
 import NodeConnectionLine from '../connection/NodeConnectionLine';
 import ConnectionMerger   from '../connection/ConnectionMerger';
 
-import buildPrototype from './buildPrototype';
+import buildPrototype from '../buildPrototype';
 
 import assertSingleArgument from './assertSingleArgument';
 

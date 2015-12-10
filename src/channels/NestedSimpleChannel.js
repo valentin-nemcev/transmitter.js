@@ -1,6 +1,6 @@
 import * as Directions from '../Directions';
 
-import buildPrototype from './buildPrototype';
+import buildPrototype from '../buildPrototype';
 
 import unidirectionalChannelPrototype from './unidirectionalChannelPrototype';
 import nodeSourcePrototype from './nodeSourcePrototype';

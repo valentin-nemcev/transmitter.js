@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import buildPrototype from './buildPrototype';
+import buildPrototype from '../buildPrototype';
 
 import ConnectionNodeLine  from '../connection/ConnectionNodeLine';
 import ConnectionSeparator from '../connection/ConnectionSeparator';

@@ -1,4 +1,4 @@
-import buildPrototype from './buildPrototype';
+import buildPrototype from '../buildPrototype';
 
 import channelPrototype from './channelPrototype';
 

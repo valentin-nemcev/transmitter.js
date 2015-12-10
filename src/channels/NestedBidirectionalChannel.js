@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import buildPrototype from './buildPrototype';
+import buildPrototype from '../buildPrototype';
 
 import BidirectionalChannel from './BidirectionalChannel';
 import NestedSimpleChannel from './NestedSimpleChannel';
