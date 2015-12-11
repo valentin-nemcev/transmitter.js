@@ -1,4 +1,4 @@
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import channelPrototype from './channelPrototype';
 
@@ -28,8 +28,8 @@ for (const [name, constructor] of Object.entries(channelConstructors)) {
   };
 }
 
-CompositeChannel.prototype = buildPrototype()
-  .copyPropertiesFrom(channelPrototype)
+CompositeChannel.prototype = defineClass()
+  .includes(channelPrototype)
   .lazyReadOnlyProperty('_channels', () => [])
   .methods({
     inspect() { return '[' + this.constructor.name + ']'; },
@@ -42,4 +42,4 @@ CompositeChannel.prototype = buildPrototype()
   })
   .methods(channelDefinitionMethods)
 
-  .freezeAndReturnPrototype();
+  .buildPrototype();

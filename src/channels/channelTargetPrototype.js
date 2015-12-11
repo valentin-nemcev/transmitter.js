@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import ConnectionDuplicator from '../connection/ConnectionDuplicator';
 import assertSingleArgument from './assertSingleArgument';
@@ -13,7 +13,7 @@ function assertChannelTarget(channelTarget) {
   return this;
 }
 
-export default buildPrototype()
+export default defineClass()
   .setOnceMandatoryProperty('_connectionTarget', {title: 'Target'})
   .methods({
     toChannelTarget(channelTarget) {
@@ -35,4 +35,4 @@ export default buildPrototype()
       return new ConnectionDuplicator(targets);
     },
   })
-  .freezeAndReturnPrototype();
+  .buildPrototype();

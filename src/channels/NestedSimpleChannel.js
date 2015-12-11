@@ -1,18 +1,18 @@
 import * as Directions from '../Directions';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import unidirectionalChannelPrototype from './unidirectionalChannelPrototype';
 import nodeSourcePrototype from './nodeSourcePrototype';
 import channelTargetPrototype from './channelTargetPrototype';
 
 
-export default buildPrototype('NestedSimpleChannel')
-  .copyPropertiesFrom(unidirectionalChannelPrototype)
-  .copyPropertiesFrom(nodeSourcePrototype)
-  .copyPropertiesFrom(channelTargetPrototype)
+export default defineClass('NestedSimpleChannel')
+  .includes(unidirectionalChannelPrototype)
+  .includes(nodeSourcePrototype)
+  .includes(channelTargetPrototype)
   .readOnlyProperty('_direction', Directions.omni)
   .setOnceLazyProperty('_transform', () => returnArg, {title: 'Transform'})
-  .freezeAndReturnConstructor();
+  .buildConstructor();
 
 function returnArg(arg) { return arg; }

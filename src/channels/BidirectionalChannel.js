@@ -1,4 +1,4 @@
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import getNullChannel from './getNullChannel';
 import SimpleChannel from './SimpleChannel';
@@ -8,7 +8,7 @@ import {forward, backward} from '../Directions';
 
 export default class BidirectionalChannel {}
 
-BidirectionalChannel.prototype = buildPrototype()
+BidirectionalChannel.prototype = defineClass()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
   .setOnceLazyProperty('_directions', () => ({forward, backward}),
@@ -30,7 +30,7 @@ BidirectionalChannel.prototype = buildPrototype()
     },
   })
 
-  .copyPropertiesFrom(channelPrototype)
+  .includes(channelPrototype)
   .lazyReadOnlyProperty('_channels', function() {
     return [this._backwardChannel, this._forwardChannel];
   })
@@ -86,7 +86,7 @@ BidirectionalChannel.prototype = buildPrototype()
     },
   })
 
-  .freezeAndReturnPrototype();
+  .buildPrototype();
 
 
 function createTransform(map, match, {swapMatch = false} = {}) {

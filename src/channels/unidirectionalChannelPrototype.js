@@ -1,10 +1,10 @@
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import Connection from '../connection/Connection';
 import channelPrototype from './channelPrototype';
 
 
-export default buildPrototype()
+export default defineClass()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
   .method('withTransform', function(transform) {
@@ -12,7 +12,7 @@ export default buildPrototype()
     return this;
   })
 
-  .copyPropertiesFrom(channelPrototype)
+  .includes(channelPrototype)
   .lazyReadOnlyProperty('_connection', function() {
     return new Connection(
       this._connectionSource,
@@ -21,4 +21,4 @@ export default buildPrototype()
     );
   })
   .lazyReadOnlyProperty('_channels', function() { return [this._connection]; })
-  .freezeAndReturnPrototype();
+  .buildPrototype();

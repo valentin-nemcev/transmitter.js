@@ -1,10 +1,10 @@
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 
 import ChannelNodeTarget from './ChannelNodeTarget';
 
 
-export default buildPrototype('ChannelNode')
+export default defineClass('ChannelNode')
 
   .writableMethod(
     'inspect',
@@ -60,4 +60,4 @@ export default buildPrototype('ChannelNode')
 
     getTargetPayload() { return null; },
   })
-  .freezeAndReturnConstructor();
+  .buildConstructor();

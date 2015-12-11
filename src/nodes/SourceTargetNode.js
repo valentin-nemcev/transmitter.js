@@ -1,11 +1,11 @@
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import NodeSource from '../connection/NodeSource';
 import NodeTarget from '../connection/NodeTarget';
 import {getNoOpPayload} from '../payloads';
 
 
-export default buildPrototype('SourceTargetNode')
+export default defineClass('SourceTargetNode')
 
   .propertyInitializer(
     'nodeSource',
@@ -41,4 +41,4 @@ export default buildPrototype('SourceTargetNode')
       return this;
     },
   })
-  .freezeAndReturnConstructor();
+  .buildConstructor();

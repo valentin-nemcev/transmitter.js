@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import ConnectionNodeLine  from '../connection/ConnectionNodeLine';
 import ConnectionSeparator from '../connection/ConnectionSeparator';
@@ -16,7 +16,7 @@ function assertTarget(target) {
 }
 
 
-export default buildPrototype()
+export default defineClass()
   .setOnceMandatoryProperty('_connectionTarget', {title: 'Target'})
   .methods({
     toTarget(target) {
@@ -55,4 +55,4 @@ export default buildPrototype()
       return new ConnectionSeparator(new Map(parts), opts);
     },
   })
-  .freezeAndReturnPrototype();
+  .buildPrototype();

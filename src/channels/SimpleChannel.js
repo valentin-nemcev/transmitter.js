@@ -1,16 +1,16 @@
 import * as Directions from '../Directions';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import unidirectionalChannelPrototype  from './unidirectionalChannelPrototype';
 import nodeSourcePrototype from './nodeSourcePrototype';
 import nodeTargetPrototype from './nodeTargetPrototype';
 
 
-export default buildPrototype('SimpleChannel')
-  .copyPropertiesFrom(unidirectionalChannelPrototype)
-  .copyPropertiesFrom(nodeSourcePrototype)
-  .copyPropertiesFrom(nodeTargetPrototype)
+export default defineClass('SimpleChannel')
+  .includes(unidirectionalChannelPrototype)
+  .includes(nodeSourcePrototype)
+  .includes(nodeTargetPrototype)
   .setOnceMandatoryProperty('_direction', {title: 'Direction'})
   .methods({
     inForwardDirection() { return this.inDirection(Directions.forward); },
@@ -23,6 +23,6 @@ export default buildPrototype('SimpleChannel')
   })
 
   .setOnceLazyProperty('_transform', () => returnArg, {title: 'Transform'})
-  .freezeAndReturnConstructor();
+  .buildConstructor();
 
 function returnArg(arg) { return arg; }

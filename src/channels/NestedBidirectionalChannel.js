@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import BidirectionalChannel from './BidirectionalChannel';
 import NestedSimpleChannel from './NestedSimpleChannel';
@@ -9,8 +9,8 @@ import {getChannelNodeConstructorFor} from '../channel_nodes';
 
 export default class NestedBidirectionalChannel {}
 
-NestedBidirectionalChannel.prototype = buildPrototype()
-  .copyPropertiesFrom(BidirectionalChannel.prototype, {rename: {
+NestedBidirectionalChannel.prototype = defineClass()
+  .includes(BidirectionalChannel.prototype, {rename: {
     _channels: '_bidirectionalChannels',
     withOriginDerived: 'shallowWithOriginDerived',
   }})
@@ -50,7 +50,7 @@ NestedBidirectionalChannel.prototype = buildPrototype()
     },
   })
 
-  .freezeAndReturnPrototype();
+  .buildPrototype();
 
 
 function getChannelNodeConstructorForPair(origin, derived) {

@@ -1,6 +1,6 @@
 import {inspect} from 'util';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import channelPrototype from './channelPrototype';
 
@@ -13,7 +13,7 @@ import {forward, backward} from '../Directions';
 
 export default class FlatteningChannel {}
 
-FlatteningChannel.prototype = buildPrototype()
+FlatteningChannel.prototype = defineClass()
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
   .setOnceLazyProperty('_directions', () => ({forward, backward}),
@@ -35,7 +35,7 @@ FlatteningChannel.prototype = buildPrototype()
     },
   })
 
-  .copyPropertiesFrom(channelPrototype)
+  .includes(channelPrototype)
   .lazyReadOnlyProperty('_channels', function() {
     return [this._nestedChannel];
   })
@@ -133,7 +133,7 @@ FlatteningChannel.prototype = buildPrototype()
     return this;
   })
 
-  .freezeAndReturnPrototype();
+  .buildPrototype();
 
 function assertNode(node) {
   if (node == null || node.constructor == null) {

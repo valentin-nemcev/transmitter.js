@@ -1,4 +1,4 @@
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import SourceTargetNode from './SourceTargetNode';
 import {
@@ -7,8 +7,8 @@ import {
 
 import {createOrderedMap} from './_map';
 
-export default buildPrototype('OrderedMap')
-  .copyPropertiesFrom(SourceTargetNode.prototype)
+export default defineClass('OrderedMap')
+  .includes(SourceTargetNode.prototype)
   .propertyInitializer('map', createOrderedMap)
 
   .methods({
@@ -88,4 +88,4 @@ export default buildPrototype('OrderedMap')
       return this.map.getSize();
     },
   })
-  .freezeAndReturnConstructor();
+  .buildConstructor();

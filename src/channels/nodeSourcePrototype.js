@@ -3,7 +3,7 @@ import {inspect} from 'util';
 import NodeConnectionLine from '../connection/NodeConnectionLine';
 import ConnectionMerger   from '../connection/ConnectionMerger';
 
-import buildPrototype from '../buildPrototype';
+import defineClass from '../defineClass';
 
 import assertSingleArgument from './assertSingleArgument';
 
@@ -14,7 +14,7 @@ function assertSource(source) {
   }
 }
 
-export default buildPrototype()
+export default defineClass()
   .setOnceMandatoryProperty('_connectionSource', {title: 'Source'})
   .methods({
     fromSource(source) {
@@ -56,4 +56,4 @@ export default buildPrototype()
       return new ConnectionMerger(new Map(parts), opts);
     },
   })
-  .freezeAndReturnPrototype();
+  .buildPrototype();

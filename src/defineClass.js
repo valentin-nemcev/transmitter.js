@@ -5,20 +5,20 @@ function iterateOwnPropertiesAndSymbols(object) {
   ].values();
 }
 
-class PrototypeBuilder {
+class ClassDefinition {
 
-  inspect() { return '[PrototypeBuilder]'; }
+  inspect() { return '[ClassDefinition]'; }
 
   constructor(name = 'Anonymous') {
     this.name = name;
     this.proto = {};
   }
 
-  freezeAndReturnPrototype() {
+  buildPrototype() {
     return Object.freeze(this.proto);
   }
 
-  freezeAndReturnConstructor() {
+  buildConstructor() {
     // http://discourse.wicg.io/t/proposal-let-the-
     //   function-constructor-accept-a-name-for-creating-named-functions/1172
     /* eslint-disable no-new-func */
@@ -52,7 +52,7 @@ class PrototypeBuilder {
   }
 
 
-  copyPropertiesFrom(otherProto, {rename = {}} = {}) {
+  includes(otherProto, {rename = {}} = {}) {
     for (const propName of iterateOwnPropertiesAndSymbols(otherProto)) {
       const newPropName = rename[propName] || propName;
       const desc = Object.getOwnPropertyDescriptor(otherProto, propName);
@@ -152,6 +152,6 @@ class PrototypeBuilder {
   }
 }
 
-export default function buildPrototype(...args) {
-  return new PrototypeBuilder(...args);
+export default function defineClass(...args) {
+  return new ClassDefinition(...args);
 }
