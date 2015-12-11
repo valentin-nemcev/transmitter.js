@@ -55,4 +55,4 @@ export default buildPrototype()
       return new ConnectionSeparator(new Map(parts), opts);
     },
   })
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();

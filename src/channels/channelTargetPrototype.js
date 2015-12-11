@@ -35,4 +35,4 @@ export default buildPrototype()
       return new ConnectionDuplicator(targets);
     },
   })
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();

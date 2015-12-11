@@ -30,7 +30,7 @@ BidirectionalChannel.prototype = buildPrototype()
     },
   })
 
-  .include(channelPrototype)
+  .copyPropertiesFrom(channelPrototype)
   .lazyReadOnlyProperty('_channels', function() {
     return [this._backwardChannel, this._forwardChannel];
   })
@@ -86,7 +86,7 @@ BidirectionalChannel.prototype = buildPrototype()
     },
   })
 
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();
 
 
 function createTransform(map, match, {swapMatch = false} = {}) {

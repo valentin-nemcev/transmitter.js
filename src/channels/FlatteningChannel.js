@@ -35,7 +35,7 @@ FlatteningChannel.prototype = buildPrototype()
     },
   })
 
-  .include(channelPrototype)
+  .copyPropertiesFrom(channelPrototype)
   .lazyReadOnlyProperty('_channels', function() {
     return [this._nestedChannel];
   })
@@ -133,7 +133,7 @@ FlatteningChannel.prototype = buildPrototype()
     return this;
   })
 
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();
 
 function assertNode(node) {
   if (node == null || node.constructor == null) {

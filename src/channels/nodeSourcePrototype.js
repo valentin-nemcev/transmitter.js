@@ -56,4 +56,4 @@ export default buildPrototype()
       return new ConnectionMerger(new Map(parts), opts);
     },
   })
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();

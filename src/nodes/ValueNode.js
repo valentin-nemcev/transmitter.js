@@ -6,6 +6,7 @@ import {
 
 export default class ValueNode extends SourceTargetNode {
 
+
   processPayload(payload) {
     payload.deliver(this);
     return createValuePayload(this);

@@ -7,12 +7,10 @@ import nodeSourcePrototype from './nodeSourcePrototype';
 import nodeTargetPrototype from './nodeTargetPrototype';
 
 
-export default class SimpleChannel {}
-
-SimpleChannel.prototype = buildPrototype()
-  .include(unidirectionalChannelPrototype)
-  .include(nodeSourcePrototype)
-  .include(nodeTargetPrototype)
+export default buildPrototype('SimpleChannel')
+  .copyPropertiesFrom(unidirectionalChannelPrototype)
+  .copyPropertiesFrom(nodeSourcePrototype)
+  .copyPropertiesFrom(nodeTargetPrototype)
   .setOnceMandatoryProperty('_direction', {title: 'Direction'})
   .methods({
     inForwardDirection() { return this.inDirection(Directions.forward); },
@@ -25,6 +23,6 @@ SimpleChannel.prototype = buildPrototype()
   })
 
   .setOnceLazyProperty('_transform', () => returnArg, {title: 'Transform'})
-  .freezeAndReturn();
+  .freezeAndReturnConstructor();
 
 function returnArg(arg) { return arg; }

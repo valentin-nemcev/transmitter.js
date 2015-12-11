@@ -29,7 +29,7 @@ for (const [name, constructor] of Object.entries(channelConstructors)) {
 }
 
 CompositeChannel.prototype = buildPrototype()
-  .include(channelPrototype)
+  .copyPropertiesFrom(channelPrototype)
   .lazyReadOnlyProperty('_channels', () => [])
   .methods({
     inspect() { return '[' + this.constructor.name + ']'; },
@@ -42,4 +42,4 @@ CompositeChannel.prototype = buildPrototype()
   })
   .methods(channelDefinitionMethods)
 
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();

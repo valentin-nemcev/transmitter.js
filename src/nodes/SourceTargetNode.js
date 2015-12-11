@@ -1,32 +1,43 @@
+import buildPrototype from '../buildPrototype';
+
 import NodeSource from '../connection/NodeSource';
 import NodeTarget from '../connection/NodeTarget';
 import {getNoOpPayload} from '../payloads';
 
 
-export default class SourceTargetNode {
+export default buildPrototype('SourceTargetNode')
 
-  inspect() { return '[' + this.constructor.name + ']'; }
+  .propertyInitializer(
+    'nodeSource',
+    function() { return new NodeSource(this); }
+  )
+  .propertyInitializer(
+    'nodeTarget',
+    function() { return new NodeTarget(this); }
+  )
 
-  constructor() {
-    this.nodeSource = new NodeSource(this);
-    this.nodeTarget = new NodeTarget(this);
-  }
+  .writableMethod(
+    'inspect',
+    function() { return '[' + this.constructor.name + ']'; }
+  )
 
-  getNodeSource() { return this.nodeSource; }
-  getNodeTarget() { return this.nodeTarget; }
+  .methods({
 
-  originate(tr, payload = null) {
-    tr.originateMessage(
-      this, payload || this.processPayload(getNoOpPayload()));
-    return this;
-  }
+    getNodeSource() { return this.nodeSource; },
+    getNodeTarget() { return this.nodeTarget; },
 
-  init(tr) {
-    return this.originate(tr);
-  }
+    originate(tr, payload = null) {
+      tr.originateMessage(
+        this, payload || this.processPayload(getNoOpPayload()));
+      return this;
+    },
 
-  query(tr) {
-    tr.originateQuery(this);
-    return this;
-  }
-}
+    init(tr) {
+      return this.originate(tr);
+    },
+
+    query(tr) {
+      tr.originateQuery(this);
+      return this;
+    },
+  }).freezeAndReturnConstructor();

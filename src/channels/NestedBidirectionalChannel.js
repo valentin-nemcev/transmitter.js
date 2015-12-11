@@ -10,7 +10,7 @@ import {getChannelNodeConstructorFor} from '../channel_nodes';
 export default class NestedBidirectionalChannel {}
 
 NestedBidirectionalChannel.prototype = buildPrototype()
-  .include(BidirectionalChannel.prototype, {rename: {
+  .copyPropertiesFrom(BidirectionalChannel.prototype, {rename: {
     _channels: '_bidirectionalChannels',
     withOriginDerived: 'shallowWithOriginDerived',
   }})
@@ -50,7 +50,7 @@ NestedBidirectionalChannel.prototype = buildPrototype()
     },
   })
 
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();
 
 
 function getChannelNodeConstructorForPair(origin, derived) {

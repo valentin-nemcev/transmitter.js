@@ -12,7 +12,7 @@ export default buildPrototype()
     return this;
   })
 
-  .include(channelPrototype)
+  .copyPropertiesFrom(channelPrototype)
   .lazyReadOnlyProperty('_connection', function() {
     return new Connection(
       this._connectionSource,
@@ -21,4 +21,4 @@ export default buildPrototype()
     );
   })
   .lazyReadOnlyProperty('_channels', function() { return [this._connection]; })
-  .freezeAndReturn();
+  .freezeAndReturnPrototype();
