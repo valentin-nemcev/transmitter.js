@@ -9,6 +9,38 @@ import MergingMessage from './MergingMessage';
 import SeparatingMessage from './SeparatingMessage';
 
 
+class PlaceholderConnectionMessage {
+  inspect() {
+    return [
+      'PCM',
+      inspect(this.pass),
+      inspect(this.sourceChannelNode),
+    ].join(' ');
+  }
+
+
+  log(...args) {
+    this.transmission.log(this, ...args);
+    return this;
+  }
+
+  static createNext(prevMessage, sourceChannelNode) {
+    const {transmission, pass} = prevMessage;
+    return new this(transmission, pass, sourceChannelNode);
+  }
+
+  constructor(transmission, pass, sourceChannelNode) {
+    this.transmission = transmission;
+    this.pass = pass;
+    this.sourceChannelNode = sourceChannelNode;
+  }
+
+  sendToTargetPoints() {
+    return this;
+  }
+}
+
+
 export default class ConnectionMessage {
 
   inspect() {
@@ -47,7 +79,8 @@ export default class ConnectionMessage {
   }
 
   createPlaceholderConnectionMessage(sourceChannelNode) {
-    return ConnectionMessage.createNext(this, sourceChannelNode);
+    // return ConnectionMessage.createNext(this, sourceChannelNode);
+    return PlaceholderConnectionMessage.createNext(this, sourceChannelNode);
   }
 
   createNextQuery() {

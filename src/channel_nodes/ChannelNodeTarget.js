@@ -12,7 +12,10 @@ export default class ChannelNodeTarget {
 
     const payload = this.getPlaceholderPayload();
     if (payload != null) {
-      this.channelNode.routePlaceholderMessage(message, payload);
+      this.channelNode.routeConnectionMessage(
+        message.createPlaceholderConnectionMessage(this.channelNode),
+        payload
+      );
     }
     return this;
   }

@@ -57,7 +57,10 @@ export default class JointChannelMessage {
         );
     }
     this.message = message;
-    this.channelNode.routeMessage(message, message.getPayload());
+    this.channelNode.routeConnectionMessage(
+      message.createNextConnectionMessage(this.channelNode),
+      message.getPayload()
+    );
     return this;
   }
 

@@ -68,18 +68,8 @@ export default defineClass('ChannelNode')
     },
 
 
-    routePlaceholderMessage(tr, payload) {
-      this.message = tr.createPlaceholderConnectionMessage(this);
-      this.changeListener.message = this.message;
-      this.payload = payload;
-      payload.deliver(this);
-      this.message = null;
-      this.changeListener.message = null;
-      return this;
-    },
-
-    routeMessage(tr, payload) {
-      this.message = tr.createNextConnectionMessage(this);
+    routeConnectionMessage(message, payload) {
+      this.message = message;
       this.payload = payload;
       this.changeListener.message = this.message;
       payload.deliver(this);
