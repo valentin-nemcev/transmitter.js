@@ -4,6 +4,29 @@ import defineClass from '../defineClass';
 import ChannelNodeTarget from './ChannelNodeTarget';
 
 
+class ChangeListener {
+  constructor() {
+    this.message = null;
+  }
+
+  notifyAdd(key, channel) {
+    channel.connect(this.message);
+    return this;
+  }
+
+  notifyUpdate(key, prevChannel, channel) {
+    this.notifyRemove(key, prevChannel);
+    this.notifyAdd(key, channel);
+    return this;
+  }
+
+  notifyRemove(key, channel) {
+    channel.disconnect(this.message);
+    return this;
+  }
+}
+
+
 export default defineClass('ChannelNode')
 
   .writableMethod(
@@ -15,6 +38,12 @@ export default defineClass('ChannelNode')
   .propertyInitializer(
     'channelNodeTarget', function() { return new ChannelNodeTarget(this); }
   )
+
+
+  .propertyInitializer(
+    'changeListener', function() { return new ChangeListener(); }
+  )
+
 
   .methods({
 
@@ -41,18 +70,22 @@ export default defineClass('ChannelNode')
 
     routePlaceholderMessage(tr, payload) {
       this.message = tr.createPlaceholderConnectionMessage(this);
+      this.changeListener.message = this.message;
       this.payload = payload;
       payload.deliver(this);
       this.message = null;
+      this.changeListener.message = null;
       return this;
     },
 
     routeMessage(tr, payload) {
       this.message = tr.createNextConnectionMessage(this);
       this.payload = payload;
+      this.changeListener.message = this.message;
       payload.deliver(this);
       this.message.sendToTargetPoints();
       this.message = null;
+      this.changeListener.message = null;
       return this;
     },
 
