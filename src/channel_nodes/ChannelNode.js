@@ -1,53 +1,63 @@
+import buildPrototype from '../buildPrototype';
+
+
 import ChannelNodeTarget from './ChannelNodeTarget';
 
 
-export default class ChannelNode {
+export default buildPrototype('ChannelNode')
 
-  inspect() { return '[' + this.constructor.name + ']'; }
-
-  constructor() {
-    this.channelNodeTarget = new ChannelNodeTarget(this);
-  }
-
-  getChannelNodeTarget() {
-    return this.channelNodeTarget;
-  }
+  .writableMethod(
+    'inspect',
+    function() { return '[' + this.constructor.name + ']'; }
+  )
 
 
-  getTargetPoints() {
-    if (this.targetPoints == null) this.targetPoints = new Set();
-    return this.targetPoints;
-  }
+  .propertyInitializer(
+    'channelNodeTarget', function() { return new ChannelNodeTarget(this); }
+  )
 
-  addTargetPoint(targetPoint) {
-    this.getTargetPoints().add(targetPoint);
-    return this;
-  }
+  .methods({
 
-  removeTargetPoint(targetPoint) {
-    this.getTargetPoints().delete(targetPoint);
-    return this;
-  }
+    getChannelNodeTarget() {
+      return this.channelNodeTarget;
+    },
 
 
-  routePlaceholderMessage(tr, payload) {
-    this.message = tr.createPlaceholderConnectionMessage(this);
-    this.payload = payload;
-    payload.deliver(this);
-    this.message = null;
-    return this;
-  }
+    getTargetPoints() {
+      if (this.targetPoints == null) this.targetPoints = new Set();
+      return this.targetPoints;
+    },
 
-  routeMessage(tr, payload) {
-    this.message = tr.createNextConnectionMessage(this);
-    this.payload = payload;
-    payload.deliver(this);
-    this.message.sendToTargetPoints();
-    this.message = null;
-    return this;
-  }
+    addTargetPoint(targetPoint) {
+      this.getTargetPoints().add(targetPoint);
+      return this;
+    },
 
-  getSourcePayload() { return null; }
+    removeTargetPoint(targetPoint) {
+      this.getTargetPoints().delete(targetPoint);
+      return this;
+    },
 
-  getTargetPayload() { return null; }
-}
+
+    routePlaceholderMessage(tr, payload) {
+      this.message = tr.createPlaceholderConnectionMessage(this);
+      this.payload = payload;
+      payload.deliver(this);
+      this.message = null;
+      return this;
+    },
+
+    routeMessage(tr, payload) {
+      this.message = tr.createNextConnectionMessage(this);
+      this.payload = payload;
+      payload.deliver(this);
+      this.message.sendToTargetPoints();
+      this.message = null;
+      return this;
+    },
+
+    getSourcePayload() { return null; },
+
+    getTargetPayload() { return null; },
+  })
+  .freezeAndReturnConstructor();

@@ -40,4 +40,5 @@ export default buildPrototype('SourceTargetNode')
       tr.originateQuery(this);
       return this;
     },
-  }).freezeAndReturnConstructor();
+  })
+  .freezeAndReturnConstructor();
