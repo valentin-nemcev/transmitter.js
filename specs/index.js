@@ -38,4 +38,5 @@ describe('Examples', function() {
   // Example specs focus on typical framework usecases
 
   require('./examples/model_view.specs');
+  require('./examples/model_serialization.specs');
 });

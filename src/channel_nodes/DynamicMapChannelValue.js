@@ -1,37 +1,22 @@
-import ChannelNode from './ChannelNode';
+import defineClass from '../defineClass';
+
+import DynamicChannelNode from './DynamicChannelNode';
+
 import {createEmptyMapPayload} from '../payloads';
 
+import orderedMapPrototype from '../nodes/orderedMapPrototype';
 
-export default class DynamicMapChannelValue extends ChannelNode {
 
-  constructor(type, createChannel) {
-    super();
+export default defineClass('DynamicMapChannelValue')
 
-    if (type !== 'sources' && type !== 'targets') {
-      throw new Error(`Unknown DynamicMapChannelValue type: ${type}`);
-    }
+  .includes(DynamicChannelNode.prototype)
+  .includes(orderedMapPrototype)
 
-    this.type = type;
-    this.createChannel = createChannel;
-  }
+  .methods({
 
-  get() { return this.channel; }
+    getPlaceholderPayload() {
+      return createEmptyMapPayload();
+    },
 
-  set(newNodes) {
-    const oldChannel = this.channel;
-    if (oldChannel != null) oldChannel.disconnect(this.message);
-
-    const newChannel = this.createChannel.call(null, newNodes);
-    this.channel = newChannel;
-
-    if (newChannel != null) newChannel.connect(this.message);
-    return this;
-  }
-
-  getPlaceholderPayload() {
-    return createEmptyMapPayload();
-  }
-
-  getSourcePayload() { return this.type === 'sources' ? this.payload : null; }
-  getTargetPayload() { return this.type === 'targets' ? this.payload : null; }
-}
+  })
+  .buildConstructor();

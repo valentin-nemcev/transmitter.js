@@ -7,13 +7,9 @@ import {
 
 import orderedMapPrototype from './orderedMapPrototype';
 
-const nullChangeListener = {
-  notifyAdd() {},
-  notifyUpdate() {},
-  notifyRemove() {},
-};
+import nullChangeListener from './_nullChangeListener';
 
-export default defineClass('OrderedMap')
+export default defineClass('OrderedMapNode')
   .includes(SourceTargetNode.prototype)
   .includes(orderedMapPrototype)
 

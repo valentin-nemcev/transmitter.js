@@ -51,7 +51,7 @@ export default class OrderedSet extends SourceTargetNode {
   }
 
   *[Symbol.iterator]() {
-    for (const [key] of this.map) yield [null, key];
+    for (const [key] of this.map) yield [key, key];
   }
 
   get() {

@@ -1,7 +1,6 @@
 import defineClass from '../defineClass';
 
-
-import ChannelNodeTarget from './ChannelNodeTarget';
+import BaseChannelNode from './BaseChannelNode';
 
 
 class ChangeListener {
@@ -29,45 +28,13 @@ class ChangeListener {
 
 export default defineClass('ChannelNode')
 
-  .writableMethod(
-    'inspect',
-    function() { return '[' + this.constructor.name + ']'; }
-  )
-
-
-  .propertyInitializer(
-    'channelNodeTarget', function() { return new ChannelNodeTarget(this); }
-  )
-
+  .includes(BaseChannelNode.prototype)
 
   .propertyInitializer(
     'changeListener', function() { return new ChangeListener(); }
   )
 
-
   .methods({
-
-    getChannelNodeTarget() {
-      return this.channelNodeTarget;
-    },
-
-
-    getTargetPoints() {
-      if (this.targetPoints == null) this.targetPoints = new Set();
-      return this.targetPoints;
-    },
-
-    addTargetPoint(targetPoint) {
-      this.getTargetPoints().add(targetPoint);
-      return this;
-    },
-
-    removeTargetPoint(targetPoint) {
-      this.getTargetPoints().delete(targetPoint);
-      return this;
-    },
-
-
     routeConnectionMessage(message, payload) {
       this.message = message;
       this.payload = payload;

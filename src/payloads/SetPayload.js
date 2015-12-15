@@ -8,7 +8,7 @@ class ConvertedPayload extends Payload {
 
   *[Symbol.iterator]() {
     for (const [, value] of this.source) {
-      yield [null, value];
+      yield [value, value];
     }
   }
 }

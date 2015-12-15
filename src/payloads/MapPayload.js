@@ -8,8 +8,7 @@ class UpdatePayload {
   }
 
   deliver(map) {
-    for (const [, value] of this.source) {
-      const key = value;
+    for (const [key, value] of this.source) {
       if (!map.hasAt(key)) map.setAt(key, this.map.call(null, value));
       map.visitKey(key);
     }

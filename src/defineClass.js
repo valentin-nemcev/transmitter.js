@@ -1,3 +1,5 @@
+// import {inspect} from 'util';
+
 function iterateOwnPropertiesAndSymbols(object) {
   return [
     ...Object.getOwnPropertyNames(object),
@@ -23,7 +25,7 @@ class ClassDefinition {
     //   function-constructor-accept-a-name-for-creating-named-functions/1172
     /* eslint-disable no-new-func */
     const body = this._getInitializerMethodNames().map(
-      (prop) => `this.${prop}();`
+      (prop) => `this.${prop}.apply(this, arguments);`
     ).join('\n');
     const constructor = new Function(
       `return function ${this.name} () { \n${body}\n }`
@@ -54,7 +56,8 @@ class ClassDefinition {
 
   includes(otherProto, {rename = {}} = {}) {
     for (const propName of iterateOwnPropertiesAndSymbols(otherProto)) {
-      const newPropName = rename[propName] || propName;
+      const newPropName = propName in rename ? rename[propName] : propName;
+      if (newPropName == null) continue;
       const desc = Object.getOwnPropertyDescriptor(otherProto, propName);
       Object.defineProperty(this.proto, newPropName, desc);
     }

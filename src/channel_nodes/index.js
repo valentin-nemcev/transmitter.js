@@ -18,9 +18,10 @@ import ChannelMap   from './ChannelMap';
 
 export {ChannelValue, ChannelList, ChannelMap};
 
-import ValueNode    from '../nodes/ValueNode';
-import OptionalNode from '../nodes/OptionalNode';
-import ListNode     from '../nodes/ListNode';
+import ValueNode      from '../nodes/ValueNode';
+import OptionalNode   from '../nodes/OptionalNode';
+import ListNode       from '../nodes/ListNode';
+import OrderedMapNode from '../nodes/OrderedMapNode';
 
 export function getChannelNodeConstructorFor(constructor) {
   switch (constructor) {
@@ -39,6 +40,8 @@ export function getDynamicChannelNodeConstructorFor(constructor) {
     return DynamicOptionalChannelValue;
   case ListNode:
     return DynamicListChannelValue;
+  case OrderedMapNode:
+    return DynamicMapChannelValue;
   default:
     throw new Error('No dynamic channel node type for '
                     + inspect(constructor));
