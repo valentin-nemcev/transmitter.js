@@ -9,6 +9,7 @@ import {
 
 import {
   convertToValuePayload,
+  convertToValueEntriesPayload,
   createValuePayloadFromConst,
   createEmptyValuePayload,
   createValuePayloadAtKey,
@@ -55,6 +56,13 @@ Payload.prototype.toValue = function() {
 };
 
 NoOpPayload.prototype.toValue = function() { return this; };
+
+
+Payload.prototype.toValueEntries = function() {
+  return convertToValueEntriesPayload(this);
+};
+
+NoOpPayload.prototype.toValueEntries = function() { return this; };
 
 
 Payload.prototype.toList = function() {

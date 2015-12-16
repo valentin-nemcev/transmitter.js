@@ -27,6 +27,20 @@ class ConvertedValuePayload extends Payload {
 }
 
 
+class ConvertedValueEntriesPayload extends Payload {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    const array = [];
+    for (const [key, value] of this.source) array.push([key, value]);
+    yield [null, array];
+  }
+}
+
+
 class ValueAtKeyPayload extends Payload {
   constructor(source, key) {
     super();
@@ -42,6 +56,10 @@ class ValueAtKeyPayload extends Payload {
 
 export function convertToValuePayload(source) {
   return new ConvertedValuePayload(source);
+}
+
+export function convertToValueEntriesPayload(source) {
+  return new ConvertedValueEntriesPayload(source);
 }
 
 export function createValuePayloadAtKey(source, key) {

@@ -179,25 +179,37 @@ class ZippedPayload extends Payload {
 
     for (let i = 0; ; i++) {
       const zippedEl = [];
+      let firstKey;
       let firstDone;
       let allDone = true;
       for (const [payload, it] of payloadsWithIters) {
         const {value: entry, done} = it.next();
-        const el = done ? payload.getEmpty() : entry[1];
+        const value = done ? payload.getEmpty() : entry[1];
+        const key = done ? undefined : entry[0];
+
         if (firstDone == null) firstDone = done;
+        if (firstKey === undefined) firstKey = key;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
+        if (key !== undefined && firstKey !== key) this._throwKeyMismatch();
         allDone = allDone && done;
-        zippedEl.push(el);
+        zippedEl.push(value);
       }
       if (allDone) return;
-      else yield [i, zippedEl];
+      else yield [firstKey, zippedEl];
     }
   }
 
   _throwSizeMismatch() {
     throw new Error(
       "Can't zip lists with different sizes: "
+      + this.payloads.map(inspect).join(', ')
+    );
+  }
+
+  _throwKeyMismatch() {
+    throw new Error(
+      "Can't zip lists with different keys: "
       + this.payloads.map(inspect).join(', ')
     );
   }
@@ -211,9 +223,10 @@ class FlatteningPayload extends Payload {
   }
 
   *[Symbol.iterator]() {
-    let i = 0;
-    for (const [, payload] of this.source) {
-      for (const [, value] of payload) yield [i++, value];
+    // TODO: Check if keys are sequential
+    // let i = 0;
+    for (const [key, payload] of this.source) {
+      for (const [, value] of payload) yield [key, value];
     }
   }
 }
