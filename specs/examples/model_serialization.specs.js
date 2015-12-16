@@ -75,7 +75,7 @@ describe('Model with view', function() {
 
 
         new Transmitter.Channels.BidirectionalChannel()
-          .inBothDirections()
+          .inForwardDirection()
           .withOriginDerived(this.serializedMap, this.serializedValue)
           .withTransformOrigin(
             (payload) => payload.toValueEntries().map(
@@ -115,11 +115,6 @@ describe('Model with view', function() {
           'id4': 'value4',
         }).originate(tr)
     );
-
-    console.log(this.serializedMap.get());
-    console.log(this.serializedValueMap.get());
-
   });
 
 });
-
