@@ -4,34 +4,16 @@ import {
   Payload,
   createSimplePayload,
   createEmptyPayload,
-  zipPayloads,
-} from './Payload';
-
-import {
-  convertToValuePayload,
-  convertToValueEntriesPayload,
   createValuePayloadFromConst,
   createEmptyValuePayload,
   createValuePayloadAtKey,
-} from './ValuePayload';
-
-import {
-  convertToListPayload,
-} from './ListPayload';
+  zipPayloads,
+} from './Payload';
 
 import {
   convertToAppendElementAction,
   convertToRemoveElementAction,
 } from './ListActionsPayload';
-
-import {
-  convertToSetPayload,
-} from './SetPayload';
-
-import {
-  convertToMapPayload,
-  convertToMapUpdatePayload,
-} from './MapPayload';
 
 
 Payload.prototype.unflattenToValues = function() {
@@ -51,23 +33,11 @@ Payload.prototype.toNoOp = function() {
 NoOpPayload.prototype.toNoOp = function() { return this; };
 
 
-Payload.prototype.toValue = function() {
-  return convertToValuePayload(this);
-};
-
 NoOpPayload.prototype.toValue = function() { return this; };
 
 
-Payload.prototype.toValueEntries = function() {
-  return convertToValueEntriesPayload(this);
-};
-
 NoOpPayload.prototype.toValueEntries = function() { return this; };
 
-
-Payload.prototype.toList = function() {
-  return convertToListPayload(this);
-};
 
 NoOpPayload.prototype.toList = function() { return this; };
 
@@ -86,23 +56,11 @@ Payload.prototype.toRemoveElementAction = function() {
 NoOpPayload.prototype.toRemoveElementAction = function() { return this; };
 
 
-Payload.prototype.toSet = function() {
-  return convertToSetPayload(this);
-};
-
 NoOpPayload.prototype.toSet = function() { return this; };
 
 
-Payload.prototype.toMap = function() {
-  return convertToMapPayload(this);
-};
-
 NoOpPayload.prototype.toMap = function() { return this; };
 
-
-Payload.prototype.toMapUpdate = function(map) {
-  return convertToMapUpdatePayload(this, map);
-};
 
 NoOpPayload.prototype.toMapUpdate = function() { return this; };
 
