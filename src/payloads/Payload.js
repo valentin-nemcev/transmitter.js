@@ -7,6 +7,7 @@ import {default as zipMethods, zipPayloads} from './zipMethods';
 import mapFilterMethods from './mapFilterMethods';
 import flattenMethods from './flattenMethods';
 import conversionMethods from './conversionMethods';
+import updateMethods from './updateMethods';
 import listActionMethods from './listActionMethods';
 
 export {zipPayloads};
@@ -17,6 +18,7 @@ Object.assign(
   mapFilterMethods,
   flattenMethods,
   conversionMethods,
+  updateMethods,
   listActionMethods
 );
 

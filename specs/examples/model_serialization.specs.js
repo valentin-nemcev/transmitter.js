@@ -73,9 +73,20 @@ describe('Model with view', function() {
           .withFlat(this.serializedMap)
           .init(tr);
 
+        new Transmitter.Channels.SimpleChannel()
+          .inBackwardDirection()
+          .fromSource(this.serializedMap)
+          .toTarget(this.serializedValueMap)
+          .withTransform(
+            (payload) => payload.toMapUpdate(
+              () => new Transmitter.Nodes.ValueNode()
+            )
+          )
+          .init(tr);
+
 
         new Transmitter.Channels.BidirectionalChannel()
-          .inForwardDirection()
+          .inBothDirections()
           .withOriginDerived(this.serializedMap, this.serializedValue)
           .withTransformOrigin(
             (payload) => payload.joinEntries().map(
@@ -89,7 +100,7 @@ describe('Model with view', function() {
           .withTransformDerived(
             (payload) => payload.map(
               (obj) => Object.entries(obj)
-            ).valuesToEntries()
+            ).splitValues().valuesToEntries()
           )
           .init(tr);
       }
@@ -115,6 +126,7 @@ describe('Model with view', function() {
           'id4': 'value4',
         }).originate(tr)
     );
+    // console.log(this.serializedMap.get());
   });
 
 });

@@ -34,6 +34,37 @@ class OrderedMap {
     }
   }
 
+  move(keyArg, afterKeyArg) {
+    let fromIndex = null;
+    let toIndex = null;
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      const [key] = entry;
+      if (keyArg === key) {
+        fromIndex = i;
+        break;
+      }
+    }
+    if (fromIndex == null) return this;
+    if (afterKeyArg == null) {
+      toIndex = 0;
+    } else {
+      for (let i = 0; i < this.entries.length; i++) {
+        const entry = this.entries[i];
+        const [key] = entry;
+        if (afterKeyArg === key) {
+          toIndex = i;
+          break;
+        }
+      }
+    }
+    if (toIndex == null) return this;
+    if (fromIndex > toIndex) toIndex++;
+    const [entry] = this.entries.splice(fromIndex, 1);
+    this.entries.splice(toIndex, 0, entry);
+    return this;
+  }
+
   get(keyArg) {
     for (const [key, value] of this.entries) {
       if (keyArg === key) return value;

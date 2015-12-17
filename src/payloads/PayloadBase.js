@@ -7,7 +7,7 @@ export default class PayloadBase {
 
   log() {
     /* eslint-disable no-console */
-    console.log(Array.from(this).map( (entry) => entry.map(inspect) ));
+    console.log(Array.from(this)); // .map( (entry) => entry.map(inspect) ));
     return this;
   }
 

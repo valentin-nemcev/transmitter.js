@@ -16,11 +16,6 @@ export default {
   valuesToEntries() {
     return new ValuesToEntriesPayload(this);
   },
-
-  toMapUpdate(map) {
-    return new MapUpdatePayload(this, map);
-  },
-
 };
 
 
@@ -78,22 +73,5 @@ class ValuesToEntriesPayload extends PayloadBase {
       const [key, nestedValue] = value;
       yield [key, nestedValue];
     }
-  }
-}
-
-
-class MapUpdatePayload {
-  constructor(source, map) {
-    this.source = source;
-    this.map = map;
-  }
-
-  deliver(map) {
-    for (const [key, value] of this.source) {
-      if (!map.hasAt(key)) map.setAt(key, this.map.call(null, value));
-      map.visitKey(key);
-    }
-    map.removeUnvisitedKeys();
-    return this;
   }
 }

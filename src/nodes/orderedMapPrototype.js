@@ -65,6 +65,11 @@ export default defineClass('orderedMapPrototype')
       return this;
     },
 
+    moveAfter(key, afterKey) {
+      this.map.move(key, afterKey);
+      return this;
+    },
+
 
     visitKey(key) {
       const entry = this.map.get(key);
