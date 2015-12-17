@@ -1,3 +1,5 @@
+import listActionMethods from './listActionMethods';
+
 export class NoOpPayload {
 
   log() {
@@ -11,6 +13,8 @@ export class NoOpPayload {
   inspect() { return 'noOp()'; }
 
   isNoOp() { return true; }
+
+  toNoOp() { return this; }
 
   fixedPriority = 0;
 
@@ -27,6 +31,10 @@ export class NoOpPayload {
   deliver() {
     return this;
   }
+}
+
+for (const method of Object.keys(listActionMethods)) {
+  NoOpPayload.prototype[method] = function() { return this; };
 }
 
 

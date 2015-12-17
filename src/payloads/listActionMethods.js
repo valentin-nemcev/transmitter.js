@@ -1,11 +1,8 @@
 import {inspect} from 'util';
 
-import {Payload} from './Payload';
-
-class RemoveAction extends Payload {
+class RemoveAction {
 
   constructor(source) {
-    super();
     this.source = source;
   }
 
@@ -23,10 +20,9 @@ class RemoveAction extends Payload {
 }
 
 
-class AddAtAction extends Payload {
+class AddAtAction {
 
   constructor(source) {
-    super();
     this.source = source;
   }
 
@@ -40,10 +36,12 @@ class AddAtAction extends Payload {
 }
 
 
-export function convertToAppendElementAction(source) {
-  return new AddAtAction(source.map( (el) => [el] ));
-}
+export default {
+  toAppendElementAction() {
+    return new AddAtAction(this.map( (el) => [el] ));
+  },
 
-export function convertToRemoveElementAction(source) {
-  return new RemoveAction(source);
-}
+  toRemoveElementAction() {
+    return new RemoveAction(this);
+  },
+};

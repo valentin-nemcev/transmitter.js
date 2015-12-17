@@ -1,4 +1,5 @@
 import PayloadBase from './PayloadBase';
+import {getNoOpPayload} from './NoOpPayload';
 
 export {PayloadBase as Payload};
 
@@ -6,6 +7,7 @@ import {default as zipMethods, zipPayloads} from './zipMethods';
 import mapFilterMethods from './mapFilterMethods';
 import flattenMethods from './flattenMethods';
 import conversionMethods from './conversionMethods';
+import listActionMethods from './listActionMethods';
 
 export {zipPayloads};
 
@@ -14,7 +16,8 @@ Object.assign(
   zipMethods,
   mapFilterMethods,
   flattenMethods,
-  conversionMethods
+  conversionMethods,
+  listActionMethods
 );
 
 Object.assign(PayloadBase.prototype, {
@@ -28,6 +31,10 @@ Object.assign(PayloadBase.prototype, {
 
   isNoOp() { return false; },
 
+  toNoOp() {
+    return getNoOpPayload();
+  },
+
   replaceByNoOp(payload) { return payload.isNoOp() ? payload : this; },
 
   replaceNoOpBy() { return this; },
@@ -38,7 +45,15 @@ Object.assign(PayloadBase.prototype, {
     }
     return this;
   },
+
+  unflattenToValues() {
+    return this.unflattenTo({
+      createEmptyPayload: createEmptyValuePayload,
+      createPayloadAtKey: createValuePayloadAtKey,
+    });
+  },
 });
+
 
 class SimplePayload extends PayloadBase {
   constructor(source) {
