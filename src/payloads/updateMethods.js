@@ -14,7 +14,7 @@ class MapUpdatePayload {
   deliver(map) {
     let prevKey = null;
     for (const [key, value] of this.source) {
-      if (!map.hasAt(key)) map.setAt(key, this.map.call(null, value));
+      if (!map.hasAt(key)) map.setAt(key, this.map.call(null, value, key));
       map.moveAfter(key, prevKey);
       map.visitKey(key);
       prevKey = key;

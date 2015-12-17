@@ -5,7 +5,8 @@ describe('Model with view', function() {
   class Model {
     constructor(tr, value) {
       this.valueNode = new Transmitter.Nodes.ValueNode();
-      this.valueNode.set(value).init(tr);
+      this.valueNode.set(value);
+      if (tr != null) this.valueNode.init(tr);
     }
   }
 
@@ -14,6 +15,9 @@ describe('Model with view', function() {
     this.define('serializedValueMap', new Transmitter.Nodes.OrderedMapNode());
     this.define('serializedMap', new Transmitter.Nodes.OrderedMapNode());
     this.define('serializedValue', new Transmitter.Nodes.ValueNode());
+
+    const createSerializedValue = (id) =>
+      this.define('serializedValue_' + id, new Transmitter.Nodes.ValueNode());
 
     Transmitter.startTransmission(
       (tr) => {
@@ -28,8 +32,7 @@ describe('Model with view', function() {
           .fromSource(this.serializedValueMap)
           .toTarget(this.modelMap)
           .withTransform(
-            (payload, tr) =>
-              payload.toMapUpdate( () => new Model(tr) )
+            (payload) => payload.toMapUpdate( () => new Model() )
           )
           .init(tr);
 
@@ -39,7 +42,7 @@ describe('Model with view', function() {
           .toTarget(this.serializedValueMap)
           .withTransform(
             (payload) =>
-              payload.toMapUpdate( () => new Transmitter.Nodes.ValueNode() )
+              payload.toMapUpdate( (model, id) => createSerializedValue(id) )
           )
           .init(tr);
 
@@ -79,7 +82,7 @@ describe('Model with view', function() {
           .toTarget(this.serializedValueMap)
           .withTransform(
             (payload) => payload.toMapUpdate(
-              () => new Transmitter.Nodes.ValueNode()
+              (value, id) => createSerializedValue(id)
             )
           )
           .init(tr);
