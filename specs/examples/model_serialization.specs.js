@@ -78,7 +78,7 @@ describe('Model with view', function() {
           .inForwardDirection()
           .withOriginDerived(this.serializedMap, this.serializedValue)
           .withTransformOrigin(
-            (payload) => payload.toValueEntries().map(
+            (payload) => payload.joinEntries().map(
               (entries) => {
                 const obj = {};
                 for (const [key, value] of entries) obj[key] = value;
@@ -89,7 +89,7 @@ describe('Model with view', function() {
           .withTransformDerived(
             (payload) => payload.map(
               (obj) => Object.entries(obj)
-            ).toMap()
+            ).valuesToEntries()
           )
           .init(tr);
       }

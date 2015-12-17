@@ -48,7 +48,7 @@ describe('Flattening list connection', function() {
               const name = nestedObject.name;
               return {name, value};
             })
-            .toValue()
+            .joinValues()
         )
         .init(tr);
 
@@ -58,7 +58,7 @@ describe('Flattening list connection', function() {
         .toTargets(this.flatList, this.nestedList)
         .withTransform( (serializedPayload) =>
           serializedPayload
-            .toList()
+            .splitValues()
             .map( ({value, name}) => [value, new NestedObject(name)] )
             .unzip(2)
         )

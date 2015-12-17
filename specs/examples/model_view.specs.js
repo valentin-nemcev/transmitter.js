@@ -69,7 +69,7 @@ describe('Model with view', function() {
           .toTarget(this.elementSet)
           .withTransform(
             (payload) =>
-              payload.toSet().map( (view) => view.element )
+              payload.map( (view) => view.element )
           )
           .init(tr);
       }

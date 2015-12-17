@@ -33,15 +33,6 @@ Payload.prototype.toNoOp = function() {
 NoOpPayload.prototype.toNoOp = function() { return this; };
 
 
-NoOpPayload.prototype.toValue = function() { return this; };
-
-
-NoOpPayload.prototype.toValueEntries = function() { return this; };
-
-
-NoOpPayload.prototype.toList = function() { return this; };
-
-
 Payload.prototype.toAppendElementAction = function() {
   return convertToAppendElementAction(this);
 };
@@ -54,15 +45,6 @@ Payload.prototype.toRemoveElementAction = function() {
 };
 
 NoOpPayload.prototype.toRemoveElementAction = function() { return this; };
-
-
-NoOpPayload.prototype.toSet = function() { return this; };
-
-
-NoOpPayload.prototype.toMap = function() { return this; };
-
-
-NoOpPayload.prototype.toMapUpdate = function() { return this; };
 
 
 export {

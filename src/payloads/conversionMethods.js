@@ -1,33 +1,30 @@
 import PayloadBase from './PayloadBase';
 
 export default {
-  toValue() {
-    return new ConvertedToValuePayload(this);
+  joinValues() {
+    return new JoinValuesPayload(this);
   },
 
-  toValueEntries() {
-    return new ConvertedToValueEntriesPayload(this);
+  joinEntries() {
+    return new JoinEntriesPayload(this);
   },
 
-  toList() {
-    return new ConvertedToListPayload(this);
+  splitValues() {
+    return new SplitValuesPayload(this);
   },
 
-  toMap() {
-    return new ConvertedToMapPayload(this);
+  valuesToEntries() {
+    return new ValuesToEntriesPayload(this);
   },
 
   toMapUpdate(map) {
     return new MapUpdatePayload(this, map);
   },
 
-  toSet() {
-    return new ConvertedToSetPayload(this);
-  },
 };
 
 
-class ConvertedToValuePayload extends PayloadBase {
+class JoinValuesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -41,7 +38,7 @@ class ConvertedToValuePayload extends PayloadBase {
 }
 
 
-class ConvertedToValueEntriesPayload extends PayloadBase {
+class JoinEntriesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -55,7 +52,7 @@ class ConvertedToValueEntriesPayload extends PayloadBase {
 }
 
 
-class ConvertedToListPayload extends PayloadBase {
+class SplitValuesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -64,17 +61,13 @@ class ConvertedToListPayload extends PayloadBase {
   *[Symbol.iterator]() {
     let i = 0;
     for (const [, value] of this.source) {
-      if (value != null && value[Symbol.iterator] != null) {
-        for (const nestedValue of value) yield [i++, nestedValue];
-      } else {
-        yield [i++, value];
-      }
+      for (const nestedValue of value) yield [i++, nestedValue];
     }
   }
 }
 
 
-class ConvertedToMapPayload extends PayloadBase {
+class ValuesToEntriesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -82,7 +75,7 @@ class ConvertedToMapPayload extends PayloadBase {
 
   *[Symbol.iterator]() {
     for (const [, value] of this.source) {
-      const [key, nestedValue] = Array.from(value || []);
+      const [key, nestedValue] = value;
       yield [key, nestedValue];
     }
   }
@@ -102,19 +95,5 @@ class MapUpdatePayload {
     }
     map.removeUnvisitedKeys();
     return this;
-  }
-}
-
-
-class ConvertedToSetPayload extends PayloadBase {
-  constructor(source) {
-    super();
-    this.source = source;
-  }
-
-  *[Symbol.iterator]() {
-    for (const [, value] of this.source) {
-      yield [value, value];
-    }
   }
 }
