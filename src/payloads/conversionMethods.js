@@ -16,6 +16,10 @@ export default {
   valuesToEntries() {
     return new ValuesToEntriesPayload(this);
   },
+
+  valuesToKeys() {
+    return new ValuesToKeysPayload(this);
+  },
 };
 
 
@@ -72,6 +76,20 @@ class ValuesToEntriesPayload extends PayloadBase {
     for (const [, value] of this.source) {
       const [key, nestedValue] = value;
       yield [key, nestedValue];
+    }
+  }
+}
+
+
+class ValuesToKeysPayload extends PayloadBase {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    for (const [, value] of this.source) {
+      yield [value, value];
     }
   }
 }

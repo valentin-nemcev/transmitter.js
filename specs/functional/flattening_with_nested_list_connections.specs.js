@@ -25,25 +25,22 @@ describe('Flattening with nested list connections', function() {
   function id(arg) { return arg; }
 
   before(function() {
-    this.define('originList', new Transmitter.Nodes.ListNode());
-    this.define('derivedList', new Transmitter.Nodes.ListNode());
+    this.define('modelList', new Transmitter.Nodes.ListNode());
+    this.define('viewList', new Transmitter.Nodes.ListNode());
 
     const originDerivedChannel =
       new Transmitter.Channels.NestedBidirectionalChannel()
-      .inForwardDirection()
-      .withOriginDerived(this.originList, this.derivedList)
-      .withMatchOriginDerived( (model, view) => model === view.model )
-      .withMapOrigin( (model) => new View(model) )
-      .withMatchOriginDerivedChannel( (model, view, channel) =>
-        channel.origin === model && channel.derived === view
-      )
-      .withOriginDerivedChannel( (model, view) =>
-        new Transmitter.Channels.BidirectionalChannel()
-          .inBothDirections()
-          .withOriginDerived(model.valueNode, view.valueNode)
-          .withMapOrigin(id)
-          .withMapDerived(id)
-      );
+        .inForwardDirection()
+        .withOriginDerived(this.modelList, this.viewList)
+        .withMatchOriginDerived( (model, view) => model === view.model )
+        .withMapOrigin( (model) => new View(model) )
+        .withOriginDerivedChannel( (model, view) =>
+          new Transmitter.Channels.BidirectionalChannel()
+            .inBothDirections()
+            .withOriginDerived(model.valueNode, view.valueNode)
+            .withMapOrigin(id)
+            .withMapDerived(id)
+        );
 
     this.define(
       'flatteningChannelList',
@@ -51,14 +48,14 @@ describe('Flattening with nested list connections', function() {
     );
 
     const flatteningChannel = new Transmitter.Channels.NestedSimpleChannel()
-      .fromSource(this.derivedList)
+      .fromSource(this.viewList)
       .toChannelTarget(this.flatteningChannelList)
       .withTransform( (viewList) =>
           viewList.map( (view) =>
             new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
             .fromSource(view.removeEvt)
-            .toTarget(this.originList)
+            .toTarget(this.modelList)
             .withTransform( (ev) =>
                ev.map( () => view.model ).toRemoveElementAction()
             )
@@ -72,32 +69,32 @@ describe('Flattening with nested list connections', function() {
       this.model2 = new Model('model2');
       this.model1.valueNode.set('value1').init(tr);
       this.model2.valueNode.set('value2').init(tr);
-      this.originList.set([this.model1, this.model2]).init(tr);
+      this.modelList.set([this.model1, this.model2]).init(tr);
     });
   });
 
 
   specify('when derived nested node originates update', function() {
     Transmitter.startTransmission( (tr) =>
-        this.derivedList.getAt(0).removeEvt.originateValue(tr, true)
+        this.viewList.getAt(0).removeEvt.originateValue(tr, true)
     );
   });
 
 
   specify('then it propagates to origin node', function() {
-    expect(this.originList.get()).to.have.members([this.model2]);
+    expect(this.modelList.get()).to.have.members([this.model2]);
   });
 
 
   specify('when derived nested node is updated', function() {
     Transmitter.startTransmission( (tr) =>
-      this.derivedList.getAt(0).valueNode.set('value2a').init(tr)
+      this.viewList.getAt(0).valueNode.set('value2a').init(tr)
     );
   });
 
 
   specify('then update is transmitted to derived nested node', function() {
-    expect(this.originList.get().map( (model) => model.valueNode.get() ))
+    expect(this.modelList.get().map( (model) => model.valueNode.get() ))
       .to.deep.equal(['value2a']);
   });
 });

@@ -18,21 +18,9 @@ import ChannelMap   from './ChannelMap';
 
 export {ChannelValue, ChannelList, ChannelMap};
 
-import ValueNode      from '../nodes/ValueNode';
 import OptionalNode   from '../nodes/OptionalNode';
 import ListNode       from '../nodes/ListNode';
 import OrderedMapNode from '../nodes/OrderedMapNode';
-
-export function getChannelNodeConstructorFor(constructor) {
-  switch (constructor) {
-  case ValueNode:
-    return ChannelValue;
-  case ListNode:
-    return ChannelList;
-  default:
-    throw new Error('No channel node type for ' + inspect(constructor));
-  }
-}
 
 export function getDynamicChannelNodeConstructorFor(constructor) {
   switch (constructor) {
