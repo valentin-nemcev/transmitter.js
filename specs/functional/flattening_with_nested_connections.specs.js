@@ -24,9 +24,9 @@ describe('Flattening with nested connections', function() {
       new Transmitter.Channels.BidirectionalChannel()
       .inForwardDirection()
       .withOriginDerived(this.originValue, this.derivedValue)
-      .withMatchOriginDerived(function(model, view) {
-        return model === view.model;
-      })
+      // .withMatchOriginDerived(function(model, view) {
+      //   return model === view.model;
+      // })
       .withMapOrigin(function(model) {
         return new View(model);
       });

@@ -1,5 +1,4 @@
 import {inspect} from 'util';
-import UpdateMatchingPayload from './UpdateMatchingPayload';
 
 
 export default class PayloadBase {
@@ -15,11 +14,6 @@ export default class PayloadBase {
   deliver(target) {
     target.setIterator(this);
     return this;
-  }
-
-
-  updateMatching(map, match) {
-    return new UpdateMatchingPayload(this, {map, match});
   }
 
 

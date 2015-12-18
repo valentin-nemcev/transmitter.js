@@ -26,13 +26,13 @@ describe('Flattening with nested list connections', function() {
 
   before(function() {
     this.define('modelList', new Transmitter.Nodes.ListNode());
-    this.define('viewList', new Transmitter.Nodes.ListNode());
+    this.define('viewMap', new Transmitter.Nodes.OrderedMapNode());
 
     const originDerivedChannel =
       new Transmitter.Channels.NestedBidirectionalChannel()
         .inForwardDirection()
-        .withOriginDerived(this.modelList, this.viewList)
-        .withMatchOriginDerived( (model, view) => model === view.model )
+        .withOriginDerived(this.modelList, this.viewMap)
+        .useMapUpdate()
         .withMapOrigin( (model) => new View(model) )
         .withOriginDerivedChannel( (model, view) =>
           new Transmitter.Channels.BidirectionalChannel()
@@ -48,10 +48,10 @@ describe('Flattening with nested list connections', function() {
     );
 
     const flatteningChannel = new Transmitter.Channels.NestedSimpleChannel()
-      .fromSource(this.viewList)
+      .fromSource(this.viewMap)
       .toChannelTarget(this.flatteningChannelList)
-      .withTransform( (viewList) =>
-          viewList.map( (view) =>
+      .withTransform( (viewMap) =>
+          viewMap.map( (view) =>
             new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
             .fromSource(view.removeEvt)
@@ -76,7 +76,7 @@ describe('Flattening with nested list connections', function() {
 
   specify('when derived nested node originates update', function() {
     Transmitter.startTransmission( (tr) =>
-        this.viewList.getAt(0).removeEvt.originateValue(tr, true)
+        this.viewMap.get()[0][1].removeEvt.originateValue(tr, true)
     );
   });
 
@@ -88,7 +88,7 @@ describe('Flattening with nested list connections', function() {
 
   specify('when derived nested node is updated', function() {
     Transmitter.startTransmission( (tr) =>
-      this.viewList.getAt(0).valueNode.set('value2a').init(tr)
+      this.viewMap.get()[0][1].valueNode.set('value2a').init(tr)
     );
   });
 

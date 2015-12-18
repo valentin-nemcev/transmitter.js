@@ -52,8 +52,8 @@ BidirectionalChannel.prototype = defineClass()
     return this;
   })
 
-  .setOnceLazyProperty('_matchOriginDerived', () => null,
-                       {title: 'MatchOriginDerived'})
+  .setOnceLazyProperty('_useMapUpdate', () => false,
+                       {title: 'UseMapUpdate'})
 
   .methods({
     withTransformOrigin(transform) {
@@ -69,19 +69,21 @@ BidirectionalChannel.prototype = defineClass()
 
   .methods({
     withMapOrigin(mapOrigin) {
-      this.withTransformOrigin(createTransform(
-        mapOrigin, this._matchOriginDerived));
+      this.withTransformOrigin(
+        createTransform(mapOrigin, this._useMapUpdate)
+      );
       return this;
     },
 
     withMapDerived(mapDerived) {
-      this.withTransformDerived(createTransform(
-        mapDerived, this._matchOriginDerived, {swapMatch: true}));
+      this.withTransformDerived(
+        createTransform(mapDerived, this._useMapUpdate)
+      );
       return this;
     },
 
-    withMatchOriginDerived(matchOriginDerived) {
-      this._matchOriginDerived = matchOriginDerived;
+    useMapUpdate() {
+      this._useMapUpdate = true;
       return this;
     },
   })
@@ -89,19 +91,13 @@ BidirectionalChannel.prototype = defineClass()
   .buildPrototype();
 
 
-function createTransform(map, match, {swapMatch = false} = {}) {
-  if (match != null) {
+function createTransform(map, useMapUpdate) {
+  if (useMapUpdate) {
     return (payload, tr) => {
-      const swappedMatch = swapMatch ? swapArgs(match) : match;
-      return payload.updateMatching(
-        (...args) => map(...args, tr), swappedMatch);
+      return payload.toMapUpdate((...args) => map(...args, tr));
     };
   } else {
     return (payload, tr) =>
       payload.map( (...args) => map(...args, tr));
   }
-}
-
-function swapArgs(f) {
-  return function(a1, a2) { return f.call(this, a2, a1); };
 }
