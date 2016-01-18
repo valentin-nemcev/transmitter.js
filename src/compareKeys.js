@@ -15,7 +15,10 @@ export default function compareKeys(a, b) {
   if (typeof b === 'number') return +1;
 
   if (typeof a === 'string' && typeof b === 'string') {
-    return a.localeCompare(b);
+    // return a.localeCompare(b);
+    if (a < b) return -1;
+    if (a > b) return 1;
+    return 0;
   }
   if (typeof a === 'string') return -1;
   if (typeof b === 'string') return +1;
