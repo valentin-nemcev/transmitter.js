@@ -11,15 +11,17 @@ class MapUpdatePayload {
     this.map = map;
   }
 
-  deliver(map) {
+  deliver(target) {
     let prevKey = null;
     for (const [key, value] of this.source) {
-      if (!map.hasAt(key)) map.setAt(key, this.map.call(null, value, key));
-      map.moveAfter(key, prevKey);
-      map.visitKey(key);
+      if (!target.hasAt(key)) {
+        target.setAt(key, this.map.call(null, value, key));
+      }
+      target.moveAfter(key, prevKey);
+      target.visitKey(key);
       prevKey = key;
     }
-    map.removeUnvisitedKeys();
+    target.removeUnvisitedKeys();
     return this;
   }
 }

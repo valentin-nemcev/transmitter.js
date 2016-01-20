@@ -25,4 +25,3 @@ export default class PayloadBase {
     throw new Error('No getAt for ' + this.constructor.name);
   }
 }
-

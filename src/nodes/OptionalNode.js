@@ -15,23 +15,27 @@ export default class Optional extends SourceTargetNode {
     return createEmptyListPayload();
   }
 
-  get() { return this.value; }
 
-  getAt(key) {
-    // TODO ↓
-    return (key == null || key === 0) ? this.value : null;
-  }
+  get() { return this.value; }
 
   getSize() {
     return this.value != null ? 1 : 0;
   }
 
+  getAt(key) {
+    return this.key === key ? this.value : undefined;
+  }
+
+  hasAt(key) {
+    return this.key === key;
+  }
+
   *[Symbol.iterator]() {
-    if (this.value != null) yield [null, this.value];
+    if (this.value != null) yield [this.key, this.value];
   }
 
   set(value) {
-    this.value = value;
+    this.setAt(null, value);
     return this;
   }
 
@@ -41,13 +45,32 @@ export default class Optional extends SourceTargetNode {
     return this;
   }
 
-  addAt(value, key) {
-    if (key === 0 && this.value == null) this.set(value);
+  setAt(key, value) {
+    this.key = key;
+    this.value = value;
     return this;
   }
 
   removeAt(key) {
-    if (key === 0 && this.value != null) this.set(null);
+    if (this.key === key) this.setAt(null, null);
     return this;
+  }
+
+  moveAfter() {
+    return this;
+  }
+
+
+  visitKey(key) {
+    if (this.key === key) this.visited = true;
+    return this;
+  }
+
+  removeUnvisitedKeys() {
+    if (!this.visited) {
+      this.value = null;
+      this.key = null;
+    }
+    this.visited = false;
   }
 }

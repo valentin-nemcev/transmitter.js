@@ -24,12 +24,10 @@ describe('Flattening with nested connections', function() {
       new Transmitter.Channels.BidirectionalChannel()
       .inForwardDirection()
       .withOriginDerived(this.originValue, this.derivedValue)
-      // .withMatchOriginDerived(function(model, view) {
-      //   return model === view.model;
-      // })
-      .withMapOrigin(function(model) {
-        return new View(model);
-      });
+      .withTransformOrigin(
+        (payload) =>
+          payload.valuesToKeys().toMapUpdate( (model) => new View(model) )
+      );
 
     this.define(
       'flatteningChannelValue',
