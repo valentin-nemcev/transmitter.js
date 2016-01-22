@@ -13,17 +13,23 @@ class ZippedPayload extends PayloadBase {
     const payloadsWithIters = this.payloads
       .map( (p) => [p, p[Symbol.iterator]()] );
 
-    for (let i = 0; ; i++) {
+    for (;;) {
       const zippedEl = [];
       let firstKey;
       let firstDone;
       let allDone = true;
       for (const [payload, it] of payloadsWithIters) {
         const {value: entry, done} = it.next();
-        const value = done ? payload.getEmpty() : entry[1];
-        const key = done ? undefined : entry[0];
+        let key;
+        let value;
+        if (done) {
+          value = payload.getEmpty();
+        } else {
+          [key, value] = entry;
+          if (key === null) key = value;
+        }
 
-        if (firstDone == null) firstDone = done;
+        if (firstDone === undefined) firstDone = done;
         if (firstKey === undefined) firstKey = key;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();

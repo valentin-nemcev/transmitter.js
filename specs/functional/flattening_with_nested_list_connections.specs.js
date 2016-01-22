@@ -25,7 +25,7 @@ describe('Flattening with nested list connections', function() {
   function id(arg) { return arg; }
 
   before(function() {
-    this.define('modelList', new Transmitter.Nodes.ListNode());
+    this.define('modelList', new Transmitter.Nodes.OrderedSetNode());
     this.define('viewMap', new Transmitter.Nodes.OrderedMapNode());
 
     const originDerivedChannel =
@@ -57,7 +57,7 @@ describe('Flattening with nested list connections', function() {
             .fromSource(view.removeEvt)
             .toTarget(this.modelList)
             .withTransform( (ev) =>
-               ev.map( () => view.model ).toRemoveElementAction()
+               ev.map( () => view.model ).toRemoveAction()
             )
           )
       );

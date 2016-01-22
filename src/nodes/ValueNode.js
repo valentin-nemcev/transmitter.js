@@ -4,6 +4,8 @@ import {
 } from '../payloads';
 
 
+const valueKey = {};
+
 export default class ValueNode extends SourceTargetNode {
 
 
@@ -20,10 +22,10 @@ export default class ValueNode extends SourceTargetNode {
 
   getSize() { return 1; }
 
-  getAt(key) { return key === 0 ? this.get() : undefined; }
+  getAt(key) { return key === valueKey ? this.get() : undefined; }
 
   *[Symbol.iterator]() {
-    yield [null, this.get()];
+    yield [valueKey, this.get()];
   }
 
   set(value) {

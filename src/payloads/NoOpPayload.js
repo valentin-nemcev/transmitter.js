@@ -1,4 +1,4 @@
-import listActionMethods from './listActionMethods';
+import setActionMethods from './setActionMethods';
 
 export class NoOpPayload {
 
@@ -33,7 +33,7 @@ export class NoOpPayload {
   }
 }
 
-for (const method of Object.keys(listActionMethods)) {
+for (const method of Object.keys(setActionMethods)) {
   NoOpPayload.prototype[method] = function() { return this; };
 }
 

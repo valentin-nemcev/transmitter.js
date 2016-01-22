@@ -33,7 +33,7 @@ NestedBidirectionalChannel.prototype = defineClass()
         (payloads) => {
           if (payloads.length == null) return payloads;
           const [origin, derived] = payloads;
-          return origin.zip(derived).valuesToKeys().toMapUpdate(
+          return origin.zip(derived).toMapUpdate(
             ([originItem, derivedItem]) =>
               createOriginDerivedChannel(originItem, derivedItem)
           );

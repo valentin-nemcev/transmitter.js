@@ -26,7 +26,7 @@ describe('Flattening with nested connections', function() {
       .withOriginDerived(this.originValue, this.derivedValue)
       .withTransformOrigin(
         (payload) =>
-          payload.valuesToKeys().toMapUpdate( (model) => new View(model) )
+          payload.toMapUpdate( (model) => new View(model) )
       );
 
     this.define(

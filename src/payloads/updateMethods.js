@@ -13,7 +13,9 @@ class MapUpdatePayload {
 
   deliver(target) {
     let prevKey = null;
-    for (const [key, value] of this.source) {
+    for (const entry of this.source) {
+      const value = entry[1];
+      const key = entry[0] == null ? value : entry[0];
       if (!target.hasAt(key)) {
         target.setAt(key, this.map.call(null, value, key));
       }

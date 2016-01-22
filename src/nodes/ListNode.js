@@ -62,6 +62,10 @@ export default class List extends SourceTargetNode {
     return this;
   }
 
+  append(el) {
+    return this.addAt(el);
+  }
+
   removeAt(pos) {
     this.list.splice(pos, 1);
     return this;
