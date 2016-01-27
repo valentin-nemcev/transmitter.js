@@ -52,8 +52,8 @@ BidirectionalChannel.prototype = defineClass()
     return this;
   })
 
-  .setOnceLazyProperty('_useMapUpdate', () => false,
-                       {title: 'UseMapUpdate'})
+  .setOnceLazyProperty('_useSetToMapUpdate', () => false,
+                       {title: 'UseSetToMapUpdate'})
 
   .methods({
     withTransformOrigin(transform) {
@@ -70,20 +70,20 @@ BidirectionalChannel.prototype = defineClass()
   .methods({
     withMapOrigin(mapOrigin) {
       this.withTransformOrigin(
-        createTransform(mapOrigin, this._useMapUpdate)
+        createTransform(mapOrigin, this._useSetToMapUpdate)
       );
       return this;
     },
 
     withMapDerived(mapDerived) {
       this.withTransformDerived(
-        createTransform(mapDerived, this._useMapUpdate)
+        createTransform(mapDerived, this._useSetToMapUpdate)
       );
       return this;
     },
 
-    useMapUpdate() {
-      this._useMapUpdate = true;
+    useSetToMapUpdate() {
+      this._useSetToMapUpdate = true;
       return this;
     },
   })
@@ -91,10 +91,10 @@ BidirectionalChannel.prototype = defineClass()
   .buildPrototype();
 
 
-function createTransform(map, useMapUpdate) {
-  if (useMapUpdate) {
+function createTransform(map, useSetToMapUpdate) {
+  if (useSetToMapUpdate) {
     return (payload, tr) => {
-      return payload.toMapUpdate((...args) => map(...args, tr));
+      return payload.toSetToMapUpdate((...args) => map(...args, tr));
     };
   } else {
     return (payload, tr) =>

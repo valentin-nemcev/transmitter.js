@@ -39,7 +39,7 @@ describe('Model with view', function() {
           .fromSource(this.modelSet)
           .toTarget(this.viewMap)
           .withTransform(
-            (payload) => payload.toMapUpdate( () => new View() )
+            (payload) => payload.toSetToMapUpdate( () => new View() )
           )
           .init(tr);
 
@@ -50,7 +50,7 @@ describe('Model with view', function() {
             (payloads) => {
               if (payloads.length == null) return payloads;
               const [models, views] = payloads;
-              return models.zip(views).toMapUpdate(
+              return models.zip(views).toSetToMapUpdate(
                 ([model, view]) =>
                   new Transmitter.Channels.SimpleChannel()
                     .inForwardDirection()

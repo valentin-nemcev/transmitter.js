@@ -1,6 +1,6 @@
 import * as Transmitter from 'transmitter';
 
-describe('Model with view', function() {
+describe('Model serialization', function() {
 
   class Model {
     constructor(tr, value) {
@@ -32,7 +32,7 @@ describe('Model with view', function() {
           .fromSource(this.serializedValueMap)
           .toTarget(this.modelMap)
           .withTransform(
-            (payload) => payload.toMapUpdate( () => new Model() )
+            (payload) => payload.toMapToMapUpdate( () => new Model() )
           )
           .init(tr);
 
@@ -42,7 +42,9 @@ describe('Model with view', function() {
           .toTarget(this.serializedValueMap)
           .withTransform(
             (payload) =>
-              payload.toMapUpdate( (model, id) => createSerializedValue(id) )
+              payload.toMapToMapUpdate(
+                (model, id) => createSerializedValue(id)
+              )
           )
           .init(tr);
 
@@ -62,7 +64,7 @@ describe('Model with view', function() {
               if (payloads.length == null) return payloads;
               const [origin, derived] = payloads;
               return origin.zip(derived)
-                .toMapUpdate(
+                .toSetToMapUpdate(
                   ([origin, derived]) =>
                     createSerializeModelChannel(origin, derived)
                 );
@@ -81,7 +83,7 @@ describe('Model with view', function() {
           .fromSource(this.serializedMap)
           .toTarget(this.serializedValueMap)
           .withTransform(
-            (payload) => payload.toMapUpdate(
+            (payload) => payload.toMapToMapUpdate(
               (value, id) => createSerializedValue(id)
             )
           )

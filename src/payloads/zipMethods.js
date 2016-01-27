@@ -26,14 +26,12 @@ class ZippedPayload extends PayloadBase {
           value = payload.getEmpty();
         } else {
           [key, value] = entry;
-          if (key === null) key = value;
         }
 
         if (firstDone === undefined) firstDone = done;
         if (firstKey === undefined) firstKey = key;
         if (this.coerceSize && firstDone) return;
         if (!this.coerceSize && done !== firstDone) this._throwSizeMismatch();
-        if (key !== undefined && firstKey !== key) this._throwKeyMismatch();
         allDone = allDone && done;
         zippedEl.push(value);
       }
@@ -45,13 +43,6 @@ class ZippedPayload extends PayloadBase {
   _throwSizeMismatch() {
     throw new Error(
       "Can't zip lists with different sizes: "
-      + this.payloads.map(inspect).join(', ')
-    );
-  }
-
-  _throwKeyMismatch() {
-    throw new Error(
-      "Can't zip lists with different keys: "
       + this.payloads.map(inspect).join(', ')
     );
   }
