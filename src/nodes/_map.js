@@ -79,7 +79,7 @@ class OrderedMap {
   }
 
   [Symbol.iterator]() {
-    return this.entries.values();
+    return this.entries[Symbol.iterator]();
   }
 
   getSize() {

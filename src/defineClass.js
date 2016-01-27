@@ -4,7 +4,7 @@ function iterateOwnPropertiesAndSymbols(object) {
   return [
     ...Object.getOwnPropertyNames(object),
     ...Object.getOwnPropertySymbols(object),
-  ].values();
+  ];
 }
 
 class ClassDefinition {

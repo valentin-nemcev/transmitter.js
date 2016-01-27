@@ -42,6 +42,10 @@ export default class OrderedSet extends SourceTargetNode {
     return this.map.set(value);
   }
 
+  append(el) {
+    return this.add(el);
+  }
+
   remove(value) {
     return this.map.remove(value);
   }

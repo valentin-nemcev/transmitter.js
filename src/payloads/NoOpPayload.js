@@ -1,3 +1,4 @@
+import conversionMethods from './conversionMethods';
 import setActionMethods from './setActionMethods';
 
 export class NoOpPayload {
@@ -33,7 +34,12 @@ export class NoOpPayload {
   }
 }
 
-for (const method of Object.keys(setActionMethods)) {
+const methods = [].concat.apply([], [
+  setActionMethods,
+  conversionMethods,
+].map(Object.keys));
+
+for (const method of methods) {
   NoOpPayload.prototype[method] = function() { return this; };
 }
 
