@@ -9,50 +9,50 @@ class OrderedMap {
     return this;
   }
 
-  set(keyArg, valueArg) {
+  add(keyArg) {
+    return this.set(keyArg);
+  }
+
+  set(key, value) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      const [key] = entry;
 
-      if (keyArg === key) {
-        entry[1] = valueArg;
+      if (key === entry.key) {
+        entry.value = value;
         return this;
       }
     }
-    this.entries.push([keyArg, valueArg]);
+    this.entries.push({key, value, visited: false});
     return this;
   }
 
-  remove(keyArg) {
+  remove(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      const [key] = entry;
-      if (keyArg === key) {
+      if (key === entry.key) {
         this.entries.splice(i, 1);
-        return entry[1];
+        return entry.value;
       }
     }
   }
 
-  move(keyArg, afterKeyArg) {
+  move(key, afterKey) {
     let fromIndex = null;
     let toIndex = null;
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      const [key] = entry;
-      if (keyArg === key) {
+      if (key === entry.key) {
         fromIndex = i;
         break;
       }
     }
     if (fromIndex == null) return this;
-    if (afterKeyArg == null) {
+    if (afterKey == null) {
       toIndex = 0;
     } else {
       for (let i = 0; i < this.entries.length; i++) {
         const entry = this.entries[i];
-        const [key] = entry;
-        if (afterKeyArg === key) {
+        if (afterKey === entry.key) {
           toIndex = i;
           break;
         }
@@ -65,25 +65,50 @@ class OrderedMap {
     return this;
   }
 
-  get(keyArg) {
-    for (const [key, value] of this.entries) {
-      if (keyArg === key) return value;
+  get(key) {
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      if (key === entry.key) return entry.value;
     }
   }
 
-  has(keyArg) {
-    for (const [key] of this.entries) {
-      if (keyArg === key) return true;
+  has(key) {
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      if (key === entry.key) return true;
     }
     return false;
   }
 
-  [Symbol.iterator]() {
-    return this.entries[Symbol.iterator]();
+  *[Symbol.iterator]() {
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      yield [entry.key, entry.value];
+    }
   }
 
   getSize() {
     return this.entries.length;
+  }
+
+  visit(key) {
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+
+      if (key === entry.key) {
+        entry.visited = true;
+        return this;
+      }
+    }
+    return this;
+  }
+
+  *iterateAndClearUnvisitedKeys() {
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      if (!entry.visited) yield entry.key;
+      entry.visited = false;
+    }
   }
 }
 

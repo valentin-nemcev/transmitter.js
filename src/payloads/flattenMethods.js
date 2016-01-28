@@ -7,7 +7,7 @@ export default {
 
   unflattenTo({createEmptyPayload, createPayloadAtKey}) {
     return this
-      .map( (value, index) => createPayloadAtKey(this, index) )
+      .mapWithKey( (value, index) => createPayloadAtKey(this, index) )
       .withEmpty(createEmptyPayload());
   },
 };

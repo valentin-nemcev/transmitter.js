@@ -52,8 +52,8 @@ BidirectionalChannel.prototype = defineClass()
     return this;
   })
 
-  .setOnceLazyProperty('_useSetToMapUpdate', () => false,
-                       {title: 'UseSetToMapUpdate'})
+  .setOnceLazyProperty('_updateType', () => null,
+                       {title: 'UpdateType'})
 
   .methods({
     withTransformOrigin(transform) {
@@ -70,20 +70,25 @@ BidirectionalChannel.prototype = defineClass()
   .methods({
     withMapOrigin(mapOrigin) {
       this.withTransformOrigin(
-        createTransform(mapOrigin, this._useSetToMapUpdate)
+        createTransform(mapOrigin, this._updateType)
       );
       return this;
     },
 
     withMapDerived(mapDerived) {
       this.withTransformDerived(
-        createTransform(mapDerived, this._useSetToMapUpdate)
+        createTransform(mapDerived, this._updateType)
       );
       return this;
     },
 
     useSetToMapUpdate() {
-      this._useSetToMapUpdate = true;
+      this._updateType = 'SetToMap';
+      return this;
+    },
+
+    useSetToSetUpdate() {
+      this._updateType = 'SetToSet';
       return this;
     },
   })
@@ -91,10 +96,11 @@ BidirectionalChannel.prototype = defineClass()
   .buildPrototype();
 
 
-function createTransform(map, useSetToMapUpdate) {
-  if (useSetToMapUpdate) {
+function createTransform(map, updateType) {
+  if (updateType) {
+    const updateMethodName = 'to' + updateType + 'Update';
     return (payload, tr) => {
-      return payload.toSetToMapUpdate((...args) => map(...args, tr));
+      return payload[updateMethodName]((...args) => map(...args, tr));
     };
   } else {
     return (payload, tr) =>

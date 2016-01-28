@@ -28,48 +28,30 @@ describe('Model with view', function() {
     this.define('modelSet', new Transmitter.Nodes.OrderedSetNode());
     this.define('viewMap', new Transmitter.Nodes.OrderedMapNode());
     this.define('elementSet', new Transmitter.Nodes.OrderedSetNode());
-    this.define('channelMap', new Transmitter.ChannelNodes.ChannelMap());
 
     Transmitter.startTransmission(
       (tr) => {
         this.modelSet.set([new Model(tr, 'value1'), new Model(tr, 'value2')]);
 
-        new Transmitter.Channels.SimpleChannel()
+        new Transmitter.Channels.NestedBidirectionalChannel()
           .inForwardDirection()
-          .fromSource(this.modelSet)
-          .toTarget(this.viewMap)
-          .withTransform(
-            (payload) => payload.toSetToMapUpdate( () => new View() )
+          .withOriginDerived(this.modelSet, this.viewMap)
+          .useSetToMapUpdate()
+          .withMapOrigin( () => new View() )
+          .withOriginDerivedChannel(
+            (model, view) =>
+              new Transmitter.Channels.SimpleChannel()
+                .inForwardDirection()
+                .fromSource(model.valueNode)
+                .toTarget(view.valueProp)
           )
           .init(tr);
 
-        new Transmitter.Channels.NestedSimpleChannel()
-          .fromSourcesWithMatchingPriorities(this.modelSet, this.viewMap)
-          .toChannelTarget(this.channelMap)
-          .withTransform(
-            (payloads) => {
-              if (payloads.length == null) return payloads;
-              const [models, views] = payloads;
-              return models.zip(views).toSetToMapUpdate(
-                ([model, view]) =>
-                  new Transmitter.Channels.SimpleChannel()
-                    .inForwardDirection()
-                    .fromSource(model.valueNode)
-                    .toTarget(view.valueProp)
-              );
-
-            }
-          )
-          .init(tr);
-
-        new Transmitter.Channels.SimpleChannel()
+        new Transmitter.Channels.BidirectionalChannel()
           .inForwardDirection()
-          .fromSource(this.viewMap)
-          .toTarget(this.elementSet)
-          .withTransform(
-            (payload) =>
-              payload.map( (view) => view.element )
-          )
+          .withOriginDerived(this.viewMap, this.elementSet)
+          .useSetToSetUpdate()
+          .withMapOrigin( (view) => view.element )
           .init(tr);
       }
     );

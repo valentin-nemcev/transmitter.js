@@ -3,11 +3,11 @@ import defineClass from '../defineClass';
 import {createOrderedMap} from './_map';
 
 export default defineClass('orderedMapPrototype')
-  .propertyInitializer('map', createOrderedMap)
+  .propertyInitializer('_map', createOrderedMap)
   .methods({
 
     *[Symbol.iterator]() {
-      for (const [key, {value}] of this.map) {
+      for (const [key, value] of this._map) {
         yield [key, value];
       }
     },
@@ -17,16 +17,15 @@ export default defineClass('orderedMapPrototype')
     },
 
     getSize() {
-      return this.map.getSize();
+      return this._map.getSize();
     },
 
     getAt(key) {
-      const entry = this.map.get(key);
-      if (entry != null) return entry.value;
+      return this._map.get(key);
     },
 
     hasAt(key) {
-      return this.map.has(key);
+      return this._map.has(key);
     },
 
 
@@ -36,7 +35,7 @@ export default defineClass('orderedMapPrototype')
     },
 
     setIterator(it) {
-      this.map.clear();
+      this._map.clear();
       for (const [key, value] of it) {
         this.setAt(key, value);
       }
@@ -44,50 +43,42 @@ export default defineClass('orderedMapPrototype')
     },
 
     setAt(key, value) {
-      const entry = this.map.get(key);
-      if (entry != null) {
-        const prevValue = entry.value;
-        entry.value = value;
+      const prevValue = this._map.get(key);
+      if (prevValue !== undefined) {
+        this._map.set(key, value);
         this.changeListener.notifyUpdate(key, prevValue, value);
       } else {
-        this.map.set(key, {value, visited: false});
+        this._map.set(key, value);
         this.changeListener.notifyAdd(key, value);
       }
       return this;
     },
 
     removeAt(key) {
-      const entry = this.map.remove(key);
-      if (entry != null) {
-        const prevValue = entry.value;
+      const prevValue = this._map.remove(key);
+      if (prevValue !== undefined) {
         this.changeListener.notifyRemove(key, prevValue);
       }
       return this;
     },
 
     moveAfter(key, afterKey) {
-      this.map.move(key, afterKey);
+      this._map.move(key, afterKey);
       return this;
     },
 
 
     visitKey(key) {
-      const entry = this.map.get(key);
-      if (entry != null) entry.visited = true;
+      this._map.visit(key);
       return this;
     },
 
     removeUnvisitedKeys() {
-      const keysToRemove = Array.from(this.iterateAndClearUnvisitedKeys());
+      const keysToRemove =
+        Array.from(this._map.iterateAndClearUnvisitedKeys());
       for (const key of keysToRemove) this.removeAt(key);
       return this;
     },
 
-    *iterateAndClearUnvisitedKeys() {
-      for (const [key, entry] of this.map) {
-        if (!entry.visited) yield key;
-        entry.visited = false;
-      }
-    },
   })
   .buildPrototype();

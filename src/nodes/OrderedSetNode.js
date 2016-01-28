@@ -19,43 +19,11 @@ export default class OrderedSet extends SourceTargetNode {
 
   constructor() {
     super();
-    this.map = createOrderedMap();
-  }
-
-  set(values) {
-    this.map.clear();
-    for (const value of values) {
-      this.add(value);
-    }
-    return this;
-  }
-
-  setIterator(it) {
-    this.map.clear();
-    for (const [, value] of it) {
-      this.add(value);
-    }
-    return this;
-  }
-
-  add(value) {
-    return this.map.set(value);
-  }
-
-  append(el) {
-    return this.add(el);
-  }
-
-  remove(value) {
-    return this.map.remove(value);
-  }
-
-  has(value) {
-    return this.map.has(value);
+    this._set = createOrderedMap();
   }
 
   *[Symbol.iterator]() {
-    for (const [key] of this.map) yield [null, key];
+    for (const [key] of this._set) yield [null, key];
   }
 
   get() {
@@ -63,6 +31,57 @@ export default class OrderedSet extends SourceTargetNode {
   }
 
   getSize() {
-    return this.map.getSize();
+    return this._set.getSize();
+  }
+
+  has(key) {
+    return this._set.has(key);
+  }
+
+
+  set(values) {
+    this._set.clear();
+    for (const value of values) {
+      this.add(value);
+    }
+    return this;
+  }
+
+  setIterator(it) {
+    this._set.clear();
+    for (const [, value] of it) {
+      this.add(value);
+    }
+    return this;
+  }
+
+  add(value) {
+    return this._set.add(value);
+  }
+
+  append(el) {
+    return this.add(el);
+  }
+
+  remove(value) {
+    return this._set.remove(value);
+  }
+
+  moveAfter(value, afterValue) {
+    this._set.move(value, afterValue);
+    return this;
+  }
+
+
+  visitKey(key) {
+    this._set.visit(key);
+    return this;
+  }
+
+  removeUnvisitedKeys() {
+    const keysToRemove =
+      Array.from(this._set.iterateAndClearUnvisitedKeys());
+    for (const key of keysToRemove) this.remove(key);
+    return this;
   }
 }
