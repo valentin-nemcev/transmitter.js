@@ -1,9 +1,6 @@
 import defineClass from '../defineClass';
 
-import {createOrderedMap} from './_map';
-
 export default defineClass('orderedMapPrototype')
-  .propertyInitializer('_map', createOrderedMap)
   .methods({
 
     *[Symbol.iterator]() {

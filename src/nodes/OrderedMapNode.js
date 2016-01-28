@@ -1,19 +1,23 @@
 import defineClass from '../defineClass';
 
 import SourceTargetNode from './SourceTargetNode';
+
 import {
   createMapPayload, createEmptyMapPayload,
 } from '../payloads';
 
 import orderedMapPrototype from './orderedMapPrototype';
 
+import {createOrderedMap} from './_map';
+
 import nullChangeListener from './_nullChangeListener';
 
 export default defineClass('OrderedMapNode')
   .includes(SourceTargetNode.prototype)
-  .includes(orderedMapPrototype)
 
+  .propertyInitializer('_map', createOrderedMap)
   .propertyInitializer('changeListener', () => nullChangeListener )
+  .includes(orderedMapPrototype)
 
   .methods({
     processPayload(payload) {
@@ -24,6 +28,5 @@ export default defineClass('OrderedMapNode')
     createPlaceholderPayload() {
       return createEmptyMapPayload();
     },
-
   })
   .buildConstructor();
