@@ -37,6 +37,7 @@ class OrderedMap {
   }
 
   move(key, afterKey) {
+    if (key === afterKey) return this;
     let fromIndex = null;
     let toIndex = null;
     for (let i = 0; i < this.entries.length; i++) {
@@ -64,6 +65,7 @@ class OrderedMap {
     this.entries.splice(toIndex, 0, entry);
     return this;
   }
+
 
   get(key) {
     for (let i = 0; i < this.entries.length; i++) {

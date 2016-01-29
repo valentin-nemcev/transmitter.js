@@ -1,5 +1,5 @@
 export DOMEvent           from './DOMEvent';
-export ChildrenList       from './ChildrenList';
+export ChildrenSet        from './ChildrenSet';
 export TextValue          from './TextValue';
 export AttributeValue     from './AttributeValue';
 export CheckboxStateValue from './CheckboxStateValue';
