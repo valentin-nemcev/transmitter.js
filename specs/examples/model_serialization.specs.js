@@ -128,6 +128,9 @@ describe('Model serialization', function() {
 
 
     specify('unserializing', function() {
+      const [model1, model2, model3] =
+        this.modelMap.get().map( ([, value]) => value);
+
       Transmitter.startTransmission(
         (tr) =>
           this.serializedValue.set({
@@ -136,7 +139,18 @@ describe('Model serialization', function() {
             'id4': 'value4',
           }).originate(tr)
       );
-      expect(this.serializedMap.get()).to.deep.equal([
+
+      expect(this.modelMap.getSize()).to.equal(3);
+      expect(this.modelMap.get().map( ([key]) => key))
+        .to.deep.equal(['id3', 'id2', 'id4']);
+
+      expect(this.modelMap.getAt('id3')).to.equal(model3);
+      expect(this.modelMap.getAt('id2')).to.equal(model2);
+      expect(this.modelMap.getAt('id4')).to.not.equal(model1);
+
+      expect(
+        this.modelMap.get().map( ([id, model]) => [id, model.valueNode.get()] )
+      ).to.deep.equal([
         ['id3', 'value3a'],
         ['id2', 'value2'],
         ['id4', 'value4'],
@@ -249,18 +263,31 @@ describe('Model serialization', function() {
 
 
     specify('unserializing', function() {
+      const [model0, model1, model2] =
+        this.modelList.get();
+
       Transmitter.startTransmission(
         (tr) =>
           this.serializedValue.set([
             'value3a',
             'value2',
             'value4',
+            'value5',
           ]).originate(tr)
       );
-      expect(this.serializedList.get()).to.deep.equal([
+
+      expect(this.modelList.getSize()).to.equal(4);
+      expect(this.modelList.getAt(0)).to.equal(model0);
+      expect(this.modelList.getAt(1)).to.equal(model1);
+      expect(this.modelList.getAt(2)).to.equal(model2);
+
+      expect(
+        this.modelList.get().map( (model) => model.valueNode.get() )
+      ).to.deep.equal([
         'value3a',
         'value2',
         'value4',
+        'value5',
       ]);
     });
 
