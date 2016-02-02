@@ -8,6 +8,7 @@
     "prebuild": "npm run clean",
     "build": "babel src --out-dir build",
     "clean": "rm -rf build/* coverage/*",
+    "test-watch": "mocha --watch --opts .mocharc specs/index.js",
     "test": "mocha --opts .mocharc specs/index.js",
     "deps": "madge --config .madgerc --image build/deps.png src",
     "cover": "babel-node node_modules/isparta/bin/isparta cover --report text --report html node_modules/mocha/bin/_mocha -- --reporter dot specs/index.js"

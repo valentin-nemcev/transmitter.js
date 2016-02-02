@@ -1,7 +1,12 @@
 export default {
   // TODO: Convey lazy vs eager value mapping in names
-  toSetToSetUpdate(set) {
-    return new SetToSetUpdatePayload(this, set);
+  // replace SetTo... and MapTo... with ValuesTo... and KeysTo...
+  toSetToSetUpdate(map) {
+    return new SetToSetUpdatePayload(this, map);
+  },
+
+  toSetToListUpdate(map) {
+    return new SetToListUpdatePayload(this, map);
   },
 
   toSetToMapUpdate(map) {
@@ -31,6 +36,28 @@ class SetToSetUpdatePayload {
       target.moveAfter(targetKey, prevKey);
       target.visitKey(targetKey);
       prevKey = targetKey;
+    }
+    target.removeUnvisitedKeys();
+    return this;
+  }
+}
+
+
+class SetToListUpdatePayload {
+  constructor(source, map) {
+    this.source = source;
+    this.map = map;
+  }
+
+  deliver(target) {
+    let key = 0;
+    // Use set values as keys
+    for (const [, value] of this.source) {
+      if (!target.hasAt(key)) {
+        target.setAt(key, this.map.call(null, value));
+      }
+      target.visitKey(key);
+      key++;
     }
     target.removeUnvisitedKeys();
     return this;

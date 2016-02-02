@@ -1,79 +1,31 @@
+import defineClass from '../defineClass';
+
 import SourceTargetNode from './SourceTargetNode';
+
 import {
   createListPayload, createEmptyListPayload,
 } from '../payloads';
 
+import listPrototype from './listPrototype';
 
-export default class List extends SourceTargetNode {
+import {createList} from './_map';
 
-  processPayload(payload) {
-    payload.deliver(this);
-    return createListPayload(this);
-  }
 
-  createPlaceholderPayload() {
-    return createEmptyListPayload();
-  }
+export default defineClass('ListNode')
+  .includes(SourceTargetNode.prototype)
 
-  constructor() {
-    super();
-    this.list = [];
-  }
+  .propertyInitializer('_list', createList)
+  .includes(listPrototype)
 
-  get() {
-    return this.list.slice();
-  }
 
-  [Symbol.iterator]() {
-    return this.list.entries();
-  }
+  .methods({
+    processPayload(payload) {
+      payload.deliver(this);
+      return createListPayload(this);
+    },
 
-  getAt(pos) {
-    return this.list[pos];
-  }
-
-  getSize() {
-    return this.list.length;
-  }
-
-  set(list) {
-    this.list.length = 0;
-    this.list.push(...list);
-    return this;
-  }
-
-  setIterator(it) {
-    this.list.length = 0;
-    for (const [, el] of it) this.list.push(el);
-    return this;
-  }
-
-  setAt(el, pos) {
-    this.list[pos] = el;
-    return this;
-  }
-
-  addAt(el, pos = this.list.length) {
-    if (pos === this.list.length) {
-      this.list.push(el);
-    } else {
-      this.list.splice(pos, 0, el);
-    }
-    return this;
-  }
-
-  append(el) {
-    return this.addAt(el);
-  }
-
-  removeAt(pos) {
-    this.list.splice(pos, 1);
-    return this;
-  }
-
-  move(fromPos, toPos) {
-    this.list.splice(toPos, 0, this.list.splice(fromPos, 1)[0]);
-    return this;
-  }
-
-}
+    createPlaceholderPayload() {
+      return createEmptyListPayload();
+    },
+  })
+  .buildConstructor();
