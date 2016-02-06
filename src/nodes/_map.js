@@ -55,11 +55,24 @@ class List {
     return this;
   }
 
+  // TODO: Fix name
   *iterateAndClearUnvisitedKeys() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
       if (!entry.visited) yield i;
       entry.visited = false;
+    }
+  }
+
+  removeUnvisited() {
+    for (let i = 0; i < this.entries.length; i++) {
+      const entry = this.entries[i];
+      if (entry.visited) {
+        entry.visited = false;
+      } else {
+        this.remove(i);
+        i--;
+      }
     }
   }
 }

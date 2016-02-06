@@ -73,9 +73,7 @@ export default defineClass('orderedSetPrototype')
     },
 
     removeUnvisitedKeys() {
-      const indicesToRemove =
-        Array.from(this._list.iterateAndClearUnvisitedKeys());
-      for (const index of indicesToRemove) this.removeAt(index);
+      this._list.removeUnvisited();
       return this;
     },
 
