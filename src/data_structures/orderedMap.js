@@ -105,7 +105,7 @@ class OrderedMap {
     return this;
   }
 
-  *iterateAndClearUnvisitedKeys() {
+  *clearVisitedAndIterateUnvisited() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
       if (!entry.visited) yield entry.key;

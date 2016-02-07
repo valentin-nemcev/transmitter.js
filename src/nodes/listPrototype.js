@@ -67,12 +67,12 @@ export default defineClass('orderedSetPrototype')
     },
 
 
-    visitKey(index) {
+    visitAt(index) {
       this._list.visit(index);
       return this;
     },
 
-    removeUnvisitedKeys() {
+    removeUnvisited() {
       this._list.removeUnvisited();
       return this;
     },

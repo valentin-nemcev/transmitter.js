@@ -34,10 +34,10 @@ class SetToSetUpdatePayload {
         target.add(targetKey);
       }
       target.moveAfter(targetKey, prevKey);
-      target.visitKey(targetKey);
+      target.visitAt(targetKey);
       prevKey = targetKey;
     }
-    target.removeUnvisitedKeys();
+    target.removeUnvisited();
     return this;
   }
 }
@@ -56,10 +56,10 @@ class SetToListUpdatePayload {
       if (!target.hasAt(key)) {
         target.setAt(key, this.map.call(null, value));
       }
-      target.visitKey(key);
+      target.visitAt(key);
       key++;
     }
-    target.removeUnvisitedKeys();
+    target.removeUnvisited();
     return this;
   }
 }
@@ -79,10 +79,10 @@ class SetToMapUpdatePayload {
         target.setAt(key, this.map.call(null, key));
       }
       target.moveAfter(key, prevKey);
-      target.visitKey(key);
+      target.visitAt(key);
       prevKey = key;
     }
-    target.removeUnvisitedKeys();
+    target.removeUnvisited();
     return this;
   }
 }
@@ -102,10 +102,10 @@ class MapToMapUpdatePayload {
         target.setAt(key, this.map.call(null, value, key));
       }
       target.moveAfter(key, prevKey);
-      target.visitKey(key);
+      target.visitAt(key);
       prevKey = key;
     }
-    target.removeUnvisitedKeys();
+    target.removeUnvisited();
     return this;
   }
 }

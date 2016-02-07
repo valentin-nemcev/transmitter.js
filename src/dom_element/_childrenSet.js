@@ -71,7 +71,7 @@ class ChildrenSet {
     return this;
   }
 
-  *iterateAndClearUnvisitedKeys() {
+  *clearVisitedAndIterateUnvisited() {
     for (const element of Array.from(this.element.childNodes)) {
       if (!element.visited) yield element;
       element.visited = false;

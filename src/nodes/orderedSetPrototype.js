@@ -54,14 +54,14 @@ export default defineClass('orderedSetPrototype')
     },
 
 
-    visitKey(key) {
+    visitAt(key) {
       this._set.visit(key);
       return this;
     },
 
-    removeUnvisitedKeys() {
+    removeUnvisited() {
       const keysToRemove =
-        Array.from(this._set.iterateAndClearUnvisitedKeys());
+        Array.from(this._set.clearVisitedAndIterateUnvisited());
       for (const key of keysToRemove) this.remove(key);
       return this;
     },

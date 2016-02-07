@@ -61,12 +61,12 @@ export default class Optional extends SourceTargetNode {
   }
 
 
-  visitKey(key) {
+  visitAt(key) {
     if (this.key === key) this.visited = true;
     return this;
   }
 
-  removeUnvisitedKeys() {
+  removeUnvisited() {
     if (!this.visited) {
       this.value = null;
       this.key = null;

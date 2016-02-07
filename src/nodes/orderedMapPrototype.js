@@ -65,14 +65,14 @@ export default defineClass('orderedMapPrototype')
     },
 
 
-    visitKey(key) {
+    visitAt(key) {
       this._map.visit(key);
       return this;
     },
 
-    removeUnvisitedKeys() {
+    removeUnvisited() {
       const keysToRemove =
-        Array.from(this._map.iterateAndClearUnvisitedKeys());
+        Array.from(this._map.clearVisitedAndIterateUnvisited());
       for (const key of keysToRemove) this.removeAt(key);
       return this;
     },
