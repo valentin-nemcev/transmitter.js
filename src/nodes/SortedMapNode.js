@@ -3,7 +3,7 @@ import {
   createMapPayload, createEmptyMapPayload,
 } from '../payloads';
 
-import {createSortedMap} from './_map';
+import createSortedMap from '../data_structures/sortedMap';
 
 export default class SortedMap extends SourceTargetNode {
 

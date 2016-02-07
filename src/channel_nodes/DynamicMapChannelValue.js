@@ -6,7 +6,7 @@ import {createEmptyMapPayload} from '../payloads';
 
 import orderedMapPrototype from '../nodes/orderedMapPrototype';
 
-import {createOrderedMap} from '../nodes/_map';
+import createOrderedMap from '../data_structures/orderedMap';
 
 
 export default defineClass('DynamicMapChannelValue')

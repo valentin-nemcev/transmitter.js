@@ -8,7 +8,7 @@ import {
 
 import orderedSetPrototype from './orderedSetPrototype';
 
-import {createOrderedMap} from './_map';
+import createOrderedMap from '../data_structures/orderedMap';
 
 export default defineClass('OrderedSetNode')
   .includes(SourceTargetNode.prototype)

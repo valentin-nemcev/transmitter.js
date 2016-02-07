@@ -8,7 +8,7 @@ import {
 
 import listPrototype from './listPrototype';
 
-import {createList} from './_map';
+import createList from '../data_structures/list';
 
 
 export default defineClass('ListNode')

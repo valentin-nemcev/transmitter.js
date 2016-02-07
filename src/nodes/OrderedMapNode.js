@@ -8,7 +8,7 @@ import {
 
 import orderedMapPrototype from './orderedMapPrototype';
 
-import {createOrderedMap} from './_map';
+import createOrderedMap from '../data_structures/orderedMap';
 
 import nullChangeListener from './_nullChangeListener';
 
