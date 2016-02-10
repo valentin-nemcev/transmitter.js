@@ -1,35 +1,36 @@
 export default {
   // TODO: Convey lazy vs eager value mapping in names
   // replace SetTo... and MapTo... with ValuesTo... and KeysTo...
-  toSetToSetUpdate(map) {
-    return new SetToSetUpdatePayload(this, map);
+  updateSetByValue(mapFn) {
+    return new UpdateSetByValuePayload(this, mapFn);
   },
 
-  toSetToListUpdate(map) {
-    return new SetToListUpdatePayload(this, map);
+  updateListByIndex(mapFn) {
+    return new UpdateListByIndexPayload(this, mapFn);
   },
 
-  toSetToMapUpdate(map) {
-    return new SetToMapUpdatePayload(this, map);
+  updateMapByValue(mapFn) {
+    return new UpdateMapByValuePayload(this, mapFn);
   },
 
-  toMapToMapUpdate(map) {
-    return new MapToMapUpdatePayload(this, map);
+  updateMapByKey(mapFn) {
+    return new UpdateMapByKeyPayload(this, mapFn);
   },
 };
 
 
-class SetToSetUpdatePayload {
-  constructor(source, map) {
+class UpdateSetByValuePayload {
+  constructor(source, mapFn) {
     this.source = source;
-    this.map = map;
+    this.mapFn = mapFn;
   }
 
   deliver(target) {
+    const mapFn = this.mapFn;
     let prevKey = null;
     // Use set values as keys
     for (const [, key] of this.source) {
-      const targetKey = this.map.call(null, key);
+      const targetKey = mapFn(key);
       if (!target.has(targetKey)) {
         target.add(targetKey);
       }
@@ -43,18 +44,18 @@ class SetToSetUpdatePayload {
 }
 
 
-class SetToListUpdatePayload {
-  constructor(source, map) {
+class UpdateListByIndexPayload {
+  constructor(source, mapFn) {
     this.source = source;
-    this.map = map;
+    this.mapFn = mapFn;
   }
 
   deliver(target) {
+    const mapFn = this.mapFn;
     let key = 0;
-    // Use set values as keys
     for (const [, value] of this.source) {
       if (!target.hasAt(key)) {
-        target.setAt(key, this.map.call(null, value));
+        target.setAt(key, mapFn(value));
       }
       target.visitAt(key);
       key++;
@@ -65,18 +66,19 @@ class SetToListUpdatePayload {
 }
 
 
-class SetToMapUpdatePayload {
-  constructor(source, map) {
+class UpdateMapByValuePayload {
+  constructor(source, mapFn) {
     this.source = source;
-    this.map = map;
+    this.mapFn = mapFn;
   }
 
   deliver(target) {
+    const mapFn = this.mapFn;
     let prevKey = null;
     // Use set values as keys
     for (const [, key] of this.source) {
       if (!target.hasAt(key)) {
-        target.setAt(key, this.map.call(null, key));
+        target.setAt(key, mapFn(key));
       }
       target.moveAfter(key, prevKey);
       target.visitAt(key);
@@ -88,18 +90,18 @@ class SetToMapUpdatePayload {
 }
 
 
-class MapToMapUpdatePayload {
-  constructor(source, map) {
+class UpdateMapByKeyPayload {
+  constructor(source, mapFn) {
     this.source = source;
-    this.map = map;
+    this.mapFn = mapFn;
   }
 
   deliver(target) {
+    const mapFn = this.mapFn;
     let prevKey = null;
-    // Use set values as keys
     for (const [key, value] of this.source) {
       if (!target.hasAt(key)) {
-        target.setAt(key, this.map.call(null, value, key));
+        target.setAt(key, mapFn(value, key));
       }
       target.moveAfter(key, prevKey);
       target.visitAt(key);

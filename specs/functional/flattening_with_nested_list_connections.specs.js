@@ -32,7 +32,7 @@ describe('Flattening with nested list connections', function() {
       new Transmitter.Channels.NestedBidirectionalChannel()
         .inForwardDirection()
         .withOriginDerived(this.modelList, this.viewMap)
-        .useSetToMapUpdate()
+        .updateMapByValue()
         .withMapOrigin( (model) => new View(model) )
         .withOriginDerivedChannel( (model, view) =>
           new Transmitter.Channels.BidirectionalChannel()

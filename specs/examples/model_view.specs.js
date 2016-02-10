@@ -36,7 +36,7 @@ describe('Model with view', function() {
         new Transmitter.Channels.NestedBidirectionalChannel()
           .inForwardDirection()
           .withOriginDerived(this.modelSet, this.viewMap)
-          .useSetToMapUpdate()
+          .updateMapByValue()
           .withMapOrigin( () => new View() )
           .withOriginDerivedChannel(
             (model, view) =>
@@ -50,7 +50,7 @@ describe('Model with view', function() {
         new Transmitter.Channels.BidirectionalChannel()
           .inForwardDirection()
           .withOriginDerived(this.viewMap, this.elementSet)
-          .useSetToSetUpdate()
+          .updateSetByValue()
           .withMapOrigin( (view) => view.element )
           .init(tr);
       }

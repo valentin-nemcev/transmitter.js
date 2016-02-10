@@ -82,13 +82,13 @@ BidirectionalChannel.prototype = defineClass()
       return this;
     },
 
-    useSetToMapUpdate() {
-      this._updateType = 'SetToMap';
+    updateMapByValue() {
+      this._updateType = 'updateMapByValue';
       return this;
     },
 
-    useSetToSetUpdate() {
-      this._updateType = 'SetToSet';
+    updateSetByValue() {
+      this._updateType = 'updateSetByValue';
       return this;
     },
   })
@@ -98,9 +98,8 @@ BidirectionalChannel.prototype = defineClass()
 
 function createTransform(map, updateType) {
   if (updateType) {
-    const updateMethodName = 'to' + updateType + 'Update';
     return (payload, tr) => {
-      return payload[updateMethodName]((...args) => map(...args, tr));
+      return payload[updateType]((...args) => map(...args, tr));
     };
   } else {
     return (payload, tr) =>

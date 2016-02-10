@@ -43,7 +43,7 @@ describe('Model serialization', function() {
             .fromSource(this.serializedValueMap)
             .toTarget(this.modelMap)
             .withTransform(
-              (payload) => payload.toMapToMapUpdate( () => new Model() )
+              (payload) => payload.updateMapByKey( () => new Model() )
             )
             .init(tr);
 
@@ -53,7 +53,7 @@ describe('Model serialization', function() {
             .toTarget(this.serializedValueMap)
             .withTransform(
               (payload) =>
-                payload.toMapToMapUpdate(
+                payload.updateMapByKey(
                   (model, id) => createSerializedValue(id)
                 )
             )
@@ -69,7 +69,7 @@ describe('Model serialization', function() {
                 if (payloads.length == null) return payloads;
                 const [origin, derived] = payloads;
                 return origin.zip(derived)
-                  .toSetToMapUpdate(
+                  .updateMapByValue(
                     ([origin, derived]) =>
                       createSerializeModelChannel(origin, derived)
                   );
@@ -88,7 +88,7 @@ describe('Model serialization', function() {
             .fromSource(this.serializedMap)
             .toTarget(this.serializedValueMap)
             .withTransform(
-              (payload) => payload.toMapToMapUpdate(
+              (payload) => payload.updateMapByKey(
                 (value, id) => createSerializedValue(id)
               )
             )
@@ -186,7 +186,7 @@ describe('Model serialization', function() {
             .fromSource(this.serializedValueList)
             .toTarget(this.modelList)
             .withTransform(
-              (payload) => payload.toSetToListUpdate( () => new Model() )
+              (payload) => payload.updateListByIndex( () => new Model() )
             )
             .init(tr);
 
@@ -196,7 +196,7 @@ describe('Model serialization', function() {
             .toTarget(this.serializedValueList)
             .withTransform(
               (payload) =>
-                payload.toSetToListUpdate(
+                payload.updateListByIndex(
                   (model, i) => createSerializedValue(i)
                 )
             )
@@ -212,7 +212,7 @@ describe('Model serialization', function() {
                 if (payloads.length == null) return payloads;
                 const [origin, derived] = payloads;
                 return origin.zip(derived)
-                  .toSetToMapUpdate(
+                  .updateMapByValue(
                     ([origin, derived]) =>
                       createSerializeModelChannel(origin, derived)
                   );
@@ -231,7 +231,7 @@ describe('Model serialization', function() {
             .fromSource(this.serializedList)
             .toTarget(this.serializedValueList)
             .withTransform(
-              (payload) => payload.toSetToListUpdate(
+              (payload) => payload.updateListByIndex(
                 (value, i) => createSerializedValue(i)
               )
             )
