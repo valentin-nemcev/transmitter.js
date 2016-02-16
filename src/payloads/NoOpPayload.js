@@ -1,5 +1,6 @@
 import conversionMethods from './conversionMethods';
 import setActionMethods from './setActionMethods';
+import mapActionMethods from './mapActionMethods';
 
 export class NoOpPayload {
 
@@ -36,6 +37,7 @@ export class NoOpPayload {
 
 const methods = [].concat.apply([], [
   setActionMethods,
+  mapActionMethods,
   conversionMethods,
 ].map(Object.keys));
 

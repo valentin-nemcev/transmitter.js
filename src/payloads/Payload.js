@@ -9,6 +9,7 @@ import flattenMethods from './flattenMethods';
 import conversionMethods from './conversionMethods';
 import updateMethods from './updateMethods';
 import setActionMethods from './setActionMethods';
+import mapActionMethods from './mapActionMethods';
 
 export {zipPayloads};
 
@@ -19,7 +20,8 @@ Object.assign(
   flattenMethods,
   conversionMethods,
   updateMethods,
-  setActionMethods
+  setActionMethods,
+  mapActionMethods
 );
 
 Object.assign(PayloadBase.prototype, {

@@ -87,6 +87,11 @@ BidirectionalChannel.prototype = defineClass()
       return this;
     },
 
+    updateMapByKey() {
+      this._updateType = 'updateMapByKey';
+      return this;
+    },
+
     updateSetByValue() {
       this._updateType = 'updateSetByValue';
       return this;
