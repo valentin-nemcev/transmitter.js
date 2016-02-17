@@ -52,8 +52,7 @@ BidirectionalChannel.prototype = defineClass()
     return this;
   })
 
-  .setOnceLazyProperty('_updateType', () => null,
-                       {title: 'UpdateType'})
+  .setOnceLazyProperty('_updateType', () => null, {title: 'UpdateType'})
 
   .methods({
     withTransformOrigin(transform) {

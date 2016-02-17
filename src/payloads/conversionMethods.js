@@ -13,6 +13,10 @@ export default {
     return new SplitValuesPayload(this);
   },
 
+  splitEntries() {
+    return new SplitEntriesPayload(this);
+  },
+
   valuesToEntries() {
     return new ValuesToEntriesPayload(this);
   },
@@ -57,6 +61,20 @@ class SplitValuesPayload extends PayloadBase {
     let i = 0;
     for (const [, value] of this.source) {
       for (const nestedValue of value) yield [i++, nestedValue];
+    }
+  }
+}
+
+
+class SplitEntriesPayload extends PayloadBase {
+  constructor(source) {
+    super();
+    this.source = source;
+  }
+
+  *[Symbol.iterator]() {
+    for (const [, value] of this.source) {
+      for (const nestedEntry of value) yield nestedEntry;
     }
   }
 }
