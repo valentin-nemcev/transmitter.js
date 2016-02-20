@@ -1,3 +1,5 @@
+import keysEqual from '../keysEqual';
+
 class OrderedMap {
 
   constructor() {
@@ -17,7 +19,7 @@ class OrderedMap {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
 
-      if (key === entry.key) {
+      if (keysEqual(key, entry.key)) {
         entry.value = value;
         return this;
       }
@@ -29,7 +31,7 @@ class OrderedMap {
   remove(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (key === entry.key) {
+      if (keysEqual(key, entry.key)) {
         this.entries.splice(i, 1);
         return entry.value;
       }
@@ -37,12 +39,12 @@ class OrderedMap {
   }
 
   move(key, afterKey) {
-    if (key === afterKey) return this;
+    if (keysEqual(key, afterKey)) return this;
     let fromIndex = null;
     let toIndex = null;
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (key === entry.key) {
+      if (keysEqual(key, entry.key)) {
         fromIndex = i;
         break;
       }
@@ -53,7 +55,7 @@ class OrderedMap {
     } else {
       for (let i = 0; i < this.entries.length; i++) {
         const entry = this.entries[i];
-        if (afterKey === entry.key) {
+        if (keysEqual(afterKey, entry.key)) {
           toIndex = i;
           break;
         }
@@ -70,14 +72,14 @@ class OrderedMap {
   get(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (key === entry.key) return entry.value;
+      if (keysEqual(key, entry.key)) return entry.value;
     }
   }
 
   has(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (key === entry.key) return true;
+      if (keysEqual(key, entry.key)) return true;
     }
     return false;
   }
@@ -97,7 +99,7 @@ class OrderedMap {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
 
-      if (key === entry.key) {
+      if (keysEqual(key, entry.key)) {
         entry.visited = true;
         return this;
       }
