@@ -47,7 +47,6 @@ export default class ConnectionMessage {
   }
 
   createPlaceholderConnectionMessage(sourceChannelNode) {
-    // return ConnectionMessage.createNext(this, sourceChannelNode);
     return PlaceholderConnectionMessage.createNext(this, sourceChannelNode);
   }
 
