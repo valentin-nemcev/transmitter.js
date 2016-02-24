@@ -1,7 +1,5 @@
 import SourceTargetNode from './SourceTargetNode';
-import {
-  createValuePayload, createEmptyValuePayload,
-} from '../payloads';
+import {createValuePayload} from '../payloads';
 
 
 export default class ValueNode extends SourceTargetNode {
@@ -10,10 +8,6 @@ export default class ValueNode extends SourceTargetNode {
   processPayload(payload) {
     payload.deliver(this);
     return createValuePayload(this);
-  }
-
-  createPlaceholderPayload() {
-    return createEmptyValuePayload();
   }
 
   get() { return this.value; }

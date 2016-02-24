@@ -1,18 +1,12 @@
 import SourceTargetNode from './SourceTargetNode';
 
-import {
-  createListPayload, createEmptyListPayload,
-} from '../payloads';
+import {createListPayload} from '../payloads';
 
 export default class Optional extends SourceTargetNode {
 
   processPayload(payload) {
     payload.deliver(this);
     return createListPayload(this);
-  }
-
-  createPlaceholderPayload() {
-    return createEmptyListPayload();
   }
 
 

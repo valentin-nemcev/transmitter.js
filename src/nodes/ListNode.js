@@ -2,9 +2,7 @@ import defineClass from '../defineClass';
 
 import SourceTargetNode from './SourceTargetNode';
 
-import {
-  createListPayload, createEmptyListPayload,
-} from '../payloads';
+import {createListPayload} from '../payloads';
 
 import listPrototype from './listPrototype';
 
@@ -22,10 +20,6 @@ export default defineClass('ListNode')
     processPayload(payload) {
       payload.deliver(this);
       return createListPayload(this);
-    },
-
-    createPlaceholderPayload() {
-      return createEmptyListPayload();
     },
   })
   .buildConstructor();

@@ -22,10 +22,6 @@ export default class Connection {
     return this;
   }
 
-  getPlaceholderPayload() {
-    return this.transform.call(null, this.source.getPlaceholderPayload());
-  }
-
   receiveMessage(message) {
     this.target.receiveMessage(message.addTransform(this.transform));
     return this;

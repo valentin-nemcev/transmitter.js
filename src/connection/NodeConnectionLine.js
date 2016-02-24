@@ -26,10 +26,6 @@ export default class NodeConnectionLine {
     return message.directionMatches(this.direction);
   }
 
-  getPlaceholderPayload() {
-    return this.nodeSource.getPlaceholderPayload();
-  }
-
   receiveMessage(message) {
     message.sendToConnectionMerger(this, this.target);
     return this;

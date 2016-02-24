@@ -1,3 +1,5 @@
+import {getNoOpPayload} from '../payloads';
+
 export default class ChannelNodeTarget {
 
   constructor(channelNode) {
@@ -10,13 +12,10 @@ export default class ChannelNodeTarget {
 
     message.addTargetPoint(this);
 
-    const payload = this.getPlaceholderPayload();
-    if (payload != null) {
-      this.channelNode.routeConnectionMessage(
-        message.createPlaceholderConnectionMessage(this.channelNode),
-        payload
-      );
-    }
+    this.channelNode.routeConnectionMessage(
+      message.createPlaceholderConnectionMessage(this.channelNode),
+      getNoOpPayload()
+    );
     return this;
   }
 
@@ -29,10 +28,6 @@ export default class ChannelNodeTarget {
   receiveQuery(query) {
     if (this.source != null) this.source.receiveQuery(query);
     return this;
-  }
-
-  getPlaceholderPayload() {
-    return this.source.getPlaceholderPayload();
   }
 
   receiveConnectionMessage(connectionMessage) {

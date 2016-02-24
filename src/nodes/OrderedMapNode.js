@@ -2,9 +2,7 @@ import defineClass from '../defineClass';
 
 import SourceTargetNode from './SourceTargetNode';
 
-import {
-  createMapPayload, createEmptyMapPayload,
-} from '../payloads';
+import {createMapPayload} from '../payloads';
 
 import orderedMapPrototype from './orderedMapPrototype';
 
@@ -23,10 +21,6 @@ export default defineClass('OrderedMapNode')
     processPayload(payload) {
       payload.deliver(this);
       return createMapPayload(this);
-    },
-
-    createPlaceholderPayload() {
-      return createEmptyMapPayload();
     },
   })
   .buildConstructor();

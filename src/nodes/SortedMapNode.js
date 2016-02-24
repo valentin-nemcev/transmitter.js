@@ -1,7 +1,5 @@
 import SourceTargetNode from './SourceTargetNode';
-import {
-  createMapPayload, createEmptyMapPayload,
-} from '../payloads';
+import {createMapPayload} from '../payloads';
 
 import createSortedMap from '../data_structures/sortedMap';
 
@@ -12,9 +10,6 @@ export default class SortedMap extends SourceTargetNode {
     return createMapPayload(this);
   }
 
-  createPlaceholderPayload() {
-    return createEmptyMapPayload();
-  }
 
   constructor() {
     super();

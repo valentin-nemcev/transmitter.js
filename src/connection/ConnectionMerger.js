@@ -1,7 +1,5 @@
 import {inspect} from 'util';
 
-import {getNoOpPayload} from '../payloads';
-
 
 export default class ConnectionMerger {
 
@@ -33,8 +31,6 @@ export default class ConnectionMerger {
     this.sourceNodesToLines.forEach( (line) => line.disconnect(message) );
     return this;
   }
-
-  getPlaceholderPayload() { return getNoOpPayload(); }
 
   sendMessage(message) {
     this.target.receiveMessage(message);

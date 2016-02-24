@@ -2,9 +2,7 @@ import defineClass from '../defineClass';
 
 import SourceTargetNode from './SourceTargetNode';
 
-import {
-  createSetPayload, createEmptySetPayload,
-} from '../payloads';
+import {createSetPayload} from '../payloads';
 
 import orderedSetPrototype from './orderedSetPrototype';
 
@@ -21,10 +19,6 @@ export default defineClass('OrderedSetNode')
     processPayload(payload) {
       payload.deliver(this);
       return createSetPayload(this);
-    },
-
-    createPlaceholderPayload() {
-      return createEmptySetPayload();
     },
   })
   .buildConstructor();

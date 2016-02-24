@@ -35,6 +35,4 @@ export default class ConnectionDuplicator {
     this.source.receiveQuery(query);
     return this;
   }
-
-  getPlaceholderPayload() { return this.source.getPlaceholderPayload(); }
 }
