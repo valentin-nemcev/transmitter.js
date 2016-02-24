@@ -1,3 +1,8 @@
+function createEntry(value) {
+  if (value === undefined) value = null;
+  return {value, touched: false};
+}
+
 class List {
   constructor() {
     this.entries = [];
@@ -10,16 +15,22 @@ class List {
 
   add(index, value) {
     if (index == null || index === this.entries.length) {
-      this.entries.push({value, visited: false});
+      this.entries.push(createEntry(value));
     } else {
-      this.entries.splice(index, 0, {value, visited: false});
+      this.entries.splice(index, 0, createEntry(value));
     }
-    return this;
+    return value;
   }
 
   set(index, value) {
-    this.entries[index] = {value, visited: false};
-    return this;
+    const len = this.entries.length;
+    if (index < 0 || index >= len) {
+      throw new Error(`List index out of bounds: ${index} of ${len}`);
+    }
+    const entry = this.entries[index];
+    const prevValue = entry.value;
+    entry.value = value;
+    return prevValue;
   }
 
   remove(index) {
@@ -50,24 +61,24 @@ class List {
     return this.entries.length;
   }
 
-  visit(index) {
-    this.entries[index].visited = true;
+  touch(index) {
+    this.entries[index].touched = true;
     return this;
   }
 
-  *clearVisitedAndIterateUnvisited() {
+  *clearTouchedAndIterateUntouched() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (!entry.visited) yield i;
-      entry.visited = false;
+      if (!entry.touched) yield i;
+      entry.touched = false;
     }
   }
 
-  removeUnvisited() {
+  removeUntouched() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (entry.visited) {
-        entry.visited = false;
+      if (entry.touched) {
+        entry.touched = false;
       } else {
         this.remove(i);
         i--;

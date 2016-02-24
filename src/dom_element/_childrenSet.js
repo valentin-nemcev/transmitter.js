@@ -64,17 +64,17 @@ class ChildrenSet {
   }
 
 
-  visit(element) {
+  touch(element) {
     if (this.has(element)) {
-      element.visited = true;
+      element.touched = true;
     }
     return this;
   }
 
-  *clearVisitedAndIterateUnvisited() {
+  *clearTouchedAndIterateUntouched() {
     for (const element of Array.from(this.element.childNodes)) {
-      if (!element.visited) yield element;
-      element.visited = false;
+      if (!element.touched) yield element;
+      element.touched = false;
     }
   }
 }

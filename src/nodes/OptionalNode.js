@@ -61,26 +61,26 @@ export default class Optional extends SourceTargetNode {
   }
 
 
-  ensureAndVisitValueAtAfter(key, afterKey, valueFn) {
+  updateValueOnceAtAfter(key, afterKey, valueFn) {
     if (!this.hasAt(key)) {
       this.setAt(key, valueFn());
     }
     this.moveAfter(key, afterKey);
-    this.visitUnchangedAt(key);
+    this.touchAt(key);
     return this;
   }
 
 
-  visitUnchangedAt(key) {
-    if (this.key === key) this.visited = true;
+  touchAt(key) {
+    if (this.key === key) this.touched = true;
     return this;
   }
 
-  removeUnvisited() {
-    if (!this.visited) {
+  removeUntouched() {
+    if (!this.touched) {
       this.value = null;
       this.key = null;
     }
-    this.visited = false;
+    this.touched = false;
   }
 }

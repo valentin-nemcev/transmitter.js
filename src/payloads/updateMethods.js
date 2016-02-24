@@ -34,10 +34,10 @@ class UpdateSetByValuePayload {
         target.add(targetKey);
       }
       target.moveAfter(targetKey, prevKey);
-      target.visitAt(targetKey);
+      target.touchAt(targetKey);
       prevKey = targetKey;
     }
-    target.removeUnvisited();
+    target.removeUntouched();
     return this;
   }
 }
@@ -54,12 +54,12 @@ class UpdateListByIndexPayload {
     let key = 0;
     for (const [, value] of this.source) {
       if (!target.hasAt(key)) {
-        target.setAt(key, mapFn(value));
+        target.addAt(key, mapFn(value));
       }
-      target.visitAt(key);
+      target.touchAt(key);
       key++;
     }
-    target.removeUnvisited();
+    target.removeUntouched();
     return this;
   }
 }
@@ -77,12 +77,12 @@ class UpdateMapByValuePayload {
     // Use set values as keys
     for (const [, key] of this.source) {
       /* eslint-disable no-loop-func */
-      target.ensureAndVisitValueAtAfter(key, prevKey, () => mapFn(key) );
+      target.updateValueOnceAtAfter(key, prevKey, () => mapFn(key) );
       /* eslint-enable no-loop-func */
 
       prevKey = key;
     }
-    target.removeUnvisited();
+    target.removeUntouched();
     return this;
   }
 }
@@ -99,12 +99,11 @@ class UpdateMapByKeyPayload {
     let prevKey = null;
     for (const [key, value] of this.source) {
       /* eslint-disable no-loop-func */
-      target.ensureAndVisitValueAtAfter(key, prevKey,
-                                        () => mapFn(value, key) );
+      target.updateValueOnceAtAfter(key, prevKey, () => mapFn(value, key) );
       /* eslint-enable no-loop-func */
       prevKey = key;
     }
-    target.removeUnvisited();
+    target.removeUntouched();
     return this;
   }
 }

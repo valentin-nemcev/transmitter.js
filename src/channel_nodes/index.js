@@ -3,13 +3,11 @@ import {inspect} from 'util';
 export ChannelNode from './ChannelNode';
 
 import DynamicListChannelValue     from './DynamicListChannelValue';
-import DynamicOptionalChannelValue from './DynamicOptionalChannelValue';
 import DynamicSetChannelValue      from './DynamicSetChannelValue';
 import DynamicMapChannelValue      from './DynamicMapChannelValue';
 
 export {
   DynamicListChannelValue,
-  DynamicOptionalChannelValue,
   DynamicSetChannelValue,
   DynamicMapChannelValue,
 };
@@ -29,7 +27,7 @@ import OrderedMapNode from '../nodes/OrderedMapNode';
 export function getDynamicChannelNodeConstructorFor(constructor) {
   switch (constructor) {
   case OptionalNode:
-    return DynamicOptionalChannelValue;
+    return DynamicMapChannelValue;
   case ListNode:
     return DynamicListChannelValue;
   case OrderedSetNode:

@@ -40,12 +40,10 @@ export default defineClass('orderedMapPrototype')
     },
 
     setAt(key, value) {
-      const prevValue = this._map.get(key);
+      const prevValue = this._map.set(key, value);
       if (prevValue !== undefined) {
-        this._map.set(key, value);
         this.changeListener.notifyUpdate(key, prevValue, value);
       } else {
-        this._map.set(key, value);
         this.changeListener.notifyAdd(key, value);
       }
       return this;
@@ -65,25 +63,26 @@ export default defineClass('orderedMapPrototype')
     },
 
 
-    ensureAndVisitValueAtAfter(key, afterKey, valueFn) {
-      if (!this.hasAt(key)) {
+    updateValueOnceAtAfter(key, afterKey, valueFn) {
+      if (this.hasAt(key)) {
+        this.changeListener.notifyKeep(key, this.getAt(key));
+      } else {
         this.setAt(key, valueFn());
       }
       this.moveAfter(key, afterKey);
-      this.visitUnchangedAt(key);
+      this.touchAt(key);
       return this;
     },
 
 
-    visitUnchangedAt(key) {
-      this._map.visit(key);
-      this.changeListener.notifyKeep(key, this.getAt(key));
+    touchAt(key) {
+      this._map.touch(key);
       return this;
     },
 
-    removeUnvisited() {
+    removeUntouched() {
       const keysToRemove =
-        Array.from(this._map.clearVisitedAndIterateUnvisited());
+        Array.from(this._map.clearTouchedAndIterateUntouched());
       for (const key of keysToRemove) this.removeAt(key);
       return this;
     },

@@ -1,41 +1,26 @@
-import ChannelNode from './ChannelNode';
+import defineClass from '../defineClass';
+
+import DynamicChannelNode from './DynamicChannelNode';
+
 import {createEmptyListPayload} from '../payloads';
 
+import listPrototype from '../nodes/listPrototype';
 
-export default class DynamicListChannelValue extends ChannelNode {
+import createList from '../data_structures/list';
 
-  constructor(type, createChannel) {
-    super();
 
-    if (type !== 'sources' && type !== 'targets') {
-      throw new Error(`Unknown DynamicListChannelValue type: ${type}`);
-    }
+export default defineClass('DynamicListChannelValue')
 
-    this.type = type;
-    this.createChannel = createChannel;
-  }
+  .includes(DynamicChannelNode.prototype)
+  .propertyInitializer('_list', createList)
+  .includes(listPrototype)
 
-  get() { return this.channel; }
 
-  set(newNodes) {
-    const oldChannel = this.channel;
-    if (oldChannel != null) oldChannel.disconnect(this.message);
+  .methods({
 
-    const newChannel = this.createChannel.call(null, newNodes);
-    this.channel = newChannel;
+    getPlaceholderPayload() {
+      return createEmptyListPayload();
+    },
 
-    if (newChannel != null) newChannel.connect(this.message);
-    return this;
-  }
-
-  setIterator(newNodes) {
-    return this.set(Array.from(newNodes).map( ([, value]) => value ));
-  }
-
-  getPlaceholderPayload() {
-    return createEmptyListPayload();
-  }
-
-  getSourcePayload() { return this.type === 'sources' ? this.payload : null; }
-  getTargetPayload() { return this.type === 'targets' ? this.payload : null; }
-}
+  })
+  .buildConstructor();

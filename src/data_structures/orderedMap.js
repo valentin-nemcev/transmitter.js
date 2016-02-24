@@ -1,5 +1,10 @@
 import keysEqual from '../keysEqual';
 
+function createEntry(key, value) {
+  if (value === undefined) value = null;
+  return {key, value, touched: false};
+}
+
 class OrderedMap {
 
   constructor() {
@@ -20,12 +25,13 @@ class OrderedMap {
       const entry = this.entries[i];
 
       if (keysEqual(key, entry.key)) {
+        const prevValue = entry.value;
         entry.value = value;
-        return this;
+        return prevValue;
       }
     }
-    this.entries.push({key, value, visited: false});
-    return this;
+    this.entries.push(createEntry(key, value));
+    return undefined;
   }
 
   remove(key) {
@@ -96,32 +102,32 @@ class OrderedMap {
   }
 
 
-  ensureAndVisit(key, afterKey, valueFn) {
+  ensureAndTouch(key, afterKey, valueFn) {
     if (!this.has(key)) {
       this.set(key, valueFn());
     }
     this.move(key, afterKey);
-    this.visit(key);
+    this.touch(key);
   }
 
 
-  visit(key) {
+  touch(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
 
       if (keysEqual(key, entry.key)) {
-        entry.visited = true;
+        entry.touched = true;
         return this;
       }
     }
     return this;
   }
 
-  *clearVisitedAndIterateUnvisited() {
+  *clearTouchedAndIterateUntouched() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (!entry.visited) yield entry.key;
-      entry.visited = false;
+      if (!entry.touched) yield entry.key;
+      entry.touched = false;
     }
   }
 }

@@ -1,6 +1,6 @@
 import defineClass from '../defineClass';
 
-export default defineClass('orderedSetPrototype')
+export default defineClass('orderedListPrototype')
   .methods({
 
     *[Symbol.iterator]() {
@@ -49,6 +49,7 @@ export default defineClass('orderedSetPrototype')
 
     addAt(index, value) {
       this._list.add(index, value);
+      // this.changeListener.notifyAdd(index, value);
       return this;
     },
 
@@ -67,13 +68,13 @@ export default defineClass('orderedSetPrototype')
     },
 
 
-    visitAt(index) {
-      this._list.visit(index);
+    touchAt(index) {
+      this._list.touch(index);
       return this;
     },
 
-    removeUnvisited() {
-      this._list.removeUnvisited();
+    removeUntouched() {
+      this._list.removeUntouched();
       return this;
     },
 

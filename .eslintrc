@@ -11,6 +11,9 @@
     "no-console": 1,
     "id-length": 0,
     "max-len": [1, 79],
+    // ↓ disabled unless https://github.com/eslint/eslint/issues/3652 is
+    //   implemented
+    "no-param-reassign": 0,
     // ↓ disabled unless https://github.com/eslint/eslint/issues/3944 is
     //   implemented
     "no-use-before-define": 0,
