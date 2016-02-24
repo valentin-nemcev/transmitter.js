@@ -1,6 +1,5 @@
 export default {
-  // TODO: Convey lazy vs eager value mapping in names
-  // replace SetTo... and MapTo... with ValuesTo... and KeysTo...
+  // TODO: Convey map function idempotency in names (mapOnce?)
   updateSetByValue(mapFn) {
     return new UpdateSetByValuePayload(this, mapFn);
   },
@@ -77,11 +76,10 @@ class UpdateMapByValuePayload {
     let prevKey = null;
     // Use set values as keys
     for (const [, key] of this.source) {
-      if (!target.hasAt(key)) {
-        target.setAt(key, mapFn(key));
-      }
-      target.moveAfter(key, prevKey);
-      target.visitAt(key);
+      /* eslint-disable no-loop-func */
+      target.ensureAndVisitValueAtAfter(key, prevKey, () => mapFn(key) );
+      /* eslint-enable no-loop-func */
+
       prevKey = key;
     }
     target.removeUnvisited();
@@ -100,11 +98,10 @@ class UpdateMapByKeyPayload {
     const mapFn = this.mapFn;
     let prevKey = null;
     for (const [key, value] of this.source) {
-      if (!target.hasAt(key)) {
-        target.setAt(key, mapFn(value, key));
-      }
-      target.moveAfter(key, prevKey);
-      target.visitAt(key);
+      /* eslint-disable no-loop-func */
+      target.ensureAndVisitValueAtAfter(key, prevKey,
+                                        () => mapFn(value, key) );
+      /* eslint-enable no-loop-func */
       prevKey = key;
     }
     target.removeUnvisited();

@@ -19,10 +19,11 @@ describe('Nested list connection', function() {
     return derived.replace('Derived', 'Origin');
   }
 
-  before(function() {
+  beforeEach(function() {
     this.define('originList', new Transmitter.Nodes.ListNode());
     this.define('derivedList', new Transmitter.Nodes.ListNode());
 
+    // TODO: Use list updates
     const listChannel = new Transmitter.Channels.NestedBidirectionalChannel()
       .inBothDirections()
       .withOriginDerived(this.originList, this.derivedList)
@@ -43,27 +44,37 @@ describe('Nested list connection', function() {
     Transmitter.startTransmission( (tr) =>
       listChannel.init(tr)
     );
-  });
 
-
-  specify('when origin list is updated', function() {
-    const item1 = new ListItem('Origin item 1');
-    const item2 = new ListItem('Origin item 2');
+    this.item1 = new ListItem('Origin item 1');
+    this.item2 = new ListItem('Origin item 2');
 
     Transmitter.startTransmission( (tr) => {
-      item1.valueNode.set('Origin value 1').init(tr);
-      item2.valueNode.set('Origin value 2').init(tr);
-      this.originList.set([item1, item2]).init(tr);
+      this.item1.valueNode.set('Origin value 1').init(tr);
+      this.item2.valueNode.set('Origin value 2').init(tr);
+      this.originList.set([this.item1, this.item2]).init(tr);
     });
+
   });
 
 
-  specify('then update is transmitted to derived list', function() {
+  specify('inner and outer initial update', function() {
     const derivedItems = this.derivedList.get();
 
     expect(derivedItems.map( (item) => item.name ))
       .to.deep.equal(['Derived item 1', 'Derived item 2']);
     expect(derivedItems.map( (item) => item.valueNode.get() ))
       .to.deep.equal(['Derived value 1', 'Derived value 2']);
+  });
+
+
+  specify('inner only update', function() {
+    Transmitter.startTransmission( (tr) => {
+      this.item1.valueNode.set('Origin value 1a').init(tr);
+    });
+
+    const derivedItems = this.derivedList.get();
+
+    expect(derivedItems.map( (item) => item.valueNode.get() ))
+      .to.deep.equal(['Derived value 1a', 'Derived value 2']);
   });
 });

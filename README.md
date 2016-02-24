@@ -30,6 +30,8 @@ yet**
 
 ### Development tasks
 
+* Update Babel and ESLint (https://github.com/babel/babel-eslint/issues/254)
+
 * Implement
   * Better checks for message pass ordering in joint message
   * Update inner and outer nodes in separating channels

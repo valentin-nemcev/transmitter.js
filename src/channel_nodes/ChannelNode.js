@@ -23,6 +23,12 @@ class ChangeListener {
     channel.disconnect(this.message);
     return this;
   }
+
+  notifyKeep(key, channel) {
+    channel.disconnect(this.message);
+    channel.connect(this.message);
+    return this;
+  }
 }
 
 

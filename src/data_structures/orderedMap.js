@@ -95,6 +95,16 @@ class OrderedMap {
     return this.entries.length;
   }
 
+
+  ensureAndVisit(key, afterKey, valueFn) {
+    if (!this.has(key)) {
+      this.set(key, valueFn());
+    }
+    this.move(key, afterKey);
+    this.visit(key);
+  }
+
+
   visit(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];

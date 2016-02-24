@@ -40,10 +40,6 @@ export default class ConnectionMessage {
     this.sourceChannelNode = sourceChannelNode;
 
     this.targetPointsToUpdate = new Set();
-    if (this.sourceChannelNode != null) {
-      this.sourceChannelNode.getTargetPoints()
-        .forEach( (point) => this.targetPointsToUpdate.add(point) );
-    }
   }
 
   createPlaceholderConnectionMessage(sourceChannelNode) {
@@ -72,17 +68,11 @@ export default class ConnectionMessage {
 
   addTargetPoint(targetPoint) {
     this.targetPointsToUpdate.add(targetPoint);
-    if (this.sourceChannelNode != null) {
-      this.sourceChannelNode.addTargetPoint(targetPoint);
-    }
     return this;
   }
 
   removeTargetPoint(targetPoint) {
     this.targetPointsToUpdate.add(targetPoint);
-    if (this.sourceChannelNode != null) {
-      this.sourceChannelNode.removeTargetPoint(targetPoint);
-    }
     return this;
   }
 

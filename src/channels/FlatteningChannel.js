@@ -75,9 +75,7 @@ FlatteningChannel.prototype = defineClass()
           .inDirection(direction)
           .fromSource(this._flatNode)
           .toDynamicTargets(targets)
-          .withTransform( (flatPayload) =>
-            flatPayload.unflattenToValues()
-          )
+          .withTransform( (flatPayload) => flatPayload.unflattenToValues() )
     );
   })
   .lazyReadOnlyProperty('_nestedToFlatChannelNode', function() {

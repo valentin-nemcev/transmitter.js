@@ -65,8 +65,19 @@ export default defineClass('orderedMapPrototype')
     },
 
 
-    visitAt(key) {
+    ensureAndVisitValueAtAfter(key, afterKey, valueFn) {
+      if (!this.hasAt(key)) {
+        this.setAt(key, valueFn());
+      }
+      this.moveAfter(key, afterKey);
+      this.visitUnchangedAt(key);
+      return this;
+    },
+
+
+    visitUnchangedAt(key) {
       this._map.visit(key);
+      this.changeListener.notifyKeep(key, this.getAt(key));
       return this;
     },
 
