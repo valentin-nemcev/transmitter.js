@@ -7,10 +7,10 @@ export default class ChannelValue extends ChannelNode {
 
   set(newChannel) {
     const oldChannel = this.channel;
-    if (oldChannel != null) oldChannel.disconnect(this.message);
+    if (oldChannel != null) oldChannel.disconnect(this.connectionMessage);
 
     this.channel = newChannel;
-    if (newChannel != null) newChannel.connect(this.message);
+    if (newChannel != null) newChannel.connect(this.connectionMessage);
 
     return this;
   }

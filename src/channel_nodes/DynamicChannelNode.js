@@ -19,20 +19,20 @@ export default defineClass('DynamicChannelNode')
     this.createChannel = createChannel;
   })
   .methods({
-    routeConnectionMessage(message, payload) {
+    routeConnectionMessage(connectionMessage, payload) {
       this.payload = payload;
 
       const oldChannel = this.channel;
-      if (oldChannel != null) oldChannel.disconnect(message);
+      if (oldChannel != null) oldChannel.disconnect(connectionMessage);
 
       payload.deliver(this);
 
       const nodes = Array.from(this).map( ([, value]) => value );
       const newChannel = this.createChannel.call(null, nodes);
       this.channel = newChannel;
-      if (newChannel != null) newChannel.connect(message);
+      if (newChannel != null) newChannel.connect(connectionMessage);
 
-      message.sendToTargetPoints();
+      connectionMessage.sendToTargetPoints();
       return this;
     },
 

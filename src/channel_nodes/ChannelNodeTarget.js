@@ -6,20 +6,20 @@ export default class ChannelNodeTarget {
     this.channelNode = channelNode;
   }
 
-  connectSource(message, source) {
+  connectSource(connectionMessage, source) {
     if (this.source != null) throw new Error('Connect source mismatch');
     this.source = source;
 
-    message.addTargetPoint(this);
+    connectionMessage.addTargetPoint(this);
 
     this.channelNode.routeConnectionMessage(
-      message.createPlaceholderConnectionMessage(this.channelNode),
+      connectionMessage.createPlaceholderConnectionMessage(this.channelNode),
       getNoOpPayload()
     );
     return this;
   }
 
-  disconnectSource(message, source) {
+  disconnectSource(connectionMessage, source) {
     if (this.source !== source) throw new Error('Disconnect source mismatch');
     this.source = null;
     return this;

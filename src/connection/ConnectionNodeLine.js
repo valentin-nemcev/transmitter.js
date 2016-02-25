@@ -12,13 +12,13 @@ export default class ConnectionNodeLine {
     return this;
   }
 
-  connect(message) {
-    this.nodeTarget.connectLine(message, this);
+  connect(connectionMessage) {
+    this.nodeTarget.connectLine(connectionMessage, this);
     return this;
   }
 
-  disconnect(message) {
-    this.nodeTarget.disconnectLine(message, this);
+  disconnect(connectionMessage) {
+    this.nodeTarget.disconnectLine(connectionMessage, this);
     return this;
   }
 

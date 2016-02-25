@@ -47,9 +47,9 @@ export default class NodeLineMap {
     }
   }
 
-  connectLine(message, line) {
-    const channelNode = message.getSourceChannelNode();
-    message.addTargetPoint(this);
+  connectLine(connectionMessage, line) {
+    const channelNode = connectionMessage.getSourceChannelNode();
+    connectionMessage.addTargetPoint(this);
 
     let lines = this.channelNodeToLines.get(channelNode);
     if (lines == null) {
@@ -60,9 +60,9 @@ export default class NodeLineMap {
     return this;
   }
 
-  disconnectLine(message, line) {
-    const channelNode = message.getSourceChannelNode();
-    message.removeTargetPoint(this);
+  disconnectLine(connectionMessage, line) {
+    const channelNode = connectionMessage.getSourceChannelNode();
+    connectionMessage.removeTargetPoint(this);
 
     const lines = this.channelNodeToLines.get(channelNode);
     lines.delete(line);

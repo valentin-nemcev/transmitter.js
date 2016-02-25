@@ -5,11 +5,11 @@ import BaseChannelNode from './BaseChannelNode';
 
 class ChangeListener {
   constructor() {
-    this.message = null;
+    this.connectionMessage = null;
   }
 
   notifyAdd(key, channel) {
-    channel.connect(this.message);
+    channel.connect(this.connectionMessage);
     return this;
   }
 
@@ -20,13 +20,13 @@ class ChangeListener {
   }
 
   notifyRemove(key, channel) {
-    channel.disconnect(this.message);
+    channel.disconnect(this.connectionMessage);
     return this;
   }
 
   notifyKeep(key, channel) {
-    channel.disconnect(this.message);
-    channel.connect(this.message);
+    channel.disconnect(this.connectionMessage);
+    channel.connect(this.connectionMessage);
     return this;
   }
 }
@@ -41,14 +41,14 @@ export default defineClass('ChannelNode')
   )
 
   .methods({
-    routeConnectionMessage(message, payload) {
-      this.message = message;
+    routeConnectionMessage(connectionMessage, payload) {
+      this.connectionMessage = connectionMessage;
       this.payload = payload;
-      this.changeListener.message = this.message;
+      this.changeListener.connectionMessage = this.connectionMessage;
       payload.deliver(this);
-      this.message.sendToTargetPoints();
-      this.message = null;
-      this.changeListener.message = null;
+      this.connectionMessage.sendToTargetPoints();
+      this.connectionMessage = null;
+      this.changeListener.connectionMessage = null;
       return this;
     },
 

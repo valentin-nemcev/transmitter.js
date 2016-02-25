@@ -1,18 +1,18 @@
 export default {
-  connect(message) {
-    this._channels.forEach( (channel) => channel.connect(message) );
+  connect(connectionMessage) {
+    this._channels.forEach( (channel) => channel.connect(connectionMessage) );
     return this;
   },
 
-  disconnect(message) {
-    this._channels.forEach( (channel) => channel.disconnect(message) );
+  disconnect(connectionMessage) {
+    this._channels.forEach( (channel) => channel.disconnect(connectionMessage) );
     return this;
   },
 
   init(tr) {
-    const message = tr.createInitialConnectionMessage();
-    this.connect(message);
-    message.sendToTargetPoints();
+    const connectionMessage = tr.createInitialConnectionMessage();
+    this.connect(connectionMessage);
+    connectionMessage.sendToTargetPoints();
     return this;
   },
 };

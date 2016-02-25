@@ -21,14 +21,18 @@ export default class ConnectionMerger {
     return this;
   }
 
-  connect(message) {
-    this.sourceNodesToLines.forEach( (line) => line.connect(message) );
-    message.sendToMergedMessage(this);
+  connect(connectionMessage) {
+    this.sourceNodesToLines.forEach(
+      (line) => line.connect(connectionMessage)
+    );
+    connectionMessage.sendToMergedMessage(this);
     return this;
   }
 
-  disconnect(message) {
-    this.sourceNodesToLines.forEach( (line) => line.disconnect(message) );
+  disconnect(connectionMessage) {
+    this.sourceNodesToLines.forEach(
+      (line) => line.disconnect(connectionMessage)
+    );
     return this;
   }
 

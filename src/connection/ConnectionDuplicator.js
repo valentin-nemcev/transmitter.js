@@ -14,13 +14,17 @@ export default class ConnectionDuplicator {
     return this;
   }
 
-  connect(message) {
-    this.targets.forEach( (target) => target.connectSource(message, this) );
+  connect(connectionMessage) {
+    this.targets.forEach(
+      (target) => target.connectSource(connectionMessage, this)
+    );
     return this;
   }
 
-  disconnect(message) {
-    this.targets.forEach( (target) => target.disconnectSource(message, this) );
+  disconnect(connectionMessage) {
+    this.targets.forEach(
+      (target) => target.disconnectSource(connectionMessage, this)
+    );
     return this;
   }
 

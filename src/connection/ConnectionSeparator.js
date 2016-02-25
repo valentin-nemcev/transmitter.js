@@ -19,14 +19,18 @@ export default class ConnectionSeparator {
     return this;
   }
 
-  connect(message) {
-    this.targetNodesToLines.forEach( (line) => line.connect(message) );
-    message.sendToSeparatedMessage(this);
+  connect(connectionMessage) {
+    this.targetNodesToLines.forEach(
+      (line) => line.connect(connectionMessage)
+    );
+    connectionMessage.sendToSeparatedMessage(this);
     return this;
   }
 
-  disconnect(message) {
-    this.targetNodesToLines.forEach( (line) => line.disconnect(message) );
+  disconnect(connectionMessage) {
+    this.targetNodesToLines.forEach(
+      (line) => line.disconnect(connectionMessage)
+    );
     return this;
   }
 

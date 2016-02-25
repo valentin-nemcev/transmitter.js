@@ -10,15 +10,15 @@ export default class Connection {
 
   inspect() { return this.source.inspect() + this.target.inspect(); }
 
-  connect(message) {
-    this.source.connect(message);
-    this.target.connect(message);
+  connect(connectionMessage) {
+    this.source.connect(connectionMessage);
+    this.target.connect(connectionMessage);
     return this;
   }
 
-  disconnect(message) {
-    this.source.disconnect(message);
-    this.target.disconnect(message);
+  disconnect(connectionMessage) {
+    this.source.disconnect(connectionMessage);
+    this.target.disconnect(connectionMessage);
     return this;
   }
 
