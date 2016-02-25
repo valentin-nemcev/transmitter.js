@@ -2,7 +2,6 @@ import {inspect} from 'util';
 
 import defineClass from '../defineClass';
 
-import ConnectionNodeLine  from '../connection/ConnectionNodeLine';
 import ConnectionSeparator from '../connection/ConnectionSeparator';
 
 import assertSingleArgument from './assertSingleArgument';
@@ -46,13 +45,8 @@ export default defineClass()
     },
 
     _createSeparator(targets, opts) {
-      const parts = targets.map( (target) => {
-        assertTarget(target);
-        const line = new ConnectionNodeLine(
-            target.getNodeTarget(), this._direction);
-        return [target, line];
-      });
-      return new ConnectionSeparator(new Map(parts), opts);
+      targets.forEach(assertTarget);
+      return new ConnectionSeparator(targets, this._direction, opts);
     },
   })
   .buildPrototype();

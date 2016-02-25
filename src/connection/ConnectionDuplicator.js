@@ -5,8 +5,10 @@ export default class ConnectionDuplicator {
 
   inspect() { return '=[' + this.target.map(inspect).join(', ') + ']'; }
 
-  constructor(targets) {
-    this.targets = targets;
+  constructor(channelTargets) {
+    this.targets = channelTargets.map(
+      (channelTarget) => channelTarget.getChannelNodeTarget()
+    );
   }
 
   setSource(source) {

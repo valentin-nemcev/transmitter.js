@@ -1,15 +1,23 @@
 import {inspect} from 'util';
 
+import ConnectionNodeLine  from './ConnectionNodeLine';
+
 export default class ConnectionSeparator {
 
   inspect() {
     return ':[' + this.targetNodesToLines.keys().map(inspect).join(', ') + ']';
   }
 
-  constructor(targetNodesToLines, {singleTarget} = {}) {
-    this.targetNodesToLines = targetNodesToLines;
+  constructor(targets, direction, {singleTarget} = {}) {
     this.singleTarget = singleTarget;
-    this.targetNodesToLines.forEach( (line) => line.setSource(this) );
+
+    this.targetNodesToLines = new Map(targets.map(
+      (target) => {
+        const line = new ConnectionNodeLine(target.getNodeTarget(), direction);
+        line.setSource(this);
+        return [target, line];
+      }
+    ));
   }
 
   getTargetNodesToLines() { return this.targetNodesToLines; }

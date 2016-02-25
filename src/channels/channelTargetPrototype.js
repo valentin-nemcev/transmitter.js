@@ -28,11 +28,8 @@ export default defineClass()
     },
 
     _createDuplicator(channelTargets) {
-      const targets = channelTargets.map( (channelTarget) => {
-        assertChannelTarget(channelTarget);
-        return channelTarget.getChannelNodeTarget();
-      });
-      return new ConnectionDuplicator(targets);
+      channelTargets.forEach(assertChannelTarget);
+      return new ConnectionDuplicator(channelTargets);
     },
   })
   .buildPrototype();

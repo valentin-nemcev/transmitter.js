@@ -1,6 +1,5 @@
 import {inspect} from 'util';
 
-import NodeConnectionLine from '../connection/NodeConnectionLine';
 import ConnectionMerger   from '../connection/ConnectionMerger';
 
 import defineClass from '../defineClass';
@@ -47,13 +46,8 @@ export default defineClass()
     },
 
     _createMerger(sources, opts) {
-      const parts = sources.map( (source) => {
-        assertSource(source);
-        const line = new NodeConnectionLine(
-            source.getNodeSource(), this._direction);
-        return [source, line];
-      });
-      return new ConnectionMerger(new Map(parts), opts);
+      sources.forEach(assertSource);
+      return new ConnectionMerger(sources, this._direction, opts);
     },
   })
   .buildPrototype();
