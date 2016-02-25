@@ -1,5 +1,5 @@
 import BlindNodeSource from '../connection/BlindNodeSource';
-import NodeTarget from '../connection/NodeTarget';
+import NodePoint from '../connection/NodePoint';
 
 import {getNoOpPayload} from '../payloads';
 
@@ -10,7 +10,7 @@ export default class TargetNode {
 
   constructor() {
     this.nodeSource = new BlindNodeSource(this);
-    this.nodeTarget = new NodeTarget(this);
+    this.nodeTarget = new NodePoint('target', this);
   }
 
   getNodeSource() { return this.nodeSource; }

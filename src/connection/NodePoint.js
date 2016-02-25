@@ -34,10 +34,23 @@ class LineSet {
 }
 
 
-export default class NodeLineMap {
+export default class NodePoint {
 
-  constructor(node) {
+  inspect() {
+    const n = this.node.inspect();
+    switch (this.type) { // eslint-disable-line default-case
+    case 'source': return n + '<';
+    case 'target': return '>' + n;
+    }
+  }
+
+  constructor(type, node) {
+    this.type = type;
     this.node = node;
+    if (type !== 'source' && type !== 'target') {
+      throw new Error(`Unknown node point type: ${type}`);
+    }
+
     this.channelNodeToLines = new Map();
   }
 
@@ -75,4 +88,17 @@ export default class NodeLineMap {
     if (lines != null) lines.receiveCommunication(comm);
     return this;
   }
+
+  receiveConnectionMessage(connectionMessage) {
+    switch (this.type) { // eslint-disable-line default-case
+    case 'source':
+      connectionMessage.sendToJointMessageFromSource(this.node);
+      break;
+    case 'target':
+      connectionMessage.sendToJointMessageFromTarget(this.node);
+      break;
+    }
+    return this;
+  }
+
 }

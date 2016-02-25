@@ -1,7 +1,6 @@
 import defineClass from '../defineClass';
 
-import NodeSource from '../connection/NodeSource';
-import NodeTarget from '../connection/NodeTarget';
+import NodePoint from '../connection/NodePoint';
 import {getNoOpPayload} from '../payloads';
 
 
@@ -9,11 +8,11 @@ export default defineClass('SourceTargetNode')
 
   .propertyInitializer(
     'nodeSource',
-    function() { return new NodeSource(this); }
+    function() { return new NodePoint('source', this); }
   )
   .propertyInitializer(
     'nodeTarget',
-    function() { return new NodeTarget(this); }
+    function() { return new NodePoint('target', this); }
   )
 
   .writableMethod(

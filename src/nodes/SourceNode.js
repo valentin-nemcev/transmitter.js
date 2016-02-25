@@ -1,4 +1,4 @@
-import NodeSource from '../connection/NodeSource';
+import NodePoint from '../connection/NodePoint';
 import BlindNodeTarget from '../connection/BlindNodeTarget';
 
 
@@ -7,7 +7,7 @@ export default class SourceNode {
   inspect() { return '[' + this.constructor.name + ']'; }
 
   constructor() {
-    this.nodeSource = new NodeSource(this);
+    this.nodeSource = new NodePoint('source', this);
     this.nodeTarget = new BlindNodeTarget(this);
   }
 
