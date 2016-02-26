@@ -4,6 +4,7 @@ import defineClass from '../defineClass';
 
 import channelPrototype from './channelPrototype';
 
+import getNullChannel from './getNullChannel';
 import NestedSimpleChannel from './NestedSimpleChannel';
 import SimpleChannel from './SimpleChannel';
 
@@ -73,24 +74,26 @@ FlatteningChannel.prototype = defineClass()
 
   .lazyReadOnlyProperty('_flatToNestedChannel', function() {
     const direction = this._flatToNestedDirection;
-    if (direction == null) return null;
+    if (direction == null) return getNullChannel();
     return new SimpleChannel()
       .inDirection(direction)
       .withTransform( (flatPayload) => flatPayload.unflattenToValues() );
   })
   .lazyReadOnlyProperty('_nestedToFlatChannel', function() {
     const direction = this._nestedToFlatDirection;
-    if (direction == null) return null;
+    if (direction == null) return getNullChannel();
     return new SimpleChannel()
       .inDirection(direction)
       .withTransform( (payload) => payload.flatten() );
   })
 
-  .lazyReadOnlyProperty('_dynamicSourceNode', function() {
-    return new this._dynamicChannelNodeConstructor('source');
-  })
   .lazyReadOnlyProperty('_dynamicTargetNode', function() {
-    return new this._dynamicChannelNodeConstructor('target');
+    const direction = this._flatToNestedDirection;
+    return direction && new this._dynamicChannelNodeConstructor('target');
+  })
+  .lazyReadOnlyProperty('_dynamicSourceNode', function() {
+    const direction = this._nestedToFlatDirection;
+    return direction && new this._dynamicChannelNodeConstructor('source');
   })
 
   .lazyReadOnlyProperty('_nestedChannel', function() {
@@ -117,8 +120,8 @@ FlatteningChannel.prototype = defineClass()
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(nestedNode.constructor);
 
-    this._nestedToFlatChannel.fromDynamicSourceNode(this._dynamicSourceNode);
     this._flatToNestedChannel.toDynamicTargetNode(this._dynamicTargetNode);
+    this._nestedToFlatChannel.fromDynamicSourceNode(this._dynamicSourceNode);
 
     this._nestedChannel.fromSource(nestedNode);
 
