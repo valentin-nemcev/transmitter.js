@@ -71,10 +71,14 @@ class ChildrenSet {
     return this;
   }
 
-  *clearTouchedAndIterateUntouched() {
+  *clearTouchedAndRemoveAndIterateUntouched() {
     for (const element of Array.from(this.element.childNodes)) {
-      if (!element.touched) yield element;
-      element.touched = false;
+      if (element.touched) {
+        element.touched = false;
+      } else {
+        this.element.removeChild(element);
+        yield [null, element];
+      }
     }
   }
 }

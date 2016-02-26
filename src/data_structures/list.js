@@ -75,14 +75,15 @@ class List {
     }
   }
 
-  removeUntouched() {
+  *clearTouchedAndRemoveAndIterateUntouched() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
       if (entry.touched) {
         entry.touched = false;
       } else {
-        this.remove(i);
+        this.entries.splice(i, 1);
         i--;
+        yield [i, entry.value];
       }
     }
   }

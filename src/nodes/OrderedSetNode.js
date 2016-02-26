@@ -8,10 +8,14 @@ import orderedSetPrototype from './orderedSetPrototype';
 
 import createOrderedMap from '../data_structures/orderedMap';
 
+import nullChangeListener from './_nullChangeListener';
+
+
 export default defineClass('OrderedSetNode')
   .includes(SourceTargetNode.prototype)
 
   .propertyInitializer('_set', createOrderedMap)
+  .propertyInitializer('changeListener', () => nullChangeListener )
   .includes(orderedSetPrototype)
 
 

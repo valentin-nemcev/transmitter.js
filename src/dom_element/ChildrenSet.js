@@ -8,6 +8,8 @@ import orderedSetPrototype from '../nodes/orderedSetPrototype';
 
 import {createChildrenSet} from './_childrenSet';
 
+import nullChangeListener from '../nodes/_nullChangeListener';
+
 export default defineClass('OrderedSetNode')
   .includes(SourceTargetNode.prototype)
 
@@ -15,6 +17,7 @@ export default defineClass('OrderedSetNode')
     '_set',
     function(element) { this._set = createChildrenSet(element); }
   )
+  .propertyInitializer('changeListener', () => nullChangeListener )
 
   .includes(orderedSetPrototype)
 

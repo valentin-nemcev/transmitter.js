@@ -53,7 +53,7 @@ export default defineClass('orderedMapPrototype')
     },
 
     removeAt(key) {
-      const prevValue = this._map.remove(key);
+      const prevValue = this._map.unset(key);
       if (prevValue !== undefined) {
         this.changeListener.notifyRemove(key, prevValue);
       }
@@ -84,9 +84,10 @@ export default defineClass('orderedMapPrototype')
     },
 
     removeUntouched() {
-      const keysToRemove =
-        Array.from(this._map.clearTouchedAndIterateUntouched());
-      for (const key of keysToRemove) this.removeAt(key);
+      for (const [key, value] of
+           this._map.clearTouchedAndRemoveAndIterateUntouched()) {
+        this.changeListener.notifyRemove(key, value);
+      }
       return this;
     },
 

@@ -4,7 +4,7 @@ export default defineClass('orderedSetPrototype')
   .methods({
 
     *[Symbol.iterator]() {
-      for (const [key] of this._set) yield [null, key];
+      for (const [value] of this._set) yield [null, value];
     },
 
     get() {
@@ -21,14 +21,15 @@ export default defineClass('orderedSetPrototype')
 
 
     set(values) {
-      this._set.clear();
-      for (const value of values) {
-        this.add(value);
-      }
-      return this;
+      return this.setIterator((function* () {
+        for (const value of values) yield [null, value];
+      })());
     },
 
     setIterator(it) {
+      for (const [value] of this._set) {
+        this.changeListener.notifyRemove(null, value);
+      }
       this._set.clear();
       for (const [, value] of it) {
         this.add(value);
@@ -37,7 +38,10 @@ export default defineClass('orderedSetPrototype')
     },
 
     add(value) {
-      return this._set.add(value);
+      if (this._set.add(value)) {
+        this.changeListener.notifyAdd(null, value);
+      }
+      return this;
     },
 
     append(el) {
@@ -45,7 +49,10 @@ export default defineClass('orderedSetPrototype')
     },
 
     remove(value) {
-      return this._set.remove(value);
+      if (this._set.remove(value)) {
+        this.changeListener.notifyRemove(null, value);
+      }
+      return this;
     },
 
     moveAfter(value, afterValue) {
@@ -60,9 +67,10 @@ export default defineClass('orderedSetPrototype')
     },
 
     removeUntouched() {
-      const keysToRemove =
-        Array.from(this._set.clearTouchedAndIterateUntouched());
-      for (const key of keysToRemove) this.remove(key);
+      for (const [value] of
+           this._set.clearTouchedAndRemoveAndIterateUntouched()) {
+        this.changeListener.notifyRemove(null, value);
+      }
       return this;
     },
 

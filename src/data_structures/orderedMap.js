@@ -17,7 +17,7 @@ class OrderedMap {
   }
 
   add(keyArg) {
-    return this.set(keyArg);
+    return this.set(keyArg) === undefined;
   }
 
   set(key, value) {
@@ -35,6 +35,10 @@ class OrderedMap {
   }
 
   remove(key) {
+    return this.unset(key) !== undefined;
+  }
+
+  unset(key) {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
       if (keysEqual(key, entry.key)) {
@@ -123,11 +127,16 @@ class OrderedMap {
     return this;
   }
 
-  *clearTouchedAndIterateUntouched() {
+  *clearTouchedAndRemoveAndIterateUntouched() {
     for (let i = 0; i < this.entries.length; i++) {
       const entry = this.entries[i];
-      if (!entry.touched) yield entry.key;
-      entry.touched = false;
+      if (entry.touched) {
+        entry.touched = false;
+      } else {
+        this.entries.splice(i, 1);
+        i--;
+        yield [entry.key, entry.value];
+      }
     }
   }
 }

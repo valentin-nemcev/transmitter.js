@@ -1,11 +1,11 @@
 export default {
   // TODO: Convey map function idempotency in names (mapOnce?)
-  updateSetByValue(mapFn) {
-    return new UpdateSetByValuePayload(this, mapFn);
-  },
-
   updateListByIndex(mapFn) {
     return new UpdateListByIndexPayload(this, mapFn);
+  },
+
+  updateSetByValue(mapFn) {
+    return new UpdateSetByValuePayload(this, mapFn);
   },
 
   updateMapByValue(mapFn) {
@@ -16,6 +16,28 @@ export default {
     return new UpdateMapByKeyPayload(this, mapFn);
   },
 };
+
+
+class UpdateListByIndexPayload {
+  constructor(source, mapFn) {
+    this.source = source;
+    this.mapFn = mapFn;
+  }
+
+  deliver(target) {
+    const mapFn = this.mapFn;
+    let key = 0;
+    for (const [, value] of this.source) {
+      if (!target.hasAt(key)) {
+        target.addAt(key, mapFn(value));
+      }
+      target.touchAt(key);
+      key++;
+    }
+    target.removeUntouched();
+    return this;
+  }
+}
 
 
 class UpdateSetByValuePayload {
@@ -36,28 +58,6 @@ class UpdateSetByValuePayload {
       target.moveAfter(targetKey, prevKey);
       target.touchAt(targetKey);
       prevKey = targetKey;
-    }
-    target.removeUntouched();
-    return this;
-  }
-}
-
-
-class UpdateListByIndexPayload {
-  constructor(source, mapFn) {
-    this.source = source;
-    this.mapFn = mapFn;
-  }
-
-  deliver(target) {
-    const mapFn = this.mapFn;
-    let key = 0;
-    for (const [, value] of this.source) {
-      if (!target.hasAt(key)) {
-        target.addAt(key, mapFn(value));
-      }
-      target.touchAt(key);
-      key++;
     }
     target.removeUntouched();
     return this;
