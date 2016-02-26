@@ -78,8 +78,8 @@ describe('Flattening list connection', function() {
       {name: 'objectB', value: 'value2'},
     ];
 
-    Transmitter.startTransmission( (tr) =>
-        this.serializedValue.set(serialized).init(tr)
+    Transmitter.startTransmission(
+      (tr) => this.serializedValue.set(serialized).init(tr)
     );
 
     const nestedObjects = this.nestedList.get();

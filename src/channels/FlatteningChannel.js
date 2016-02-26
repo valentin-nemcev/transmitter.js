@@ -37,7 +37,11 @@ FlatteningChannel.prototype = defineClass()
 
   .includes(channelPrototype)
   .lazyReadOnlyProperty('_channels', function() {
-    return [this._nestedChannel];
+    return [
+      this._nestedChannel,
+      this._flatToNestedChannel,
+      this._nestedToFlatChannel,
+    ];
   })
 
   .accessorProperty('_dynamicChannelNodeConstructor', {
@@ -67,33 +71,32 @@ FlatteningChannel.prototype = defineClass()
       this._directions.forward : this._directions.backward;
   })
 
-  .lazyReadOnlyProperty('_flatToNestedChannelNode', function() {
+  .lazyReadOnlyProperty('_flatToNestedChannel', function() {
     const direction = this._flatToNestedDirection;
-    return direction && new this._dynamicChannelNodeConstructor(
-      'targets', (targets) =>
-        new SimpleChannel()
-          .inDirection(direction)
-          .fromSource(this._flatNode)
-          .toDynamicTargets(targets)
-          .withTransform( (flatPayload) => flatPayload.unflattenToValues() )
-    );
+    if (direction == null) return null;
+    return new SimpleChannel()
+      .inDirection(direction)
+      .withTransform( (flatPayload) => flatPayload.unflattenToValues() );
   })
-  .lazyReadOnlyProperty('_nestedToFlatChannelNode', function() {
+  .lazyReadOnlyProperty('_nestedToFlatChannel', function() {
     const direction = this._nestedToFlatDirection;
-    return direction && new this._dynamicChannelNodeConstructor(
-      'sources', (sources) =>
-        new SimpleChannel()
-          .inDirection(direction)
-          .fromDynamicSources(sources)
-          .toTarget(this._flatNode)
-          .withTransform( (payload) => payload.flatten() )
-      );
+    if (direction == null) return null;
+    return new SimpleChannel()
+      .inDirection(direction)
+      .withTransform( (payload) => payload.flatten() );
+  })
+
+  .lazyReadOnlyProperty('_dynamicSourceNode', function() {
+    return new this._dynamicChannelNodeConstructor('source');
+  })
+  .lazyReadOnlyProperty('_dynamicTargetNode', function() {
+    return new this._dynamicChannelNodeConstructor('target');
   })
 
   .lazyReadOnlyProperty('_nestedChannel', function() {
     const targets = [
-      this._nestedToFlatChannelNode,
-      this._flatToNestedChannelNode,
+      this._dynamicSourceNode,
+      this._dynamicTargetNode,
     ].filter( (c) => c );
     return new NestedSimpleChannel().toChannelTargets(...targets);
   })
@@ -114,6 +117,9 @@ FlatteningChannel.prototype = defineClass()
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(nestedNode.constructor);
 
+    this._nestedToFlatChannel.fromDynamicSourceNode(this._dynamicSourceNode);
+    this._flatToNestedChannel.toDynamicTargetNode(this._dynamicTargetNode);
+
     this._nestedChannel.fromSource(nestedNode);
 
     if (mapNested != null) {
@@ -122,10 +128,13 @@ FlatteningChannel.prototype = defineClass()
     return this;
   })
 
-  .setOnceMandatoryProperty('_flatNode', 'Flat node')
+  .setOnceMandatoryProperty('_flatNode', {title: 'Flat node'})
   .method('withFlat', function(flatNode) {
     assertNode(flatNode);
     this._flatNode = flatNode;
+    this._nestedToFlatChannel.toTarget(this._flatNode);
+    this._flatToNestedChannel.fromSource(this._flatNode);
+
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(flatNode.constructor);
     return this;

@@ -32,6 +32,9 @@ export default defineClass('orderedMapPrototype')
     },
 
     setIterator(it) {
+      for (const [key, value] of this._map) {
+        this.changeListener.notifyRemove(key, value);
+      }
       this._map.clear();
       for (const [key, value] of it) {
         this.setAt(key, value);

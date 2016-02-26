@@ -1,3 +1,4 @@
+
 export default class NodeConnectionLine {
 
   inspect() { return this.nodeSource.inspect() + this.direction.inspect(); }

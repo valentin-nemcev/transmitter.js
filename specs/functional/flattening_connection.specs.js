@@ -1,9 +1,13 @@
 import * as Transmitter from 'transmitter';
 
+let id = 0;
+
 class NestedObject {
   constructor(name) {
     this.name = name;
     this.valueNode = new Transmitter.Nodes.ValueNode();
+    const debugName = this.name + id++;
+    this.valueNode.inspect = () => debugName + '.valueNode';
   }
 }
 

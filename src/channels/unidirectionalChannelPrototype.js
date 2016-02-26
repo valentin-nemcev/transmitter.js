@@ -13,11 +13,14 @@ export default defineClass()
   })
 
   .includes(channelPrototype)
+  .setOnceLazyProperty('_channelNode', () => null,
+                       {title: 'Channel node'})
   .lazyReadOnlyProperty('_connection', function() {
     return new Connection(
       this._connectionSource,
       this._connectionTarget,
-      this._transform
+      this._transform,
+      this._channelNode
     );
   })
   .lazyReadOnlyProperty('_channels', function() { return [this._connection]; })

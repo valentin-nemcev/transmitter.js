@@ -8,11 +8,14 @@ import listPrototype from './listPrototype';
 
 import createList from '../data_structures/list';
 
+import nullChangeListener from './_nullChangeListener';
+
 
 export default defineClass('ListNode')
   .includes(SourceTargetNode.prototype)
 
   .propertyInitializer('_list', createList)
+  .propertyInitializer('changeListener', () => nullChangeListener )
   .includes(listPrototype)
 
 

@@ -27,6 +27,9 @@ export default defineClass('orderedListPrototype')
 
 
     set(values) {
+      for (const [index, value] of this._list) {
+        this.changeListener.notifyRemove(index, value);
+      }
       this._list.clear();
       for (const value of values) {
         this.append(value);
@@ -35,6 +38,9 @@ export default defineClass('orderedListPrototype')
     },
 
     setIterator(it) {
+      for (const [index, value] of this._list) {
+        this.changeListener.notifyRemove(index, value);
+      }
       this._list.clear();
       for (const [, value] of it) {
         this.append(value);
@@ -43,13 +49,14 @@ export default defineClass('orderedListPrototype')
     },
 
     setAt(index, value) {
-      this._list.set(index, value);
+      const prevValue = this._list.set(index, value);
+      this.changeListener.notifyUpdate(index, prevValue, value);
       return this;
     },
 
     addAt(index, value) {
-      this._list.add(index, value);
-      // this.changeListener.notifyAdd(index, value);
+      index = this._list.add(index, value);
+      this.changeListener.notifyAdd(index, value);
       return this;
     },
 
@@ -58,7 +65,8 @@ export default defineClass('orderedListPrototype')
     },
 
     removeAt(index) {
-      this._list.remove(index);
+      const prevValue = this._list.remove(index);
+      this.changeListener.notifyRemove(index, prevValue);
       return this;
     },
 

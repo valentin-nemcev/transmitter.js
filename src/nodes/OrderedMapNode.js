@@ -10,6 +10,7 @@ import createOrderedMap from '../data_structures/orderedMap';
 
 import nullChangeListener from './_nullChangeListener';
 
+
 export default defineClass('OrderedMapNode')
   .includes(SourceTargetNode.prototype)
 

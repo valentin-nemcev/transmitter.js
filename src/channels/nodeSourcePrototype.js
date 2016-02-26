@@ -1,6 +1,8 @@
 import {inspect} from 'util';
 
 import ConnectionMerger   from '../connection/ConnectionMerger';
+import DynamicConnectionMerger
+from '../connection/DynamicConnectionMerger';
 
 import defineClass from '../defineClass';
 
@@ -48,6 +50,14 @@ export default defineClass()
     _createMerger(sources, opts) {
       sources.forEach(assertSource);
       return new ConnectionMerger(sources, this._direction, opts);
+    },
+
+
+    fromDynamicSourceNode(dynamicSourceNode) {
+      this._connectionSource =
+        new DynamicConnectionMerger(dynamicSourceNode, this._direction);
+      this._channelNode = dynamicSourceNode;
+      return this;
     },
   })
   .buildPrototype();

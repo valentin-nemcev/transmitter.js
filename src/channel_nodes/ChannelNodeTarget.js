@@ -1,5 +1,3 @@
-import {getNoOpPayload} from '../payloads';
-
 export default class ChannelNodeTarget {
 
   constructor(channelNode) {
@@ -12,10 +10,6 @@ export default class ChannelNodeTarget {
 
     connectionMessage.addTargetPoint(this);
 
-    this.channelNode.routeConnectionMessage(
-      connectionMessage.createPlaceholderConnectionMessage(this.channelNode),
-      getNoOpPayload()
-    );
     return this;
   }
 

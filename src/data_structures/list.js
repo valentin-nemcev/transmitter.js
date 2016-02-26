@@ -16,10 +16,11 @@ class List {
   add(index, value) {
     if (index == null || index === this.entries.length) {
       this.entries.push(createEntry(value));
+      return this.entries.length - 1;
     } else {
       this.entries.splice(index, 0, createEntry(value));
+      return index;
     }
-    return value;
   }
 
   set(index, value) {
