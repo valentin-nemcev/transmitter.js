@@ -71,10 +71,16 @@ export default defineClass('orderedListPrototype')
     },
 
 
-    touchAt(index) {
+    updateValueOnceAt(index, valueFn) {
+      if (this.hasAt(index)) {
+        this.changeListener.notifyKeep(index, this.getAt(index));
+      } else {
+        this.addAt(index, valueFn());
+      }
       this._list.touch(index);
       return this;
     },
+
 
     removeUntouched() {
       for (const [index, value] of

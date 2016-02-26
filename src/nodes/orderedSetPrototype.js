@@ -61,10 +61,17 @@ export default defineClass('orderedSetPrototype')
     },
 
 
-    touchAt(key) {
-      this._set.touch(key);
+    updateValueAfter(value, afterValue) {
+      if (this.has(value)) {
+        this.changeListener.notifyKeep(null, value);
+      } else {
+        this.add(value);
+      }
+      this.moveAfter(value, afterValue);
+      this._set.touch(value);
       return this;
     },
+
 
     removeUntouched() {
       for (const [value] of

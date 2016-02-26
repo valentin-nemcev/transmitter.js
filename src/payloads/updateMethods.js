@@ -26,13 +26,12 @@ class UpdateListByIndexPayload {
 
   deliver(target) {
     const mapFn = this.mapFn;
-    let key = 0;
+    let index = 0;
     for (const [, value] of this.source) {
-      if (!target.hasAt(key)) {
-        target.addAt(key, mapFn(value));
-      }
-      target.touchAt(key);
-      key++;
+      /* eslint-disable no-loop-func */
+      target.updateValueOnceAt(index, () => mapFn(value, index) );
+      /* eslint-enable no-loop-func */
+      index++;
     }
     target.removeUntouched();
     return this;
@@ -48,16 +47,11 @@ class UpdateSetByValuePayload {
 
   deliver(target) {
     const mapFn = this.mapFn;
-    let prevKey = null;
-    // Use set values as keys
-    for (const [, key] of this.source) {
-      const targetKey = mapFn(key);
-      if (!target.has(targetKey)) {
-        target.add(targetKey);
-      }
-      target.moveAfter(targetKey, prevKey);
-      target.touchAt(targetKey);
-      prevKey = targetKey;
+    let prevValue = null;
+    for (const [, value] of this.source) {
+      const targetValue = mapFn(value);
+      target.updateValueAfter(targetValue, prevValue);
+      prevValue = targetValue;
     }
     target.removeUntouched();
     return this;

@@ -73,15 +73,10 @@ export default defineClass('orderedMapPrototype')
         this.setAt(key, valueFn());
       }
       this.moveAfter(key, afterKey);
-      this.touchAt(key);
-      return this;
-    },
-
-
-    touchAt(key) {
       this._map.touch(key);
       return this;
     },
+
 
     removeUntouched() {
       for (const [key, value] of
