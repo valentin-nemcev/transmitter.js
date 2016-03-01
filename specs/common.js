@@ -1,5 +1,5 @@
 require('source-map-support').install();
-require('babel/register')();
+require('babel-register');
 
 Error.stackTraceLimit = 15;
 

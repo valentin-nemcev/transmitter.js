@@ -1,7 +1,8 @@
 {
-  optional: [
-    "es7.exportExtensions",
-    "es7.classProperties",
-    "runtime"
+  "presets": ["es2015"],
+  "plugins": [
+    "transform-runtime",
+    "transform-class-properties",
+    "transform-export-extensions"
   ]
 }
