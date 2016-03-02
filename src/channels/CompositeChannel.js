@@ -8,8 +8,6 @@ import BidirectionalChannel from './BidirectionalChannel';
 import NestedBidirectionalChannel from './NestedBidirectionalChannel';
 import FlatteningChannel from './FlatteningChannel';
 
-export default class CompositeChannel {}
-
 const channelConstructors = {
   SimpleChannel,
   NestedSimpleChannel,
@@ -28,7 +26,7 @@ for (const [name, constructor] of Object.entries(channelConstructors)) {
   };
 }
 
-CompositeChannel.prototype = defineClass()
+export default defineClass('CompositeChannel')
   .includes(channelPrototype)
   .lazyReadOnlyProperty('_channels', () => [])
   .methods({
@@ -42,4 +40,4 @@ CompositeChannel.prototype = defineClass()
   })
   .methods(channelDefinitionMethods)
 
-  .buildPrototype();
+  .buildConstructor();

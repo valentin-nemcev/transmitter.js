@@ -12,9 +12,7 @@ import {getDynamicChannelNodeConstructorFor} from '../channel_nodes';
 
 import {forward, backward} from '../Directions';
 
-export default class FlatteningChannel {}
-
-FlatteningChannel.prototype = defineClass()
+export default defineClass('FlatteningChannel')
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
   .setOnceLazyProperty('_directions', () => ({forward, backward}),
@@ -143,7 +141,7 @@ FlatteningChannel.prototype = defineClass()
     return this;
   })
 
-  .buildPrototype();
+  .buildConstructor();
 
 function assertNode(node) {
   if (node == null || node.constructor == null) {

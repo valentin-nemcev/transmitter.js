@@ -6,9 +6,7 @@ import channelPrototype from './channelPrototype';
 
 import {forward, backward} from '../Directions';
 
-export default class BidirectionalChannel {}
-
-BidirectionalChannel.prototype = defineClass()
+export default defineClass('BidirectionalChannel')
   .method('inspect', function() { return '[' + this.constructor.name + ']'; })
 
   .setOnceLazyProperty('_directions', () => ({forward, backward}),
@@ -97,7 +95,7 @@ BidirectionalChannel.prototype = defineClass()
     },
   })
 
-  .buildPrototype();
+  .buildConstructor();
 
 
 function createTransform(map, updateType) {

@@ -47,8 +47,8 @@ class ClassDefinition {
   accessorProperty(prop, {get, set}) {
     Object.defineProperty(this.proto, prop, {
       enumerable: true,
-      get,
-      set,
+      get: get,
+      set: set,
     });
     return this;
   }

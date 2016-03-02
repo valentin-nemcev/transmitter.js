@@ -5,9 +5,7 @@ import NestedSimpleChannel from './NestedSimpleChannel';
 import {ChannelMap} from '../channel_nodes';
 
 
-export default class NestedBidirectionalChannel {}
-
-NestedBidirectionalChannel.prototype = defineClass()
+export default defineClass('NestedBidirectionalChannel')
   .includes(BidirectionalChannel.prototype, {rename: {
     _channels: '_bidirectionalChannels',
     withOriginDerived: 'shallowWithOriginDerived',
@@ -43,4 +41,4 @@ NestedBidirectionalChannel.prototype = defineClass()
     },
   })
 
-  .buildPrototype();
+  .buildConstructor();
