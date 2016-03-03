@@ -70,12 +70,16 @@ export default defineClass('FlatteningChannel')
       this._directions.forward : this._directions.backward;
   })
 
+  .setOnceLazyProperty('_transformFlat', function() {
+    return (flatPayload) => flatPayload.unflattenToValues();
+  })
+
   .lazyReadOnlyProperty('_flatToNestedChannel', function() {
     const direction = this._flatToNestedDirection;
     if (direction == null) return getNullChannel();
     return new SimpleChannel()
       .inDirection(direction)
-      .withTransform( (flatPayload) => flatPayload.unflattenToValues() );
+      .withTransform(this._transformFlat);
   })
   .lazyReadOnlyProperty('_nestedToFlatChannel', function() {
     const direction = this._nestedToFlatDirection;
@@ -138,6 +142,10 @@ export default defineClass('FlatteningChannel')
 
     this._dynamicChannelNodeConstructor =
       getDynamicChannelNodeConstructorFor(flatNode.constructor);
+    return this;
+  })
+  .method('withTransformFlat', function(transformFlat) {
+    this._transformFlat = transformFlat;
     return this;
   })
 

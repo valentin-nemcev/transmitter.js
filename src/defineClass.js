@@ -7,6 +7,11 @@ function iterateOwnPropertiesAndSymbols(object) {
   ];
 }
 
+function getTitleFromOptions(options, prop) {
+  return options.title || prop;
+}
+
+
 class ClassDefinition {
 
   inspect() { return '[ClassDefinition]'; }
@@ -102,7 +107,8 @@ class ClassDefinition {
     return this.dataProperty(prop, {value});
   }
 
-  setOnceMandatoryProperty(prop, {title}) {
+  setOnceMandatoryProperty(prop, options = {}) {
+    const title = getTitleFromOptions(options, prop);
     const hiddenProp = '_' + prop;
     return this.accessorProperty(prop, {
       set(newValue) {
@@ -122,7 +128,8 @@ class ClassDefinition {
     });
   }
 
-  setOnceLazyProperty(prop, getValue, {title}) {
+  setOnceLazyProperty(prop, getValue, options = {}) {
+    const title = getTitleFromOptions(options, prop);
     const hiddenProp = '_' + prop;
     return this.accessorProperty(prop, {
       set(newValue) {

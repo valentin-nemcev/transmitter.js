@@ -56,6 +56,15 @@ Object.assign(PayloadBase.prototype, {
       createPayloadAtKey: createValuePayloadAtKey,
     });
   },
+
+  unflattenToSequences() {
+    return this.unflattenTo({
+      createEmptyPayload: createEmptyPayload,
+      createPayloadAtKey:
+        (source, index) =>
+          createValuePayloadAtKey(source, index).splitValues(),
+    });
+  },
 });
 
 
