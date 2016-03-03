@@ -35,16 +35,7 @@ describe('Grouping', function() {
         .inForwardDirection()
         .withOriginDerived(this.tagByItemMap, this.itemsByTagMap)
         .withTransformOrigin(
-          (payload) => payload.joinEntries().map(
-            (itemsWithTags) => {
-              const result = {};
-              for (const [item, tag] of itemsWithTags) {
-                if (!(tag in result)) result[tag] = [];
-                result[tag].push(item);
-              }
-              return Object.entries(result);
-            }
-          ).splitEntries()
+          (payload) => payload.groupKeysByValue()
         )
         .init(tr);
 
@@ -87,12 +78,8 @@ describe('Grouping', function() {
   specify('groups items by tag', function() {
     expect(this.itemSetByTagMap.getSize()).to.equal(2);
 
-    // console.log(this.itemSetByTagMap.get());
     const tagAItemSet = this.itemSetByTagMap.getAt('tagA');
     const tagBItemSet = this.itemSetByTagMap.getAt('tagB');
-    // console.log(tagAItemSet.get());
-    // console.log(tagBItemSet.get());
-
 
     expect(tagAItemSet.getSize()).to.equal(1);
     expect(tagBItemSet.getSize()).to.equal(2);

@@ -6,6 +6,7 @@ export {PayloadBase as Payload};
 import {default as zipMethods, zipPayloads} from './zipMethods';
 import mapFilterMethods from './mapFilterMethods';
 import flattenMethods from './flattenMethods';
+import groupMethods from './groupMethods';
 import conversionMethods from './conversionMethods';
 import updateMethods from './updateMethods';
 import setActionMethods from './setActionMethods';
@@ -18,6 +19,7 @@ Object.assign(
   zipMethods,
   mapFilterMethods,
   flattenMethods,
+  groupMethods,
   conversionMethods,
   updateMethods,
   setActionMethods,
