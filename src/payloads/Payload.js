@@ -64,7 +64,7 @@ Object.assign(PayloadBase.prototype, {
       createEmptyPayload: createEmptyPayload,
       createPayloadAtKey:
         (source, index) =>
-          createValuePayloadAtKey(source, index).splitValues(),
+          createValuePayloadAtKey(source, index).expandValues(),
     });
   },
 });

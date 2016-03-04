@@ -1,20 +1,20 @@
 import PayloadBase from './PayloadBase';
 
 export default {
-  joinValues() {
-    return new JoinValuesPayload(this);
+  collapseValues() {
+    return new CollapseValuesPayload(this);
   },
 
-  joinEntries() {
-    return new JoinEntriesPayload(this);
+  collapseEntries() {
+    return new CollapseEntriesPayload(this);
   },
 
-  splitValues() {
-    return new SplitValuesPayload(this);
+  expandValues() {
+    return new ExpandValuesPayload(this);
   },
 
-  splitEntries() {
-    return new SplitEntriesPayload(this);
+  expandEntries() {
+    return new ExpandEntriesPayload(this);
   },
 
   valuesToEntries() {
@@ -23,7 +23,7 @@ export default {
 };
 
 
-class JoinValuesPayload extends PayloadBase {
+class CollapseValuesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -37,7 +37,7 @@ class JoinValuesPayload extends PayloadBase {
 }
 
 
-class JoinEntriesPayload extends PayloadBase {
+class CollapseEntriesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -51,7 +51,7 @@ class JoinEntriesPayload extends PayloadBase {
 }
 
 
-class SplitValuesPayload extends PayloadBase {
+class ExpandValuesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;
@@ -66,7 +66,7 @@ class SplitValuesPayload extends PayloadBase {
 }
 
 
-class SplitEntriesPayload extends PayloadBase {
+class ExpandEntriesPayload extends PayloadBase {
   constructor(source) {
     super();
     this.source = source;

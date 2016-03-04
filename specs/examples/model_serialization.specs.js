@@ -99,7 +99,7 @@ describe('Model serialization', function() {
             .inBothDirections()
             .withOriginDerived(this.serializedMap, this.serializedValue)
             .withTransformOrigin(
-              (payload) => payload.joinEntries().map(
+              (payload) => payload.collapseEntries().map(
                 (entries) => {
                   const obj = {};
                   for (const [key, value] of entries) obj[key] = value;
@@ -110,7 +110,7 @@ describe('Model serialization', function() {
             .withTransformDerived(
               (payload) => payload.map(
                 (obj) => Object.entries(obj)
-              ).splitValues().valuesToEntries()
+              ).expandValues().valuesToEntries()
             )
             .init(tr);
         }
@@ -242,10 +242,10 @@ describe('Model serialization', function() {
             .inBothDirections()
             .withOriginDerived(this.serializedList, this.serializedValue)
             .withTransformOrigin(
-              (payload) => payload.joinValues()
+              (payload) => payload.collapseValues()
             )
             .withTransformDerived(
-              (payload) => payload.splitValues()
+              (payload) => payload.expandValues()
             )
             .init(tr);
         }
