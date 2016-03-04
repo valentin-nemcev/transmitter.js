@@ -41,5 +41,7 @@
     "sinon-chai": "^2.6.0",
     "source-map-support": "^0.3.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "stacktrace-js": "^1.0.4"
+  }
 }
