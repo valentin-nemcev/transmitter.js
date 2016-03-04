@@ -9,6 +9,10 @@ export default class Optional extends SourceTargetNode {
     return createListPayload(this);
   }
 
+  constructor() {
+    super();
+    this.key = null;
+  }
 
   get() { return this.value; }
 

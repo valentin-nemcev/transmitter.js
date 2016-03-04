@@ -23,6 +23,12 @@ class MappedPayload extends PayloadBase {
     this.withKey = withKey;
   }
 
+  getAt(key) {
+    const map = this.mapFn;
+    const value = this.source.getAt(key);
+    return value !== undefined ? map(value, key) : value;
+  }
+
   *[Symbol.iterator]() {
     const map = this.mapFn;
     for (const [key, value] of this.source) {

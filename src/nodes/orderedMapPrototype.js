@@ -1,6 +1,7 @@
 import defineClass from '../defineClass';
 
 export default defineClass('orderedMapPrototype')
+  .readOnlyProperty('isMap', true)
   .methods({
 
     *[Symbol.iterator]() {

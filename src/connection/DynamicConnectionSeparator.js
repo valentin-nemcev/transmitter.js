@@ -12,6 +12,7 @@ export default class DynamicConnectionSeparator {
     this.dynamicTargetNode = dynamicTargetNode;
     this.direction = direction;
     this.singleTarget = false;
+    this.useJoin = dynamicTargetNode.isMap;
     this.dynamicTargetNode.setSource(this);
     this.targetNodesToLines = new Map();
   }

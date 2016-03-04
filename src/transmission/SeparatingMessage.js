@@ -66,7 +66,11 @@ module.exports = class SeparatingMessage {
         yield [i, [nodePayload[i], valuePayload[i]]];
       }
     } else {
-      yield* nodePayload.zipCoercingSize(valuePayload);
+      if (this.connPoint.useJoin) {
+        yield* nodePayload.leftJoin(valuePayload);
+      } else {
+        yield* nodePayload.zipCoercingSize(valuePayload);
+      }
     }
   }
 

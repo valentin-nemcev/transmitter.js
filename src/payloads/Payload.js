@@ -4,6 +4,7 @@ import {getNoOpPayload} from './NoOpPayload';
 export {PayloadBase as Payload};
 
 import {default as zipMethods, zipPayloads} from './zipMethods';
+import {default as joinMethods, joinPayloads} from './joinMethods';
 import mapFilterMethods from './mapFilterMethods';
 import flattenMethods from './flattenMethods';
 import groupMethods from './groupMethods';
@@ -12,11 +13,12 @@ import updateMethods from './updateMethods';
 import setActionMethods from './setActionMethods';
 import mapActionMethods from './mapActionMethods';
 
-export {zipPayloads};
+export {zipPayloads, joinPayloads};
 
 Object.assign(
   PayloadBase.prototype,
   zipMethods,
+  joinMethods,
   mapFilterMethods,
   flattenMethods,
   groupMethods,
