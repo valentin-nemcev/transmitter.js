@@ -43,22 +43,7 @@ export default defineClass('FlatteningChannel')
     ];
   })
 
-  .accessorProperty('_dynamicChannelNodeConstructor', {
-    set(newC) {
-      const prevC = this.__dynamicChannelNodeConstructor;
-      if (prevC != null && prevC !== newC) {
-        throw new Error(
-          'Nested and flat node type mismatch: ' +
-          [this._nestedNode.constructor, this._flatNode.constructor]
-            .map(inspect).join(' ')
-        );
-      }
-      this.__dynamicChannelNodeConstructor = newC;
-    },
-    get() {
-      return this.__dynamicChannelNodeConstructor;
-    },
-  })
+  .setOnceMandatoryProperty('_dynamicChannelNodeConstructor')
 
   .lazyReadOnlyProperty('_flatToNestedDirection', function() {
     return this._nestedIsOrigin ?
@@ -140,8 +125,6 @@ export default defineClass('FlatteningChannel')
     this._nestedToFlatChannel.toTarget(this._flatNode);
     this._flatToNestedChannel.fromSource(this._flatNode);
 
-    this._dynamicChannelNodeConstructor =
-      getDynamicChannelNodeConstructorFor(flatNode.constructor);
     return this;
   })
   .method('withTransformFlat', function(transformFlat) {
