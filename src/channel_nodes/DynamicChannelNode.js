@@ -37,29 +37,16 @@ export default defineClass('DynamicChannelNode')
 
   .propertyInitializer('changeListener', () => new ChangeListener() )
 
-  .initializer('dynamicChannelNode', function(type, createChannel) {
-    if (type !== 'source' && type !== 'target') {
-      throw new Error(`Unknown dynamic channel type: ${type}`);
-    }
-
-    this.type = type;
-    this.createChannel = createChannel;
-  })
   .methods({
-
     setSource(source) {
-      if (this.type !== 'target') {
-        throw new Error(`DynamicChannelNode type mismatch: ${this.type}`);
-      }
+      this._isTarget = true;
       this.connPoint = source;
       this.changeListener.connPoint = source;
       return this;
     },
 
     setTarget(target) {
-      if (this.type !== 'source') {
-        throw new Error(`DynamicChannelNode type mismatch: ${this.type}`);
-      }
+      this._isSource = true;
       this.connPoint = target;
       this.changeListener.connPoint = target;
       return this;
@@ -78,11 +65,11 @@ export default defineClass('DynamicChannelNode')
     },
 
     getSourcePayload() {
-      return this.type === 'source' ? this.payload : null;
+      return this._isSource ? this.payload : null;
     },
 
     getTargetPayload() {
-      return this.type === 'target' ? this.payload : null;
+      return this._isTarget ? this.payload : null;
     },
   })
   .buildConstructor();
