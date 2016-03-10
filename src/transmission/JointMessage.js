@@ -64,16 +64,16 @@ export default class JointMessage {
     return this._ensureQuerySent();
   }
 
-  receiveTargetConnectionMessage(channelNode) {
+  receiveTargetConnectionMessage(connection) {
     this._ensureQuerySent();
-    this._sendQueryForChannelNode(channelNode);
+    this._sendQueryForConnection(connection);
     this._selectAndSendMessageIfReady();
     return this;
   }
 
-  receiveSourceConnectionMessage(channelNode) {
+  receiveSourceConnectionMessage(connection) {
     if (this.messageHub != null) {
-      this.messageHub.sendForChannelNode(channelNode);
+      this.messageHub.sendForConnection(connection);
     }
     return this;
   }
@@ -106,13 +106,13 @@ export default class JointMessage {
     return this;
   }
 
-  _sendQueryForChannelNode(channelNode) {
-    this.queryHub.sendForChannelNode(channelNode);
+  _sendQueryForConnection(connection) {
+    this.queryHub.sendForConnection(connection);
     return this;
   }
 
   _selectAndSendMessageIfReady() {
-    if (!this.queryHub.areAllChannelNodesUpdated()) return this;
+    if (!this.queryHub.areAllConnectionsUpdated()) return this;
 
     this.transmission.log(this.node, ...this.linesToMessages);
     this.transmission.log(this.node, this.query,
@@ -182,7 +182,7 @@ export default class JointMessage {
 
   readyToRespond() {
     return (this.query != null) && (this.message == null) &&
-      !this.query.wasDelivered() && this.queryHub.areAllChannelNodesUpdated();
+      !this.query.wasDelivered() && this.queryHub.areAllConnectionsUpdated();
   }
 
 

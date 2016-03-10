@@ -51,40 +51,40 @@ export default class NodePoint {
       throw new Error(`Unknown node point type: ${type}`);
     }
 
-    this.channelNodeToLines = new Map();
+    this.connectionToLines = new Map();
   }
 
-  *getChannelNodesFor(comm) {
-    for (const [channelNode, lines] of this.channelNodeToLines) {
-      if (lines.acceptsCommunication(comm)) yield channelNode;
+  *getConnectionsFor(comm) {
+    for (const [connection, lines] of this.connectionToLines) {
+      if (lines.acceptsCommunication(comm)) yield connection;
     }
   }
 
   connectLine(connectionMessage, line) {
-    const channelNode = connectionMessage.getSourceChannelNode();
+    const connection = connectionMessage.getSourceConnection();
     connectionMessage.addTargetPoint(this);
 
-    let lines = this.channelNodeToLines.get(channelNode);
+    let lines = this.connectionToLines.get(connection);
     if (lines == null) {
       lines = new LineSet();
-      this.channelNodeToLines.set(channelNode, lines);
+      this.connectionToLines.set(connection, lines);
     }
     lines.add(line);
     return this;
   }
 
   disconnectLine(connectionMessage, line) {
-    const channelNode = connectionMessage.getSourceChannelNode();
-    connectionMessage.removeTargetPoint(this);
+    const connection = connectionMessage.getSourceConnection();
+    connectionMessage.addTargetPoint(this);
 
-    const lines = this.channelNodeToLines.get(channelNode);
+    const lines = this.connectionToLines.get(connection);
     lines.delete(line);
-    if (lines.size === 0) this.channelNodeToLines.delete(channelNode);
+    if (lines.size === 0) this.connectionToLines.delete(connection);
     return this;
   }
 
-  receiveCommunicationForChannelNode(comm, channelNode) {
-    const lines = this.channelNodeToLines.get(channelNode);
+  receiveCommunicationForConnection(comm, connection) {
+    const lines = this.connectionToLines.get(connection);
     if (lines != null) lines.receiveCommunication(comm);
     return this;
   }

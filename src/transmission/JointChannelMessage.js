@@ -31,7 +31,7 @@ export default class JointChannelMessage {
     this.channelNode = channelNode;
   }
 
-  receiveNestedCommunication() {
+  queryForNestedCommunication() {
     this._ensureQuerySent();
     return this;
   }

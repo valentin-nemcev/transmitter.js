@@ -46,7 +46,7 @@ export default defineClass('ChannelNode')
       this.payload = payload;
       this.changeListener.connectionMessage = this.connectionMessage;
       payload.deliver(this);
-      this.connectionMessage.sendToTargetPoints();
+      this.connectionMessage.send();
       this.connectionMessage = null;
       this.changeListener.connectionMessage = null;
       return this;

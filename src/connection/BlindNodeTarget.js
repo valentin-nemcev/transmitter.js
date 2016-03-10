@@ -4,9 +4,7 @@ export default class BlindNodeTarget {
 
   constructor(node) { this.node = node; }
 
-  getChannelNodesFor() { return []; }
+  getConnectionsFor() { return []; }
 
-  receiveQuery() {
-    return this;
-  }
+  receiveQuery() { return this; }
 }

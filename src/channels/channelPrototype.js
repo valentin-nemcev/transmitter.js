@@ -16,7 +16,7 @@ export default {
   init(tr) {
     const connectionMessage = tr.createInitialConnectionMessage();
     this.connect(connectionMessage);
-    connectionMessage.sendToTargetPoints();
+    connectionMessage.send();
     return this;
   },
 };

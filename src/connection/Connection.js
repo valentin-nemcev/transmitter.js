@@ -1,31 +1,41 @@
 export default class Connection {
 
-  constructor(source, target, transform, channelNode) {
+  constructor(source, target, transform, dynamicChannelNode) {
     this.source = source;
     this.target = target;
     this.transform = transform;
-    this.channelNode = channelNode;
+    this.dynamicChannelNode = dynamicChannelNode;
     this.source.setTarget(this);
     this.target.setSource(this);
   }
 
   inspect() { return this.source.inspect() + this.target.inspect(); }
 
-  connect(connectionMessage, noPlaceholder) {
-    if (this.channelNode && !noPlaceholder) {
-      connectionMessage = connectionMessage
-        .createPlaceholderConnectionMessage(this.channelNode);
-    }
+  connect(connectionMessage) {
+    this.channelNode = connectionMessage.getSourceChannelNode();
+    connectionMessage.sendToJointConnectionMessage(this, 'connect');
+    return this;
+  }
 
+  sendConnect(connectionMessage) {
+    // if (this.dynamicChannelNode && !noPlaceholder) {
+    //   connectionMessage = connectionMessage
+    //     .createPlaceholderConnectionMessage(this.dynamicChannelNode);
+    // }
     this.source.connect(connectionMessage);
     this.target.connect(connectionMessage);
     return this;
   }
 
-  disconnect(connectionMessage, noPlaceholder) {
-    if (this.channelNode && !noPlaceholder) {
-      throw new Error('Can not disconnect with placeholder');
-    }
+  disconnect(connectionMessage) {
+    connectionMessage.sendToJointConnectionMessage(this, 'disconnect');
+    return this;
+  }
+
+  sendDisconnect(connectionMessage) {
+    // if (this.dynamicChannelNode && !noPlaceholder) {
+    //   throw new Error('Can not disconnect with placeholder');
+    // }
 
     this.source.disconnect(connectionMessage);
     this.target.disconnect(connectionMessage);

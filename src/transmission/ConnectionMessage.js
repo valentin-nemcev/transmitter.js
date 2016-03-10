@@ -3,8 +3,7 @@ import {inspect} from 'util';
 import Passes from './Passes';
 
 import Query from './Query';
-import JointMessage from './JointMessage';
-import JointChannelMessage from './JointChannelMessage';
+import JointConnectionMessage from './JointConnectionMessage';
 import MergingMessage from './MergingMessage';
 import SeparatingMessage from './SeparatingMessage';
 
@@ -39,7 +38,7 @@ export default class ConnectionMessage {
     this.pass = pass;
     this.sourceChannelNode = sourceChannelNode;
 
-    this.targetPointsToUpdate = new Set();
+    this.targetJointConnectionMessages = new Set();
   }
 
   createPlaceholderConnectionMessage(sourceChannelNode) {
@@ -48,6 +47,22 @@ export default class ConnectionMessage {
 
   createNextQuery() {
     return Query.createNext(this);
+  }
+
+  addTargetJointConnectionMessage(msg) {
+    this.targetJointConnectionMessages.add(msg);
+    return this;
+  }
+
+  send() {
+    this.targetJointConnectionMessages.forEach( (msg) => {
+      msg.sendToTargetPoints(this);
+    });
+    return this;
+  }
+
+  getSourceChannelNode() {
+    return this.sourceChannelNode;
   }
 
   sendToMergedMessage(merger) {
@@ -64,46 +79,13 @@ export default class ConnectionMessage {
     return this;
   }
 
-  getSourceChannelNode() { return this.sourceChannelNode; }
-
-  addTargetPoint(targetPoint) {
-    this.targetPointsToUpdate.add(targetPoint);
+  sendToJointConnectionMessage(connection, action) {
+    JointConnectionMessage
+      .getOrCreate(this, {connection})
+      .receiveConnectionMessage(this, action);
     return this;
   }
 
-  removeTargetPoint(targetPoint) {
-    this.targetPointsToUpdate.add(targetPoint);
-    return this;
-  }
-
-  sendToJointMessageFromSource(node) {
-    JointMessage
-      .getOrCreate(this, {node})
-      .receiveSourceConnectionMessage(this.sourceChannelNode);
-    return this;
-  }
-
-  sendToJointMessageFromTarget(node) {
-    JointMessage
-      .getOrCreate(this, {node})
-      .receiveTargetConnectionMessage(this.sourceChannelNode);
-    return this;
-  }
-
-  sendToJointChannelMessage(channelNode) {
-    JointChannelMessage
-      .getOrCreate(this, {channelNode})
-      .receiveConnectionMessage(this.sourceChannelNode);
-    return this;
-  }
-
-  sendToTargetPoints() {
-    this.targetPointsToUpdate.forEach( (targetPoint) => {
-      this.log(targetPoint);
-      targetPoint.receiveConnectionMessage(this);
-    });
-    return this;
-  }
 }
 
 

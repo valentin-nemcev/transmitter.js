@@ -1,4 +1,4 @@
-import JointChannelMessage from './JointChannelMessage';
+import JointConnectionMessage from './JointConnectionMessage';
 
 
 export default class NodePointTransmissionHub {
@@ -8,49 +8,42 @@ export default class NodePointTransmissionHub {
     this.transmission = this.comm.transmission;
     this.pass = this.comm.pass;
     this.nodePoint = nodePoint;
-    this.updatedChannelNodes = new Set();
+    this.updatedConnections = new Set();
   }
 
   sendForAll() {
-    for (const channelNode of this.nodePoint.getChannelNodesFor(this.comm)) {
-      if (this._tryQueryChannelNode(channelNode)) {
-        this.sendForChannelNode(channelNode);
+    for (const connection of this.nodePoint.getConnectionsFor(this.comm)) {
+      if (this._tryQueryConnection(connection)) {
+        this.sendForConnection(connection);
       }
     }
     return this;
   }
 
-  sendForChannelNode(channelNode) {
-    if (!this.updatedChannelNodes.has(channelNode)) {
-      this.updatedChannelNodes.add(channelNode);
+  sendForConnection(connection) {
+    if (!this.updatedConnections.has(connection)) {
+      this.updatedConnections.add(connection);
       this.nodePoint
-        .receiveCommunicationForChannelNode(this.comm, channelNode);
+        .receiveCommunicationForConnection(this.comm, connection);
     }
     return this;
   }
 
-  areAllChannelNodesUpdated() {
-    for (const node of this.nodePoint.getChannelNodesFor(this.comm)) {
-      if (!this._channelNodeUpdated(node)) return false;
+  areAllConnectionsUpdated() {
+    for (const connection of this.nodePoint.getConnectionsFor(this.comm)) {
+      const msg = JointConnectionMessage.getOrCreate(this, {connection});
+      if (!msg.isUpdated()) return false;
     }
     return true;
   }
 
-  _tryQueryChannelNode(channelNode) {
-    if (!this._channelNodeUpdated(channelNode)) {
-      JointChannelMessage
-        .getOrCreate(this, {channelNode})
-        .receiveNestedCommunication(this.comm);
+  _tryQueryConnection(connection) {
+    const msg = JointConnectionMessage.getOrCreate(this, {connection});
+    if (!msg.isUpdated()) {
+      msg.queryForNestedCommunication(this.comm);
       return false;
     } else {
       return true;
     }
-  }
-
-  _channelNodeUpdated(channelNode) {
-    return channelNode === null ||
-      JointChannelMessage
-        .getOrCreate(this, {channelNode})
-        .isUpdated();
   }
 }
