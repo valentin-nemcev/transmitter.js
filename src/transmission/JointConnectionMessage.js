@@ -3,6 +3,8 @@ import {inspect} from 'util';
 // import Query from './Query';
 import JointMessage from './JointMessage';
 import JointChannelMessage from './JointChannelMessage';
+import MergingMessage from './MergingMessage';
+import SeparatingMessage from './SeparatingMessage';
 
 
 export default class JointConnectionMessage {
@@ -31,20 +33,42 @@ export default class JointConnectionMessage {
     this.connection = connection;
 
     this.targetPointsToUpdate = new Set();
+
+    this.channelNodesSent = new Set();
+
+    this.channelNodesToMessages = new Map(
+      ['channelNode', 'sourceChannelNode', 'targetChannelNode']
+        .map( (name) => this.connection[name] )
+        .filter( (n) => n )
+        .map(
+          (n) => [n, JointChannelMessage.getOrCreate(this, {channelNode: n})]
+        )
+    );
   }
 
   queryForNestedCommunication(comm) {
-    JointChannelMessage
-      .getOrCreate(this, {channelNode: this.connection.channelNode})
-      .queryForNestedCommunication(comm);
+    for (const [ , msg] of this.channelNodesToMessages) {
+      msg.queryForNestedCommunication(comm);
+    }
+    return this;
   }
 
   isUpdated() {
-    return this.connection.channelNode == null || this.channelMessage != null;
+    for (const [ , msg] of this.channelNodesToMessages) {
+      if (!msg.isUpdated()) return false;
+    }
+    return true;
+  }
+
+  isSent() {
+    for (const [ , msg] of this.channelNodesToMessages) {
+      if (!msg.isSent()) return false;
+    }
+    return true;
   }
 
   receiveConnectionMessage(connectionMessage, action) {
-    this.channelMessage = connectionMessage;
+    this.queryForNestedCommunication(this); // TODO: More appropriate method
     connectionMessage.addTargetJointConnectionMessage(this);
     if (action === 'connect') {
       this.connection.sendConnect(this);
@@ -54,6 +78,14 @@ export default class JointConnectionMessage {
     return this;
   }
 
+  receiveJointChannelMessage(channelMessage) {
+    this.queryForNestedCommunication(this); // TODO: More appropriate method
+    channelMessage.channelNode.routeConnectionMessage(
+      this,
+      channelMessage.message.getPayload()
+    );
+  }
+
   getSourceConnection() { return this.connection; }
 
   addTargetPoint(targetPoint) {
@@ -61,7 +93,14 @@ export default class JointConnectionMessage {
     return this;
   }
 
-  sendToTargetPoints() {
+  sendToTargetPoints(channelNode) {
+    if (channelNode == null) {
+      channelNode = this.connection.channelNode;
+    }
+    this.channelNodesSent.add(channelNode);
+    if (this.channelNodesToMessages.size !== this.channelNodesSent.size) {
+      return this;
+    }
     this.targetPointsToUpdate.forEach( (targetPoint) => {
       targetPoint.receiveConnectionMessage(this);
     });
@@ -89,11 +128,17 @@ export default class JointConnectionMessage {
     return this;
   }
 
-  sendToMergedMessage() {
+  sendToMergedMessage(merger, payload) {
+    MergingMessage
+      .getOrCreate(this, merger)
+      .receiveConnectionMessage(payload);
     return this;
   }
 
-  sendToSeparatedMessage() {
+  sendToSeparatedMessage(separator, payload) {
+    SeparatingMessage
+      .getOrCreate(this, separator)
+      .receiveConnectionMessage(payload);
     return this;
   }
 

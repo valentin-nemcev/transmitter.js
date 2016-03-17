@@ -56,7 +56,7 @@ export default defineClass()
     fromDynamicSourceNode(dynamicSourceNode) {
       this._connectionSource =
         new DynamicConnectionMerger(dynamicSourceNode, this._direction);
-      this._channelNode = dynamicSourceNode;
+      this._sourceChannelNode = dynamicSourceNode;
       return this;
     },
   })

@@ -41,10 +41,13 @@ export default class DynamicConnectionSeparator {
     return this;
   }
 
-  receiveConnectionMessage(connectionMessage) {
-    this.source.disconnect(connectionMessage, true);
-    this.source.connect(connectionMessage, true);
-    connectionMessage.sendToSeparatedMessage(this);
+  receiveConnectionMessage(connectionMessage, payload) {
+    connectionMessage.sendToSeparatedMessage(this, payload);
+    return this;
+  }
+
+  receiveJointChannelMessage(msg) {
+    msg.sendToJointConnectionMessage(this.source);
     return this;
   }
 

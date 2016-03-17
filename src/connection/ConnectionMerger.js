@@ -5,7 +5,8 @@ import NodeConnectionLine from './NodeConnectionLine';
 export default class ConnectionMerger {
 
   inspect() {
-    return '[' + this.sourceNodesToLines.keys().map(inspect).join(', ') + ']:';
+    return '[' + Array.from(this.sourceNodesToLines.keys())
+      .map(inspect).join(', ') + ']:';
   }
 
   constructor(sources, direction, {singleSource, prioritiesShouldMatch} = {}) {
@@ -32,7 +33,6 @@ export default class ConnectionMerger {
     this.sourceNodesToLines.forEach(
       (line) => line.connect(connectionMessage)
     );
-    connectionMessage.sendToMergedMessage(this);
     return this;
   }
 

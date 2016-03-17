@@ -55,7 +55,7 @@ export default defineClass()
     toDynamicTargetNode(dynamicTargetNode) {
       this._connectionTarget =
         new DynamicConnectionSeparator(dynamicTargetNode, this._direction);
-      this._channelNode = dynamicTargetNode;
+      this._targetChannelNode = dynamicTargetNode;
       return this;
     },
   })

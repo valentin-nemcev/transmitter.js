@@ -3,7 +3,7 @@ import {inspect} from 'util';
 
 export default class ConnectionDuplicator {
 
-  inspect() { return '=[' + this.target.map(inspect).join(', ') + ']'; }
+  inspect() { return '=[' + this.targets.map(inspect).join(', ') + ']'; }
 
   constructor(channelTargets) {
     this.targets = channelTargets.map(

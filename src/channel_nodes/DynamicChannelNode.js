@@ -37,6 +37,8 @@ export default defineClass('DynamicChannelNode')
 
   .propertyInitializer('changeListener', () => new ChangeListener() )
 
+  .readOnlyProperty('isDynamicChannelNode', true)
+
   .methods({
     setSource(source) {
       this._isTarget = true;
@@ -52,24 +54,21 @@ export default defineClass('DynamicChannelNode')
       return this;
     },
 
+    sendJointChannelMessage(msg) {
+      this.connPoint.receiveJointChannelMessage(msg);
+      return this;
+    },
+
     routeConnectionMessage(connectionMessage, payload) {
       this.payload = payload;
       this.changeListener.connectionMessage = connectionMessage;
 
       payload.deliver(this);
 
-      this.connPoint.receiveConnectionMessage(connectionMessage);
-      connectionMessage.sendToTargetPoints();
+      this.connPoint.receiveConnectionMessage(connectionMessage, payload);
+      connectionMessage.sendToTargetPoints(this);
       this.changeListener.connectionMessage = connectionMessage;
       return this;
-    },
-
-    getSourcePayload() {
-      return this._isSource ? this.payload : null;
-    },
-
-    getTargetPayload() {
-      return this._isTarget ? this.payload : null;
     },
   })
   .buildConstructor();

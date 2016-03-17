@@ -42,10 +42,13 @@ export default class DynamicConnectionMerger {
     return this;
   }
 
-  receiveConnectionMessage(connectionMessage) {
-    this.target.disconnect(connectionMessage, true);
-    this.target.connect(connectionMessage, true);
-    connectionMessage.sendToMergedMessage(this);
+  receiveConnectionMessage(connectionMessage, payload) {
+    connectionMessage.sendToMergedMessage(this, payload);
+    return this;
+  }
+
+  receiveJointChannelMessage(msg) {
+    msg.sendToJointConnectionMessage(this.target);
     return this;
   }
 

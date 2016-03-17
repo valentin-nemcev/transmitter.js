@@ -40,6 +40,8 @@ export default defineClass('ChannelNode')
     'changeListener', function() { return new ChangeListener(); }
   )
 
+  .readOnlyProperty('isChannelNode', true)
+
   .methods({
     routeConnectionMessage(connectionMessage, payload) {
       this.connectionMessage = connectionMessage;

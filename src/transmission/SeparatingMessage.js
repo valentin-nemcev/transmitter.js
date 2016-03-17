@@ -28,17 +28,15 @@ module.exports = class SeparatingMessage {
     this.connPoint = connPoint;
   }
 
-  receiveConnectionMessage(channelNode) {
-    this.channelNode = channelNode;
+  receiveConnectionMessage(payload) {
+    this.dynamicChannelPayload = payload;
     return this;
   }
 
   getPriority() { return this.sourceMessage.getPriority(); }
 
   _getNodePayload(nodesToLines) {
-    const payload = this.channelNode != null
-      ? this.channelNode.getTargetPayload() : null;
-    return payload || Array.from(nodesToLines.keys());
+    return this.dynamicChannelPayload || Array.from(nodesToLines.keys());
   }
 
   receiveMessage(message) {

@@ -45,8 +45,8 @@ export default class MergingMessage {
     this.linesToMessages = new Map();
   }
 
-  receiveConnectionMessage(channelNode) {
-    this.channelNode = channelNode;
+  receiveConnectionMessage(payload) {
+    this.dynamicChannelPayload = payload;
     return this;
   }
 
@@ -125,19 +125,16 @@ export default class MergingMessage {
   _getNoOpPayload() { return [getNoOpPayload(), null]; }
 
   _getEmptyPayload() {
-    const payload = this.channelNode != null
-      ? this.channelNode.getSourcePayload() : null;
-    return [payload || [], 0];
+    return [this.dynamicChannelPayload || [], 0];
   }
 
   _getLinePayload(nodesToLines) {
-    if (this.channelNode != null) {
-      const payload = this.channelNode.getSourcePayload();
-      if (payload != null) {
-        return payload.map( (node) => nodesToLines.get(node) );
-      }
+    if (this.dynamicChannelPayload != null) {
+      return this.dynamicChannelPayload
+        .map( (node) => nodesToLines.get(node) );
+    } else {
+      return Array.from(nodesToLines.values());
     }
-    return Array.from(nodesToLines.values());
   }
 
   _getMergedPayload() {

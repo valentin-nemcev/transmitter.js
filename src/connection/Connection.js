@@ -1,18 +1,25 @@
+import RootChannelNode from '../channel_nodes/RootChannelNode';
+
 export default class Connection {
 
-  constructor(source, target, transform, dynamicChannelNode) {
+  constructor(source, target, transform,
+              sourceChannelNode, targetChannelNode) {
     this.source = source;
     this.target = target;
-    this.transform = transform;
-    this.dynamicChannelNode = dynamicChannelNode;
     this.source.setTarget(this);
     this.target.setSource(this);
+
+    this.sourceChannelNode = sourceChannelNode;
+    this.targetChannelNode = targetChannelNode;
+
+    this.transform = transform;
   }
 
   inspect() { return this.source.inspect() + this.target.inspect(); }
 
   connect(connectionMessage) {
-    this.channelNode = connectionMessage.getSourceChannelNode();
+    this.channelNode =
+      connectionMessage.getSourceChannelNode() || new RootChannelNode(this);
     connectionMessage.sendToJointConnectionMessage(this, 'connect');
     return this;
   }

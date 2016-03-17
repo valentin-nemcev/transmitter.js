@@ -5,7 +5,8 @@ import ConnectionNodeLine  from './ConnectionNodeLine';
 export default class ConnectionSeparator {
 
   inspect() {
-    return ':[' + this.targetNodesToLines.keys().map(inspect).join(', ') + ']';
+    return ':[' + Array.from(this.targetNodesToLines.keys())
+      .map(inspect).join(', ') + ']';
   }
 
   constructor(targets, direction, {singleTarget} = {}) {
@@ -31,7 +32,6 @@ export default class ConnectionSeparator {
     this.targetNodesToLines.forEach(
       (line) => line.connect(connectionMessage)
     );
-    connectionMessage.sendToSeparatedMessage(this);
     return this;
   }
 

@@ -75,12 +75,16 @@ export default defineClass('FlatteningChannel')
   })
 
   .lazyReadOnlyProperty('_dynamicTargetNode', function() {
-    const direction = this._flatToNestedDirection;
-    return direction && new this._dynamicChannelNodeConstructor();
+    if (this._flatToNestedDirection == null) return null;
+    const node = new this._dynamicChannelNodeConstructor();
+    node.inspect = () => this._nestedNode.inspect() + node.constructor.name;
+    return node;
   })
   .lazyReadOnlyProperty('_dynamicSourceNode', function() {
-    const direction = this._nestedToFlatDirection;
-    return direction && new this._dynamicChannelNodeConstructor();
+    if (this._nestedToFlatDirection == null) return null;
+    const node = new this._dynamicChannelNodeConstructor();
+    node.inspect = () => this._nestedNode.inspect() + node.constructor.name;
+    return node;
   })
 
   .lazyReadOnlyProperty('_nestedChannel', function() {

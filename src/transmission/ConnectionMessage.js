@@ -4,8 +4,6 @@ import Passes from './Passes';
 
 import Query from './Query';
 import JointConnectionMessage from './JointConnectionMessage';
-import MergingMessage from './MergingMessage';
-import SeparatingMessage from './SeparatingMessage';
 
 
 export default class ConnectionMessage {
@@ -56,27 +54,13 @@ export default class ConnectionMessage {
 
   send() {
     this.targetJointConnectionMessages.forEach( (msg) => {
-      msg.sendToTargetPoints(this);
+      msg.sendToTargetPoints(this.sourceChannelNode);
     });
     return this;
   }
 
   getSourceChannelNode() {
     return this.sourceChannelNode;
-  }
-
-  sendToMergedMessage(merger) {
-    MergingMessage
-      .getOrCreate(this, merger)
-      .receiveConnectionMessage(this.sourceChannelNode);
-    return this;
-  }
-
-  sendToSeparatedMessage(separator) {
-    SeparatingMessage
-      .getOrCreate(this, separator)
-      .receiveConnectionMessage(this.sourceChannelNode);
-    return this;
   }
 
   sendToJointConnectionMessage(connection, action) {
