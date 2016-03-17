@@ -39,10 +39,6 @@ export default class ConnectionMessage {
     this.targetJointConnectionMessages = new Set();
   }
 
-  createPlaceholderConnectionMessage(sourceChannelNode) {
-    return PlaceholderConnectionMessage.createNext(this, sourceChannelNode);
-  }
-
   createNextQuery() {
     return Query.createNext(this);
   }
@@ -70,19 +66,4 @@ export default class ConnectionMessage {
     return this;
   }
 
-}
-
-
-class PlaceholderConnectionMessage extends ConnectionMessage {
-  inspect() {
-    return [
-      'PCM',
-      inspect(this.pass),
-      inspect(this.sourceChannelNode),
-    ].join(' ');
-  }
-
-  sendToTargetPoints() {
-    return this;
-  }
 }

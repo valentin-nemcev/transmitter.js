@@ -25,10 +25,6 @@ export default class Connection {
   }
 
   sendConnect(connectionMessage) {
-    // if (this.dynamicChannelNode && !noPlaceholder) {
-    //   connectionMessage = connectionMessage
-    //     .createPlaceholderConnectionMessage(this.dynamicChannelNode);
-    // }
     this.source.connect(connectionMessage);
     this.target.connect(connectionMessage);
     return this;
@@ -40,10 +36,6 @@ export default class Connection {
   }
 
   sendDisconnect(connectionMessage) {
-    // if (this.dynamicChannelNode && !noPlaceholder) {
-    //   throw new Error('Can not disconnect with placeholder');
-    // }
-
     this.source.disconnect(connectionMessage);
     this.target.disconnect(connectionMessage);
     return this;
