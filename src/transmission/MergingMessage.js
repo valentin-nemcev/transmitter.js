@@ -4,7 +4,6 @@ import {getNoOpPayload} from '../payloads';
 
 import Query from './Query';
 import SeparatingMessage from './SeparatingMessage';
-import ConnectionMessage from './ConnectionMessage';
 import JointChannelMessage from './JointChannelMessage';
 
 
@@ -32,10 +31,6 @@ export default class MergingMessage {
       transmission.addCommunicationFor(message, connPoint);
     }
     return message;
-  }
-
-  createNextConnectionMessage(channelNode) {
-    return ConnectionMessage.createNext(this, channelNode);
   }
 
   constructor(transmission, pass, connPoint) {

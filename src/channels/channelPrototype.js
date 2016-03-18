@@ -1,16 +1,16 @@
 import RootChannelNode from '../channel_nodes/RootChannelNode';
 
 export default {
-  connect(connectionMessage) {
+  connect(channelMessage) {
     this._channels.forEach(
-      (channel) => channel.connect(connectionMessage)
+      (channel) => channel.connect(channelMessage)
     );
     return this;
   },
 
-  disconnect(connectionMessage) {
+  disconnect(channelMessage) {
     this._channels.forEach(
-      (channel) => channel.disconnect(connectionMessage)
+      (channel) => channel.disconnect(channelMessage)
     );
     return this;
   },

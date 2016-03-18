@@ -6,7 +6,7 @@ import Query from './Query';
 import JointConnectionMessage from './JointConnectionMessage';
 
 
-export default class ConnectionMessage {
+export default class ChannelMessage {
 
   inspect() {
     return [

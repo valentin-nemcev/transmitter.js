@@ -16,7 +16,7 @@ export default class RootChannelNode {
   }
 
   originate(tr) {
-    tr.originateConnectionMessage(this);
+    tr.originateChannelMessage(this);
     return this;
   }
 }

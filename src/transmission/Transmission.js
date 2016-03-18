@@ -117,7 +117,7 @@ export default class Transmission {
       .originateMessage(payload);
   }
 
-  originateConnectionMessage(channelNode) {
+  originateChannelMessage(channelNode) {
     return JointChannelMessage
       .getOrCreate({
         transmission: this,

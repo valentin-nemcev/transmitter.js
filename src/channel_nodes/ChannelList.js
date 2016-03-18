@@ -33,13 +33,13 @@ export default class ChannelList extends ChannelNode {
     const oldChannels = this.channels;
 
     for (const oldChannel of oldChannels) {
-      oldChannel.disconnect(this.connectionMessage);
+      oldChannel.disconnect(this.channelMessage);
     }
 
     this.channels.length = 0;
     for (const [, newChannel] of newChannelEntries) {
       this.channels.push(newChannel);
-      newChannel.connect(this.connectionMessage);
+      newChannel.connect(this.channelMessage);
     }
     return this;
   }
@@ -51,13 +51,13 @@ export default class ChannelList extends ChannelNode {
       this.channels.splice(pos, 0, el);
     }
 
-    el.connect(this.connectionMessage);
+    el.connect(this.channelMessage);
     return this;
   }
 
   removeAt(pos) {
     const el = this.channels.splice(pos, 1)[0];
-    el.disconnect(this.connectionMessage);
+    el.disconnect(this.channelMessage);
     return this;
   }
 

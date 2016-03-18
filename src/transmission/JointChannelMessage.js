@@ -1,7 +1,7 @@
 import {inspect} from 'util';
 
 import Query from './Query';
-import ConnectionMessage from './ConnectionMessage';
+import ChannelMessage from './ChannelMessage';
 import JointConnectionMessage from './JointConnectionMessage';
 
 const placeholderMessage = {};
@@ -41,7 +41,7 @@ export default class JointChannelMessage {
       this.query = placeholderQuery;
       this._setMessage(placeholderMessage);
       this.channelNode.sendConnectionMessage(
-        ConnectionMessage.createNext(this, this.channelNode)
+        ChannelMessage.createNext(this, this.channelNode)
       );
     } else {
       this._ensureQuerySent();
@@ -75,8 +75,8 @@ export default class JointChannelMessage {
   receiveMessage(message) {
     this._setMessage(message);
     if (this.channelNode.isChannelNode) {
-      this.channelNode.sendConnectionMessage(
-        message.createNextConnectionMessage(this.channelNode),
+      this.channelNode.sendChannelMessage(
+        ChannelMessage.createNext(this, this.channelNode),
         message.getPayload()
       );
     } else if (this.channelNode.isDynamicChannelNode) {
@@ -88,7 +88,7 @@ export default class JointChannelMessage {
   originateChannelMessage() {
     this._setMessage(placeholderMessage);
     this.channelNode.sendConnectionMessage(
-      ConnectionMessage.createNext(this, this.channelNode)
+      ChannelMessage.createNext(this, this.channelNode)
     );
     return this;
   }
