@@ -43,12 +43,12 @@ export default defineClass('ChannelNode')
   .readOnlyProperty('isChannelNode', true)
 
   .methods({
-    routeConnectionMessage(connectionMessage, payload) {
+    sendConnectionMessage(connectionMessage, payload) {
       this.connectionMessage = connectionMessage;
       this.payload = payload;
       this.changeListener.connectionMessage = this.connectionMessage;
       payload.deliver(this);
-      this.connectionMessage.send();
+      this.connectionMessage.completeUpdate();
       this.connectionMessage = null;
       this.changeListener.connectionMessage = null;
       return this;

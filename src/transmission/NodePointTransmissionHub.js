@@ -8,6 +8,7 @@ export default class NodePointTransmissionHub {
     this.transmission = this.comm.transmission;
     this.pass = this.comm.pass;
     this.nodePoint = nodePoint;
+    // TODO: ↓ Remove this after implementing message queue
     this.updatedConnections = new Set();
   }
 

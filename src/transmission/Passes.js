@@ -39,4 +39,6 @@ export default {
   createQueryDefault() { return forwardPass; },
 
   createMessageDefault() { return backwardPass; },
+
+  createChannelMessageDefault() { return forwardPass; },
 };

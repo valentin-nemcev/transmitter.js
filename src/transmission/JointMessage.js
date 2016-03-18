@@ -66,7 +66,7 @@ export default class JointMessage {
 
   receiveTargetConnectionMessage(connection) {
     this._ensureQuerySent();
-    this._sendQueryForConnection(connection);
+    this.queryHub.sendForConnection(connection);
     this._selectAndSendMessageIfReady();
     return this;
   }
@@ -103,11 +103,6 @@ export default class JointMessage {
       new NodePointTransmissionHub(this.query, this.node.getNodeTarget());
     this.queryHub.sendForAll();
 
-    return this;
-  }
-
-  _sendQueryForConnection(connection) {
-    this.queryHub.sendForConnection(connection);
     return this;
   }
 

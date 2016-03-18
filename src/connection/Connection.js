@@ -1,5 +1,3 @@
-import RootChannelNode from '../channel_nodes/RootChannelNode';
-
 export default class Connection {
 
   constructor(source, target, transform,
@@ -18,8 +16,7 @@ export default class Connection {
   inspect() { return this.source.inspect() + this.target.inspect(); }
 
   connect(connectionMessage) {
-    this.channelNode =
-      connectionMessage.getSourceChannelNode() || new RootChannelNode(this);
+    this.channelNode = connectionMessage.getSourceChannelNode();
     connectionMessage.sendToJointConnectionMessage(this, 'connect');
     return this;
   }

@@ -1,18 +1,22 @@
 export default class RootChannelNode {
 
   inspect() {
-    return 'RootChannelNode[' + this.connection.inspect() + ']';
+    return 'RootChannelNode[' + this.channel.inspect() + ']';
   }
 
-  constructor(connection) {
-    this.connection = connection;
+  constructor(channel) {
+    this.channel = channel;
     this.isRootChannelNode = true;
   }
 
   sendConnectionMessage(msg) {
-    // this.connection.disconnect(msg);
-    this.connection.connect(msg);
-    msg.send();
+    this.channel.connect(msg);
+    msg.completeUpdate();
+    return this;
+  }
+
+  originate(tr) {
+    tr.originateConnectionMessage(this);
     return this;
   }
 }

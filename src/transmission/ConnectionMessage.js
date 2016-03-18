@@ -22,8 +22,9 @@ export default class ConnectionMessage {
     return this;
   }
 
-  static createInitial(transmission) {
-    return new this(transmission, Passes.createQueryDefault(), null);
+  static createInitial(transmission, sourceChannelNode) {
+    const pass = Passes.createQueryDefault();
+    return new this(transmission, pass, sourceChannelNode);
   }
 
   static createNext(prevMessage, sourceChannelNode) {
@@ -48,9 +49,9 @@ export default class ConnectionMessage {
     return this;
   }
 
-  send() {
+  completeUpdate() {
     this.targetJointConnectionMessages.forEach( (msg) => {
-      msg.sendToTargetPoints(this.sourceChannelNode);
+      msg.completeUpdateFrom(this.sourceChannelNode);
     });
     return this;
   }

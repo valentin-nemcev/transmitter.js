@@ -54,17 +54,7 @@ export default class JointConnectionMessage {
   }
 
   isUpdated() {
-    for (const [ , msg] of this.channelNodesToMessages) {
-      if (!msg.isUpdated()) return false;
-    }
-    return true;
-  }
-
-  isSent() {
-    for (const [ , msg] of this.channelNodesToMessages) {
-      if (!msg.isSent()) return false;
-    }
-    return true;
+    return this.channelNodesToMessages.size === this.channelNodesSent.size;
   }
 
   receiveConnectionMessage(connectionMessage, action) {
@@ -93,14 +83,11 @@ export default class JointConnectionMessage {
     return this;
   }
 
-  sendToTargetPoints(channelNode) {
-    if (channelNode == null) {
-      channelNode = this.connection.channelNode;
-    }
+  completeUpdateFrom(channelNode) {
     this.channelNodesSent.add(channelNode);
-    if (this.channelNodesToMessages.size !== this.channelNodesSent.size) {
-      return this;
-    }
+
+    if (!this.isUpdated()) return this;
+
     this.targetPointsToUpdate.forEach( (targetPoint) => {
       targetPoint.receiveConnectionMessage(this);
     });

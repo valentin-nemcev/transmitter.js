@@ -2,8 +2,8 @@ import {inspect} from 'util';
 
 import Passes from './Passes';
 
-import ConnectionMessage from './ConnectionMessage';
-import JointMessage      from './JointMessage';
+import JointMessage from './JointMessage';
+import JointChannelMessage from './JointChannelMessage';
 
 
 export default class Transmission {
@@ -103,10 +103,6 @@ export default class Transmission {
       .forEach( (p) => this.comms[p] = {map: new WeakMap(), queue: []} );
   }
 
-  createInitialConnectionMessage() {
-    return ConnectionMessage.createInitial(this);
-  }
-
   originateQuery(node) {
     return JointMessage
       .getOrCreate(
@@ -119,6 +115,15 @@ export default class Transmission {
       .getOrCreate(
           {transmission: this, pass: Passes.createMessageDefault()}, {node})
       .originateMessage(payload);
+  }
+
+  originateConnectionMessage(channelNode) {
+    return JointChannelMessage
+      .getOrCreate({
+        transmission: this,
+        pass: Passes.createChannelMessageDefault(),
+      }, {channelNode})
+      .originateChannelMessage();
   }
 
   addCommunicationForAndEnqueue(comm, point) {

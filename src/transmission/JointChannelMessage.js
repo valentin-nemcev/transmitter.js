@@ -37,7 +37,7 @@ export default class JointChannelMessage {
 
   queryForNestedCommunication() {
     if (this.channelNode.isRootChannelNode) {
-      if (this.query != null) return this;
+      if (this.message != null || this.query != null) return this;
       this.query = placeholderQuery;
       this._setMessage(placeholderMessage);
       this.channelNode.sendConnectionMessage(
@@ -75,13 +75,21 @@ export default class JointChannelMessage {
   receiveMessage(message) {
     this._setMessage(message);
     if (this.channelNode.isChannelNode) {
-      this.channelNode.routeConnectionMessage(
+      this.channelNode.sendConnectionMessage(
         message.createNextConnectionMessage(this.channelNode),
         message.getPayload()
       );
     } else if (this.channelNode.isDynamicChannelNode) {
       this.channelNode.sendJointChannelMessage(this);
     }
+    return this;
+  }
+
+  originateChannelMessage() {
+    this._setMessage(placeholderMessage);
+    this.channelNode.sendConnectionMessage(
+      ConnectionMessage.createNext(this, this.channelNode)
+    );
     return this;
   }
 

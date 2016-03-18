@@ -66,7 +66,7 @@ export default defineClass('DynamicChannelNode')
       payload.deliver(this);
 
       this.connPoint.receiveConnectionMessage(connectionMessage, payload);
-      connectionMessage.sendToTargetPoints(this);
+      connectionMessage.completeUpdateFrom(this);
       this.changeListener.connectionMessage = connectionMessage;
       return this;
     },
