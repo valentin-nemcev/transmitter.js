@@ -30,13 +30,13 @@ describe('Flattening with nested connections', function() {
       );
 
     this.define(
-      'flatteningChannelValue',
-      new Transmitter.ChannelNodes.ChannelValue()
+      'flatteningChannelNode',
+      new Transmitter.ChannelNodes.ChannelSet()
     );
 
     const flatteningChannel = new Transmitter.Channels.NestedSimpleChannel()
       .fromSource(this.derivedValue)
-      .toChannelTarget(this.flatteningChannelValue)
+      .toChannelTarget(this.flatteningChannelNode)
       .withTransform( (viewVal) =>
         viewVal.map( (view) => {
           return new Transmitter.Channels.SimpleChannel()

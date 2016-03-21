@@ -40,13 +40,11 @@ export default defineClass('ChannelNode')
   .methods({
     receiveJointChannelMessage(msg, payload) {
       const channelMessage = msg.createNextChannelMessage();
-      this.channelMessage = channelMessage;
       this.changeListener.channelMessage = channelMessage;
 
       payload.deliver(this);
 
       channelMessage.completeUpdate();
-      this.channelMessage = null;
       this.changeListener.channelMessage = null;
       return this;
     },

@@ -12,12 +12,9 @@ export {
   DynamicMapChannelValue,
 };
 
-export ChannelValue from './ChannelValue';
 export ChannelList  from './ChannelList';
 export ChannelSet   from './ChannelSet';
 export ChannelMap   from './ChannelMap';
-
-// export {ChannelValue, ChannelList, ChannelSet, ChannelMap};
 
 import OptionalNode   from '../nodes/OptionalNode';
 import ListNode       from '../nodes/ListNode';
