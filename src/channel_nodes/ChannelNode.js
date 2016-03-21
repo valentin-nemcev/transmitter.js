@@ -33,29 +33,22 @@ class ChangeListener {
 
 
 export default defineClass('ChannelNode')
-
   .includes(BaseChannelNode.prototype)
 
-  .propertyInitializer(
-    'changeListener', function() { return new ChangeListener(); }
-  )
-
-  .readOnlyProperty('isChannelNode', true)
+  .propertyInitializer('changeListener', () => new ChangeListener() )
 
   .methods({
-    sendChannelMessage(channelMessage, payload) {
+    receiveJointChannelMessage(msg, payload) {
+      const channelMessage = msg.createNextChannelMessage();
       this.channelMessage = channelMessage;
-      this.payload = payload;
-      this.changeListener.channelMessage = this.channelMessage;
+      this.changeListener.channelMessage = channelMessage;
+
       payload.deliver(this);
-      this.channelMessage.completeUpdate();
+
+      channelMessage.completeUpdate();
       this.channelMessage = null;
       this.changeListener.channelMessage = null;
       return this;
     },
-
-    getSourcePayload() { return null; },
-
-    getTargetPayload() { return null; },
   })
   .buildConstructor();

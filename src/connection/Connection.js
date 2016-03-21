@@ -15,24 +15,20 @@ export default class Connection {
 
   inspect() { return this.source.inspect() + this.target.inspect(); }
 
-  connect(connectionMessage) {
-    this.channelNode = connectionMessage.getSourceChannelNode();
-    connectionMessage.sendToJointConnectionMessage(this, 'connect');
-    return this;
-  }
+  connect(channelMessage) {
+    this.channelNode = channelMessage.getSourceChannelNode();
+    const connectionMessage =
+      channelMessage.exchangeWithJointConnectionMessage(this);
 
-  sendConnect(connectionMessage) {
     this.source.connect(connectionMessage);
     this.target.connect(connectionMessage);
     return this;
   }
 
-  disconnect(connectionMessage) {
-    connectionMessage.sendToJointConnectionMessage(this, 'disconnect');
-    return this;
-  }
+  disconnect(channelMessage) {
+    const connectionMessage =
+      channelMessage.exchangeWithJointConnectionMessage(this);
 
-  sendDisconnect(connectionMessage) {
     this.source.disconnect(connectionMessage);
     this.target.disconnect(connectionMessage);
     return this;

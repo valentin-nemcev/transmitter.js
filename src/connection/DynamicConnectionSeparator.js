@@ -13,7 +13,7 @@ export default class DynamicConnectionSeparator {
     this.direction = direction;
     this.singleTarget = false;
     this.useJoin = dynamicTargetNode.isMap;
-    this.dynamicTargetNode.setSource(this);
+    this.dynamicTargetNode.setConnPoint(this);
     this.targetNodesToLines = new Map();
   }
 
@@ -41,14 +41,10 @@ export default class DynamicConnectionSeparator {
     return this;
   }
 
-  receiveConnectionMessage(connectionMessage, payload) {
-    connectionMessage.sendToSeparatedMessage(this, payload);
-    return this;
-  }
-
-  receiveJointChannelMessage(msg) {
-    msg.sendToJointConnectionMessage(this.source);
-    return this;
+  exchangeConnectionPointMessage(msg) {
+    return msg
+      .sendToSeparatedMessage(this)
+      .exchangeWithJointConnectionMessage(this.source);
   }
 
   connect() {

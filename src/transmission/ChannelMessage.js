@@ -60,11 +60,10 @@ export default class ChannelMessage {
     return this.sourceChannelNode;
   }
 
-  sendToJointConnectionMessage(connection, action) {
-    JointConnectionMessage
+  exchangeWithJointConnectionMessage(connection) {
+    return JointConnectionMessage
       .getOrCreate(this, {connection})
-      .receiveConnectionMessage(this, action);
-    return this;
+      .receiveChannelMessage(this);
   }
 
 }

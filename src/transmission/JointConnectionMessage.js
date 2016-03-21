@@ -3,8 +3,6 @@ import {inspect} from 'util';
 // import Query from './Query';
 import JointMessage from './JointMessage';
 import JointChannelMessage from './JointChannelMessage';
-import MergingMessage from './MergingMessage';
-import SeparatingMessage from './SeparatingMessage';
 
 
 export default class JointConnectionMessage {
@@ -57,23 +55,15 @@ export default class JointConnectionMessage {
     return this.channelNodesToMessages.size === this.channelNodesSent.size;
   }
 
-  receiveConnectionMessage(connectionMessage, action) {
+  receiveChannelMessage(connectionMessage) {
     this.queryForNestedCommunication(this); // TODO: More appropriate method
     connectionMessage.addTargetJointConnectionMessage(this);
-    if (action === 'connect') {
-      this.connection.sendConnect(this);
-    } else if (action === 'disconnect') {
-      this.connection.sendDisconnect(this);
-    }
     return this;
   }
 
-  receiveJointChannelMessage(channelMessage) {
+  receiveJointChannelMessage() {
     this.queryForNestedCommunication(this); // TODO: More appropriate method
-    channelMessage.channelNode.routeConnectionMessage(
-      this,
-      channelMessage.message.getPayload()
-    );
+    return this;
   }
 
   getSourceConnection() { return this.connection; }
@@ -114,19 +104,4 @@ export default class JointConnectionMessage {
       .receiveConnectionMessage();
     return this;
   }
-
-  sendToMergedMessage(merger, payload) {
-    MergingMessage
-      .getOrCreate(this, merger)
-      .receiveConnectionMessage(payload);
-    return this;
-  }
-
-  sendToSeparatedMessage(separator, payload) {
-    SeparatingMessage
-      .getOrCreate(this, separator)
-      .receiveConnectionMessage(payload);
-    return this;
-  }
-
 }

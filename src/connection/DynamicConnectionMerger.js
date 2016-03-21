@@ -14,7 +14,7 @@ export default class DynamicConnectionMerger {
     this.direction = direction;
     this.singleSource = false;
     this.prioritiesShouldMatch = false;
-    this.dynamicSourceNode.setTarget(this);
+    this.dynamicSourceNode.setConnPoint(this);
     this.sourceNodesToLines = new Map();
   }
 
@@ -42,14 +42,10 @@ export default class DynamicConnectionMerger {
     return this;
   }
 
-  receiveConnectionMessage(connectionMessage, payload) {
-    connectionMessage.sendToMergedMessage(this, payload);
-    return this;
-  }
-
-  receiveJointChannelMessage(msg) {
-    msg.sendToJointConnectionMessage(this.target);
-    return this;
+  exchangeConnectionPointMessage(msg) {
+    return msg
+      .sendToMergedMessage(this)
+      .exchangeWithJointConnectionMessage(this.target);
   }
 
   connect() {

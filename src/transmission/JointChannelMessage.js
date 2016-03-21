@@ -2,7 +2,7 @@ import {inspect} from 'util';
 
 import Query from './Query';
 import ChannelMessage from './ChannelMessage';
-import JointConnectionMessage from './JointConnectionMessage';
+import ConnectionPointMessage from './ConnectionPointMessage';
 
 const placeholderMessage = {};
 const placeholderQuery = {};
@@ -74,16 +74,18 @@ export default class JointChannelMessage {
 
   receiveMessage(message) {
     this._setMessage(message);
-    if (this.channelNode.isChannelNode) {
-      this.channelNode.sendChannelMessage(
-        ChannelMessage.createNext(this, this.channelNode),
-        message.getPayload()
-      );
-    } else if (this.channelNode.isDynamicChannelNode) {
-      this.channelNode.sendJointChannelMessage(this);
-    }
+    this.channelNode.receiveJointChannelMessage(this, message.getPayload());
     return this;
   }
+
+  createNextChannelMessage() {
+    return ChannelMessage.createNext(this, this.channelNode);
+  }
+
+  createNextConnectionPointMessage() {
+    return ConnectionPointMessage.createNext(this, this.message.getPayload());
+  }
+
 
   originateChannelMessage() {
     this._setMessage(placeholderMessage);
@@ -91,16 +93,5 @@ export default class JointChannelMessage {
       ChannelMessage.createNext(this, this.channelNode)
     );
     return this;
-  }
-
-  sendToJointConnectionMessage(connection) {
-    JointConnectionMessage
-      .getOrCreate(this, {connection})
-      .receiveJointChannelMessage(this);
-    return this;
-  }
-
-  isUpdated() {
-    return this.message != null;
   }
 }
