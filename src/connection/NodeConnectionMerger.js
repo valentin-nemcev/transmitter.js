@@ -3,18 +3,18 @@ import {inspect} from 'util';
 import NodeConnectionLine from './NodeConnectionLine';
 
 
-export default class DynamicConnectionMerger {
+export default class NodeConnectionMerger {
 
   inspect() {
-    return '[' + inspect(this.dynamicSourceNode) + ']:';
+    return '[' + inspect(this.connectionSourceNode) + ']:';
   }
 
-  constructor(dynamicSourceNode, direction) {
-    this.dynamicSourceNode = dynamicSourceNode;
+  constructor(connectionSourceNode, direction) {
+    this.connectionSourceNode = connectionSourceNode;
     this.direction = direction;
     this.singleSource = false;
     this.prioritiesShouldMatch = false;
-    this.dynamicSourceNode.setConnPoint(this);
+    this.connectionSourceNode.setConnectionPoint(this);
     this.sourceNodesToLines = new Map();
   }
 

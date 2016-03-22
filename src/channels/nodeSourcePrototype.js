@@ -1,10 +1,9 @@
 import {inspect} from 'util';
 
-import ConnectionMerger   from '../connection/ConnectionMerger';
-import DynamicConnectionMerger
-from '../connection/DynamicConnectionMerger';
-
 import defineClass from '../defineClass';
+
+import ConnectionMerger from '../connection/ConnectionMerger';
+import NodeConnectionMerger from '../connection/NodeConnectionMerger';
 
 import assertSingleArgument from './assertSingleArgument';
 
@@ -33,12 +32,6 @@ export default defineClass()
       return this._fromSourcesArray(sources, {prioritiesShouldMatch: true});
     },
 
-    fromDynamicSources(sources) {
-      assertSingleArgument(arguments.length);
-      this._fromSourcesArray(sources);
-      return this;
-    },
-
     _fromSourcesArray(sources, {prioritiesShouldMatch = false} = {}) {
       this._connectionSource = this._createMerger(sources, {
         prioritiesShouldMatch,
@@ -53,10 +46,10 @@ export default defineClass()
     },
 
 
-    fromDynamicSourceNode(dynamicSourceNode) {
+    fromSourceNode(connectionSourceNode) {
       this._connectionSource =
-        new DynamicConnectionMerger(dynamicSourceNode, this._direction);
-      this._sourceChannelNode = dynamicSourceNode;
+        new NodeConnectionMerger(connectionSourceNode, this._direction);
+      this._connectionSourceNode = connectionSourceNode;
       return this;
     },
   })

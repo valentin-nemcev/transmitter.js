@@ -3,8 +3,7 @@ import {inspect} from 'util';
 import defineClass from '../defineClass';
 
 import ConnectionSeparator from '../connection/ConnectionSeparator';
-import DynamicConnectionSeparator
-from '../connection/DynamicConnectionSeparator';
+import NodeConnectionSeparator from '../connection/NodeConnectionSeparator';
 
 import assertSingleArgument from './assertSingleArgument';
 
@@ -33,12 +32,6 @@ export default defineClass()
       return this;
     },
 
-    toDynamicTargets(targets) {
-      assertSingleArgument(arguments.length);
-      this._toTargetsArray(targets);
-      return this;
-    },
-
     _toTargetsArray(targets) {
       this._connectionTarget = this._createSeparator(targets,
         {singleTarget: false}
@@ -52,10 +45,10 @@ export default defineClass()
     },
 
 
-    toDynamicTargetNode(dynamicTargetNode) {
+    toTargetNode(connectionTargetNode) {
       this._connectionTarget =
-        new DynamicConnectionSeparator(dynamicTargetNode, this._direction);
-      this._targetChannelNode = dynamicTargetNode;
+        new NodeConnectionSeparator(connectionTargetNode, this._direction);
+      this._connectionTargetNode = connectionTargetNode;
       return this;
     },
   })

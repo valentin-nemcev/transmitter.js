@@ -13,15 +13,15 @@ export default defineClass()
   })
 
   .includes(channelPrototype)
-  .setOnceLazyProperty('_sourceChannelNode', () => null)
-  .setOnceLazyProperty('_targetChannelNode', () => null)
+  .setOnceLazyProperty('_connectionSourceNode', () => null)
+  .setOnceLazyProperty('_connectionTargetNode', () => null)
   .lazyReadOnlyProperty('_connection', function() {
     return new Connection(
       this._connectionSource,
       this._connectionTarget,
       this._transform,
-      this._sourceChannelNode,
-      this._targetChannelNode
+      this._connectionSourceNode,
+      this._connectionTargetNode
     );
   })
   .lazyReadOnlyProperty('_channels', function() { return [this._connection]; })

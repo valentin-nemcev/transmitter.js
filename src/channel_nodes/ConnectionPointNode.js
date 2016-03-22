@@ -32,13 +32,13 @@ class ChangeListener {
 }
 
 
-export default defineClass('DynamicChannelNode')
+export default defineClass('ConnectionPointNode')
   .includes(BaseChannelNode.prototype)
 
   .propertyInitializer('changeListener', () => new ChangeListener() )
 
   .methods({
-    setConnPoint(connPoint) {
+    setConnectionPoint(connPoint) {
       this.connPoint = connPoint;
       this.changeListener.connPoint = connPoint;
       return this;

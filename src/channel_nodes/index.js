@@ -2,7 +2,7 @@ import defineClass from '../defineClass';
 import {inspect} from 'util';
 
 import ChannelNode from './ChannelNode';
-import DynamicChannelNode from './DynamicChannelNode';
+import ConnectionPointNode from './ConnectionPointNode';
 
 import listPrototype from '../nodes/listPrototype';
 import orderedSetPrototype from '../nodes/orderedSetPrototype';
@@ -12,20 +12,20 @@ import createList from '../data_structures/list';
 import createOrderedMap from '../data_structures/orderedMap';
 
 
-export const DynamicListChannelValue = defineClass('DynamicListChannelValue')
-  .includes(DynamicChannelNode.prototype)
+export const ListConnectionPointNode = defineClass('ListConnectionPointNode')
+  .includes(ConnectionPointNode.prototype)
   .propertyInitializer('_list', createList)
   .includes(listPrototype)
   .buildConstructor();
 
-export const DynamicSetChannelValue = defineClass('DynamicSetChannelValue')
-  .includes(DynamicChannelNode.prototype)
+export const SetConnectionPointNode = defineClass('SetConnectionPointNode')
+  .includes(ConnectionPointNode.prototype)
   .propertyInitializer('_set', createOrderedMap)
   .includes(orderedSetPrototype)
   .buildConstructor();
 
-export const DynamicMapChannelValue = defineClass('DynamicMapChannelValue')
-  .includes(DynamicChannelNode.prototype)
+export const MapConnectionPointNode = defineClass('MapConnectionPointNode')
+  .includes(ConnectionPointNode.prototype)
   .propertyInitializer('_map', createOrderedMap)
   .includes(orderedMapPrototype)
   .buildConstructor();
@@ -55,18 +55,18 @@ import ListNode       from '../nodes/ListNode';
 import OrderedSetNode from '../nodes/OrderedSetNode';
 import OrderedMapNode from '../nodes/OrderedMapNode';
 
-export function getDynamicChannelNodeConstructorFor(constructor) {
+export function getConnectionPointNodeConstructorFor(constructor) {
   switch (constructor) {
   case OptionalNode:
-    return DynamicMapChannelValue;
+    return MapConnectionPointNode;
   case ListNode:
-    return DynamicListChannelValue;
+    return ListConnectionPointNode;
   case OrderedSetNode:
-    return DynamicSetChannelValue;
+    return SetConnectionPointNode;
   case OrderedMapNode:
-    return DynamicMapChannelValue;
+    return MapConnectionPointNode;
   default:
-    throw new Error('No dynamic channel node type for '
+    throw new Error('No connection point node type for '
                     + inspect(constructor));
   }
 }

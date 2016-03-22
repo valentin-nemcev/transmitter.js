@@ -35,7 +35,7 @@ export default class JointConnectionMessage {
     this.channelNodesSent = new Set();
 
     this.channelNodesToMessages = new Map(
-      ['channelNode', 'sourceChannelNode', 'targetChannelNode']
+      ['channelNode', 'connectionSourceNode', 'connectionTargetNode']
         .map( (name) => this.connection[name] )
         .filter( (n) => n )
         .map(

@@ -8,7 +8,7 @@ import getNullChannel from './getNullChannel';
 import NestedSimpleChannel from './NestedSimpleChannel';
 import SimpleChannel from './SimpleChannel';
 
-import {getDynamicChannelNodeConstructorFor} from '../channel_nodes';
+import {getConnectionPointNodeConstructorFor} from '../channel_nodes';
 
 import {forward, backward} from '../Directions';
 
@@ -43,7 +43,7 @@ export default defineClass('FlatteningChannel')
     ];
   })
 
-  .setOnceMandatoryProperty('_dynamicChannelNodeConstructor')
+  .setOnceMandatoryProperty('_connectionPointNodeConstructor')
 
   .lazyReadOnlyProperty('_flatToNestedDirection', function() {
     return this._nestedIsOrigin ?
@@ -74,23 +74,23 @@ export default defineClass('FlatteningChannel')
       .withTransform( (payload) => payload.flatten() );
   })
 
-  .lazyReadOnlyProperty('_dynamicTargetNode', function() {
+  .lazyReadOnlyProperty('_connectionTargetNode', function() {
     if (this._flatToNestedDirection == null) return null;
-    const node = new this._dynamicChannelNodeConstructor();
+    const node = new this._connectionPointNodeConstructor();
     node.inspect = () => this._nestedNode.inspect() + node.constructor.name;
     return node;
   })
-  .lazyReadOnlyProperty('_dynamicSourceNode', function() {
+  .lazyReadOnlyProperty('_connectionSourceNode', function() {
     if (this._nestedToFlatDirection == null) return null;
-    const node = new this._dynamicChannelNodeConstructor();
+    const node = new this._connectionPointNodeConstructor();
     node.inspect = () => this._nestedNode.inspect() + node.constructor.name;
     return node;
   })
 
   .lazyReadOnlyProperty('_nestedChannel', function() {
     const targets = [
-      this._dynamicSourceNode,
-      this._dynamicTargetNode,
+      this._connectionSourceNode,
+      this._connectionTargetNode,
     ].filter( (c) => c );
     return new NestedSimpleChannel().toChannelTargets(...targets);
   })
@@ -108,11 +108,13 @@ export default defineClass('FlatteningChannel')
   .method('_withNested', function(nestedNode, mapNested) {
     assertNode(nestedNode);
     this._nestedNode = nestedNode;
-    this._dynamicChannelNodeConstructor =
-      getDynamicChannelNodeConstructorFor(nestedNode.constructor);
+    this._connectionPointNodeConstructor =
+      getConnectionPointNodeConstructorFor(nestedNode.constructor);
 
-    this._flatToNestedChannel.toDynamicTargetNode(this._dynamicTargetNode);
-    this._nestedToFlatChannel.fromDynamicSourceNode(this._dynamicSourceNode);
+    this._flatToNestedChannel
+      .toTargetNode(this._connectionTargetNode);
+    this._nestedToFlatChannel
+      .fromSourceNode(this._connectionSourceNode);
 
     this._nestedChannel.fromSource(nestedNode);
 

@@ -1,14 +1,14 @@
 export default class Connection {
 
   constructor(source, target, transform,
-              sourceChannelNode, targetChannelNode) {
+              connectionSourceNode, connectionTargetNode) {
     this.source = source;
     this.target = target;
     this.source.setTarget(this);
     this.target.setSource(this);
 
-    this.sourceChannelNode = sourceChannelNode;
-    this.targetChannelNode = targetChannelNode;
+    this.connectionSourceNode = connectionSourceNode;
+    this.connectionTargetNode = connectionTargetNode;
 
     this.transform = transform;
   }

@@ -29,14 +29,14 @@ module.exports = class SeparatingMessage {
   }
 
   receiveConnectionMessage(payload) {
-    this.dynamicChannelPayload = payload;
+    this.connPointPayload = payload;
     return this;
   }
 
   getPriority() { return this.sourceMessage.getPriority(); }
 
   _getNodePayload(nodesToLines) {
-    return this.dynamicChannelPayload || Array.from(nodesToLines.keys());
+    return this.connPointPayload || Array.from(nodesToLines.keys());
   }
 
   receiveMessage(message) {

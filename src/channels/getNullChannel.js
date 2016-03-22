@@ -3,9 +3,9 @@ class NullChannel {
   connect() { return this; }
   disconnect() { return this; }
   fromSource() { return this; }
-  fromDynamicSourceNode() { return this; }
+  fromSourceNode() { return this; }
   toTarget() { return this; }
-  toDynamicTargetNode() { return this; }
+  toTargetNode() { return this; }
   withTransform() { return this; }
 }
 

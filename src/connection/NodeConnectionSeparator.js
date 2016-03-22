@@ -2,18 +2,18 @@ import {inspect} from 'util';
 
 import ConnectionNodeLine  from './ConnectionNodeLine';
 
-export default class DynamicConnectionSeparator {
+export default class NodeConnectionSeparator {
 
   inspect() {
-    return ':[' + inspect(this.dynamicTargetNode) + ']';
+    return ':[' + inspect(this.connectionTargetNode) + ']';
   }
 
-  constructor(dynamicTargetNode, direction) {
-    this.dynamicTargetNode = dynamicTargetNode;
+  constructor(connectionTargetNode, direction) {
+    this.connectionTargetNode = connectionTargetNode;
     this.direction = direction;
     this.singleTarget = false;
-    this.useJoin = dynamicTargetNode.isMap;
-    this.dynamicTargetNode.setConnPoint(this);
+    this.useJoin = connectionTargetNode.isMap;
+    this.connectionTargetNode.setConnectionPoint(this);
     this.targetNodesToLines = new Map();
   }
 
