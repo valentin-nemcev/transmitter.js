@@ -10,7 +10,7 @@ const placeholderQuery = {};
 export default class JointChannelMessage {
   inspect() {
     return [
-      '↓M',
+      '↓ChM',
       inspect(this.pass),
     ].join(' ');
   }

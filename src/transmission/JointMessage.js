@@ -13,7 +13,6 @@ export default class JointMessage {
     return [
       '×M',
       inspect(this.pass),
-      inspect(this.query),
       ',',
       Array.from(this.linesToMessages.values()).map(inspect).join(', '),
     ].join(' ');

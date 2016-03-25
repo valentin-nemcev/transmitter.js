@@ -1,3 +1,5 @@
+import {inspect} from 'util';
+
 export default {
   // TODO: Convey map function idempotency in names (mapOnce?)
   updateListByIndex(mapFn) {
@@ -18,8 +20,15 @@ export default {
 };
 
 
-class UpdateListByIndexPayload {
+class UpdatePayloadBase {
+  inspect() {
+    return `${this.constructor.name}(${inspect(Array.from(this.source))})`;
+  }
+}
+
+class UpdateListByIndexPayload extends UpdatePayloadBase {
   constructor(source, mapFn) {
+    super();
     this.source = source;
     this.mapFn = mapFn;
   }
@@ -39,8 +48,9 @@ class UpdateListByIndexPayload {
 }
 
 
-class UpdateSetByValuePayload {
+class UpdateSetByValuePayload extends UpdatePayloadBase {
   constructor(source, mapFn) {
+    super();
     this.source = source;
     this.mapFn = mapFn;
   }
@@ -59,8 +69,9 @@ class UpdateSetByValuePayload {
 }
 
 
-class UpdateMapByValuePayload {
+class UpdateMapByValuePayload extends UpdatePayloadBase {
   constructor(source, mapFn) {
+    super();
     this.source = source;
     this.mapFn = mapFn;
   }
@@ -82,8 +93,9 @@ class UpdateMapByValuePayload {
 }
 
 
-class UpdateMapByKeyPayload {
+class UpdateMapByKeyPayload extends UpdatePayloadBase {
   constructor(source, mapFn) {
+    super();
     this.source = source;
     this.mapFn = mapFn;
   }
