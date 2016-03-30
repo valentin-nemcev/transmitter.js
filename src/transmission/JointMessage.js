@@ -3,9 +3,9 @@ import {inspect} from 'util';
 import {getNoOpPayload} from '../payloads';
 
 import NodePointTransmissionHub from './NodePointTransmissionHub';
-import Query from './Query';
-import JointConnectionMessage from './JointConnectionMessage';
+import QueryState from './NodePointState';
 import SourceMessage from './SourceMessage';
+import Query from './Query';
 
 
 class LineToMessageMap {
@@ -41,129 +41,6 @@ class LineToMessageMap {
   get size() {
     return this._map.size;
   }
-}
-
-class ConnectionState {
-  inspect() {
-    return {connnection: this._connection, queryIsSent: this._querySent};
-  }
-
-  constructor(query, connection, nodePoint) {
-    this._nodePoint = nodePoint;
-    this._connection = connection;
-    this._querySent = false;
-
-    this._query = query;
-    this._jointConnectionMessage =
-      JointConnectionMessage.getOrCreate(
-        this._query, {connection: this._connection}
-      );
-  }
-
-  _querySend() {
-    this._querySent = true;
-    this._nodePoint
-      .receiveCommunicationForConnection(this._query, this._connection);
-    return this.propagateState();
-  }
-
-
-  queryIsSet() { return this._query != null && !this._querySent; }
-
-  queryIsSent() { return this._querySent; }
-
-
-  _connectionQuery() {
-    this._jointConnectionMessage.queryForNestedCommunication(this._query);
-    return this;
-  }
-
-  connectionIsOutdated() { return !this._jointConnectionMessage.isUpdated(); }
-
-  connectionIsUpdated() { return !this.connectionIsOutdated(); }
-
-
-  propagateState() {
-    if (this.queryIsSet()) {
-      if (this.connectionIsOutdated()) return this._connectionQuery();
-      if (this.connectionIsUpdated()) return this._querySend();
-    }
-    if (this.queryIsSent()) {
-      if (this.connectionIsUpdated()) return this;
-    }
-    throw new Error('Invalid state');
-  }
-}
-
-class QueryState {
-
-  constructor(jointMessage, nodeTarget) {
-    this._jointMessage = jointMessage;
-    this._nodeTarget = nodeTarget;
-
-    this._query = null;
-    this._connectionStates = null;
-  }
-
-  _setQuery(query) {
-    this._query = query;
-    this._connectionStates = new Map();
-    return this;
-  }
-
-  queryIsUnset() { return this._query == null; }
-
-  queryIsSet() { return this._query != null && !this.queryIsSent(); }
-
-  queryIsSent() {
-    if (this._query == null) return false;
-    for (const [ , connectionState] of this._connectionStates) {
-      if (!connectionState.queryIsSent()) return false;
-    }
-    return true;
-  }
-
-  getPassedLinesCount() {
-    return this._query.getPassedLines().size;
-  }
-
-  wasDelivered() {
-    return this._query.wasDelivered();
-  }
-
-
-  queryRequested() {
-    if (this.queryIsUnset()) {
-      this._setQuery(Query.createNext(this._jointMessage));
-      this._refreshConnectionStates();
-    }
-    return this;
-  }
-
-  _refreshConnectionStates() {
-    for (const connection of this._nodeTarget.getConnectionsFor(this._query)) {
-      if (this._connectionStates.has(connection)) continue;
-      const state =
-        new ConnectionState(this._query, connection, this._nodeTarget);
-      this._connectionStates.set(connection, state);
-      state.propagateState();
-    }
-  }
-
-  connectionChanged() {
-    if (this._query == null) return this;
-    this._refreshConnectionStates();
-    return this;
-  }
-
-  connectionUpdated(connection) {
-    if (this._query == null) return this;
-    this._refreshConnectionStates();
-    const state = this._connectionStates.get(connection);
-    if (state != null) state.propagateState();
-    return this;
-  }
-
 }
 
 export default class JointMessage {
@@ -208,18 +85,18 @@ export default class JointMessage {
 
   receiveMessageFrom(message, line) {
     this._linesToMessages.add(message, line);
-    this.queryState.queryRequested();
+    this._ensureQuerySent();
     this._selectAndSendMessageIfReady();
     return this;
   }
 
   receiveQuery() {
-    this.queryState.queryRequested();
+    this._ensureQuerySent();
     return this;
   }
 
   originateQuery() {
-    this.queryState.queryRequested();
+    this._ensureQuerySent();
     return this;
   }
 
@@ -229,7 +106,7 @@ export default class JointMessage {
   }
 
   receiveTargetConnectionMessage(connection) {
-    this.queryState.queryRequested();
+    this._ensureQuerySent();
     this.queryState.connectionUpdated(connection);
     this._selectAndSendMessageIfReady();
     return this;
@@ -255,7 +132,14 @@ export default class JointMessage {
         );
     }
     this.precedingMessage = precedingMessage;
-    this.queryState.queryRequested();
+    this._ensureQuerySent();
+    return this;
+  }
+
+  _ensureQuerySent() {
+    if (this.queryState.communicationIsUnset()) {
+      this.queryState.setCommunication(Query.createNext(this));
+    }
     return this;
   }
 
@@ -272,7 +156,7 @@ export default class JointMessage {
   }
 
   _selectAndSendMessageIfReady() {
-    if (!this.queryState.queryIsSent()) return this;
+    if (!this.queryState.communicationIsSent()) return this;
 
     // TODO: Compare contents
     if (this._linesToMessages.size !== this.queryState.getPassedLinesCount()) {
@@ -337,7 +221,7 @@ export default class JointMessage {
 
 
   readyToRespond() {
-    return this.message == null && this.queryState.queryIsSent()
+    return this.message == null && this.queryState.communicationIsSent()
       && !this.queryState.wasDelivered();
   }
 
