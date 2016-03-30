@@ -60,10 +60,7 @@ export default class NodePoint {
     }
   }
 
-  connectLine(connectionMessage, line) {
-    const connection = connectionMessage.getSourceConnection();
-    connectionMessage.addTargetPoint(this);
-
+  connectLine(connection, line) {
     let lines = this.connectionToLines.get(connection);
     if (lines == null) {
       lines = new LineSet();
@@ -73,10 +70,7 @@ export default class NodePoint {
     return this;
   }
 
-  disconnectLine(connectionMessage, line) {
-    const connection = connectionMessage.getSourceConnection();
-    connectionMessage.addTargetPoint(this);
-
+  disconnectLine(connection, line) {
     const lines = this.connectionToLines.get(connection);
     lines.delete(line);
     if (lines.size === 0) this.connectionToLines.delete(connection);

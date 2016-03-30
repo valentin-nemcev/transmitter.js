@@ -28,7 +28,7 @@ describe('Bidirectional state message routing', function() {
     );
 
     this.define('tagInput', new Transmitter.Nodes.ValueNode());
-    return Transmitter.startTransmission( (tr) =>
+    Transmitter.startTransmission( (tr) =>
       new Transmitter.Channels.BidirectionalChannel()
         .inBothDirections()
         .withOriginDerived(this.tagSortedList, this.tagInput)

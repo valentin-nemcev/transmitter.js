@@ -99,6 +99,22 @@ export default class JointConnectionMessage {
     return this;
   }
 
+  exchangeWithJointMessageFromTarget(nodeTarget) {
+    this.addTargetPoint(nodeTarget);
+    JointMessage
+      .getOrCreate(this, {nodeTarget})
+      .receiveTargetConnectionChange(this.connection);
+    return this.connection;
+  }
+
+  exchangeWithJointMessageFromSource(nodeSource) {
+    this.addTargetPoint(nodeSource);
+    JointMessage
+      .getOrCreate(this, {nodeSource})
+      .receiveSourceConnectionChange(this.connection);
+    return this.connection;
+  }
+
   sendToJointChannelMessage(channelNode) {
     JointChannelMessage
       .getOrCreate(this, {channelNode})
