@@ -10,6 +10,7 @@ class View {
   constructor(model) {
     this.model = model;
     this.removeEvt = new Transmitter.Nodes.ValueSourceNode();
+    this.removeEvt.inspect = () => 'removeEvt';
   }
 }
 
@@ -31,14 +32,14 @@ describe('Flattening with nested connections', function() {
 
     this.define(
       'flatteningChannelNode',
-      new Transmitter.ChannelNodes.ChannelSet()
+      new Transmitter.ChannelNodes.ChannelMap()
     );
 
     const flatteningChannel = new Transmitter.Channels.NestedSimpleChannel()
       .fromSource(this.derivedValue)
       .toChannelTarget(this.flatteningChannelNode)
       .withTransform( (viewVal) =>
-        viewVal.map( (view) => {
+        viewVal.updateMapByKey( (view) => {
           return new Transmitter.Channels.SimpleChannel()
             .inBackwardDirection()
             .fromSource(view.removeEvt)

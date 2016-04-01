@@ -35,7 +35,6 @@ export default class SourceMessage {
   directionMatches(direction) { return this.pass.directionMatches(direction); }
 
   sendToLine(line) {
-    this.log(line);
     line.receiveMessage(this);
     return this;
   }

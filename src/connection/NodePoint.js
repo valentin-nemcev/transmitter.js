@@ -60,20 +60,35 @@ export default class NodePoint {
     }
   }
 
-  connectLine(connection, line) {
+  connectLine(connectionMessage, line) {
+    const connection = connectionMessage.getSourceConnection();
     let lines = this.connectionToLines.get(connection);
     if (lines == null) {
       lines = new LineSet();
       this.connectionToLines.set(connection, lines);
     }
     lines.add(line);
+
+    const nodePointState = connectionMessage.getNodePointState(this);
+    if (lines.acceptsCommunication(nodePointState)) {
+      connectionMessage.addTargetPoint(this);
+      nodePointState.connectionAdded(connection);
+    }
     return this;
   }
 
-  disconnectLine(connection, line) {
+  disconnectLine(connectionMessage, line) {
+    const connection = connectionMessage.getSourceConnection();
     const lines = this.connectionToLines.get(connection);
+
+    const nodePointState = connectionMessage.getNodePointState(this);
+    if (lines.acceptsCommunication(nodePointState)) {
+      connectionMessage.addTargetPoint(this);
+    }
+
     lines.delete(line);
     if (lines.size === 0) this.connectionToLines.delete(connection);
+
     return this;
   }
 
@@ -94,5 +109,4 @@ export default class NodePoint {
     }
     return this;
   }
-
 }

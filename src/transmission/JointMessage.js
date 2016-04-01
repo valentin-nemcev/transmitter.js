@@ -72,14 +72,16 @@ export default class JointMessage {
     this.pass = pass;
     this.node = node;
 
-    this.queryState =
-      new CommunicationState(this, this.node.getNodeTarget());
+    this.queryState = CommunicationState.getOrCreate(
+      this, {nodePoint: this.node.getNodeTarget()}
+    );
     this._linesToMessages = new LineToMessageMap();
     this.precedingMessage = null;
     this.selectedMessage = null;
     this.message = null;
-    this.messageState =
-      new CommunicationState(this, this.node.getNodeSource());
+    this.messageState = CommunicationState.getOrCreate(
+      this, {nodePoint: this.node.getNodeSource()}
+    );
   }
 
   receiveMessageFrom(message, line) {
@@ -99,20 +101,10 @@ export default class JointMessage {
     return this;
   }
 
-  receiveTargetConnectionChange(connection) {
-    this.queryState.connectionChanged(connection);
-    return this;
-  }
-
   receiveTargetConnectionMessage(connection) {
     this._ensureQuerySent();
     this.queryState.connectionUpdated(connection);
     this._selectAndSendMessageIfReady();
-    return this;
-  }
-
-  receiveSourceConnectionChange(connection) {
-    this.messageState.connectionChanged(connection);
     return this;
   }
 
@@ -248,9 +240,6 @@ export default class JointMessage {
 
     this._sendMessageToSucceeding();
     this.messageState.setCommunication(this.message);
-    // this.messageHub =
-    //   new NodePointTransmissionHub(this.message, this.node.getNodeSource());
-    // this.messageHub.sendForAll();
     return this;
   }
 

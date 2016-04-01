@@ -13,16 +13,12 @@ export default class ConnectionNodeLine {
   }
 
   connect(connectionMessage) {
-    const connection = connectionMessage.getSourceConnection();
-    this.nodeTarget.connectLine(connection, this);
-    connectionMessage.exchangeWithJointMessageFromTarget(this.nodeTarget);
+    this.nodeTarget.connectLine(connectionMessage, this);
     return this;
   }
 
   disconnect(connectionMessage) {
-    const connection = connectionMessage.getSourceConnection();
-    this.nodeTarget.disconnectLine(connection, this);
-    connectionMessage.exchangeWithJointMessageFromTarget(this.nodeTarget);
+    this.nodeTarget.disconnectLine(connectionMessage, this);
     return this;
   }
 

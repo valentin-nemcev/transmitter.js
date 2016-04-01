@@ -36,7 +36,7 @@ class ConnectionPointState {
 
   setCommunication(comm) {
     if (this.communicationIsUnset()) return this._setCommunication(comm);
-    throw new Error('Invalid state');
+    return this;
   }
 
   communicationIsUnset() {
@@ -76,21 +76,35 @@ class ConnectionPointState {
   }
 }
 
-export default class CommunicationState {
+export default class NodePointState {
 
-  constructor(jointMessage, nodeTarget) {
-    this._jointMessage = jointMessage;
-    this._nodeTarget = nodeTarget;
+  static getOrCreate(prevComm, opts) {
+    const {transmission, pass} = prevComm;
+    const nodePoint = opts.nodePoint;
+
+    let state = transmission.getCommunicationFor(pass, nodePoint);
+    if (state == null) {
+      state = new this(transmission, pass, nodePoint);
+      transmission.addCommunicationFor(state, nodePoint);
+    }
+    return state;
+  }
+
+  constructor(transmission, pass, nodePoint) {
+    this.transmission = transmission;
+    this.pass = pass;
+    this.nodePoint = nodePoint;
 
     this._communication = null;
-    this._connectionStates = null;
+    this._connectionStates = new Map();
+    for (const connection of this.nodePoint.getConnectionsFor(this)) {
+      this.connectionAdded(connection);
+    }
   }
 
-  _setCommunication(communication) {
-    this._communication = communication;
-    this._connectionStates = new Map();
-    return this;
-  }
+  // ConnectionStates must be segregated by direction in order to prevent loops
+  // See Flattening with nested connections specs
+  directionMatches(direction) { return this.pass.directionMatches(direction); }
 
   communicationIsUnset() { return this._communication == null; }
 
@@ -117,36 +131,28 @@ export default class CommunicationState {
 
   setCommunication(communication) {
     if (this.communicationIsUnset()) {
-      this._setCommunication(communication);
-      this._refreshConnectionStates();
+      this._communication = communication;
+      for (const state of this._connectionStates.values()) {
+        state.setCommunication(this._communication);
+      }
       return this;
     }
     throw new Error('Invalid state');
   }
 
-  _refreshConnectionStates() {
-    const conns = this._nodeTarget.getConnectionsFor(this._communication);
-    for (const connection of conns) {
-      if (this._connectionStates.has(connection)) continue;
-      const state = new ConnectionPointState(
-        connection, this._nodeTarget
-      );
-      this._connectionStates.set(connection, state);
+  connectionAdded(connection) {
+    if (this._connectionStates.has(connection)) return this;
+    const state = new ConnectionPointState(connection, this.nodePoint);
+    this._connectionStates.set(connection, state);
+    if (!this.communicationIsUnset()) {
       state.setCommunication(this._communication);
     }
-  }
-
-  connectionChanged() {
-    // if (this._communication == null) return this;
-    // this._refreshConnectionStates();
     return this;
   }
 
   connectionUpdated(connection) {
-    if (this._communication == null) return this;
-    this._refreshConnectionStates();
     const state = this._connectionStates.get(connection);
-    if (state != null) state.connectionUpdated();
+    state.connectionUpdated();
     return this;
   }
 }
