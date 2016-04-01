@@ -8,16 +8,22 @@ class ConnectionPointState {
     };
   }
 
-  constructor(communication, connection, nodePoint) {
+  constructor(connection, nodePoint) {
     this._nodePoint = nodePoint;
     this._connection = connection;
-    this._communicationSent = false;
 
+    this._communication = null;
+    this._communicationSent = false;
+  }
+
+
+  _setCommunication(communication) {
     this._communication = communication;
     this._jointConnectionMessage =
       JointConnectionMessage.getOrCreate(
         this._communication, {connection: this._connection}
       );
+    return this._propagateState();
   }
 
   _communicationSend() {
@@ -25,9 +31,17 @@ class ConnectionPointState {
     this._nodePoint.receiveCommunicationForConnection(
       this._communication, this._connection
     );
-    return this.propagateState();
+    return this._propagateState();
   }
 
+  setCommunication(comm) {
+    if (this.communicationIsUnset()) return this._setCommunication(comm);
+    throw new Error('Invalid state');
+  }
+
+  communicationIsUnset() {
+    return this._communication == null;
+  }
 
   communicationIsSet() {
     return this._communication != null && !this._communicationSent;
@@ -42,12 +56,15 @@ class ConnectionPointState {
     return this;
   }
 
+  connectionUpdated() { return this._propagateState(); }
+
   connectionIsOutdated() { return !this._jointConnectionMessage.isUpdated(); }
 
   connectionIsUpdated() { return !this.connectionIsOutdated(); }
 
 
-  propagateState() {
+  _propagateState() {
+    if (this.communicationIsUnset()) return this;
     if (this.communicationIsSet()) {
       if (this.connectionIsOutdated()) return this._connectionQuery();
       if (this.connectionIsUpdated()) return this._communicationSend();
@@ -112,16 +129,16 @@ export default class CommunicationState {
     for (const connection of conns) {
       if (this._connectionStates.has(connection)) continue;
       const state = new ConnectionPointState(
-        this._communication, connection, this._nodeTarget
+        connection, this._nodeTarget
       );
       this._connectionStates.set(connection, state);
-      state.propagateState();
+      state.setCommunication(this._communication);
     }
   }
 
   connectionChanged() {
-    if (this._communication == null) return this;
-    this._refreshConnectionStates();
+    // if (this._communication == null) return this;
+    // this._refreshConnectionStates();
     return this;
   }
 
@@ -129,7 +146,7 @@ export default class CommunicationState {
     if (this._communication == null) return this;
     this._refreshConnectionStates();
     const state = this._connectionStates.get(connection);
-    if (state != null) state.propagateState();
+    if (state != null) state.connectionUpdated();
     return this;
   }
 }

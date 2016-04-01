@@ -2,8 +2,7 @@ import {inspect} from 'util';
 
 import {getNoOpPayload} from '../payloads';
 
-import NodePointTransmissionHub from './NodePointTransmissionHub';
-import QueryState from './NodePointState';
+import CommunicationState from './NodePointState';
 import SourceMessage from './SourceMessage';
 import Query from './Query';
 
@@ -73,14 +72,14 @@ export default class JointMessage {
     this.pass = pass;
     this.node = node;
 
-    this.queryState = new QueryState(this, this.node.getNodeTarget());
-    this.query = null;
-    this.queryHub = null;
+    this.queryState =
+      new CommunicationState(this, this.node.getNodeTarget());
     this._linesToMessages = new LineToMessageMap();
     this.precedingMessage = null;
     this.selectedMessage = null;
     this.message = null;
-    this.messageHub = null;
+    this.messageState =
+      new CommunicationState(this, this.node.getNodeSource());
   }
 
   receiveMessageFrom(message, line) {
@@ -112,14 +111,13 @@ export default class JointMessage {
     return this;
   }
 
-  receiveSourceConnectionChange() {
+  receiveSourceConnectionChange(connection) {
+    this.messageState.connectionChanged(connection);
     return this;
   }
 
   receiveSourceConnectionMessage(connection) {
-    if (this.messageHub != null) {
-      this.messageHub.sendForConnection(connection);
-    }
+    this.messageState.connectionUpdated(connection);
     return this;
   }
 
@@ -249,9 +247,10 @@ export default class JointMessage {
     this.transmission.log(this.message, this.node.getNodeSource());
 
     this._sendMessageToSucceeding();
-    this.messageHub =
-      new NodePointTransmissionHub(this.message, this.node.getNodeSource());
-    this.messageHub.sendForAll();
+    this.messageState.setCommunication(this.message);
+    // this.messageHub =
+    //   new NodePointTransmissionHub(this.message, this.node.getNodeSource());
+    // this.messageHub.sendForAll();
     return this;
   }
 
