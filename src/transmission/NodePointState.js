@@ -28,7 +28,11 @@ class ConnectionPointState {
 
   _communicationSend() {
     this._communicationSent = true;
-    this._lines.receiveCommunication(this._communication);
+    this._passedLines = [];
+    for (const line of this._lines
+          .receiveCommunicationYieldingPassedLines(this._communication)) {
+      this._passedLines.push(line);
+    }
     return this._propagateState();
   }
 
@@ -47,6 +51,9 @@ class ConnectionPointState {
 
   communicationIsSent() { return this._communicationSent; }
 
+  getPassedLines() {
+    return this._passedLines;
+  }
 
   _connectionQuery() {
     this._jointConnectionMessage
@@ -112,18 +119,22 @@ export default class NodePointState {
 
   communicationIsSent() {
     if (this._communication == null) return false;
-    for (const [ , connectionState] of this._connectionStates) {
+    for (const connectionState of this._connectionStates.values()) {
       if (!connectionState.communicationIsSent()) return false;
     }
     return true;
   }
 
   getPassedLinesCount() {
-    return this._communication.getPassedLines().size;
+    let result = 0;
+    for (const connectionState of this._connectionStates.values()) {
+      result += connectionState.getPassedLines().length;
+    }
+    return result;
   }
 
   wasDelivered() {
-    return this._communication.wasDelivered();
+    return this.getPassedLinesCount() > 0;
   }
 
 

@@ -25,11 +25,13 @@ class ConnectionLines {
     return false;
   }
 
-  receiveCommunication(comm) {
+  *receiveCommunicationYieldingPassedLines(comm) {
     for (const line of this.set) {
-      if (line.acceptsCommunication(comm)) comm.sendToLine(line);
+      if (line.acceptsCommunication(comm)) {
+        comm.sendToLine(line);
+        yield line;
+      }
     }
-    return this;
   }
 }
 

@@ -31,17 +31,13 @@ export default class Query {
   constructor(transmission, pass) {
     this.transmission = transmission;
     this.pass = pass;
-    this.passedLines = new Set();
   }
 
 
   directionMatches(direction) { return this.pass.directionMatches(direction); }
 
-  getPassedLines() { return this.passedLines; }
-
   sendToLine(line) {
     this.log(line);
-    this.passedLines.add(line);
     line.receiveQuery(this);
     return this;
   }
@@ -58,9 +54,5 @@ export default class Query {
       .getOrCreate(this, {nodeSource})
       .receiveQuery(this, line);
     return this;
-  }
-
-  wasDelivered() {
-    return this.passedLines.size > 0;
   }
 }
