@@ -1,4 +1,4 @@
-class LineSet {
+class ConnectionLines {
 
   constructor() {
     this.set = new Set();
@@ -33,6 +33,23 @@ class LineSet {
   }
 }
 
+class ConnectionToLinesMap extends Map {
+
+  getOrCreate(connection) {
+    let lines = this.get(connection);
+    if (lines == null) {
+      lines = new ConnectionLines();
+      this.set(connection, lines);
+    }
+    return lines;
+  }
+
+  deleteWhenEmpty(connection) {
+    const lines = this.get(connection);
+    if (lines.size === 0) return this.delete(connection);
+  }
+}
+
 
 export default class NodePoint {
 
@@ -51,28 +68,25 @@ export default class NodePoint {
       throw new Error(`Unknown node point type: ${type}`);
     }
 
-    this.connectionToLines = new Map();
+    this.connectionToLines = new ConnectionToLinesMap();
   }
 
-  *getConnectionsFor(comm) {
+  *getConnectionLinesFor(comm) {
     for (const [connection, lines] of this.connectionToLines) {
-      if (lines.acceptsCommunication(comm)) yield connection;
+      if (lines.acceptsCommunication(comm)) yield [connection, lines];
     }
   }
 
   connectLine(connectionMessage, line) {
     const connection = connectionMessage.getSourceConnection();
-    let lines = this.connectionToLines.get(connection);
-    if (lines == null) {
-      lines = new LineSet();
-      this.connectionToLines.set(connection, lines);
-    }
+    const lines = this.connectionToLines.getOrCreate(connection);
+
     lines.add(line);
 
     const nodePointState = connectionMessage.getNodePointState(this);
     if (lines.acceptsCommunication(nodePointState)) {
       connectionMessage.addTargetPoint(this);
-      nodePointState.connectionAdded(connection);
+      nodePointState.addConnectionLines(connection, lines);
     }
     return this;
   }
@@ -87,18 +101,14 @@ export default class NodePoint {
     }
 
     lines.delete(line);
-    if (lines.size === 0) this.connectionToLines.delete(connection);
 
-    return this;
-  }
-
-  receiveCommunicationForConnection(comm, connection) {
-    const lines = this.connectionToLines.get(connection);
-    if (lines != null) lines.receiveCommunication(comm);
     return this;
   }
 
   receiveConnectionMessage(connectionMessage) {
+    const connection = connectionMessage.getSourceConnection();
+    this.connectionToLines.deleteWhenEmpty(connection);
+
     switch (this.type) { // eslint-disable-line default-case
     case 'source':
       connectionMessage.sendToJointMessageFromSource(this.node);

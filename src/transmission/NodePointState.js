@@ -8,8 +8,8 @@ class ConnectionPointState {
     };
   }
 
-  constructor(connection, nodePoint) {
-    this._nodePoint = nodePoint;
+  constructor(connection, lines) {
+    this._lines = lines;
     this._connection = connection;
 
     this._communication = null;
@@ -28,9 +28,7 @@ class ConnectionPointState {
 
   _communicationSend() {
     this._communicationSent = true;
-    this._nodePoint.receiveCommunicationForConnection(
-      this._communication, this._connection
-    );
+    this._lines.receiveCommunication(this._communication);
     return this._propagateState();
   }
 
@@ -97,8 +95,8 @@ export default class NodePointState {
 
     this._communication = null;
     this._connectionStates = new Map();
-    for (const connection of this.nodePoint.getConnectionsFor(this)) {
-      this.connectionAdded(connection);
+    for (const [conn, lines] of this.nodePoint.getConnectionLinesFor(this)) {
+      this.addConnectionLines(conn, lines);
     }
   }
 
@@ -140,9 +138,9 @@ export default class NodePointState {
     throw new Error('Invalid state');
   }
 
-  connectionAdded(connection) {
+  addConnectionLines(connection, lines) {
     if (this._connectionStates.has(connection)) return this;
-    const state = new ConnectionPointState(connection, this.nodePoint);
+    const state = new ConnectionPointState(connection, lines);
     this._connectionStates.set(connection, state);
     if (!this.communicationIsUnset()) {
       state.setCommunication(this._communication);

@@ -4,5 +4,5 @@ export default class BlindNodeSource {
 
   constructor(node) { this.node = node; }
 
-  getConnectionsFor() { return []; }
+  getConnectionLinesFor() { return []; }
 }

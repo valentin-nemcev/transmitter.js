@@ -4,7 +4,7 @@ export default class BlindNodeTarget {
 
   constructor(node) { this.node = node; }
 
-  getConnectionsFor() { return []; }
+  getConnectionLinesFor() { return []; }
 
   receiveQuery() { return this; }
 }
