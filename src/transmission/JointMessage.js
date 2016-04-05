@@ -7,21 +7,10 @@ import SourceMessage from './SourceMessage';
 import Query from './Query';
 
 
-class LineToMessageMap {
-  inspect() {
-    return Array.from(this.getMessages()).map(inspect).join(', ');
-  }
-
-  constructor() {
-    this._map = new Map();
-  }
-
-  [Symbol.iterator]() {
-    return this._map[Symbol.iterator]();
-  }
+class LineToMessageMap extends Map {
 
   add(message, line) {
-    const prev = this._map.get(line);
+    const prev = this.get(line);
     if (prev != null) {
       throw new Error(
           `Already received message from ${inspect(line)}. ` +
@@ -29,16 +18,8 @@ class LineToMessageMap {
           `current: ${inspect(message)}`
         );
     }
-    this._map.set(line, message);
+    this.set(line, message);
     return this;
-  }
-
-  getMessages() {
-    return this._map.values();
-  }
-
-  get size() {
-    return this._map.size;
   }
 }
 
@@ -72,7 +53,7 @@ export default class JointMessage {
     this.pass = pass;
     this.node = node;
 
-    this.queryState = CommunicationState.getOrCreate(
+    this._queryState = CommunicationState.getOrCreate(
       this, {nodePoint: this.node.getNodeTarget()}
     );
     this._linesToMessages = new LineToMessageMap();
@@ -84,28 +65,33 @@ export default class JointMessage {
     );
   }
 
+  // Query state
+
+  queryIsRequested() { return this._queryRequested; }
+
+  targetConnectionsChanged() { return this._targetConnectionsChanged; }
+
+  // Triggers
+
   receiveMessageFrom(message, line) {
     this._linesToMessages.add(message, line);
-    this._ensureQuerySent();
-    this._selectAndSendMessageIfReady();
-    return this;
+    return this._propagateState();
   }
 
   receiveQuery() {
-    this._ensureQuerySent();
-    return this;
+    this._queryRequested = true;
+    return this._propagateState();
   }
 
   originateQuery() {
-    this._ensureQuerySent();
-    return this;
+    this._queryRequested = true;
+    return this._propagateState();
   }
 
   receiveTargetConnectionMessage(connection) {
-    this._ensureQuerySent();
-    this.queryState.connectionUpdated(connection);
-    this._selectAndSendMessageIfReady();
-    return this;
+    this._targetConnectionsChanged = true;
+    this._queryState.connectionUpdated(connection);
+    return this._propagateState();
   }
 
   receiveSourceConnectionMessage(connection) {
@@ -122,15 +108,7 @@ export default class JointMessage {
         );
     }
     this.precedingMessage = precedingMessage;
-    this._ensureQuerySent();
-    return this;
-  }
-
-  _ensureQuerySent() {
-    if (this.queryState.communicationIsUnset()) {
-      this.queryState.setCommunication(Query.createNext(this));
-    }
-    return this;
+    return this._propagateState();
   }
 
   originateMessage(payload) {
@@ -145,11 +123,42 @@ export default class JointMessage {
     return this;
   }
 
-  _selectAndSendMessageIfReady() {
-    if (!this.queryState.communicationIsSent()) return this;
+  readyToRespond() {
+    return this.message == null && this._queryState.wasNotDelivered();
+  }
 
-    // TODO: Compare contents
-    if (this._linesToMessages.size !== this.queryState.getPassedLinesCount()) {
+
+  respond() {
+    const prevPayload = this.precedingMessage
+      ? this.precedingMessage.getPayload()
+      : null;
+    const prevPriority = this.precedingMessage
+      ? this.precedingMessage.getPriority()
+      : 0;
+
+    const nextPayload =
+      prevPayload || this.node.processPayload(getNoOpPayload());
+    const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
+
+    return this._sendMessage(nextMessage);
+  }
+
+  _propagateState() {
+    if (this.queryIsRequested() || this._linesToMessages.size ||
+        this.targetConnectionsChanged() || this.precedingMessage != null) {
+      if (this._queryState.communicationIsUnset()) {
+        this._queryState.setCommunication(Query.createNext(this));
+        return this._propagateState();
+      }
+    }
+
+    if (this._linesToMessages.size) return this._selectAndSendMessageIfReady();
+    return this;
+  }
+
+
+  _selectAndSendMessageIfReady() {
+    if (!this._queryState.matchPassedLined(this._linesToMessages)) {
       return this;
     }
 
@@ -196,7 +205,7 @@ export default class JointMessage {
 
   _selectMessage() {
     // TODO: Add checks for more than one message with precedence of 1
-    const messages = Array.from(this._linesToMessages.getMessages());
+    const messages = Array.from(this._linesToMessages.values());
     messages.sort( (a, b) =>
       -1 * (a.getPriority() - b.getPriority())
     );
@@ -207,28 +216,6 @@ export default class JointMessage {
     const prevPayload = prevMessage.getPayload();
     const nextPayload = this.node.processPayload(prevPayload);
     return SourceMessage.create(this, nextPayload, prevMessage.getPriority());
-  }
-
-
-  readyToRespond() {
-    return this.message == null && this.queryState.communicationIsSent()
-      && !this.queryState.wasDelivered();
-  }
-
-
-  respond() {
-    const prevPayload = this.precedingMessage
-      ? this.precedingMessage.getPayload()
-      : null;
-    const prevPriority = this.precedingMessage
-      ? this.precedingMessage.getPriority()
-      : 0;
-
-    const nextPayload =
-      prevPayload || this.node.processPayload(getNoOpPayload());
-    const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
-
-    return this._sendMessage(nextMessage);
   }
 
   _sendMessage(message) {

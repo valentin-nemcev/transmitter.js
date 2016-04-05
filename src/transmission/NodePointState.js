@@ -16,30 +16,7 @@ class ConnectionPointState {
     this._communicationSent = false;
   }
 
-
-  _setCommunication(communication) {
-    this._communication = communication;
-    this._jointConnectionMessage =
-      JointConnectionMessage.getOrCreate(
-        this._communication, {connection: this._connection}
-      );
-    return this._propagateState();
-  }
-
-  _communicationSend() {
-    this._communicationSent = true;
-    this._passedLines = [];
-    for (const line of this._lines
-          .receiveCommunicationYieldingPassedLines(this._communication)) {
-      this._passedLines.push(line);
-    }
-    return this._propagateState();
-  }
-
-  setCommunication(comm) {
-    if (this.communicationIsUnset()) return this._setCommunication(comm);
-    return this;
-  }
+  // Communication state
 
   communicationIsUnset() {
     return this._communication == null;
@@ -51,21 +28,28 @@ class ConnectionPointState {
 
   communicationIsSent() { return this._communicationSent; }
 
-  getPassedLines() {
-    return this._passedLines;
-  }
+  getPassedLines() { return this._passedLines; }
 
-  _connectionQuery() {
-    this._jointConnectionMessage
-      .queryForNestedCommunication(this._communication);
-    return this;
-  }
-
-  connectionUpdated() { return this._propagateState(); }
+  // Connection state
 
   connectionIsOutdated() { return !this._jointConnectionMessage.isUpdated(); }
 
   connectionIsUpdated() { return !this.connectionIsOutdated(); }
+
+
+  // Triggers
+
+  connectionUpdated() { return this._propagateState(); }
+
+  setCommunication(communication) {
+    if (!this.communicationIsUnset()) return this;
+    this._communication = communication;
+    this._jointConnectionMessage =
+      JointConnectionMessage.getOrCreate(
+        this._communication, {connection: this._connection}
+      );
+    return this._propagateState();
+  }
 
 
   _propagateState() {
@@ -79,7 +63,24 @@ class ConnectionPointState {
     }
     throw new Error('Invalid state');
   }
+
+  _communicationSend() {
+    this._communicationSent = true;
+    this._passedLines = [];
+    for (const line of this._lines
+          .receiveCommunicationYieldingPassedLines(this._communication)) {
+      this._passedLines.push(line);
+    }
+    return this._propagateState();
+  }
+
+  _connectionQuery() {
+    this._jointConnectionMessage
+      .queryForNestedCommunication(this._communication);
+    return this;
+  }
 }
+
 
 export default class NodePointState {
 
@@ -107,36 +108,35 @@ export default class NodePointState {
     }
   }
 
+  // State
+
   // ConnectionStates must be segregated by direction in order to prevent loops
   // See Flattening with nested connections specs
   directionMatches(direction) { return this.pass.directionMatches(direction); }
 
   communicationIsUnset() { return this._communication == null; }
 
-  communicationIsSet() {
-    return this._communication != null && !this.communicationIsSent();
-  }
-
-  communicationIsSent() {
+  matchPassedLined(lines) {
     if (this._communication == null) return false;
     for (const connectionState of this._connectionStates.values()) {
       if (!connectionState.communicationIsSent()) return false;
+      for (const passedLine of connectionState.getPassedLines()) {
+        if (!lines.has(passedLine)) return false;
+      }
     }
     return true;
   }
 
-  getPassedLinesCount() {
-    let result = 0;
+  wasNotDelivered() {
+    if (this._communication == null) return false;
     for (const connectionState of this._connectionStates.values()) {
-      result += connectionState.getPassedLines().length;
+      if (!connectionState.communicationIsSent()) return false;
+      if (connectionState.getPassedLines().length > 0) return false;
     }
-    return result;
+    return true;
   }
 
-  wasDelivered() {
-    return this.getPassedLinesCount() > 0;
-  }
-
+  // Triggers
 
   setCommunication(communication) {
     if (this.communicationIsUnset()) {
