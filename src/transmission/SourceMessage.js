@@ -20,15 +20,16 @@ export default class SourceMessage {
   }
 
   static create(prevMessage, payload, priority) {
-    return new this(
-        prevMessage.transmission, prevMessage.pass, payload, priority);
+    return new this(prevMessage.transmission, prevMessage.pass,
+                    payload, priority, prevMessage);
   }
 
-  constructor(transmission, pass, payload, priority) {
+  constructor(transmission, pass, payload, priority, prevMessage) {
     this.transmission = transmission;
     this.pass = pass;
     this.payload = payload;
     this.priority = priority;
+    this.prevMessage = prevMessage;
     if (this.payload == null) throw new Error('Missing payload');
   }
 
@@ -52,4 +53,17 @@ export default class SourceMessage {
   }
 
   getPayload() { return this.payload; }
+
+  assertPrevious(message, node) {
+    if (this.prevMessage !== message &&
+        message.getPriority() >= this.getPriority()) {
+      throw new Error(
+          `Message already sent at ${inspect(node)}. ` +
+          `Previous: ${inspect(this.prevMessage)} → ${inspect(this)}, ` +
+          `current: ${inspect(message)}`
+        );
+    }
+    return this;
+  }
+
 }
