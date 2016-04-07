@@ -9,6 +9,11 @@ import Query from './Query';
 
 class LineToMessageMap extends Map {
 
+  constructor() {
+    super();
+    this._selectedMessage = null;
+  }
+
   add(message, line) {
     const prev = this.get(line);
     if (prev != null) {
@@ -19,7 +24,29 @@ class LineToMessageMap extends Map {
         );
     }
     this.set(line, message);
+
+    this._updateSelectedMessage(message);
     return this;
+  }
+
+  _updateSelectedMessage(message) {
+    if (this._selectedMessage == null) {
+      this._selectedMessage = message;
+      return this;
+    } else if (this._selectedMessage.getPriority() === 0
+               && message.getPriority() === 0) {
+      return this;
+    } else if (this._selectedMessage.getPriority() === 0
+               && message.getPriority() === 1) {
+      this._selectedMessage = message;
+    } else if (this._selectedMessage.getPriority() === 1
+               && message.getPriority() === 1) {
+      throw new Error(
+          `Message already selected at ${inspect(this)}. ` +
+          `Previous: ${inspect(this.selectedMessage)}, ` +
+          `current: ${inspect(message)}`
+        );
+    }
   }
 }
 
@@ -58,7 +85,6 @@ export default class JointMessage {
     );
     this._linesToMessages = new LineToMessageMap();
     this.precedingMessage = null;
-    this.selectedMessage = null;
     this.message = null;
     this.messageState = CommunicationState.getOrCreate(
       this, {nodePoint: this.node.getNodeSource()}
@@ -70,6 +96,8 @@ export default class JointMessage {
   queryIsRequested() { return this._queryRequested; }
 
   targetConnectionsChanged() { return this._targetConnectionsChanged; }
+
+  messageSent() { return this.message != null; }
 
   // Triggers
 
@@ -112,14 +140,8 @@ export default class JointMessage {
   }
 
   originateMessage(payload) {
-    if (this.message != null) {
-      throw new Error(
-          `Message already originated at ${inspect(this.node)}. ` +
-          `Previous: ${inspect(this.message)}`
-        );
-    }
     const message = SourceMessage.create(this, payload, 1);
-    this._sendMessage(message);
+    this._sendMessage(null, message);
     return this;
   }
 
@@ -140,7 +162,7 @@ export default class JointMessage {
       prevPayload || this.node.processPayload(getNoOpPayload());
     const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
 
-    return this._sendMessage(nextMessage);
+    return this._sendMessage(this.precedingMessage, nextMessage);
   }
 
   _propagateState() {
@@ -162,54 +184,26 @@ export default class JointMessage {
       return this;
     }
 
-    const newSelectedMessage = this._selectMessage();
-    if (this.selectedMessage != null) {
-      this._assertSelectedMessage(newSelectedMessage);
-      return this;
-    }
-
-    if (newSelectedMessage == null) return this;
-
-    this.selectedMessage = newSelectedMessage;
+    const selectedMessage = this._linesToMessages._selectedMessage;
     if (this.message != null) {
-      this._assertMessage(newSelectedMessage);
+      this._assertMessage(selectedMessage);
       return this;
     }
 
-    this._sendMessage(this._processMessage(newSelectedMessage));
-    return this;
-  }
-
-  _assertSelectedMessage(newSelectedMessage) {
-    if (this.selectedMessage !== newSelectedMessage) {
-      throw new Error(
-          `Message already selected at ${inspect(this.node)}. ` +
-          `Previous: ${inspect(this.selectedMessage)}, ` +
-          `current: ${inspect(newSelectedMessage)}`
-        );
-    }
+    this._sendMessage(selectedMessage, this._processMessage(selectedMessage));
     return this;
   }
 
   _assertMessage(message) {
-    if (this.message !== message &&
-        message.getPriority() >= this.message.getPriority()) {
+    if (this.prevMessage !== message &&
+        message.getPriority() >= this.prevMessage.getPriority()) {
       throw new Error(
           `Message already sent at ${inspect(this.node)}. ` +
-          `Previous: ${inspect(this.message)}, ` +
+          `Previous: ${inspect(this.prevMessage)}, ` +
           `current: ${inspect(message)}`
         );
     }
     return this;
-  }
-
-  _selectMessage() {
-    // TODO: Add checks for more than one message with precedence of 1
-    const messages = Array.from(this._linesToMessages.values());
-    messages.sort( (a, b) =>
-      -1 * (a.getPriority() - b.getPriority())
-    );
-    return messages[0];
   }
 
   _processMessage(prevMessage) {
@@ -218,10 +212,28 @@ export default class JointMessage {
     return SourceMessage.create(this, nextPayload, prevMessage.getPriority());
   }
 
-  _sendMessage(message) {
+  _sendMessage(prevMessage, message) {
+    if (prevMessage == null) {
+      prevMessage = {
+        originMessage: true,
+        getPriority: () => 1,
+      };
+    }
     this.transmission.log(this, this.node);
-    if (this.message != null) throw new Error("Can't send message twice");
+    if (this.prevMessage != null) {
+      if (prevMessage !== this.prevMessage) {
+        const i = (...ms) => ms.map(inspect).join(' → ');
+        throw new Error(
+          `Message already sent at ${inspect(this.node)}. ` +
+          `Previous: ${i(this.prevMessage, this.message)}, ` +
+          `current: ${i(prevMessage, message)}`
+        );
+      } else {
+        return this;
+      }
+    }
     // This method is reentrant, so assign @message before sending
+    this.prevMessage = prevMessage;
     this.message = message;
     this.transmission.log(this.message, this.node.getNodeSource());
 
