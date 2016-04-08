@@ -149,16 +149,16 @@ export default class Transmission {
   respond() {
     this.comms.forEach(({queue}) => {
       for (;;) {
-        let didRespond = false;
+        let didSend = false;
         // Use for-i loop to handle comms pushed to queue in single iteration
         for (let i = 0; i < queue.length; i++) {
           const comm = queue[i];
-          if (comm.readyToRespond()) {
-            didRespond = true;
-            comm.respond();
+          if (comm.messageReady()) {
+            didSend = true;
+            comm.sendMessage();
           }
         }
-        if (!didRespond) break;
+        if (!didSend) break;
       }
     });
     return this;

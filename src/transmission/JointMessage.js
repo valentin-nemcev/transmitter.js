@@ -25,29 +25,10 @@ class LineToMessageMap extends Map {
     }
     this.set(line, message);
 
-    this._updateSelectedMessage(message);
+    this._selectedMessage = message.select(this._selectedMessage);
     return this;
   }
 
-  _updateSelectedMessage(message) {
-    if (this._selectedMessage == null) {
-      this._selectedMessage = message;
-      return this;
-    } else if (this._selectedMessage.getPriority() === 0
-               && message.getPriority() === 0) {
-      return this;
-    } else if (this._selectedMessage.getPriority() === 0
-               && message.getPriority() === 1) {
-      this._selectedMessage = message;
-    } else if (this._selectedMessage.getPriority() === 1
-               && message.getPriority() === 1) {
-      throw new Error(
-          `Message already selected at ${inspect(this)}. ` +
-          `Previous: ${inspect(this.selectedMessage)}, ` +
-          `current: ${inspect(message)}`
-        );
-    }
-  }
 }
 
 export default class JointMessage {
@@ -56,8 +37,8 @@ export default class JointMessage {
     return [
       '×M',
       inspect(this.pass),
-      ',',
-      this._linesToMessages.inspect(),
+      // ',',
+      // inspect(this._linesToMessages),
     ].join(' ');
   }
 
@@ -97,7 +78,9 @@ export default class JointMessage {
 
   targetConnectionsChanged() { return this._targetConnectionsChanged; }
 
-  messageSent() { return this.message != null; }
+  messageReady() { return this.message != null && !this._messageSent; }
+
+  messageSent() { return this._messageSent; }
 
   // Triggers
 
@@ -128,13 +111,6 @@ export default class JointMessage {
   }
 
   receivePrecedingMessage(precedingMessage) {
-    if (this.message != null) {
-      throw new Error(
-          `Succeding message already sent at ${inspect(this.node)}. ` +
-          `Preceding: ${inspect(precedingMessage)}`
-          `current: ${inspect(this.message)}`
-        );
-    }
     this.precedingMessage = precedingMessage;
     return this._propagateState();
   }
@@ -145,25 +121,6 @@ export default class JointMessage {
     return this;
   }
 
-  readyToRespond() {
-    return this.message == null && this._queryState.wasNotDelivered();
-  }
-
-
-  respond() {
-    const prevPayload = this.precedingMessage
-      ? this.precedingMessage.getPayload()
-      : null;
-    const prevPriority = this.precedingMessage
-      ? this.precedingMessage.getPriority()
-      : 0;
-
-    const nextPayload =
-      prevPayload || this.node.processPayload(getNoOpPayload());
-    const nextMessage = SourceMessage.create(this, nextPayload, prevPriority);
-
-    return this._sendMessage(nextMessage);
-  }
 
   _propagateState() {
     if (this.queryIsRequested() || this.targetConnectionsChanged()
@@ -177,11 +134,27 @@ export default class JointMessage {
     if (this._linesToMessages.size &&
           this._queryState.matchPassedLined(this._linesToMessages)) {
       const selectedMessage = this._linesToMessages._selectedMessage;
-      if (this.message != null) {
+      if (this.messageSent()) {
         this.message.assertPrevious(selectedMessage, this.node);
       } else {
         this._sendMessage(this._processMessage(selectedMessage));
       }
+    }
+
+    if (this._queryState.wasNotDelivered() && this.message == null) {
+      const prevPayload = this.precedingMessage
+        ? this.precedingMessage.getPayload()
+        : null;
+      const prevPriority = this.precedingMessage
+        ? this.precedingMessage.getPriority()
+        : 0;
+
+      const nextPayload =
+        prevPayload || this.node.processPayload(getNoOpPayload());
+      const nextMessage =
+        SourceMessage.create(this, nextPayload, prevPriority);
+
+      this._setMessage(nextMessage);
     }
     return this;
   }
@@ -194,11 +167,19 @@ export default class JointMessage {
     );
   }
 
+  _setMessage(message) {
+    if (this.messageSent()) throw new Error("Can't send message twice");
+
+    this.message = message.select(this.message);
+  }
+
   _sendMessage(message) {
-    if (this.message != null) throw new Error("Can't send message twice");
+    this._setMessage(message);
+    return this.sendMessage();
+  }
 
-    this.message = message;
-
+  sendMessage() {
+    this._messageSent = true;
     this._sendMessageToSucceeding();
     this.messageState.setCommunication(this.message);
     return this;

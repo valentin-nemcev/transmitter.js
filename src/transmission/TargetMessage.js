@@ -49,4 +49,26 @@ export default class TargetMessage {
   }
 
   getPayload() { return this.payload; }
+
+  select(prevMessage) {
+    if (prevMessage == null) {
+      return this;
+    } else if (prevMessage.getPriority() === 0
+               && this.getPriority() === 0) {
+      return prevMessage;
+    } else if (prevMessage.getPriority() === 1
+               && this.getPriority() === 0) {
+      return prevMessage;
+    } else if (prevMessage.getPriority() === 0
+               && this.getPriority() === 1) {
+      return this;
+    } else if (prevMessage.getPriority() === 1
+               && this.getPriority() === 1) {
+      throw new Error(
+          `Message already selected at ${inspect(this)}. ` +
+          `Previous: ${inspect(prevMessage)}, ` +
+          `current: ${inspect(this)}`
+        );
+    }
+  }
 }

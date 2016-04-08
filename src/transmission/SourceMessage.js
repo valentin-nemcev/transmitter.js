@@ -55,8 +55,8 @@ export default class SourceMessage {
   getPayload() { return this.payload; }
 
   assertPrevious(message, node) {
-    if (this.prevMessage !== message &&
-        message.getPriority() >= this.getPriority()) {
+    if (!(this.prevMessage === message ||
+        message.getPriority() < this.getPriority())) {
       throw new Error(
           `Message already sent at ${inspect(node)}. ` +
           `Previous: ${inspect(this.prevMessage)} → ${inspect(this)}, ` +
@@ -66,4 +66,25 @@ export default class SourceMessage {
     return this;
   }
 
+  select(prevMessage) {
+    if (prevMessage == null) {
+      return this;
+    } else if (prevMessage.getPriority() === 0
+               && this.getPriority() === 0) {
+      return prevMessage;
+    } else if (prevMessage.getPriority() === 1
+               && this.getPriority() === 0) {
+      return prevMessage;
+    } else if (prevMessage.getPriority() === 0
+               && this.getPriority() === 1) {
+      return this;
+    } else if (prevMessage.getPriority() === 1
+               && this.getPriority() === 1) {
+      throw new Error(
+          `Message already selected at ${inspect(this)}. ` +
+          `Previous: ${inspect(prevMessage)}, ` +
+          `current: ${inspect(this)}`
+        );
+    }
+  }
 }
