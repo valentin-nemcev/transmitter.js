@@ -116,7 +116,7 @@ export default class NodePointState {
 
   communicationIsUnset() { return this._communication == null; }
 
-  matchPassedLined(lines) {
+  matchPassedLines(lines) {
     if (this._communication == null) return false;
     for (const connectionState of this._connectionStates.values()) {
       if (!connectionState.communicationIsSent()) return false;

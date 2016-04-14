@@ -78,7 +78,11 @@ export default class JointMessage {
 
   targetConnectionsChanged() { return this._targetConnectionsChanged; }
 
+  waitingForMessage() { return; }
+
   messageReady() { return this.message != null && !this._messageSent; }
+
+  responseReady() { return this._responseReady; }
 
   messageSent() { return this._messageSent; }
 
@@ -118,7 +122,7 @@ export default class JointMessage {
   originateMessage(payload) {
     const message = SourceMessage.create(this, payload, 1);
     this._sendMessage(message);
-    return this;
+    return this._propagateState();
   }
 
 
@@ -132,7 +136,7 @@ export default class JointMessage {
     }
 
     if (this._linesToMessages.size &&
-          this._queryState.matchPassedLined(this._linesToMessages)) {
+          this._queryState.matchPassedLines(this._linesToMessages)) {
       const selectedMessage = this._linesToMessages._selectedMessage;
       if (this.messageSent()) {
         this.message.assertPrevious(selectedMessage, this.node);
@@ -142,19 +146,9 @@ export default class JointMessage {
     }
 
     if (this._queryState.wasNotDelivered() && this.message == null) {
-      const prevPayload = this.precedingMessage
-        ? this.precedingMessage.getPayload()
-        : null;
-      const prevPriority = this.precedingMessage
-        ? this.precedingMessage.getPriority()
-        : 0;
-
-      const nextPayload =
-        prevPayload || this.node.processPayload(getNoOpPayload());
-      const nextMessage =
-        SourceMessage.create(this, nextPayload, prevPriority);
-
-      this._setMessage(nextMessage);
+      this._responseReady = true;
+    } else {
+      this._responseReady = false;
     }
     return this;
   }
@@ -175,14 +169,27 @@ export default class JointMessage {
 
   _sendMessage(message) {
     this._setMessage(message);
-    return this.sendMessage();
-  }
-
-  sendMessage() {
     this._messageSent = true;
     this._sendMessageToSucceeding();
     this.messageState.setCommunication(this.message);
     return this;
+  }
+
+  respond() {
+    const prevPayload = this.precedingMessage
+      ? this.precedingMessage.getPayload()
+      : null;
+    const prevPriority = this.precedingMessage
+      ? this.precedingMessage.getPriority()
+      : 0;
+
+    const nextPayload =
+      prevPayload || this.node.processPayload(getNoOpPayload());
+    const nextMessage =
+      SourceMessage.create(this, nextPayload, prevPriority);
+
+    this._sendMessage(nextMessage);
+    return this._propagateState();
   }
 
   _sendMessageToSucceeding() {

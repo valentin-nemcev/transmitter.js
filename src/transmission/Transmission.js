@@ -100,7 +100,7 @@ export default class Transmission {
   constructor() {
     this.comms = [];
     Passes.priorities
-      .forEach( (p) => this.comms[p] = {map: new WeakMap(), queue: []} );
+      .forEach( (p) => this.comms[p] = {map: new Map(), queue: []} );
   }
 
   originateQuery(node) {
@@ -153,9 +153,9 @@ export default class Transmission {
         // Use for-i loop to handle comms pushed to queue in single iteration
         for (let i = 0; i < queue.length; i++) {
           const comm = queue[i];
-          if (comm.messageReady()) {
+          if (comm.responseReady()) {
             didSend = true;
-            comm.sendMessage();
+            comm.respond();
           }
         }
         if (!didSend) break;

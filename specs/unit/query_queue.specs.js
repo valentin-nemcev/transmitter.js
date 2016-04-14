@@ -6,12 +6,12 @@ class QueryStub {
     this.pass = pass;
   }
 
-  sendMessage() {
+  respond() {
     this._didRespond = true;
     return this;
   }
 
-  messageReady() {
+  responseReady() {
     return !this._didRespond;
   }
 }
@@ -27,13 +27,13 @@ describe('Query queue', function() {
 
   it('responds to queries from nodes', function() {
     this.query = new QueryStub(Passes.getBackward());
-    sinon.spy(this.query, 'sendMessage');
+    sinon.spy(this.query, 'respond');
 
     this.transmission
       .addCommunicationForAndEnqueue(this.query, new PointStub());
     this.transmission.respond();
 
-    expect(this.query.sendMessage).to.have.been.calledOnce();
+    expect(this.query.respond).to.have.been.calledOnce();
   });
 
 
@@ -41,11 +41,11 @@ describe('Query queue', function() {
     this.query1 = new QueryStub(Passes.getBackward());
     this.query2 = new QueryStub(Passes.getForward());
     const callOrder = [];
-    sinon.stub(this.query1, 'sendMessage', function() {
+    sinon.stub(this.query1, 'respond', function() {
       callOrder.push(1);
       this._didRespond = true;
     });
-    sinon.stub(this.query2, 'sendMessage', function() {
+    sinon.stub(this.query2, 'respond', function() {
       callOrder.push(2);
       this._didRespond = true;
     });
@@ -64,11 +64,11 @@ describe('Query queue', function() {
     this.query1 = new QueryStub(Passes.getBackward());
     this.query2 = new QueryStub(Passes.getBackward());
     const callOrder = [];
-    sinon.stub(this.query1, 'sendMessage', function() {
+    sinon.stub(this.query1, 'respond', function() {
       callOrder.push(1);
       this._didRespond = true;
     });
-    sinon.stub(this.query2, 'sendMessage', function() {
+    sinon.stub(this.query2, 'respond', function() {
       callOrder.push(2);
       this._didRespond = true;
     });
@@ -88,11 +88,11 @@ describe('Query queue', function() {
     this.query1 = new QueryStub(Passes.getBackward());
     this.query2 = new QueryStub(Passes.getBackward());
     const callOrder = [];
-    sinon.stub(this.query1, 'sendMessage', function() {
+    sinon.stub(this.query1, 'respond', function() {
       callOrder.push(1);
       this._didRespond = true;
     });
-    sinon.stub(this.query2, 'sendMessage', function() {
+    sinon.stub(this.query2, 'respond', function() {
       callOrder.push(2);
       this._didRespond = true;
     });
@@ -112,17 +112,17 @@ describe('Query queue', function() {
   function() {
     this.query1 = new QueryStub(Passes.getBackward());
     this.query2 = new QueryStub(Passes.getBackward());
-    sinon.stub(this.query1, 'sendMessage', () => {
+    sinon.stub(this.query1, 'respond', () => {
       this.transmission
         .addCommunicationForAndEnqueue(this.query2, new PointStub());
       this.query1._didRespond = true;
     });
-    sinon.spy(this.query2, 'sendMessage');
+    sinon.spy(this.query2, 'respond');
 
     this.transmission
       .addCommunicationForAndEnqueue(this.query1, new PointStub());
     this.transmission.respond();
 
-    expect(this.query2.sendMessage).to.have.been.calledOnce();
+    expect(this.query2.respond).to.have.been.calledOnce();
   });
 });
