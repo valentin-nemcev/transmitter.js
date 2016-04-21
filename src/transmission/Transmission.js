@@ -6,6 +6,12 @@ import JointMessage from './JointMessage';
 import JointChannelMessage from './JointChannelMessage';
 
 
+class QueueSet extends Set {
+  *iterateUntilEmpty() {
+    while (this.size) { yield* this; }
+  }
+}
+
 export default class Transmission {
 
   static queue = [];
@@ -97,12 +103,6 @@ export default class Transmission {
   inspect() { return '[Transmission]'; }
 
 
-  constructor() {
-    this.comms = [];
-    Passes.priorities
-      .forEach( (p) => this.comms[p] = {map: new Map(), queue: []} );
-  }
-
   originateQuery(node) {
     return JointMessage
       .getOrCreate(
@@ -126,39 +126,40 @@ export default class Transmission {
       .originateChannelMessage();
   }
 
-  addCommunicationForAndEnqueue(comm, point) {
-    return this.addCommunicationFor(comm, point, true);
+
+  constructor() {
+    this.comms = [];
+    Passes.priorities.forEach(
+      (p) => this.comms[p] = {map: new Map(), queue: new QueueSet() }
+    );
   }
 
-  addCommunicationFor(comm, point, enqueue = false) {
-    const {map, queue} = this.comms[comm.pass.priority];
-    map.set(point, comm);
-    if (enqueue) {
-      if (this.reverseOrder) queue.unshift(comm);
-      else queue.push(comm);
-    }
+  addCommunicationFor(comm, point) {
+    this.comms[comm.pass.priority].map.set(point, comm);
     return this;
   }
 
   getCommunicationFor(pass, point) {
-    if (pass === null) { return null; }
+    if (pass === null) return null;
     return this.comms[pass.priority].map.get(point);
+  }
+
+
+  addToQueue(comm) {
+    this.comms[comm.pass.priority].queue.add(comm);
+    return this;
+  }
+
+  removeFromQueue(comm) {
+    this.comms[comm.pass.priority].queue.delete(comm);
+    return this;
   }
 
 
   respond() {
     this.comms.forEach(({queue}) => {
-      for (;;) {
-        let didSend = false;
-        // Use for-i loop to handle comms pushed to queue in single iteration
-        for (let i = 0; i < queue.length; i++) {
-          const comm = queue[i];
-          if (comm.responseReady()) {
-            didSend = true;
-            comm.respond();
-          }
-        }
-        if (!didSend) break;
+      for (const comm of queue.iterateUntilEmpty()) {
+        comm.respond();
       }
     });
     return this;

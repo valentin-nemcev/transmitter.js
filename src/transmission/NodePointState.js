@@ -108,23 +108,26 @@ export default class NodePointState {
     }
   }
 
-  // State
-
   // ConnectionStates must be segregated by direction in order to prevent loops
   // See Flattening with nested connections specs
   directionMatches(direction) { return this.pass.directionMatches(direction); }
 
+
+  // State
+
   communicationIsUnset() { return this._communication == null; }
 
-  matchPassedLines(lines) {
+  hasResponses(messages) {
     if (this._communication == null) return false;
+    let hasResponses = false;
     for (const connectionState of this._connectionStates.values()) {
       if (!connectionState.communicationIsSent()) return false;
       for (const passedLine of connectionState.getPassedLines()) {
-        if (!lines.has(passedLine)) return false;
+        if (messages.hasForLine(passedLine)) hasResponses = true;
+        else return false;
       }
     }
-    return true;
+    return hasResponses;
   }
 
   wasNotDelivered() {

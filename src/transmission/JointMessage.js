@@ -14,6 +14,12 @@ class LineToMessageMap extends Map {
     this._selectedMessage = null;
   }
 
+  hasSome() { return this.size > 0; }
+
+  hasForLine(line) { return this.has(line); }
+
+  getSelectedMessage() { return this._selectedMessage; }
+
   add(message, line) {
     const prev = this.get(line);
     if (prev != null) {
@@ -37,8 +43,6 @@ export default class JointMessage {
     return [
       '×M',
       inspect(this.pass),
-      // ',',
-      // inspect(this._linesToMessages),
     ].join(' ');
   }
 
@@ -51,7 +55,7 @@ export default class JointMessage {
     let message = transmission.getCommunicationFor(pass, node);
     if (message == null) {
       message = new this(transmission, pass, node);
-      transmission.addCommunicationForAndEnqueue(message, node);
+      transmission.addCommunicationFor(message, node);
     }
     return message;
   }
@@ -64,58 +68,82 @@ export default class JointMessage {
     this._queryState = CommunicationState.getOrCreate(
       this, {nodePoint: this.node.getNodeTarget()}
     );
-    this._linesToMessages = new LineToMessageMap();
-    this.precedingMessage = null;
-    this.message = null;
-    this.messageState = CommunicationState.getOrCreate(
+    this._targetMessages = new LineToMessageMap();
+
+    this._precedingMessage = null;
+    this._message = null;
+    this._messageState = CommunicationState.getOrCreate(
       this, {nodePoint: this.node.getNodeSource()}
     );
   }
 
-  // Query state
+  getSentMessage() { return this._message; }
 
-  queryIsRequested() { return this._queryRequested; }
+  getPrecedingMessage() { return this._precedingMessage; }
 
-  targetConnectionsChanged() { return this._targetConnectionsChanged; }
 
-  waitingForMessage() { return; }
+  // State
 
-  messageReady() { return this.message != null && !this._messageSent; }
+  messageSent() { return this._message != null; }
 
-  responseReady() { return this._responseReady; }
+  _sendMessage(message) {
+    if (this.messageSent()) throw new Error("Can't send message twice");
+    this._message = message;
+    const succ = this._getSucceedingMessage();
 
-  messageSent() { return this._messageSent; }
+    if (succ != null) succ.receivePrecedingMessage(this._message);
+    this._messageState.setCommunication(this._message);
+
+    return this;
+  }
+
+
+  hasPrecedingMessage() { return this._precedingMessage != null; }
+
+  _setPrecedingMessage(message) { this._precedingMessage = message; }
+
 
   // Triggers
 
   receiveMessageFrom(message, line) {
-    this._linesToMessages.add(message, line);
+    this._targetMessages.add(message, line);
     return this._propagateState();
   }
 
   receiveQuery() {
-    this._queryRequested = true;
+    this._sendQueryOnce();
     return this._propagateState();
   }
 
   originateQuery() {
-    this._queryRequested = true;
+    this._sendQueryOnce();
     return this._propagateState();
   }
 
   receiveTargetConnectionMessage(connection) {
-    this._targetConnectionsChanged = true;
+    this._sendQueryOnce();
     this._queryState.connectionUpdated(connection);
     return this._propagateState();
   }
 
+  _sendQueryOnce() {
+    if (this._queryState.communicationIsUnset()) {
+      this._queryState.setCommunication(Query.createNext(this));
+      return this._propagateState();
+    }
+  }
+
   receiveSourceConnectionMessage(connection) {
-    this.messageState.connectionUpdated(connection);
+    this._messageState.connectionUpdated(connection);
     return this;
   }
 
   receivePrecedingMessage(precedingMessage) {
-    this.precedingMessage = precedingMessage;
+    if (!this.hasPrecedingMessage()) {
+      this._setPrecedingMessage(precedingMessage);
+    } else {
+      throw new Error('Invalid state');
+    }
     return this._propagateState();
   }
 
@@ -126,82 +154,72 @@ export default class JointMessage {
   }
 
 
+  respond() {
+    if (this._queryState.wasNotDelivered() && !this.messageSent()) {
+      this._sendResponseMessage();
+      return this._propagateState();
+    } else {
+      throw new Error('Invalid state');
+    }
+  }
+
   _propagateState() {
-    if (this.queryIsRequested() || this.targetConnectionsChanged()
-      || this._linesToMessages.size || this.precedingMessage != null) {
-      if (this._queryState.communicationIsUnset()) {
-        this._queryState.setCommunication(Query.createNext(this));
-        return this._propagateState();
-      }
+    if (this._targetMessages.hasSome() || this.hasPrecedingMessage()) {
+      this._sendQueryOnce();
     }
 
-    if (this._linesToMessages.size &&
-          this._queryState.matchPassedLines(this._linesToMessages)) {
-      const selectedMessage = this._linesToMessages._selectedMessage;
+    if (this._queryState.hasResponses(this._targetMessages)) {
+      const selectedMessage = this._targetMessages.getSelectedMessage();
       if (this.messageSent()) {
-        this.message.assertPrevious(selectedMessage, this.node);
+        this.getSentMessage().assertPrevious(selectedMessage, this.node);
       } else {
-        this._sendMessage(this._processMessage(selectedMessage));
+        this._sendSelectedMessage(selectedMessage);
       }
     }
 
-    if (this._queryState.wasNotDelivered() && this.message == null) {
+    if (this._queryState.wasNotDelivered() && !this.messageSent()) {
+      if (!this._responseReady) this.transmission.addToQueue(this);
       this._responseReady = true;
     } else {
+      if (this._responseReady) this.transmission.removeFromQueue(this);
       this._responseReady = false;
     }
     return this;
   }
 
-  _processMessage(prevMessage) {
-    const prevPayload = prevMessage.getPayload();
-    const nextPayload = this.node.processPayload(prevPayload);
-    return SourceMessage.create(
-      prevMessage, nextPayload, prevMessage.getPriority()
-    );
-  }
+  _sendResponseMessage() {
+    const msg = this.getPrecedingMessage();
+    let payload;
+    let priority;
 
-  _setMessage(message) {
-    if (this.messageSent()) throw new Error("Can't send message twice");
+    if (msg != null) {
+      [payload, priority] = [msg.getPayload(), msg.getPriority()];
+    } else {
+      [payload, priority] = [this.node.processPayload(getNoOpPayload()), 0];
+    }
 
-    this.message = message.select(this.message);
-  }
-
-  _sendMessage(message) {
-    this._setMessage(message);
-    this._messageSent = true;
-    this._sendMessageToSucceeding();
-    this.messageState.setCommunication(this.message);
-    return this;
-  }
-
-  respond() {
-    const prevPayload = this.precedingMessage
-      ? this.precedingMessage.getPayload()
-      : null;
-    const prevPriority = this.precedingMessage
-      ? this.precedingMessage.getPriority()
-      : 0;
-
-    const nextPayload =
-      prevPayload || this.node.processPayload(getNoOpPayload());
-    const nextMessage =
-      SourceMessage.create(this, nextPayload, prevPriority);
+    const nextMessage = SourceMessage.create(this, payload, priority);
 
     this._sendMessage(nextMessage);
-    return this._propagateState();
   }
 
-  _sendMessageToSucceeding() {
+  _sendSelectedMessage(selectedMessage) {
+    const prevPayload = selectedMessage.getPayload();
+    const nextPayload = this.node.processPayload(prevPayload);
+    const message = SourceMessage.create(
+      selectedMessage, nextPayload, selectedMessage.getPriority()
+    );
+
+    this._sendMessage(message);
+  }
+
+  _getSucceedingMessage() {
     const responsePass = this.pass.getForResponse();
     if (responsePass != null) {
-      JointMessage
-        .getOrCreate(
-            {transmission: this.transmission, pass: responsePass },
+      return JointMessage.getOrCreate(
+            {transmission: this.transmission, pass: responsePass},
             {node: this.node}
-          )
-        .receivePrecedingMessage(this.message);
-    }
-    return this;
+          );
+    } else return null;
   }
 }

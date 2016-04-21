@@ -1,7 +1,6 @@
 require('./common');
 
 describe('Unit', function() {
-  require('./unit/query_queue.specs');
   require('./unit/compare_keys.specs');
   require('./unit/keys_equal.specs');
   require('./unit/ordered_map.specs');
