@@ -1,7 +1,5 @@
 import NodePointState from './NodePointState';
 
-import {getNoOpPayload} from '../payloads';
-
 import SourceMessage from './SourceMessage';
 
 
@@ -39,44 +37,27 @@ export default class NodeSourceState {
   }
 
   sendResponseMessage(precedingMessage) {
-    const msg = precedingMessage;
-    let payload;
-    let priority;
-
-    if (msg != null) {
-      [payload, priority] = [msg.getPayload(), msg.getPriority()];
-    } else {
-      [payload, priority] = [this.node.processPayload(getNoOpPayload()), 0];
-    }
-
-    const nextMessage = SourceMessage.create(
-      this, payload, priority, precedingMessage
+    return this._sendMessage(
+      SourceMessage.createFromPreceding(this, this.node, precedingMessage)
     );
-
-    this._sendMessage(nextMessage);
   }
 
   assertPrecedingMessage(precedingMessage, node) {
     this._message.assertPrevious(precedingMessage, node);
+    return this;
   }
-
 
   sendOrAssertSelectedMessage(selectedMessage) {
     if (this.messageSent()) {
       this._message.assertPrevious(selectedMessage, this.node);
     } else {
-      const prevPayload = selectedMessage.getPayload();
-      const nextPayload = this.node.processPayload(prevPayload);
-      const message = SourceMessage.create(
-        this, nextPayload, selectedMessage.getPriority(), selectedMessage
+      this._sendMessage(
+        SourceMessage.createFromSelected(this, this.node, selectedMessage)
       );
-
-      this._sendMessage(message);
     }
   }
 
   sendOriginMessage(payload) {
-    const message = SourceMessage.create(this, payload, 1, null);
-    this._sendMessage(message);
+    this._sendMessage(SourceMessage.createOrigin(this, payload));
   }
 }

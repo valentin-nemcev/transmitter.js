@@ -1,5 +1,7 @@
 import {inspect} from 'util';
 
+import {getNoOpPayload} from '../payloads';
+
 import MergingMessage from './MergingMessage';
 
 
@@ -19,8 +21,31 @@ export default class SourceMessage {
     return this;
   }
 
-  static create({transmission, pass}, payload, priority, prevMessage) {
-    return new this(transmission, pass, payload, priority, prevMessage);
+
+  static createOrigin({transmission, pass}, payload) {
+    return new this(transmission, pass, payload, 1, null);
+  }
+
+  static createFromSelected({transmission, pass}, node, selectedMessage) {
+    const payload = node.processPayload(selectedMessage.getPayload());
+    const priority = selectedMessage.getPriority();
+    return new this(transmission, pass, payload, priority, selectedMessage);
+  }
+
+  static createFromPreceding({transmission, pass}, node, precedingMessage) {
+    let payload;
+    let priority;
+
+    if (precedingMessage != null) {
+      [payload, priority] = [
+        precedingMessage.getPayload(),
+        precedingMessage.getPriority(),
+      ];
+    } else {
+      [payload, priority] = [node.processPayload(getNoOpPayload()), 0];
+    }
+
+    return new this(transmission, pass, payload, priority, precedingMessage);
   }
 
   constructor(transmission, pass, payload, priority, prevMessage) {
