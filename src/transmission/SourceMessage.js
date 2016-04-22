@@ -19,9 +19,8 @@ export default class SourceMessage {
     return this;
   }
 
-  static create(prevMessage, payload, priority) {
-    return new this(prevMessage.transmission, prevMessage.pass,
-                    payload, priority, prevMessage);
+  static create({transmission, pass}, payload, priority, prevMessage) {
+    return new this(transmission, pass, payload, priority, prevMessage);
   }
 
   constructor(transmission, pass, payload, priority, prevMessage) {
