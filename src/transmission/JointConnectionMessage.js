@@ -1,6 +1,7 @@
 import {inspect} from 'util';
 
-import NodePointState from './NodePointState';
+import MessageSourceState from './CommunicationSourceState';
+import QuerySourceState from './QuerySourceState';
 import JointMessage from './JointMessage';
 import JointChannelMessage from './JointChannelMessage';
 
@@ -85,22 +86,16 @@ export default class JointConnectionMessage {
     return this;
   }
 
-  sendToJointMessageFromSource(node) {
-    JointMessage
-      .getOrCreate(this, {node})
-      .receiveSourceConnectionMessage(this.connection);
-    return this;
+  getNodeSourceState(nodePoint) {
+    return MessageSourceState.getOrCreate(this, {nodePoint});
   }
 
-  sendToJointMessageFromTarget(node) {
-    JointMessage
-      .getOrCreate(this, {node})
-      .receiveTargetConnectionMessage(this.connection);
-    return this;
+  getNodeTargetState(nodePoint) {
+    return QuerySourceState.getOrCreate(this, {nodePoint});
   }
 
-  getNodePointState(nodePoint) {
-    return NodePointState.getOrCreate(this, {nodePoint});
+  getJointMessage(node) {
+    return JointMessage.getOrCreate(this, {node});
   }
 
   sendToJointChannelMessage(channelNode) {

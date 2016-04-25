@@ -1,6 +1,6 @@
 import JointConnectionMessage from './JointConnectionMessage';
 
-class ConnectionPointState {
+export class ConnectionPointState {
   inspect() {
     return {
       connnection: this._connection,
@@ -27,8 +27,6 @@ class ConnectionPointState {
   }
 
   communicationIsSent() { return this._communicationSent; }
-
-  getPassedLines() { return this._passedLines; }
 
   // Connection state
 
@@ -66,12 +64,12 @@ class ConnectionPointState {
 
   _communicationSend() {
     this._communicationSent = true;
-    this._passedLines = [];
-    for (const line of this._lines
-          .receiveCommunicationYieldingPassedLines(this._communication)) {
-      this._passedLines.push(line);
-    }
+    this._sendCommunicationToLines(this._communication, this._lines);
     return this._propagateState();
+  }
+
+  _sendCommunicationToLines(communication, lines) {
+    lines.receiveCommunication(communication);
   }
 
   _connectionQuery() {
@@ -82,7 +80,7 @@ class ConnectionPointState {
 }
 
 
-export default class NodePointState {
+export default class CommunicationSourceState {
 
   static getOrCreate(prevComm, opts) {
     const {transmission, pass} = prevComm;
@@ -108,6 +106,10 @@ export default class NodePointState {
     }
   }
 
+  _createConnectionPointState(...args) {
+    return new ConnectionPointState(...args);
+  }
+
   // ConnectionStates must be segregated by direction in order to prevent loops
   // See Flattening with nested connections specs
   directionMatches(direction) { return this.pass.directionMatches(direction); }
@@ -117,27 +119,6 @@ export default class NodePointState {
 
   communicationIsUnset() { return this._communication == null; }
 
-  hasResponses(messages) {
-    if (this._communication == null) return false;
-    let hasResponses = false;
-    for (const connectionState of this._connectionStates.values()) {
-      if (!connectionState.communicationIsSent()) return false;
-      for (const passedLine of connectionState.getPassedLines()) {
-        if (messages.hasForLine(passedLine)) hasResponses = true;
-        else return false;
-      }
-    }
-    return hasResponses;
-  }
-
-  wasNotDelivered() {
-    if (this._communication == null) return false;
-    for (const connectionState of this._connectionStates.values()) {
-      if (!connectionState.communicationIsSent()) return false;
-      if (connectionState.getPassedLines().length > 0) return false;
-    }
-    return true;
-  }
 
   // Triggers
 
@@ -154,7 +135,7 @@ export default class NodePointState {
 
   addConnectionLines(connection, lines) {
     if (this._connectionStates.has(connection)) return this;
-    const state = new ConnectionPointState(connection, lines);
+    const state = this._createConnectionPointState(connection, lines);
     this._connectionStates.set(connection, state);
     if (!this.communicationIsUnset()) {
       state.setCommunication(this._communication);

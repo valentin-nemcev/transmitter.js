@@ -10,7 +10,6 @@ export default class Query {
     return [
       'Q',
       inspect(this.pass),
-      this.wasDelivered() && 'D' || '',
     ].filter( (s) => s.length ).join(' ');
   }
 

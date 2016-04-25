@@ -1,6 +1,4 @@
-import NodePointState from './NodePointState';
-
-import SourceMessage from './SourceMessage';
+import CommunicationSourceState from './CommunicationSourceState';
 
 
 export default class NodeSourceState {
@@ -13,20 +11,15 @@ export default class NodeSourceState {
     this.node = node;
 
     this._message = null;
-    this._messageState = NodePointState.getOrCreate(
+    this._messageState = CommunicationSourceState.getOrCreate(
       this, {nodePoint: nodeSource}
     );
   }
 
 
-  connectionUpdated(connection) {
-    this._messageState.connectionUpdated(connection);
-    return this;
-  }
-
   messageSent() { return this._message != null; }
 
-  _sendMessage(message) {
+  sendMessage(message) {
     if (this.messageSent()) throw new Error("Can't send message twice");
 
     this._message = message;
@@ -36,28 +29,8 @@ export default class NodeSourceState {
     return this;
   }
 
-  sendResponseMessage(precedingMessage) {
-    return this._sendMessage(
-      SourceMessage.createFromPreceding(this, this.node, precedingMessage)
-    );
-  }
-
-  assertPrecedingMessage(precedingMessage, node) {
-    this._message.assertPrevious(precedingMessage, node);
+  assertPreviousMessage(previousMessage, node) {
+    this._message.assertPrevious(previousMessage, node);
     return this;
-  }
-
-  sendOrAssertSelectedMessage(selectedMessage) {
-    if (this.messageSent()) {
-      this._message.assertPrevious(selectedMessage, this.node);
-    } else {
-      this._sendMessage(
-        SourceMessage.createFromSelected(this, this.node, selectedMessage)
-      );
-    }
-  }
-
-  sendOriginMessage(payload) {
-    this._sendMessage(SourceMessage.createOrigin(this, payload));
   }
 }

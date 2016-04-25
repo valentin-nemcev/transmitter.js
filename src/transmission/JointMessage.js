@@ -1,6 +1,8 @@
 import {inspect} from 'util';
 
 
+import SourceMessage from './SourceMessage';
+
 import NodeTargetState from './NodeTargetState';
 import NodeSourceState from './NodeSourceState';
 
@@ -67,23 +69,16 @@ export default class JointMessage {
     return this._propagateState();
   }
 
-  receiveTargetConnectionMessage(connection) {
-    this._nodeTargetState
-      .enqueryOnce()
-      .connectionUpdated(connection);
+  targetConnectionsUpdated() {
+    this._nodeTargetState.enqueryOnce();
     return this._propagateState();
-  }
-
-  receiveSourceConnectionMessage(connection) {
-    this._nodeSourceState.connectionUpdated(connection);
-    return this;
   }
 
   receivePrecedingMessage(precedingMessage) {
     if (!this._precedingMessage) {
       if (this._nodeSourceState.messageSent()) {
         this._nodeSourceState
-          .assertPrecedingMessage(precedingMessage, this.node);
+          .assertPreviousMessage(precedingMessage, this.node);
       }
       this._precedingMessage = precedingMessage;
       this._nodeTargetState.enqueryOnce();
@@ -96,14 +91,18 @@ export default class JointMessage {
   }
 
   originateMessage(payload) {
-    this._nodeSourceState.sendOriginMessage(payload);
+    this._nodeSourceState.sendMessage(
+      SourceMessage.createOrigin(this, payload)
+    );
     return this._propagateState();
   }
 
   respond() {
     if (this._nodeTargetState.noMessageSelected() &&
         !this._nodeSourceState.messageSent()) {
-      this._nodeSourceState.sendResponseMessage(this._precedingMessage);
+      this._nodeSourceState.sendMessage(SourceMessage.createFromPreceding(
+        this, this.node, this._precedingMessage
+      ));
       return this._propagateState();
     } else {
       throw new Error('Invalid state');
@@ -112,9 +111,15 @@ export default class JointMessage {
 
   _propagateState() {
     if (this._nodeTargetState.messageSelected()) {
-      this._nodeSourceState.sendOrAssertSelectedMessage(
-        this._nodeTargetState.getSelectedMessage()
-      );
+      const selectedMessage = this._nodeTargetState.getSelectedMessage();
+      const source = this._nodeSourceState;
+      if (source.messageSent()) {
+        source.assertPreviousMessage(selectedMessage, this.node);
+      } else {
+        source.sendMessage(
+          SourceMessage.createFromSelected(this, this.node, selectedMessage)
+        );
+      }
     }
 
     if (this._nodeTargetState.noMessageSelected()

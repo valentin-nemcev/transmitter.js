@@ -1,24 +1,24 @@
 import {inspect} from 'util';
 
-import NodePointState from './NodePointState';
+import QuerySourceState from './QuerySourceState';
 import Query from './Query';
 
 
-class LineToMessageMap extends Map {
+class MessageTarget {
 
   constructor() {
-    super();
     this._selectedMessage = null;
+    this._map = new Map();
   }
 
-  hasSome() { return this.size > 0; }
+  hasSome() { return this._map.size > 0; }
 
-  hasForLine(line) { return this.has(line); }
+  hasForLine(line) { return this._map.has(line); }
 
   getSelectedMessage() { return this._selectedMessage; }
 
-  add(message, line) {
-    const prev = this.get(line);
+  receive(message, line) {
+    const prev = this._map.get(line);
     if (prev != null) {
       throw new Error(
           `Already received message from ${inspect(line)}. ` +
@@ -26,12 +26,11 @@ class LineToMessageMap extends Map {
           `current: ${inspect(message)}`
         );
     }
-    this.set(line, message);
+    this._map.set(line, message);
 
     this._selectedMessage = message.select(this._selectedMessage);
     return this;
   }
-
 }
 
 
@@ -41,21 +40,21 @@ export default class NodeTargetState {
     this.transmission = transmission;
     this.pass = pass;
 
-    this._queryState = NodePointState.getOrCreate(
+    this._queryState = QuerySourceState.getOrCreate(
       this, {nodePoint: nodeTarget}
     );
-    this._targetMessages = new LineToMessageMap();
+    this._messageTarget = new MessageTarget();
   }
 
 
   getSelectedMessage() {
-    return this._targetMessages.getSelectedMessage();
+    return this._messageTarget.getSelectedMessage();
   }
 
   // States
 
   messageSelected() {
-    return this._queryState.hasResponses(this._targetMessages);
+    return this._queryState.hasResponses(this._messageTarget);
   }
 
   noMessageSelected() {
@@ -65,13 +64,8 @@ export default class NodeTargetState {
   // Triggers
 
   receiveMessageFrom(message, line) {
-    this._targetMessages.add(message, line);
+    this._messageTarget.receive(message, line);
     return this.enqueryOnce();
-  }
-
-  connectionUpdated(connection) {
-    this._queryState.connectionUpdated(connection);
-    return this;
   }
 
   enqueryOnce() {

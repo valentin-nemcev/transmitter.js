@@ -25,6 +25,15 @@ class ConnectionLines {
     return false;
   }
 
+  receiveCommunication(comm) {
+    for (const line of this.set) {
+      if (line.acceptsCommunication(comm)) {
+        comm.sendToLine(line);
+      }
+    }
+    return this;
+  }
+
   *receiveCommunicationYieldingPassedLines(comm) {
     for (const line of this.set) {
       if (line.acceptsCommunication(comm)) {
@@ -85,7 +94,7 @@ export default class NodePoint {
 
     lines.add(line);
 
-    const nodePointState = connectionMessage.getNodePointState(this);
+    const nodePointState = this._getNodePointState(connectionMessage);
     if (lines.acceptsCommunication(nodePointState)) {
       connectionMessage.addTargetPoint(this);
       nodePointState.addConnectionLines(connection, lines);
@@ -97,7 +106,7 @@ export default class NodePoint {
     const connection = connectionMessage.getSourceConnection();
     const lines = this.connectionToLines.get(connection);
 
-    const nodePointState = connectionMessage.getNodePointState(this);
+    const nodePointState = this._getNodePointState(connectionMessage);
     if (lines.acceptsCommunication(nodePointState)) {
       connectionMessage.addTargetPoint(this);
     }
@@ -111,14 +120,22 @@ export default class NodePoint {
     const connection = connectionMessage.getSourceConnection();
     this.connectionToLines.deleteWhenEmpty(connection);
 
-    switch (this.type) { // eslint-disable-line default-case
-    case 'source':
-      connectionMessage.sendToJointMessageFromSource(this.node);
-      break;
-    case 'target':
-      connectionMessage.sendToJointMessageFromTarget(this.node);
-      break;
+    const nodePointState = this._getNodePointState(connectionMessage);
+    nodePointState.connectionUpdated(connection);
+
+    if (this.type === 'target') {
+      const jointMessage = connectionMessage.getJointMessage(this.node);
+      jointMessage.targetConnectionsUpdated();
     }
     return this;
+  }
+
+  _getNodePointState(connectionMessage) {
+    switch (this.type) { // eslint-disable-line default-case
+    case 'source':
+      return connectionMessage.getNodeSourceState(this);
+    case 'target':
+      return connectionMessage.getNodeTargetState(this);
+    }
   }
 }
