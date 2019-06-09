@@ -134,7 +134,7 @@ export default class CommunicationSourceState {
   }
 
   addConnectionLines(connection, lines) {
-    if (this._connectionStates.has(connection)) return this;
+    if (this._connectionStates.has(connection)) throw new Error('Invalid state');
     const state = this._createConnectionPointState(connection, lines);
     this._connectionStates.set(connection, state);
     if (!this.communicationIsUnset()) {
