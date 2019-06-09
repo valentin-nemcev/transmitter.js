@@ -7,6 +7,7 @@ backend storage, no matter how complex your application is.
 **Transmitter.js is in early development stage and is not ready for production
 yet**
 
+There is no user facing documentation or explanation yet, if you are interested in the project, please, [write me](mailto:%6d%61%69%6c@%76%61%6c%65%6e%74%69%6e-%6e%65%6d%63%65%76.%63%6f%6d)
 
 ## TODO
 
